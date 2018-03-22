@@ -1,0 +1,2 @@
+class PersistenceMechanism:
+    pass

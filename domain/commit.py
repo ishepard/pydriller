@@ -1,7 +1,7 @@
 from _datetime import datetime
-from domain.Developer import Developer
-from domain.Modification import Modification
-from domain.ModificationType import ModificationType
+from domain.developer import Developer
+from domain.modification import Modification
+from domain.modification_type import ModificationType
 
 
 class Commit:

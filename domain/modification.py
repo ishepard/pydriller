@@ -1,4 +1,4 @@
-from domain.ModificationType import ModificationType
+from domain.modification_type import ModificationType
 import re
 import os
 

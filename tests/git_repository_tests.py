@@ -20,6 +20,7 @@ class GitRepositoryTests(unittest.TestCase):
         change_sets = gr.get_change_sets()
         tozone = tz.gettz('GMT+1')
 
+
         cs1 = ChangeSet('a88c84ddf42066611e76e6cb690144e5357d132c',
                         datetime.fromtimestamp(1521711671).replace(tzinfo=tozone))
         cs2 = ChangeSet('6411e3096dd2070438a17b225f44475136e54e3a',
@@ -32,5 +33,8 @@ class GitRepositoryTests(unittest.TestCase):
         self.assertIn(cs3, change_sets)
         self.assertEqual(3, len(change_sets))
 
+    def test_get_commit(self):
+        gr = GitRepository('/Users/dspadini/Documents/Papers/ICSE18-CRtestfiles')
+        c = gr.get_commit('09f6182cef737db02a085e1d018963c7a29bde5a')
 
 

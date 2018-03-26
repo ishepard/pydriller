@@ -14,16 +14,13 @@ class Commit:
         self.msg = msg
         self.parent = parent
         self.merge = merge
-        self.modifications = [Modification]
+        self.modifications = []
         self.branches = branches
         self.in_main_branch = isCommitInMainBranch
 
     def add_modifications(self, old_path: str, new_path: str, change: ModificationType, diff: str, sc: str):
         m = Modification(old_path, new_path, change, diff, sc)
         self.modifications.append(m)
-
-    def add_modifications(self, modifications: []):
-        self.modifications.extend(modifications)
 
     def __eq__(self, other):
         if not isinstance(other, Commit):
@@ -32,3 +29,19 @@ class Commit:
             return True
         else:
             return self.__dict__ == other.__dict__
+
+    def __str__(self):
+        return ('Hash: ' + self.hash + '\n'
+                'Author: ' + self.author.name + '\n'
+                'Author email: ' + self.author.email + '\n'
+                'Committer: ' + self.committer.name + '\n'
+                'Committer email: ' + self.committer.email + '\n'
+                'Date: ' + self.date.strftime("%Y-%m-%d %H:%M:%S") + '\n'
+                'Committer date: ' + self.committer_date.strftime("%Y-%m-%d %H:%M:%S") + '\n'
+                'Message: ' + self.msg + '\n'
+                'Parent: ' + self.parent + '\n'
+                'Merge: ' + str(self.merge) + '\n'
+                'Modifications: ' + "\n".join(map(str, self.modifications)) + '\n'
+                'Branches: {}'.format(str(self.branches)) + '\n'
+                'In main branch: {}'.format(self.in_main_branch)
+                )

@@ -3,6 +3,7 @@ from scm.git_repository import GitRepository
 from domain.change_set import ChangeSet
 from datetime import datetime
 from dateutil import tz
+from pprint import pprint
 
 class GitRepositoryTests(unittest.TestCase):
     def test_get_head(self):
@@ -34,7 +35,32 @@ class GitRepositoryTests(unittest.TestCase):
         self.assertEqual(3, len(change_sets))
 
     def test_get_commit(self):
-        gr = GitRepository('/Users/dspadini/Documents/Papers/ICSE18-CRtestfiles')
+        gr = GitRepository('../test-repos/test1/')
         c = gr.get_commit('09f6182cef737db02a085e1d018963c7a29bde5a')
+        tozone = tz.gettz('GMT+1')
 
+        print(c)
+        self.assertEqual('09f6182cef737db02a085e1d018963c7a29bde5a', c.hash)
+        self.assertEqual('ishepard', c.author.name)
+        self.assertEqual('ishepard', c.committer.name)
+        self.assertEqual(datetime.fromtimestamp(1521711723).replace(tzinfo=tozone).timestamp(), c.date.timestamp())
+        self.assertEqual(1, len(c.modifications))
+        self.assertEqual('Ooops file2', c.msg)
 
+    def test_checkout(self):
+        gr = GitRepository('../test-repos/test1/')
+        gr.checkout('master')
+
+    def test_files(self):
+        gr = GitRepository('../test-repos/test2/')
+        all = gr.files()
+
+        self.assertEqual(8, len(all))
+        self.assertIn('../test-repos/test2/tmp1.py', all)
+        self.assertIn('../test-repos/test2/tmp2.py', all)
+        self.assertIn('../test-repos/test2/fold1/tmp3.py', all)
+        self.assertIn('../test-repos/test2/fold1/tmp4.py', all)
+        self.assertIn('../test-repos/test2/fold2/tmp5.py', all)
+        self.assertIn('../test-repos/test2/fold2/tmp6.py', all)
+        self.assertIn('../test-repos/test2/fold2/fold3/tmp7.py', all)
+        self.assertIn('../test-repos/test2/fold2/fold3/tmp8.py', all)

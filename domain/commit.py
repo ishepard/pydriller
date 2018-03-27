@@ -42,6 +42,6 @@ class Commit:
                 'Parent: ' + self.parent + '\n'
                 'Merge: ' + str(self.merge) + '\n'
                 'Modifications: ' + "\n".join(map(str, self.modifications)) + '\n'
-                'Branches: {}'.format(str(self.branches)) + '\n'
+                'Branches: ' "\n".join(map(str, self.branches)) + '\n'
                 'In main branch: {}'.format(self.in_main_branch)
                 )

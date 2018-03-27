@@ -13,8 +13,8 @@ class GitRepositoryTests(unittest.TestCase):
         cs = gr.get_head()
         self.assertIsNotNone(cs)
 
-        self.assertEqual(cs.id, '09f6182cef737db02a085e1d018963c7a29bde5a')
-        self.assertEqual(1521711723, cs.date.timestamp())
+        self.assertEqual(cs.id, 'da39b1326dbc2edfe518b90672734a08f3c13458')
+        self.assertEqual(1522164679, cs.date.timestamp())
 
     def test_get_change_sets(self):
         gr = GitRepository('../test-repos/test1/')
@@ -29,11 +29,15 @@ class GitRepositoryTests(unittest.TestCase):
                         datetime.fromtimestamp(1521711707).replace(tzinfo=tozone))
         cs3 = ChangeSet('09f6182cef737db02a085e1d018963c7a29bde5a',
                         datetime.fromtimestamp(1521711723).replace(tzinfo=tozone))
+        tozone = tz.gettz('GMT+2')
+        cs4 = ChangeSet('1f99848edadfffa903b8ba1286a935f1b92b2845',
+                        datetime.fromtimestamp(1522163452).replace(tzinfo=tozone))
 
         self.assertIn(cs1, change_sets)
         self.assertIn(cs2, change_sets)
         self.assertIn(cs3, change_sets)
-        self.assertEqual(3, len(change_sets))
+        self.assertIn(cs4, change_sets)
+        self.assertEqual(5, len(change_sets))
 
     def test_get_commit(self):
         gr = GitRepository('../test-repos/test1/')
@@ -51,6 +55,7 @@ class GitRepositoryTests(unittest.TestCase):
     def test_get_first_commit(self):
         gr = GitRepository('../test-repos/test1/')
         c = gr.get_commit('a88c84ddf42066611e76e6cb690144e5357d132c')
+        print(c)
         tozone = tz.gettz('GMT+1')
 
     def test_checkout(self):
@@ -74,7 +79,7 @@ class GitRepositoryTests(unittest.TestCase):
     def test_total_commits(self):
         gr = GitRepository('../test-repos/test1/')
 
-        self.assertEqual(3, gr.total_commits())
+        self.assertEqual(5, gr.total_commits())
 
     def test_get_commit_from_tag(self):
         gr = GitRepository('../test-repos/test1/')

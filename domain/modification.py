@@ -10,6 +10,8 @@ class Modification:
         self.change_type = change_type
         self.diff = diff
         self.source_code = source_code
+        self.added = 0
+        self.removed = 0
 
         for line in diff.replace('\r', '').split("\n"):
             if line.startswith('+') and not line.startswith('+++'):

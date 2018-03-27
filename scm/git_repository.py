@@ -47,11 +47,6 @@ class GitRepository:
         msg = commit.message.strip()
         commit_hash = commit.hexsha
 
-        if len(commit.parents) > 0:
-            parent = repo.commit(commit.parents[0].hexsha)
-        else:
-            parent = repo.tree('4b825dc642cb6eb9a060e54bf8d69288fbee4904').commit()
-
         author_date = commit.authored_datetime
         committer_date = commit.committed_datetime
         merge = True if len(commit.parents) > 1 else False
@@ -61,18 +56,25 @@ class GitRepository:
 
         # TODO: calculate main branch
         main_branch = False
-
-        the_commit = Commit(commit_hash, author, committer, author_date, committer_date, msg, parent, merge, branches)
-        diff_index = parent.diff(commit)
+        if len(commit.parents) > 0:
+            parent = repo.commit(commit.parents[0].hexsha)
+            the_commit = Commit(commit_hash, author, committer, author_date, committer_date, msg, parent.hexsha, merge, branches)
+            diff_index = parent.diff(commit, create_patch=True)
+        else:
+            the_commit = Commit(commit_hash, author, committer, author_date, committer_date, msg, '', merge,
+                                branches)
+            parent = repo.tree('4b825dc642cb6eb9a060e54bf8d69288fbee4904')
+            diff_index = parent.diff(commit.tree, create_patch=True)
 
         # TODO: diff is empty, to investigate why
         for d in diff_index:
             old_path = d.a_path
             new_path = d.b_path
-            diff_text = d.diff
+            diff_text = d.diff.decode('utf-8')
+            # print(d.diff.decode('utf-8'))
+            print(old_path)
+            print(new_path)
             # pprint(vars(Diff))
-            print(d.a_blob)
-            print(d.b_blob)
             change_type = self.__from_change_to_modification_type(d.change_type)
             sc = d.b_blob.data_stream.read().decode('utf-8')
 
@@ -81,7 +83,7 @@ class GitRepository:
         return the_commit
 
     def __get_branches(self, git: Git, commit_hash: str):
-        branches = list(git.branch('--contains', commit_hash).split('\n'))
+        branches = set(git.branch('--contains', commit_hash).split('\n'))
         return branches
 
     def __from_change_to_modification_type(self, type: str):

@@ -5,6 +5,7 @@ from datetime import datetime
 from dateutil import tz
 from pprint import pprint
 
+
 class GitRepositoryTests(unittest.TestCase):
     def test_get_head(self):
         gr = GitRepository('../test-repos/test1/')
@@ -47,6 +48,11 @@ class GitRepositoryTests(unittest.TestCase):
         self.assertEqual(1, len(c.modifications))
         self.assertEqual('Ooops file2', c.msg)
 
+    def test_get_first_commit(self):
+        gr = GitRepository('../test-repos/test1/')
+        c = gr.get_commit('a88c84ddf42066611e76e6cb690144e5357d132c')
+        tozone = tz.gettz('GMT+1')
+
     def test_checkout(self):
         gr = GitRepository('../test-repos/test1/')
         gr.checkout('master')
@@ -64,3 +70,17 @@ class GitRepositoryTests(unittest.TestCase):
         self.assertIn('../test-repos/test2/fold2/tmp6.py', all)
         self.assertIn('../test-repos/test2/fold2/fold3/tmp7.py', all)
         self.assertIn('../test-repos/test2/fold2/fold3/tmp8.py', all)
+
+    def test_total_commits(self):
+        gr = GitRepository('../test-repos/test1/')
+
+        self.assertEqual(3, gr.total_commits())
+
+    def test_get_commit_from_tag(self):
+        gr = GitRepository('../test-repos/test1/')
+
+        commit = gr.get_commit_from_tag('v1.4')
+
+        self.assertEqual('09f6182cef737db02a085e1d018963c7a29bde5a', commit)
+        with self.assertRaises(IndexError):
+            gr.get_commit_from_tag('v1.5')

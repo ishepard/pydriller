@@ -49,7 +49,7 @@ def test_get_commit():
     assert datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone).timestamp() == c.date.timestamp()
     assert 1 == len(c.modifications)
     assert 'Ooops file2' == c.msg
-    assert c.in_main_branch == True
+    assert c.in_main_branch is True
 
 
 def test_get_first_commit():
@@ -63,7 +63,7 @@ def test_get_first_commit():
     assert datetime(2018,3,22,10,41,11,tzinfo=to_zone).timestamp() == c.date.timestamp()
     assert 2 == len(c.modifications)
     assert 'First commit adding 2 files' == c.msg
-    assert c.in_main_branch == True
+    assert c.in_main_branch is True
 
 
 def test_checkout():
@@ -106,14 +106,14 @@ def test_branches():
     gr = GitRepository('test-repos/test3/')
 
     commit = gr.get_commit('8cdf925bde3be3a21490d75686116b88b8263e82')
-    assert commit.in_main_branch == False
+    assert commit.in_main_branch is False
 
     commit = gr.get_commit('189988aa490b0e5f14ed0ecb155e0e2901425d05')
-    assert commit.in_main_branch == True
+    assert commit.in_main_branch is True
 
     commit = gr.get_commit('17bfb3f02331a7ce770e0a6b90584cdd473c6993')
-    assert commit.in_main_branch == True
+    assert commit.in_main_branch is True
 
     commit = gr.get_commit('b5c103c7f61d05b9a35364f1923ceacc9afe7ed9')
-    assert commit.in_main_branch == True
-    assert commit.merge == True
+    assert commit.in_main_branch is True
+    assert commit.merge is True

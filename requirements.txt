@@ -1,0 +1,3 @@
+gitpython
+pytest
+python-dateutil

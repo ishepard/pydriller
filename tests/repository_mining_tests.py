@@ -79,7 +79,7 @@ class RepositoryMiningTests(unittest.TestCase):
         lc = mv.list_commits
         self.assertEqual(3, len(lc))
 
-    def test_from_tag_filter(self):
+    def test_multiple_filters_exceptions(self):
         mv = MyVisitor()
         to_zone = tz.gettz('GMT+1')
         since_dt = datetime(2018, 3, 22, 10, 41, 45, tzinfo=to_zone)

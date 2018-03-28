@@ -49,6 +49,7 @@ class GitRepositoryTests(unittest.TestCase):
         self.assertEqual(datetime(2018,3,22,10,42,3,tzinfo=to_zone).timestamp(), c.date.timestamp())
         self.assertEqual(1, len(c.modifications))
         self.assertEqual('Ooops file2', c.msg)
+        self.assertTrue(c.in_main_branch)
 
     def test_get_first_commit(self):
         gr = GitRepository('../test-repos/test1/')
@@ -61,6 +62,7 @@ class GitRepositoryTests(unittest.TestCase):
         self.assertEqual(datetime(2018,3,22,10,41,11,tzinfo=to_zone).timestamp(), c.date.timestamp())
         self.assertEqual(2, len(c.modifications))
         self.assertEqual('First commit adding 2 files', c.msg)
+        self.assertTrue(c.in_main_branch)
 
     def test_checkout(self):
         gr = GitRepository('../test-repos/test1/')
@@ -92,3 +94,19 @@ class GitRepositoryTests(unittest.TestCase):
         self.assertEqual('09f6182cef737db02a085e1d018963c7a29bde5a', commit.hash)
         with self.assertRaises(IndexError):
             gr.get_commit_from_tag('v1.5')
+
+    def test_branches(self):
+        gr = GitRepository('../test-repos/test3/')
+
+        commit = gr.get_commit('8cdf925bde3be3a21490d75686116b88b8263e82')
+        self.assertFalse(commit.in_main_branch)
+
+        commit = gr.get_commit('189988aa490b0e5f14ed0ecb155e0e2901425d05')
+        self.assertTrue(commit.in_main_branch)
+
+        commit = gr.get_commit('17bfb3f02331a7ce770e0a6b90584cdd473c6993')
+        self.assertTrue(commit.in_main_branch)
+
+        commit = gr.get_commit('b5c103c7f61d05b9a35364f1923ceacc9afe7ed9')
+        self.assertTrue(commit.in_main_branch)
+        self.assertTrue(commit.merge)

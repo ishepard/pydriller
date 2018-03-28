@@ -1,14 +1,12 @@
 from typing import List
-
 from git import Git, Repo, Diff
 from domain.change_set import ChangeSet
 from domain.commit import Commit
 from domain.developer import Developer
 import os
-from pprint import pprint
 from domain.modification_type import ModificationType
 from threading import Lock
-from datetime import datetime
+
 
 class GitRepository:
     def __init__(self, path: str, first_parent_only: str = False):
@@ -19,13 +17,17 @@ class GitRepository:
         """
         self.path = path
         self.first_parent_only = first_parent_only
+        self.main_branch = None
         self.lock = Lock()
 
     def __open_git(self) -> Git:
         return Git(self.path)
 
     def __open_repository(self) -> Repo:
-        return Repo(self.path)
+        repo = Repo(self.path)
+        if self.main_branch is None:
+            self.main_branch = repo.active_branch.name
+        return repo
 
     def get_head(self) -> ChangeSet:
         """
@@ -69,18 +71,17 @@ class GitRepository:
         committer_date = commit.committed_datetime
         merge = True if len(commit.parents) > 1 else False
 
-        # TODO: branches is not correct, there should be a better way to do it
         branches = self.__get_branches(git, commit_hash)
+        is_in_main_branch = self.main_branch in branches
 
-        # TODO: calculate main branch
-        main_branch = False
         if len(commit.parents) > 0:
             parent = repo.commit(commit.parents[0].hexsha)
-            the_commit = Commit(commit_hash, author, committer, author_date, committer_date, msg, parent.hexsha, merge, branches)
+            the_commit = Commit(commit_hash, author, committer, author_date, committer_date, msg,
+                                parent.hexsha, merge, branches,is_in_main_branch)
             diff_index = parent.diff(commit, create_patch=True)
         else:
-            the_commit = Commit(commit_hash, author, committer, author_date, committer_date, msg, '', merge,
-                                branches)
+            the_commit = Commit(commit_hash, author, committer, author_date, committer_date, msg,
+                                '', merge, branches, is_in_main_branch)
             parent = repo.tree('4b825dc642cb6eb9a060e54bf8d69288fbee4904')
             diff_index = parent.diff(commit.tree, create_patch=True)
 
@@ -95,15 +96,12 @@ class GitRepository:
             diff_text = d.diff.decode('utf-8')
             change_type = self.__from_change_to_modification_type(d)
             sc = d.b_blob.data_stream.read().decode('utf-8')
-            # print("Sc is {}".format(sc))
-            # print("Diff is {}".format(diff_text))
-            # print("Change type is {}".format(change_type))
-            # print("Old path {}".format(old_path))
-            # print("New path {}".format(new_path))
             the_commit.add_modifications(old_path, new_path, change_type, diff_text, sc)
 
     def __get_branches(self, git: Git, commit_hash: str):
-        branches = set(git.branch('--contains', commit_hash).split('\n'))
+        branches = set()
+        for branch in set(git.branch('--contains', commit_hash).split('\n')):
+            branches.add(branch.strip().replace('* ', ''))
         return branches
 
     def __from_change_to_modification_type(self, d: Diff):

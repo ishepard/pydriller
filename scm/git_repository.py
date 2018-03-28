@@ -1,4 +1,6 @@
-from git import Git, Repo, Blob, Diff
+from typing import List
+
+from git import Git, Repo, Diff
 from domain.change_set import ChangeSet
 from domain.commit import Commit
 from domain.developer import Developer
@@ -10,23 +12,35 @@ from threading import Lock
 
 class GitRepository:
     def __init__(self, path: str, first_parent_only: str = False):
+        """
+        Init the Git Repository
+        :param path: path to the repository
+        :param first_parent_only: True if it has to analyze only the non merge commits
+        """
         self.path = path
         self.first_parent_only = first_parent_only
         self.lock = Lock()
 
-    def __open_repository(self):
+    def __open_git(self) -> Git:
         return Git(self.path)
 
-    def get_head(self):
-        repo = Repo(self.path)
+    def __open_repository(self) -> Repo:
+        return Repo(self.path)
+
+    def get_head(self) -> ChangeSet:
+        """
+        Get the head commit.
+        :return: ChangeSet of the head commit
+        """
+        repo = self.__open_repository()
         head_commit = repo.head.commit
         return ChangeSet(head_commit.hexsha, head_commit.committed_datetime)
 
-    def get_change_sets(self):
+    def get_change_sets(self) -> List[ChangeSet]:
         return self.__get_all_commits()
 
-    def __get_all_commits(self):
-        repo = Repo(self.path)
+    def __get_all_commits(self) -> List[ChangeSet]:
+        repo = self.__open_repository()
         commit_list = list(repo.iter_commits())
 
         change_sets = []
@@ -35,8 +49,13 @@ class GitRepository:
         return change_sets
 
     def get_commit(self, commit_id: str) -> Commit:
-        git = self.__open_repository()
-        repo = Repo(self.path)
+        """
+        Get the commit.
+        :param commit_id: hash of the commit to analyze
+        :return: Commit
+        """
+        git = self.__open_git()
+        repo = self.__open_repository()
         commit = repo.commit(commit_id)
 
         author = Developer(commit.author.name, commit.author.email)
@@ -65,7 +84,11 @@ class GitRepository:
             parent = repo.tree('4b825dc642cb6eb9a060e54bf8d69288fbee4904')
             diff_index = parent.diff(commit.tree, create_patch=True)
 
-        # TODO: diff is empty, to investigate why
+        self.__parse_diff(diff_index, the_commit)
+
+        return the_commit
+
+    def __parse_diff(self, diff_index, the_commit):
         for d in diff_index:
             old_path = d.a_path
             new_path = d.b_path
@@ -78,8 +101,6 @@ class GitRepository:
             # print("Old path {}".format(old_path))
             # print("New path {}".format(new_path))
             the_commit.add_modifications(old_path, new_path, change_type, diff_text, sc)
-
-        return the_commit
 
     def __get_branches(self, git: Git, commit_hash: str):
         branches = set(git.branch('--contains', commit_hash).split('\n'))
@@ -97,7 +118,7 @@ class GitRepository:
 
     def checkout(self, hash: str):
         with self.lock:
-            git = self.__open_repository()
+            git = self.__open_git()
             git.checkout(hash)
 
     def files(self):
@@ -109,14 +130,14 @@ class GitRepository:
 
     def reset(self):
         with self.lock:
-            git = self.__open_repository()
+            git = self.__open_git()
             git.reset()
 
     def total_commits(self) -> int:
         return len(self.get_change_sets())
 
     def get_commit_from_tag(self, tag: str) -> str:
-        repo = Repo(self.path)
+        repo = self.__open_repository()
         try:
             selected_tag = repo.tags[tag]
             return selected_tag.commit.hexsha

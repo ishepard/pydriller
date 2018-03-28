@@ -1,8 +1,5 @@
 from typing import List
-
-from scm.commit_visitor import CommitVisitor
 from scm.git_repository import GitRepository
-from domain.commit import Commit
 from domain.change_set import ChangeSet
 from scm.commit_visitor import CommitVisitor
 from datetime import datetime
@@ -14,8 +11,15 @@ class RepositoryMining:
                  to_tag: str = None):
         """
         Init a repository mining.
-        :param path_to_repo: absolute path to the repository you have to mine
-        :param visitor: CommitVisitor that will visit all the specified commits
+        :param str path_to_repo: absolute path to the repository you have to mine
+        :param CommitVisitor visitor: CommitVisitor that will visit all the specified commits
+        :param str single: hash of a single commit to analyze
+        :param datetime since: starting date
+        :param datetime to: ending date
+        :param str from_commit: starting commit (only if `since` is None)
+        :param str to_commit: ending commit (only if `to` is None)
+        :param str from_tag: starting the analysis from specified tag (only if `since` and `from_commit` are None)
+        :param str to_tag: ending the analysis from specified tag (only if `to` and `to_commit` are None)
         """
         self.git_repo = GitRepository(path_to_repo)
         self.visitor = visitor

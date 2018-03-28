@@ -89,6 +89,6 @@ class GitRepositoryTests(unittest.TestCase):
 
         commit = gr.get_commit_from_tag('v1.4')
 
-        self.assertEqual('09f6182cef737db02a085e1d018963c7a29bde5a', commit)
+        self.assertEqual('09f6182cef737db02a085e1d018963c7a29bde5a', commit.hash)
         with self.assertRaises(IndexError):
             gr.get_commit_from_tag('v1.5')

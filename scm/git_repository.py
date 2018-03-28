@@ -8,7 +8,7 @@ import os
 from pprint import pprint
 from domain.modification_type import ModificationType
 from threading import Lock
-
+from datetime import datetime
 
 class GitRepository:
     def __init__(self, path: str, first_parent_only: str = False):
@@ -136,13 +136,12 @@ class GitRepository:
     def total_commits(self) -> int:
         return len(self.get_change_sets())
 
-    def get_commit_from_tag(self, tag: str) -> str:
+    def get_commit_from_tag(self, tag: str) -> Commit:
         repo = self.__open_repository()
         try:
             selected_tag = repo.tags[tag]
-            return selected_tag.commit.hexsha
+            return self.get_commit(selected_tag.commit.hexsha)
         except (IndexError, AttributeError):
             print('Tag {} not found'.format(tag))
             raise
-
 

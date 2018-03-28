@@ -5,6 +5,16 @@ import os
 
 class Modification:
     def __init__(self, old_path: str, new_path: str, change_type: ModificationType, diff: str, source_code: str):
+        """
+        Initialize a modification. A modification carries on information regarding
+        the changed file.
+        :param old_path: old path of the file (can be null if the file is added)
+        :param new_path: new path of the file (can be null if the file is deleted)
+        :param change_type: type of the change
+        :param diff: diff of the change
+        :param source_code: source code of the file (can be null if the file is deleted)
+        """
+
         self.old_path = old_path
         self.new_path = new_path
         self.change_type = change_type
@@ -19,17 +29,14 @@ class Modification:
             if line.startswith('-') and not line.startswith('---'):
                 self.removed += 1
 
-    def was_deleted(self):
-        return type == ModificationType.DELETE
-
-    def filename_ends_with(self, suffix: str):
+    def filename_ends_with(self, suffix: str) -> bool:
         return self.new_path.lower().endswith(suffix.lower())
 
-    def filename_matches(self, regex: str):
+    def filename_matches(self, regex: str) -> bool:
         pattern = re.compile(regex)
         return pattern.match(self.new_path.lower())
 
-    def get_filename(self):
+    def get_filename(self) -> str:
         if self.new_path is not None and self.new_path != "/dev/null":
             path = self.new_path
         else:
@@ -51,9 +58,9 @@ class Modification:
 
     def __str__(self):
         return (
-            'Old Path: ' + self.old_path + '\n'
-            'New Path: ' + self.new_path + '\n'
-            'Type: ' + self.change_type.name + '\n'
-            'Diff: ' + self.diff + '\n'
-            'Source code: ' + self.source_code
+            'Old Path: {}\n'.format(self.old_path) +
+            'New Path: {}\n'.format(self.new_path) +
+            'Type: {}\n'.format(self.change_type.name) +
+            'Diff: {}\n'.format(self.diff) +
+            'Source code: {}\n'.format(self.source_code)
         )

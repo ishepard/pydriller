@@ -1,4 +1,3 @@
-import sys
 from git import Git, Repo, Blob, Diff
 from domain.change_set import ChangeSet
 from domain.commit import Commit
@@ -7,7 +6,7 @@ import os
 from pprint import pprint
 from domain.modification_type import ModificationType
 from threading import Lock
-from utils.file_utils import FileUtils
+
 
 class GitRepository:
     def __init__(self, path: str, first_parent_only: str = False):
@@ -71,13 +70,13 @@ class GitRepository:
             old_path = d.a_path
             new_path = d.b_path
             diff_text = d.diff.decode('utf-8')
-            # print(d.diff.decode('utf-8'))
-            print(old_path)
-            print(new_path)
-            # pprint(vars(Diff))
-            change_type = self.__from_change_to_modification_type(d.change_type)
+            change_type = self.__from_change_to_modification_type(d)
             sc = d.b_blob.data_stream.read().decode('utf-8')
-
+            # print("Sc is {}".format(sc))
+            # print("Diff is {}".format(diff_text))
+            # print("Change type is {}".format(change_type))
+            # print("Old path {}".format(old_path))
+            # print("New path {}".format(new_path))
             the_commit.add_modifications(old_path, new_path, change_type, diff_text, sc)
 
         return the_commit
@@ -86,15 +85,15 @@ class GitRepository:
         branches = set(git.branch('--contains', commit_hash).split('\n'))
         return branches
 
-    def __from_change_to_modification_type(self, type: str):
-        if type == 'M':
-            return ModificationType.MODIFY
-        elif type == 'A':
+    def __from_change_to_modification_type(self, d: Diff):
+        if d.new_file:
             return ModificationType.ADD
-        elif type == 'D':
+        elif d.deleted_file:
             return ModificationType.DELETE
-        elif type == 'R':
+        elif d.renamed_file:
             return ModificationType.RENAME
+        elif d.a_blob and d.b_blob and d.a_blob != d.b_blob:
+            return ModificationType.MODIFY
 
     def checkout(self, hash: str):
         with self.lock:

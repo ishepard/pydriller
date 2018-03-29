@@ -22,6 +22,7 @@ class Modification:
         self.source_code = source_code
         self.added = 0
         self.removed = 0
+        self.filename = self.__get_filename()
 
         for line in diff.replace('\r', '').split("\n"):
             if line.startswith('+') and not line.startswith('+++'):
@@ -36,7 +37,7 @@ class Modification:
         pattern = re.compile(regex)
         return pattern.match(self.new_path.lower())
 
-    def get_filename(self) -> str:
+    def __get_filename(self) -> str:
         if self.new_path is not None and self.new_path != "/dev/null":
             path = self.new_path
         else:

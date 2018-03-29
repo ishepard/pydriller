@@ -9,87 +9,88 @@ from datetime import datetime
 from dateutil import tz
 
 
-def test_no_filters():
+to_zone = tz.gettz('GMT+1')
+dt = datetime(2018, 3, 22, 10, 41, 30, tzinfo=to_zone)
+dt1 = datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone)
+dt2 = datetime(2018, 3, 22, 10, 41, 45, tzinfo=to_zone)
+to_zone = tz.gettz('GMT+2')
+dt3 = datetime(2018, 3, 27, 17, 20, 3, tzinfo=to_zone)
+
+
+@pytest.fixture(scope="function")
+def lc_since_to(request):
+    since, to = request.param
     mv = MyVisitor()
-    rp = RepositoryMining('test-repos/test1/', mv)
-    rp.mine()
-    lc = mv.list_commits
-    assert 5 == len(lc)
+    RepositoryMining('test-repos/test1/', mv, since=since, to=to).mine()
+    yield mv.list_commits
+    print("teardown")
 
 
-def test_since_filter():
+@pytest.fixture(scope="function")
+def lc_from_to_commit(request):
+    from_commit, to_commit = request.param
     mv = MyVisitor()
-    to_zone = tz.gettz('GMT+1')
-    dt = datetime(2018, 3, 22, 10, 41, 30, tzinfo=to_zone)
-    rp = RepositoryMining('test-repos/test1/', mv, since=dt)
-    rp.mine()
-    lc = mv.list_commits
-    assert 4 == len(lc)
+    RepositoryMining('test-repos/test1/', mv, from_commit=from_commit, to_commit=to_commit).mine()
+    yield mv.list_commits
+    print("teardown")
 
 
-def test_to_filter():
+@pytest.fixture(scope="function")
+def lc_from_to_tag(request):
+    from_tag, to_tag= request.param
     mv = MyVisitor()
-    to_zone = tz.gettz('GMT+1')
-    dt = datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone)
-    rp = RepositoryMining('test-repos/test1/', mv, to=dt)
-    rp.mine()
-    lc = mv.list_commits
-    assert 3 == len(lc)
+    RepositoryMining('test-repos/test1/', mv, from_tag=from_tag, to_tag=to_tag).mine()
+    yield mv.list_commits
+    print("teardown")
 
 
-def test_since_and_to_filters():
-    mv = MyVisitor()
-    to_zone = tz.gettz('GMT+1')
-    since_dt = datetime(2018, 3, 22, 10, 41, 45, tzinfo=to_zone)
-    to_zone = tz.gettz('GMT+2')
-    to_dt = datetime(2018, 3, 27, 17, 20, 3, tzinfo=to_zone)
-    rp = RepositoryMining('test-repos/test1/', mv, since=since_dt, to=to_dt)
-    rp.mine()
-    lc = mv.list_commits
-    assert 3 == len(lc)
+@pytest.mark.parametrize('lc_since_to', [(None, None)], indirect=True)
+def test_no_filters(lc_since_to):
+    assert 5 == len(lc_since_to)
 
 
-def test_from_commit_filter():
-    mv = MyVisitor()
-    from_commit = '6411e3096dd2070438a17b225f44475136e54e3a'
-    rp = RepositoryMining('test-repos/test1/', mv, from_commit=from_commit)
-    rp.mine()
-    lc = mv.list_commits
-    assert 4 == len(lc)
+@pytest.mark.parametrize('lc_since_to', [(dt, None)], indirect=True)
+def test_since_filter(lc_since_to):
+    assert 4 == len(lc_since_to)
 
 
-def test_to_commit_filter():
-    mv = MyVisitor()
-    to_commit = '09f6182cef737db02a085e1d018963c7a29bde5a'
-    rp = RepositoryMining('test-repos/test1/', mv, from_commit=to_commit)
-    rp.mine()
-    lc = mv.list_commits
-    assert 3 == len(lc)
+@pytest.mark.parametrize('lc_since_to', [(None, dt1)], indirect=True)
+def test_to_filter(lc_since_to):
+    assert 3 == len(lc_since_to)
 
 
-def test_from_and_to_commit_filters():
-    mv = MyVisitor()
-    from_commit = '6411e3096dd2070438a17b225f44475136e54e3a'
-    to_commit = '09f6182cef737db02a085e1d018963c7a29bde5a'
-    rp = RepositoryMining('test-repos/test1/', mv, from_commit=from_commit, to_commit=to_commit)
-    rp.mine()
-    lc = mv.list_commits
-    assert 2 == len(lc)
+@pytest.mark.parametrize('lc_since_to', [(dt2, dt3)], indirect=True)
+def test_since_and_to_filters(lc_since_to):
+    assert 3 == len(lc_since_to)
 
 
-def test_from_tag_filter():
-    mv = MyVisitor()
-    from_tag = 'v1.4'
-    rp = RepositoryMining('test-repos/test1/', mv, from_tag=from_tag)
-    rp.mine()
-    lc = mv.list_commits
-    assert 3 == len(lc)
+@pytest.mark.parametrize('lc_from_to_commit', [('6411e3096dd2070438a17b225f44475136e54e3a', None)], indirect=True)
+def test_from_commit_filter(lc_from_to_commit):
+    assert 4 == len(lc_from_to_commit)
+
+
+@pytest.mark.parametrize('lc_from_to_commit', [(None, '09f6182cef737db02a085e1d018963c7a29bde5a')], indirect=True)
+def test_to_commit_filter(lc_from_to_commit):
+    assert 3 == len(lc_from_to_commit)
+
+
+@pytest.mark.parametrize('lc_from_to_commit', [('6411e3096dd2070438a17b225f44475136e54e3a', '09f6182cef737db02a085e1d018963c7a29bde5a')], indirect=True)
+def test_from_and_to_commit_filters(lc_from_to_commit):
+    assert 2 == len(lc_from_to_commit)
+
+
+@pytest.mark.parametrize('lc_from_to_tag', [('v1.4', None)], indirect=True)
+def test_from_tag_filter(lc_from_to_tag):
+    assert 3 == len(lc_from_to_tag)
+
+
+@pytest.mark.parametrize('lc_from_to_tag', [(None, 'v1.4')], indirect=True)
+def test_from_tag_filter(lc_from_to_tag):
+    assert 3 == len(lc_from_to_tag)
 
 
 def test_multiple_filters_exceptions():
     mv = MyVisitor()
-    to_zone = tz.gettz('GMT+1')
-    since_dt = datetime(2018, 3, 22, 10, 41, 45, tzinfo=to_zone)
     from_commit = '6411e3096dd2070438a17b225f44475136e54e3a'
     from_tag = 'v1.4'
 
@@ -97,13 +98,13 @@ def test_multiple_filters_exceptions():
         RepositoryMining('test-repos/test1/', mv, from_commit=from_commit, from_tag=from_tag)
 
     with pytest.raises(Exception):
-        RepositoryMining('test-repos/test1/', mv, since=since_dt, from_commit=from_commit)
+        RepositoryMining('test-repos/test1/', mv, since=dt2, from_commit=from_commit)
 
     with pytest.raises(Exception):
-        RepositoryMining('test-repos/test1/', mv, since=since_dt, from_tag=from_tag)
+        RepositoryMining('test-repos/test1/', mv, since=dt2, from_tag=from_tag)
 
     with pytest.raises(Exception):
-        RepositoryMining('test-repos/test1/', mv, to=since_dt, to_tag=from_tag)
+        RepositoryMining('test-repos/test1/', mv, to=dt2, to_tag=from_tag)
 
 
 class MyVisitor(CommitVisitor):

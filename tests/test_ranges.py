@@ -17,7 +17,7 @@ to_zone = tz.gettz('GMT+2')
 dt3 = datetime(2018, 3, 27, 17, 20, 3, tzinfo=to_zone)
 
 
-@pytest.fixture(scope="function")
+@pytest.yield_fixture(scope="function")
 def lc_since_to(request):
     since, to = request.param
     mv = VisitorTest()
@@ -26,7 +26,7 @@ def lc_since_to(request):
     print("teardown")
 
 
-@pytest.fixture(scope="function")
+@pytest.yield_fixture(scope="function")
 def lc_from_to_commit(request):
     from_commit, to_commit = request.param
     mv = VisitorTest()
@@ -35,7 +35,7 @@ def lc_from_to_commit(request):
     print("teardown")
 
 
-@pytest.fixture(scope="function")
+@pytest.yield_fixture(scope="function")
 def lc_from_to_tag(request):
     from_tag, to_tag= request.param
     mv = VisitorTest()
@@ -105,3 +105,6 @@ def test_multiple_filters_exceptions():
 
     with pytest.raises(Exception):
         RepositoryMining('test-repos/test1/', mv, to=dt2, to_tag=from_tag)
+
+    with pytest.raises(Exception):
+        RepositoryMining('test-repos/test1/', mv, single=from_commit, to=dt2, to_tag=from_tag)

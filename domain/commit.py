@@ -1,6 +1,6 @@
 from _datetime import datetime
 from typing import List
-
+from dateutil import tz
 from domain.developer import Developer
 from domain.modification import Modification
 from domain.modification_type import ModificationType
@@ -8,8 +8,9 @@ from domain.modification_type import ModificationType
 
 class Commit:
     def __init__(self, hash: str, author: Developer, committer: Developer,
-                 author_date: datetime, committer_date: datetime, msg: str,
-                 parent: str, merge: bool = False, branches: set = set(),
+                 author_date: datetime, committer_date: datetime,
+                 author_timezone: tz, committer_timezone: tz,
+                 msg: str, parent: str, merge: bool = False, branches: set = set(),
                  is_commit_in_main_branch: bool = False) -> None:
         """
         Create a commit object.
@@ -27,8 +28,10 @@ class Commit:
         self.hash = hash
         self.author = author
         self.committer = committer
-        self.date = author_date
+        self.author_date = author_date
         self.committer_date = committer_date
+        self.author_timezone = author_timezone
+        self.committer_timezone = committer_timezone
         self.msg = msg
         self.parent = parent
         self.merge = merge
@@ -62,7 +65,7 @@ class Commit:
                 'Author email: {}'.format(self.author.email) + '\n'
                 'Committer: {}'.format(self.committer.name) + '\n'
                 'Committer email: {}'.format(self.committer.email) + '\n'
-                'Date: {}'.format(self.date.strftime("%Y-%m-%d %H:%M:%S")) + '\n'
+                'Author date: {}'.format(self.author_date.strftime("%Y-%m-%d %H:%M:%S")) + '\n'
                 'Committer date: {}'.format(self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) + '\n'
                 'Message: {}'.format(self.msg) + '\n'
                 'Parent: {}'.format(self.parent) + '\n'

@@ -1,5 +1,5 @@
 from typing import List
-from git import Git, Repo, Diff
+from git import Git, Repo, Diff, GitCommandError
 from domain.change_set import ChangeSet
 from domain.commit import Commit
 from domain.developer import Developer
@@ -21,13 +21,20 @@ class GitRepository:
         self.lock = Lock()
 
     def __open_git(self) -> Git:
+        self.__open_repository()
         return Git(self.path)
 
     def __open_repository(self) -> Repo:
         repo = Repo(self.path)
         if self.main_branch is None:
-            self.main_branch = repo.active_branch.name
+            self.__discover_main_branch(repo)
         return repo
+
+    def __discover_main_branch(self, repo):
+        if repo.head.is_detached:
+            print("REFERENCE " + repo.head.name)
+            # self.main_branch = repo.head.
+        self.main_branch = repo.active_branch.name
 
     def get_head(self) -> ChangeSet:
         """
@@ -76,11 +83,13 @@ class GitRepository:
 
         if len(commit.parents) > 0:
             parent = repo.commit(commit.parents[0].hexsha)
-            the_commit = Commit(commit_hash, author, committer, author_date, committer_date, msg,
+            the_commit = Commit(commit_hash, author, committer, author_date, committer_date, author_timezone,
+                                committer_timezone, msg,
                                 parent.hexsha, merge, branches,is_in_main_branch)
             diff_index = parent.diff(commit, create_patch=True)
         else:
-            the_commit = Commit(commit_hash, author, committer, author_date, committer_date, msg,
+            the_commit = Commit(commit_hash, author, committer, author_date, committer_date, author_timezone,
+                                committer_timezone, msg,
                                 '', merge, branches, is_in_main_branch)
             parent = repo.tree('4b825dc642cb6eb9a060e54bf8d69288fbee4904')
             diff_index = parent.diff(commit.tree, create_patch=True)
@@ -120,11 +129,21 @@ class GitRepository:
     def checkout(self, hash: str):
         with self.lock:
             git = self.__open_git()
-            git.checkout(hash)
+            self.__delete_tmp_branch()
+            git.checkout('-f', hash, b='_PD')
+
+    def __delete_tmp_branch(self):
+        repo = self.__open_repository()
+        try:
+            repo.delete_head('_PD')
+        except GitCommandError:
+            print("Branch _PD not found")
 
     def files(self):
         all = []
         for path, subdirs, files in os.walk(self.path):
+            if '.git' in path:
+                continue
             for name in files:
                 all.append(os.path.join(path, name))
         return all
@@ -132,7 +151,8 @@ class GitRepository:
     def reset(self):
         with self.lock:
             git = self.__open_git()
-            git.reset()
+            git.checkout('-f', self.main_branch)
+            self.__delete_tmp_branch()
 
     def total_commits(self) -> int:
         return len(self.get_change_sets())

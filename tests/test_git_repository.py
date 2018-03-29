@@ -46,7 +46,7 @@ def test_get_commit():
     assert '09f6182cef737db02a085e1d018963c7a29bde5a' == c.hash
     assert 'ishepard' == c.author.name
     assert 'ishepard' == c.committer.name
-    assert datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone).timestamp() == c.date.timestamp()
+    assert datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone).timestamp() == c.author_date.timestamp()
     assert 1 == len(c.modifications)
     assert 'Ooops file2' == c.msg
     assert c.in_main_branch is True
@@ -60,16 +60,10 @@ def test_get_first_commit():
     assert 'a88c84ddf42066611e76e6cb690144e5357d132c' == c.hash
     assert 'ishepard' == c.author.name
     assert 'ishepard' == c.committer.name
-    assert datetime(2018,3,22,10,41,11,tzinfo=to_zone).timestamp() == c.date.timestamp()
+    assert datetime(2018,3,22,10,41,11,tzinfo=to_zone).timestamp() == c.author_date.timestamp()
     assert 2 == len(c.modifications)
     assert 'First commit adding 2 files' == c.msg
     assert c.in_main_branch is True
-
-
-def test_checkout():
-    # TODO: fix checkout
-    gr = GitRepository('test-repos/test1/')
-    gr.checkout('master')
 
 
 def test_files():
@@ -102,7 +96,47 @@ def test_get_commit_from_tag():
         gr.get_commit_from_tag('v1.5')
 
 
-def test_branches():
+def test_list_files_in_commit():
+    gr = GitRepository('test-repos/git-1/')
+    gr.checkout('a7053a4dcd627f5f4f213dc9aa002eb1caf926f8')
+    files1 = gr.files()
+    assert 3 == len(files1)
+    gr.reset()
+
+    gr.checkout('f0dd1308bd904a9b108a6a40865166ee962af3d4')
+    files2 = gr.files()
+    assert 2 == len(files2)
+    gr.reset()
+
+    gr.checkout('9e71dd5726d775fb4a5f08506a539216e878adbb')
+    files3 = gr.files()
+    assert 3 == len(files3)
+    gr.reset()
+
+
+def test_get_all_commits():
+    gr = GitRepository('test-repos/git-1/')
+    change_sets = gr.get_change_sets()
+
+    assert 13 == len(change_sets)
+    assert 'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2' == change_sets[0].id
+    assert '866e997a9e44cb4ddd9e00efe49361420aff2559' == change_sets[12].id
+
+
+def test_branches_from_commit():
+    gr = GitRepository('test-repos/git-1/')
+    commit = gr.get_commit('a997e9d400f742003dea601bb05a9315d14d1124')
+
+    assert 1 == len(commit.branches)
+    assert 'b2' in commit.branches
+
+    commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
+    assert 2 == len(commit.branches)
+    assert 'master' in commit.branches
+    assert 'b2' in commit.branches
+
+
+def test_other_branches_with_merge():
     gr = GitRepository('test-repos/test3/')
 
     commit = gr.get_commit('8cdf925bde3be3a21490d75686116b88b8263e82')
@@ -117,3 +151,46 @@ def test_branches():
     commit = gr.get_commit('b5c103c7f61d05b9a35364f1923ceacc9afe7ed9')
     assert commit.in_main_branch is True
     assert commit.merge is True
+
+
+def test_commit_in_master_branch():
+    gr = GitRepository('test-repos/git-2/')
+    assert '29e929fbc5dc6a2e9c620069b24e2a143af4285f' == gr.get_head().id
+
+    gr.checkout('8986af2a679759e5a15794f6d56e6d46c3f302f1')
+
+    git_to_change_head = GitRepository('test-repos/git-2/')
+    commit = git_to_change_head.get_commit('8169f76a3d7add54b4fc7bca7160d1f1eede6eda')
+    assert False == commit.in_main_branch
+
+    commit = git_to_change_head.get_commit('168b3aab057ed61a769acf336a4ef5e64f76c9fd')
+    assert True == commit.in_main_branch
+
+    gr.reset()
+    assert '29e929fbc5dc6a2e9c620069b24e2a143af4285f' == gr.get_head().id
+
+
+def test_should_detail_a_commit():
+    gr = GitRepository('test-repos/git-1/')
+    commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
+
+    assert "Maurício Aniche" == commit.author.name
+    assert "mauricioaniche@gmail.com" == commit.author.email
+
+    assert "Matricula adicionada" == commit.msg
+    assert 1 == len(commit.modifications)
+
+    assert "Matricula.java" == commit.modifications[0].new_path
+    assert True == commit.modifications[0].diff.startswith("@@ -0,0 +1,62 @@\n+package model;")
+    assert True == commit.modifications[0].source_code.startswith("package model;")
+
+def test_merge_commits():
+    gr = GitRepository('test-repos/git-2/')
+    commit = gr.get_commit("168b3aab057ed61a769acf336a4ef5e64f76c9fd")
+    assert False == commit.merge
+
+    commit = gr.get_commit("8169f76a3d7add54b4fc7bca7160d1f1eede6eda")
+    assert False == commit.merge
+
+    commit = gr.get_commit("29e929fbc5dc6a2e9c620069b24e2a143af4285f")
+    assert True == commit.merge

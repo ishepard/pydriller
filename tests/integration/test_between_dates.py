@@ -7,7 +7,7 @@ from repository_mining import RepositoryMining
 from tests.visitor_test import VisitorTest
 
 
-@pytest.fixture(scope="function")
+@pytest.yield_fixture(scope="function")
 def lc(request):
     reversed = request.param
     to_zone = tz.gettz('GMT-4')

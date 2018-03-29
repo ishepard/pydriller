@@ -28,25 +28,33 @@ class RepositoryMining:
         self.to = to
         self.reversed_order = reversed_order
 
+        self.__check_filters(from_commit, from_tag, since, single, to, to_commit, to_tag)
+
+    def __check_filters(self, from_commit, from_tag, since, single, to, to_commit, to_tag):
+        if single is not None:
+            if since is not None or to is not None or from_commit is not None or \
+                   to_commit is not None or from_tag is not None or to_tag is not None:
+                raise Exception('You can not specify a single commit with other filters')
+
         if from_commit is not None:
             if since is not None:
                 raise Exception('You can not specify both <since date> and <from commit>')
-            self.since = self.git_repo.get_commit(from_commit).date
+            self.since = self.git_repo.get_commit(from_commit).author_date
 
         if to_commit is not None:
             if to is not None:
                 raise Exception('You can not specify both <to date> and <to commit>')
-            self.to = self.git_repo.get_commit(to_commit).date
+            self.to = self.git_repo.get_commit(to_commit).author_date
 
         if from_tag is not None:
             if since is not None or from_commit is not None:
                 raise Exception('You can not specify <since date> or <from commit> when using <from tag>')
-            self.since = self.git_repo.get_commit_from_tag(from_tag).date
+            self.since = self.git_repo.get_commit_from_tag(from_tag).author_date
 
         if to_tag is not None:
             if to is not None or to_commit is not None:
                 raise Exception('You can not specify <to date> or <to commit> when using <to tag>')
-            self.to = self.git_repo.get_commit_from_tag(to_tag).date
+            self.to = self.git_repo.get_commit_from_tag(to_tag).author_date
 
     def mine(self):
         """
@@ -67,7 +75,7 @@ class RepositoryMining:
     def __process_cs(self, cs: ChangeSet):
         commit = self.git_repo.get_commit(cs.id)
         print('Commit #{} in {} from {} with {} modifications'
-              .format(commit.hash, commit.date, commit.author.name, len(commit.modifications)))
+              .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
 
         self.visitor.process(self.git_repo, commit, None)
 
@@ -87,5 +95,5 @@ class RepositoryMining:
         return res
 
     def __all_filters_are_none(self):
-        return self.since is None and self.to is None
+        return self.single is None and self.since is None and self.to is None
 

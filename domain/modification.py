@@ -58,6 +58,7 @@ class Modification:
 
     def __str__(self):
         return (
+            'MODIFICATION\n' +
             'Old Path: {}\n'.format(self.old_path) +
             'New Path: {}\n'.format(self.new_path) +
             'Type: {}\n'.format(self.change_type.name) +

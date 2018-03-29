@@ -108,7 +108,7 @@ class GitRepository:
             change_type = self.__from_change_to_modification_type(d)
             try:
                 sc = d.b_blob.data_stream.read().decode('utf-8')
-            except UnicodeDecodeError and AttributeError:
+            except (UnicodeDecodeError, AttributeError):
                 sc = ''
             the_commit.add_modifications(old_path, new_path, change_type, diff_text, sc)
 

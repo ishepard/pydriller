@@ -10,7 +10,7 @@ class Commit:
     def __init__(self, hash: str, author: Developer, committer: Developer,
                  author_date: datetime, committer_date: datetime,
                  author_timezone: tz, committer_timezone: tz,
-                 msg: str, parent: str, merge: bool = False, branches: set = set(),
+                 msg: str, parents: List[str], merge: bool = False, branches: set = set(),
                  is_commit_in_main_branch: bool = False) -> None:
         """
         Create a commit object.
@@ -33,7 +33,7 @@ class Commit:
         self.author_timezone = author_timezone
         self.committer_timezone = committer_timezone
         self.msg = msg
-        self.parent = parent
+        self.parents = parents
         self.merge = merge
         self.modifications: List[Modification] = []
         self.branches = branches
@@ -68,7 +68,7 @@ class Commit:
                 'Author date: {}'.format(self.author_date.strftime("%Y-%m-%d %H:%M:%S")) + '\n'
                 'Committer date: {}'.format(self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) + '\n'
                 'Message: {}'.format(self.msg) + '\n'
-                'Parent: {}'.format(self.parent) + '\n'
+                'Parent: {}'.format("\n".join(map(str, self.parents))) + '\n'
                 'Merge: {}'.format(self.merge) + '\n'
                 'Modifications: \n{}'.format("\n".join(map(str, self.modifications))) + '\n'
                 'Branches: \n{}'.format("\n".join(map(str, self.branches))) + '\n'

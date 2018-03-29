@@ -78,19 +78,21 @@ class GitRepository:
         committer_date = commit.committed_datetime
         merge = True if len(commit.parents) > 1 else False
 
+        parents = []
+        for p in commit.parents:
+            parents.append(p.hexsha)
+
         branches = self.__get_branches(git, commit_hash)
         is_in_main_branch = self.main_branch in branches
 
-        if len(commit.parents) > 0:
-            parent = repo.commit(commit.parents[0].hexsha)
-            the_commit = Commit(commit_hash, author, committer, author_date, committer_date, author_timezone,
-                                committer_timezone, msg,
-                                parent.hexsha, merge, branches,is_in_main_branch)
+        the_commit = Commit(commit_hash, author, committer, author_date, committer_date, author_timezone,
+                            committer_timezone, msg,
+                            parents, merge, branches,is_in_main_branch)
+
+        if len(parents) > 0:
+            parent = repo.commit(parents[0])
             diff_index = parent.diff(commit, create_patch=True)
         else:
-            the_commit = Commit(commit_hash, author, committer, author_date, committer_date, author_timezone,
-                                committer_timezone, msg,
-                                '', merge, branches, is_in_main_branch)
             parent = repo.tree('4b825dc642cb6eb9a060e54bf8d69288fbee4904')
             diff_index = parent.diff(commit.tree, create_patch=True)
 
@@ -106,7 +108,7 @@ class GitRepository:
             change_type = self.__from_change_to_modification_type(d)
             try:
                 sc = d.b_blob.data_stream.read().decode('utf-8')
-            except UnicodeDecodeError:
+            except UnicodeDecodeError and AttributeError:
                 sc = ''
             the_commit.add_modifications(old_path, new_path, change_type, diff_text, sc)
 

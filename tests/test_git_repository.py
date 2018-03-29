@@ -1,6 +1,7 @@
 import pytest
 from scm.git_repository import GitRepository
 from domain.change_set import ChangeSet
+from domain.modification_type import ModificationType
 from datetime import datetime
 from dateutil import tz
 
@@ -184,6 +185,7 @@ def test_should_detail_a_commit():
     assert True == commit.modifications[0].diff.startswith("@@ -0,0 +1,62 @@\n+package model;")
     assert True == commit.modifications[0].source_code.startswith("package model;")
 
+
 def test_merge_commits():
     gr = GitRepository('test-repos/git-2/')
     commit = gr.get_commit("168b3aab057ed61a769acf336a4ef5e64f76c9fd")
@@ -194,3 +196,61 @@ def test_merge_commits():
 
     commit = gr.get_commit("29e929fbc5dc6a2e9c620069b24e2a143af4285f")
     assert True == commit.merge
+
+
+def test_number_of_modifications():
+    gr = GitRepository('test-repos/git-1/')
+    commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
+    assert 62 == commit.modifications[0].added
+    assert 0 == commit.modifications[0].removed
+
+    commit = gr.get_commit('d11dd6734ff4e60cac3a7b58d9267f138c9e05c7')
+    assert 1 == commit.modifications[0].added
+    assert 1 == commit.modifications[0].removed
+
+
+def test_modification_status():
+    gr = GitRepository('test-repos/git-1/')
+    commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
+    assert ModificationType.ADD == commit.modifications[0].change_type
+
+    commit = gr.get_commit('57dbd017d1a744b949e7ca0b1c1a3b3dd4c1cbc1')
+    assert ModificationType.MODIFY == commit.modifications[0].change_type
+
+    commit = gr.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71')
+    assert ModificationType.DELETE == commit.modifications[0].change_type
+
+
+def test_detail_rename():
+    gr = GitRepository('test-repos/git-1/')
+    commit = gr.get_commit('f0dd1308bd904a9b108a6a40865166ee962af3d4')
+
+    assert "Maurício Aniche" == commit.author.name
+    assert "mauricioaniche@gmail.com", commit.author.email
+
+    assert "Matricula.javax" == commit.modifications[0].new_path
+    assert "Matricula.java" == commit.modifications[0].old_path
+
+
+def test_parent_commits():
+    gr = GitRepository('test-repos/git-5/')
+    merge_commit = gr.get_commit('5d9d79607d7e82b6f236aa29be4ba89a28fb4f15')
+    assert 2 == len(merge_commit.parents)
+    assert 'fa8217c324e7fb46c80e1ddf907f4e141449637e' in merge_commit.parents
+    assert 'ff663cf1931a67d5e47b75fc77dcea432c728052' in merge_commit.parents
+
+    normal_commit = gr.get_commit('ff663cf1931a67d5e47b75fc77dcea432c728052')
+    assert 1 == len(normal_commit.parents)
+    assert '4a17f31c0d1285477a3a467d0bc3cb38e775097d' in normal_commit.parents
+
+
+def test_tags():
+    gr = GitRepository('test-repos/git-8/')
+    commit = gr.get_commit_from_tag('tag1')
+    assert '6bb9e2c6a8080e6b5b34e6e316c894b2ddbf7fcd' == commit.hash
+
+    commit = gr.get_commit_from_tag('tag2')
+    assert '4638730126d40716e230c2040751a13153fb1556' == commit.hash
+
+    with pytest.raises(IndexError):
+        gr.get_commit_from_tag('tag4')

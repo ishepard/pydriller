@@ -8,7 +8,7 @@ from datetime import datetime
 class RepositoryMining:
     def __init__(self, path_to_repo: str, visitor: CommitVisitor, single: str = None, since: datetime = None,
                  to: datetime = None, from_commit: str = None, to_commit: str = None, from_tag: str = None,
-                 to_tag: str = None):
+                 to_tag: str = None, reversed_order: bool = False):
         """
         Init a repository mining.
         :param str path_to_repo: absolute path to the repository you have to mine
@@ -26,6 +26,7 @@ class RepositoryMining:
         self.single = single
         self.since = since
         self.to = to
+        self.reversed_order = reversed_order
 
         if from_commit is not None:
             if since is not None:
@@ -56,6 +57,9 @@ class RepositoryMining:
     def __process_repo(self):
         print('Git repository in {}'.format(self.git_repo.path))
         all_cs = self.__apply_filters(self.git_repo.get_change_sets())
+
+        if not self.reversed_order:
+            all_cs.reverse()
 
         for cs in all_cs:
             self.__process_cs(cs)

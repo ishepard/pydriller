@@ -7,7 +7,7 @@ from scm.git_repository import GitRepository
 from scm.persistence_mechanism import PersistenceMechanism
 from datetime import datetime
 from dateutil import tz
-
+from tests.visitor_test import VisitorTest
 
 to_zone = tz.gettz('GMT+1')
 dt = datetime(2018, 3, 22, 10, 41, 30, tzinfo=to_zone)
@@ -20,7 +20,7 @@ dt3 = datetime(2018, 3, 27, 17, 20, 3, tzinfo=to_zone)
 @pytest.fixture(scope="function")
 def lc_since_to(request):
     since, to = request.param
-    mv = MyVisitor()
+    mv = VisitorTest()
     RepositoryMining('test-repos/test1/', mv, since=since, to=to).mine()
     yield mv.list_commits
     print("teardown")
@@ -29,7 +29,7 @@ def lc_since_to(request):
 @pytest.fixture(scope="function")
 def lc_from_to_commit(request):
     from_commit, to_commit = request.param
-    mv = MyVisitor()
+    mv = VisitorTest()
     RepositoryMining('test-repos/test1/', mv, from_commit=from_commit, to_commit=to_commit).mine()
     yield mv.list_commits
     print("teardown")
@@ -38,7 +38,7 @@ def lc_from_to_commit(request):
 @pytest.fixture(scope="function")
 def lc_from_to_tag(request):
     from_tag, to_tag= request.param
-    mv = MyVisitor()
+    mv = VisitorTest()
     RepositoryMining('test-repos/test1/', mv, from_tag=from_tag, to_tag=to_tag).mine()
     yield mv.list_commits
     print("teardown")
@@ -90,7 +90,7 @@ def test_from_tag_filter(lc_from_to_tag):
 
 
 def test_multiple_filters_exceptions():
-    mv = MyVisitor()
+    mv = VisitorTest()
     from_commit = '6411e3096dd2070438a17b225f44475136e54e3a'
     from_tag = 'v1.4'
 
@@ -105,11 +105,3 @@ def test_multiple_filters_exceptions():
 
     with pytest.raises(Exception):
         RepositoryMining('test-repos/test1/', mv, to=dt2, to_tag=from_tag)
-
-
-class MyVisitor(CommitVisitor):
-    def __init__(self):
-        self.list_commits = []
-
-    def process(self, repo: GitRepository, commit: Commit, writer: PersistenceMechanism):
-        self.list_commits.append(commit)

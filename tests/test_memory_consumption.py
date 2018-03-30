@@ -8,12 +8,13 @@ from scm.git_repository import GitRepository
 from scm.persistence_mechanism import PersistenceMechanism
 from datetime import datetime
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-
-def test_memory():
+def test_memory(caplog):
     if 'TRAVIS' not in os.environ:
         return
+
+    # logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+    caplog.set_level(logging.INFO)
 
     mv = MemoryVisitor()
 

@@ -23,7 +23,6 @@ def lc_since_to(request):
     mv = VisitorTest()
     RepositoryMining('test-repos/test1/', mv, since=since, to=to).mine()
     yield mv.list_commits
-    print("teardown")
 
 
 @pytest.yield_fixture(scope="function")
@@ -32,7 +31,6 @@ def lc_from_to_commit(request):
     mv = VisitorTest()
     RepositoryMining('test-repos/test1/', mv, from_commit=from_commit, to_commit=to_commit).mine()
     yield mv.list_commits
-    print("teardown")
 
 
 @pytest.yield_fixture(scope="function")
@@ -41,7 +39,6 @@ def lc_from_to_tag(request):
     mv = VisitorTest()
     RepositoryMining('test-repos/test1/', mv, from_tag=from_tag, to_tag=to_tag).mine()
     yield mv.list_commits
-    print("teardown")
 
 
 @pytest.mark.parametrize('lc_since_to', [(None, None)], indirect=True)

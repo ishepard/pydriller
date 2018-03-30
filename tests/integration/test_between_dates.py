@@ -15,7 +15,6 @@ def lc(request):
     mv = VisitorTest()
     RepositoryMining('test-repos/git-4/', mv, since=dt1, to=dt2, reversed_order=reversed).mine()
     yield mv.list_commits
-    print("teardown")
 
 
 @pytest.mark.parametrize('lc', [False], indirect=True)

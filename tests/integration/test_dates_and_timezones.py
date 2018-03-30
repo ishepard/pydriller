@@ -19,7 +19,6 @@ def lc(request):
     mv = VisitorTest()
     RepositoryMining(path, mv, single=single).mine()
     yield mv.list_commits
-    print("teardown")
 
 
 @pytest.mark.parametrize('lc', [(path2, '29e929fbc5dc6a2e9c620069b24e2a143af4285f')], indirect=True)

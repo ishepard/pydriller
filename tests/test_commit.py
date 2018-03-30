@@ -7,7 +7,6 @@ from scm.git_repository import GitRepository
 @pytest.yield_fixture(scope="module")
 def resource():
     yield GitRepository('test-repos/git-1/')
-    print("teardown")
 
 
 def test_equal(resource):

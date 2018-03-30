@@ -104,12 +104,18 @@ class GitRepository:
         for d in diff_index:
             old_path = d.a_path
             new_path = d.b_path
-            diff_text = d.diff.decode('utf-8')
             change_type = self.__from_change_to_modification_type(d)
+
             try:
                 sc = d.b_blob.data_stream.read().decode('utf-8')
-            except (UnicodeDecodeError, AttributeError):
+            except (UnicodeDecodeError, AttributeError, ValueError):
                 sc = ''
+
+            try:
+                diff_text = d.diff.decode('utf-8')
+            except (UnicodeDecodeError, AttributeError, ValueError):
+                diff_text = ''
+
             the_commit.add_modifications(old_path, new_path, change_type, diff_text, sc)
 
     def __get_branches(self, git: Git, commit_hash: str):

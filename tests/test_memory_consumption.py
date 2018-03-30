@@ -14,7 +14,8 @@ def test_memory():
     if 'TRAVIS' not in os.environ:
         return
 
-    mv = MemoryVisitor()
+    p = psutil.Process()
+    mv = MemoryVisitor(p)
 
     start = datetime.now()
     RepositoryMining('test-repos/rails', mv,
@@ -30,20 +31,19 @@ def test_memory():
 
 
 class MemoryVisitor(CommitVisitor):
-    def __init__(self):
-        self.process = psutil.Process(os.getpid())
-
+    def __init__(self, p):
+        self.p = p
         self.maxMemory = -sys.maxsize
         self.minMemory = sys.maxsize
         self.numberOfCommits = 0
         self.all = []
 
     def process(self, repo: GitRepository, commit: Commit, writer: PersistenceMechanism):
-        memory = self.process.memory_info().vms / (2 ** 20)
+        memory = self.p.memory_info().vms / (2 ** 20)
 
         if memory > self.maxMemory: self.maxMemory = memory
         if memory < self.minMemory: self.minMemory = memory
 
-        all.add(memory)
+        self.all.append(memory)
 
-        self.numberOfCommits+=1
+        self.numberOfCommits += 1

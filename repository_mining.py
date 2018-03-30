@@ -75,8 +75,7 @@ class RepositoryMining:
     def __process_cs(self, cs: ChangeSet):
         commit = self.git_repo.get_commit(cs.id)
         print('Commit #{} in {} from {} with {} modifications'
-              .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
-
+              .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)), flush=True)
         self.visitor.process(self.git_repo, commit, None)
 
     def __apply_filters(self, all_cs: List[ChangeSet]) -> List[ChangeSet]:

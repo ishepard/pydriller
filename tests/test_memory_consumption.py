@@ -23,26 +23,20 @@ def test_memory():
     end = datetime.now()
 
     diff = end - start
-    print('Max memory {} Mb'.format(mv.maxMemory / (2 ** 20)))
-    print('Min memory {} Mb'.format(mv.minMemory / (2 ** 20)))
+    print('Max memory {} Mb'.format(max(mv.all) / (2 ** 20)))
+    print('Min memory {} Mb'.format(min(mv.all) / (2 ** 20)))
     print('All: {}'.format(', '.join(map(str, mv.all))))
     print('Time {}:{}:{}'.format(diff.seconds//3600, (diff.seconds % 3600) // 60, diff.seconds % 60))
-    print('Commits per second: {}'.format(len(all) / diff.seconds))
+    print('Commits per second: {}'.format(len(mv.all) / diff.seconds))
 
 
 class MemoryVisitor(CommitVisitor):
     def __init__(self):
         self.p = psutil.Process(os.getpid())
-        self.maxMemory = -sys.maxsize
-        self.minMemory = sys.maxsize
         self.numberOfCommits = 0
         self.all = []
 
     def process(self, repo: GitRepository, commit: Commit, writer: PersistenceMechanism):
         memory = self.p.memory_info()[0]
-        if memory > self.maxMemory: self.maxMemory = memory
-        if memory < self.minMemory: self.minMemory = memory
-
         self.all.append(memory)
-
         self.numberOfCommits += 1

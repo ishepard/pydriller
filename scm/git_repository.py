@@ -8,8 +8,8 @@ from domain.developer import Developer
 import os
 from domain.modification_type import ModificationType
 from threading import Lock
-from datetime import datetime, timedelta, tzinfo
-from dateutil import tz
+from datetime import datetime
+
 
 class GitRepository:
     def __init__(self, path: str, first_parent_only: str = False):

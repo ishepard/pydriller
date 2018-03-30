@@ -1,3 +1,6 @@
+import logging
+logging.getLogger(__name__).addHandler(logging.NullHandler())
+
 from typing import List
 from scm.git_repository import GitRepository
 from domain.change_set import ChangeSet
@@ -60,10 +63,11 @@ class RepositoryMining:
         """
         Starts the mining.
         """
+        logging.info('Started the mining process')
         self.__process_repo()
 
     def __process_repo(self):
-        print('Git repository in {}'.format(self.git_repo.path))
+        logging.info('Git repository in {}'.format(self.git_repo.path))
         all_cs = self.__apply_filters(self.git_repo.get_change_sets())
 
         if not self.reversed_order:
@@ -74,8 +78,8 @@ class RepositoryMining:
 
     def __process_cs(self, cs: ChangeSet):
         commit = self.git_repo.get_commit(cs.id)
-        print('Commit #{} in {} from {} with {} modifications'
-              .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)), flush=True)
+        logging.info('Commit #{} in {} from {} with {} modifications'
+              .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
         self.visitor.process(self.git_repo, commit, None)
 
     def __apply_filters(self, all_cs: List[ChangeSet]) -> List[ChangeSet]:

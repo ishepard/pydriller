@@ -1,6 +1,5 @@
 from _datetime import datetime
 from typing import List
-from dateutil import tz
 from domain.developer import Developer
 from domain.modification import Modification
 from domain.modification_type import ModificationType
@@ -9,7 +8,7 @@ from domain.modification_type import ModificationType
 class Commit:
     def __init__(self, hash: str, author: Developer, committer: Developer,
                  author_date: datetime, committer_date: datetime,
-                 author_timezone: tz, committer_timezone: tz,
+                 author_timezone: int, committer_timezone: int,
                  msg: str, parents: List[str], merge: bool = False, branches: set = set(),
                  is_commit_in_main_branch: bool = False) -> None:
         """

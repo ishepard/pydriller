@@ -1,3 +1,6 @@
+import logging
+logging.getLogger(__name__).addHandler(logging.NullHandler())
+
 from typing import List
 from git import Git, Repo, Diff, GitCommandError
 from git.objects.util import tzoffset
@@ -58,8 +61,7 @@ class GitRepository:
             change_sets.append(ChangeSet(commit.hexsha, committer_date))
         return change_sets
 
-
-    def __get_time(self, timestamp, tz_offset):
+    def __get_time(self, timestamp, tz_offset) -> datetime:
         try:
             dt = datetime.fromtimestamp(timestamp).astimezone(tzoffset(tz_offset))
         except ValueError:
@@ -112,7 +114,7 @@ class GitRepository:
 
         return the_commit
 
-    def __parse_diff(self, diff_index, the_commit):
+    def __parse_diff(self, diff_index, the_commit) -> None:
         for d in diff_index:
             old_path = d.a_path
             new_path = d.b_path
@@ -123,11 +125,11 @@ class GitRepository:
                 sc = d.b_blob.data_stream.read().decode('utf-8')
                 diff_text = d.diff.decode('utf-8')
             except (UnicodeDecodeError, AttributeError, ValueError):
-                print('Couldn\'t load all the information regarding commit {}'.format(the_commit.hash))
+                logging.debug('Couldn\'t load source code or the diff of a file in commit {}'.format(the_commit.hash))
 
             the_commit.add_modifications(old_path, new_path, change_type, diff_text, sc)
 
-    def __get_branches(self, git: Git, commit_hash: str):
+    def __get_branches(self, git: Git, commit_hash: str) -> set():
         branches = set()
         for branch in set(git.branch('--contains', commit_hash).split('\n')):
             branches.add(branch.strip().replace('* ', ''))
@@ -143,20 +145,20 @@ class GitRepository:
         elif d.a_blob and d.b_blob and d.a_blob != d.b_blob:
             return ModificationType.MODIFY
 
-    def checkout(self, hash: str):
+    def checkout(self, hash: str) -> None:
         with self.lock:
             git = self.__open_git()
             self.__delete_tmp_branch()
             git.checkout('-f', hash, b='_PD')
 
-    def __delete_tmp_branch(self):
+    def __delete_tmp_branch(self) -> None:
         repo = self.__open_repository()
         try:
             repo.delete_head('_PD')
         except GitCommandError:
-            print("Branch _PD not found")
+            logging.debug("Branch _PD not found")
 
-    def files(self):
+    def files(self) -> List[str]:
         all = []
         for path, subdirs, files in os.walk(self.path):
             if '.git' in path:
@@ -165,7 +167,7 @@ class GitRepository:
                 all.append(os.path.join(path, name))
         return all
 
-    def reset(self):
+    def reset(self) -> None:
         with self.lock:
             git = self.__open_git()
             git.checkout('-f', self.main_branch)
@@ -180,5 +182,5 @@ class GitRepository:
             selected_tag = repo.tags[tag]
             return self.get_commit(selected_tag.commit.hexsha)
         except (IndexError, AttributeError):
-            print('Tag {} not found'.format(tag))
+            logging.debug('Tag {} not found'.format(tag))
             raise

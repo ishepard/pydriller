@@ -1,12 +1,15 @@
 from typing import List
 from git import Git, Repo, Diff, GitCommandError
+from git.objects.util import tzoffset
+
 from domain.change_set import ChangeSet
 from domain.commit import Commit
 from domain.developer import Developer
 import os
 from domain.modification_type import ModificationType
 from threading import Lock
-
+from datetime import datetime, timedelta, tzinfo
+from dateutil import tz
 
 class GitRepository:
     def __init__(self, path: str, first_parent_only: str = False):
@@ -31,9 +34,6 @@ class GitRepository:
         return repo
 
     def __discover_main_branch(self, repo):
-        if repo.head.is_detached:
-            print("REFERENCE " + repo.head.name)
-            # self.main_branch = repo.head.
         self.main_branch = repo.active_branch.name
 
     def get_head(self) -> ChangeSet:
@@ -54,8 +54,18 @@ class GitRepository:
 
         change_sets = []
         for commit in commit_list:
-            change_sets.append(ChangeSet(commit.hexsha, commit.committed_datetime))
+            committer_date = self.__get_time(commit.committed_date, commit.committer_tz_offset)
+            change_sets.append(ChangeSet(commit.hexsha, committer_date))
         return change_sets
+
+
+    def __get_time(self, timestamp, tz_offset):
+        try:
+            dt = datetime.fromtimestamp(timestamp).astimezone(tzoffset(tz_offset))
+        except ValueError:
+            dt = datetime.fromtimestamp(timestamp).astimezone(tzoffset(0, 'UTC'))
+            print('Error in retrieving dates information')
+        return dt
 
     def get_commit(self, commit_id: str) -> Commit:
         """
@@ -71,11 +81,13 @@ class GitRepository:
         committer = Developer(commit.committer.name, commit.committer.email)
         author_timezone = commit.author_tz_offset
         committer_timezone = commit.committer_tz_offset
+
         msg = commit.message.strip()
         commit_hash = commit.hexsha
 
-        author_date = commit.authored_datetime
-        committer_date = commit.committed_datetime
+        author_date = self.__get_time(commit.authored_date, author_timezone)
+        committer_date = self.__get_time(commit.committed_date, author_timezone)
+
         merge = True if len(commit.parents) > 1 else False
 
         parents = []
@@ -105,16 +117,13 @@ class GitRepository:
             old_path = d.a_path
             new_path = d.b_path
             change_type = self.__from_change_to_modification_type(d)
-
+            sc = ''
+            diff_text = ''
             try:
                 sc = d.b_blob.data_stream.read().decode('utf-8')
-            except (UnicodeDecodeError, AttributeError, ValueError):
-                sc = ''
-
-            try:
                 diff_text = d.diff.decode('utf-8')
             except (UnicodeDecodeError, AttributeError, ValueError):
-                diff_text = ''
+                print('Couldn\'t load all the information regarding commit {}'.format(the_commit.hash))
 
             the_commit.add_modifications(old_path, new_path, change_type, diff_text, sc)
 
@@ -173,4 +182,3 @@ class GitRepository:
         except (IndexError, AttributeError):
             print('Tag {} not found'.format(tag))
             raise
-

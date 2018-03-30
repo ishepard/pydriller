@@ -24,10 +24,10 @@ def test_memory():
     end = datetime.now()
 
     diff = end - start
-    print('Max memory {} Mb'.format(mv.maxMemory))
-    print('Min memory {} Mb'.format(mv.minMemory))
+    print('Max memory {} Mb'.format(mv.maxMemory / (2 ** 20)))
+    print('Min memory {} Mb'.format(mv.minMemory / (2 ** 20)))
     print('Min memory {} Mb'.format(', '.join(map(str, mv.all))))
-    print('Time {}'.format(diff.min))
+    print('Time {}:{}:{}'.format(diff.seconds//3600, (diff.seconds//60)%60, diff.seconds))
 
 
 class MemoryVisitor(CommitVisitor):
@@ -39,7 +39,7 @@ class MemoryVisitor(CommitVisitor):
         self.all = []
 
     def process(self, repo: GitRepository, commit: Commit, writer: PersistenceMechanism):
-        memory = self.p.memory_info().vms / (2 ** 20)
+        memory = self.p.memory_info().vms
 
         if memory > self.maxMemory: self.maxMemory = memory
         if memory < self.minMemory: self.minMemory = memory

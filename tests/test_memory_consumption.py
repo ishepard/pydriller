@@ -1,6 +1,9 @@
 import os
 import psutil
-import logging
+if 'TRAVIS' in os.environ:
+    import logging
+    logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+
 from domain.commit import Commit
 from repository_mining import RepositoryMining
 from scm.commit_visitor import CommitVisitor
@@ -8,7 +11,6 @@ from scm.git_repository import GitRepository
 from scm.persistence_mechanism import PersistenceMechanism
 from datetime import datetime
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 
 def test_memory():

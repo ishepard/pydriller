@@ -1,4 +1,7 @@
 import logging
+
+from domain.commit import Commit
+
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 from typing import List
@@ -11,7 +14,9 @@ from datetime import datetime
 class RepositoryMining:
     def __init__(self, path_to_repo: str, visitor: CommitVisitor, single: str = None, since: datetime = None,
                  to: datetime = None, from_commit: str = None, to_commit: str = None, from_tag: str = None,
-                 to_tag: str = None, reversed_order: bool = False):
+                 to_tag: str = None, reversed_order: bool = False, only_in_main_branch: bool = False,
+                 only_in_branches: List[str]= None, only_modifications_with_file_types: List[str] = None,
+                 only_no_merge: bool = False):
         """
         Init a repository mining.
         :param str path_to_repo: absolute path to the repository you have to mine
@@ -30,6 +35,10 @@ class RepositoryMining:
         self.since = since
         self.to = to
         self.reversed_order = reversed_order
+        self.only_in_main_branch = only_in_main_branch
+        self.only_in_branches = only_in_branches
+        self.only_modifications_with_file_types = only_modifications_with_file_types
+        self.only_no_merge = only_no_merge
 
         self.__check_filters(from_commit, from_tag, since, single, to, to_commit, to_tag)
 
@@ -68,7 +77,7 @@ class RepositoryMining:
 
     def __process_repo(self):
         logging.info('Git repository in {}'.format(self.git_repo.path))
-        all_cs = self.__apply_filters(self.git_repo.get_change_sets())
+        all_cs = self.__apply_filters_on_changesets(self.git_repo.get_change_sets())
 
         if not self.reversed_order:
             all_cs.reverse()
@@ -80,9 +89,39 @@ class RepositoryMining:
         commit = self.git_repo.get_commit(cs.id)
         logging.info('Commit #{} in {} from {} with {} modifications'
               .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
+
+        if self.__is_commit_filtered(commit):
+            logging.info('Commit #{} filtered'.format(commit.hash))
+            return
+
         self.visitor.process(self.git_repo, commit, None)
 
-    def __apply_filters(self, all_cs: List[ChangeSet]) -> List[ChangeSet]:
+    def __is_commit_filtered(self, commit: Commit):
+        if self.only_in_main_branch is True and commit.in_main_branch is False:
+            return True
+        if self.only_in_branches is not None:
+            if not self.__commit_branch_in_branches(commit):
+                return True
+        if self.only_modifications_with_file_types is not None:
+            if not self.__has_modification_with_file_type(commit):
+                return True
+        if self.only_no_merge is True and commit.merge is False:
+            return True
+        return False
+
+    def __commit_branch_in_branches(self, commit: Commit):
+        for branch in commit.branches:
+            if branch in self.only_in_branches:
+                return True
+        return False
+
+    def __has_modification_with_file_type(self, commit):
+        for mod in commit.modifications:
+            if mod.filename.endswith(tuple(self.only_modifications_with_file_types)):
+                return True
+        return False
+
+    def __apply_filters_on_changesets(self, all_cs: List[ChangeSet]) -> List[ChangeSet]:
         res = []
 
         if self.__all_filters_are_none():

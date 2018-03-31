@@ -12,7 +12,6 @@ from scm.persistence_mechanism import PersistenceMechanism
 from datetime import datetime
 
 
-
 def test_memory():
     if 'TRAVIS' not in os.environ:
         return

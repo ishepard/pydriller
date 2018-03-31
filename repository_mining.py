@@ -98,14 +98,18 @@ class RepositoryMining:
 
     def __is_commit_filtered(self, commit: Commit):
         if self.only_in_main_branch is True and commit.in_main_branch is False:
+            logging.debug('Commit filtered for main branch')
             return True
         if self.only_in_branches is not None:
+            logging.debug('Commit filtered for only in branches')
             if not self.__commit_branch_in_branches(commit):
                 return True
         if self.only_modifications_with_file_types is not None:
+            logging.debug('Commit filtered for modification types')
             if not self.__has_modification_with_file_type(commit):
                 return True
-        if self.only_no_merge is True and commit.merge is False:
+        if self.only_no_merge is True and commit.merge is True:
+            logging.debug('Commit filtered for no merge')
             return True
         return False
 

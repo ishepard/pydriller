@@ -9,7 +9,6 @@ from domain.change_set import ChangeSet
 from scm.commit_visitor import CommitVisitor
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import as_completed
 
 
 class RepositoryMining:

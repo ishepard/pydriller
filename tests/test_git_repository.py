@@ -1,3 +1,6 @@
+import logging
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+
 import pytest
 from scm.git_repository import GitRepository
 from domain.change_set import ChangeSet

@@ -1,3 +1,6 @@
+import logging
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+
 import pytest
 
 from repository_mining import RepositoryMining

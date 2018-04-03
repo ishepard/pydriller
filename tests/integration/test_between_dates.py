@@ -1,3 +1,6 @@
+import logging
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+
 from datetime import datetime
 import pytest
 from dateutil import tz

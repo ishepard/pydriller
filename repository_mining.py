@@ -1,7 +1,6 @@
 import logging
 
 from domain.commit import Commit
-
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 from typing import List
@@ -9,6 +8,8 @@ from scm.git_repository import GitRepository
 from domain.change_set import ChangeSet
 from scm.commit_visitor import CommitVisitor
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import as_completed
 
 
 class RepositoryMining:
@@ -16,7 +17,7 @@ class RepositoryMining:
                  to: datetime = None, from_commit: str = None, to_commit: str = None, from_tag: str = None,
                  to_tag: str = None, reversed_order: bool = False, only_in_main_branch: bool = False,
                  only_in_branches: List[str]= None, only_modifications_with_file_types: List[str] = None,
-                 only_no_merge: bool = False):
+                 only_no_merge: bool = False, num_threads: int = 1):
         """
         Init a repository mining.
         :param str path_to_repo: absolute path to the repository you have to mine
@@ -28,6 +29,11 @@ class RepositoryMining:
         :param str to_commit: ending commit (only if `to` is None)
         :param str from_tag: starting the analysis from specified tag (only if `since` and `from_commit` are None)
         :param str to_tag: ending the analysis from specified tag (only if `to` and `to_commit` are None)
+        :param bool reversed_order: whether the commits should be analyzed in reversed order
+        :param bool only_in_main_branch: whether only commits in main branch should be analyzed
+        :param List[str] only_in_branches: only commits in these branches will be analyzed
+        :param List[str] only_modifications_with_file_types: only modifications with that file types will be analyzed
+        :param bool only_no_merge: if True, merges will not be analyzed
         """
         self.git_repo = GitRepository(path_to_repo)
         self.visitor = visitor
@@ -39,6 +45,7 @@ class RepositoryMining:
         self.only_in_branches = only_in_branches
         self.only_modifications_with_file_types = only_modifications_with_file_types
         self.only_no_merge = only_no_merge
+        self.num_threads = num_threads
 
         self.__check_filters(from_commit, from_tag, since, single, to, to_commit, to_tag)
 
@@ -82,13 +89,13 @@ class RepositoryMining:
         if not self.reversed_order:
             all_cs.reverse()
 
-        for cs in all_cs:
-            self.__process_cs(cs)
+        with ThreadPoolExecutor(max_workers=self.num_threads) as executor:
+            [executor.submit(self.__process_cs, cs) for cs in all_cs]
 
     def __process_cs(self, cs: ChangeSet):
         commit = self.git_repo.get_commit(cs.id)
         logging.info('Commit #{} in {} from {} with {} modifications'
-              .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
+                     .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
 
         if self.__is_commit_filtered(commit):
             logging.info('Commit #{} filtered'.format(commit.hash))

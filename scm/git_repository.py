@@ -1,17 +1,16 @@
+import os
 import logging
-logging.getLogger(__name__).addHandler(logging.NullHandler())
-
 from typing import List
 from git import Git, Repo, Diff, GitCommandError
 from git.objects.util import tzoffset
-
 from domain.change_set import ChangeSet
 from domain.commit import Commit
 from domain.developer import Developer
-import os
 from domain.modification_type import ModificationType
 from threading import Lock
 from datetime import datetime
+
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class GitRepository:
@@ -125,7 +124,7 @@ class GitRepository:
                 sc = d.b_blob.data_stream.read().decode('utf-8')
                 diff_text = d.diff.decode('utf-8')
             except (UnicodeDecodeError, AttributeError, ValueError):
-                logging.debug('Couldn\'t load source code or the diff of a file in commit {}'.format(the_commit.hash))
+                logging.debug('Could not load source code or the diff of a file in commit {}'.format(the_commit.hash))
 
             the_commit.add_modifications(old_path, new_path, change_type, diff_text, sc)
 
@@ -145,11 +144,11 @@ class GitRepository:
         elif d.a_blob and d.b_blob and d.a_blob != d.b_blob:
             return ModificationType.MODIFY
 
-    def checkout(self, hash: str) -> None:
+    def checkout(self, _hash: str) -> None:
         with self.lock:
             git = self.__open_git()
             self.__delete_tmp_branch()
-            git.checkout('-f', hash, b='_PD')
+            git.checkout('-f', _hash, b='_PD')
 
     def __delete_tmp_branch(self) -> None:
         repo = self.__open_repository()
@@ -159,13 +158,13 @@ class GitRepository:
             logging.debug("Branch _PD not found")
 
     def files(self) -> List[str]:
-        all = []
+        _all = []
         for path, subdirs, files in os.walk(self.path):
             if '.git' in path:
                 continue
             for name in files:
-                all.append(os.path.join(path, name))
-        return all
+                _all.append(os.path.join(path, name))
+        return _all
 
     def reset(self) -> None:
         with self.lock:

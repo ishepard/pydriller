@@ -197,3 +197,7 @@ fabric.properties
 
 test-repos/*
 .idea/vcs.xml
+
+_build
+_static
+_templates

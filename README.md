@@ -111,14 +111,14 @@ Examples:
 mv = VisitorTest()
 
 # Analyze single commit
-RepositoryMining('test-repos/git-4/', mv, single='6411e3096dd2070438a17b225f44475136e54e3a'.mine()
+RepositoryMining('test-repos/git-4/', mv, single='6411e3096dd2070438a17b225f44475136e54e3a').mine()
 
 # Since 8/10/2016
-RepositoryMining('test-repos/git-4/', mv, since=datetime(2016, 10, 8, 17, 0, 0, tzinfo=to_zone)).mine()
+RepositoryMining('test-repos/git-4/', mv, since=datetime(2016, 10, 8, 17, 0, 0).mine()
 
 # Between 2 dates
-dt1 = datetime(2016, 10, 8, 17, 0, 0, tzinfo=to_zone)
-dt2 = datetime(2016, 10, 8, 17, 59, 0, tzinfo=to_zone)
+dt1 = datetime(2016, 10, 8, 17, 0, 0)
+dt2 = datetime(2016, 10, 8, 17, 59, 0)
 RepositoryMining('test-repos/git-4/', mv, since=dt1, to=dt2).mine()
 
 # Between tags
@@ -134,8 +134,74 @@ RepositoryMining('test-repos/git-4/', mv, to=dt1).mine()
 RepositoryMining('test-repos/test1/', mv, from_tag=from_tag, from_commit=from_commit)
 ```
 
-**IMPORTANT**: it is **not** possible to configure more than one filter of the same category (for example, more than one *from*).
+**IMPORTANT**: it is **not** possible to configure more than one filter of the same category (for example, more than one *from*). It is also **not** possible to have the *single* filter together with other filters!
 
+## Filtering commits
+PyDriller comes with a set of common commit filters that you can apply:
+
+- *only\_in\_branches: List[str]*: only visits commits that belong to certain branches.
+- *only\_in\_main\_branch: bool*: only visits commits that belong to the main branch of the repository.
+- *only\_no\_merge: bool*: only visits commits that are not merge commits.
+- *only\_modifications\_with\_file\_types: List[str]*: only visits commits in which at least one modification was done in that file type, e.g., if you pass ".java", then, the it will visit only commits in which at least one Java file was modified; clearly, it will skip other commits.
+
+Examples:
+
+```
+mv = VisitorTest()
+
+# Only commits in main branch
+RepositoryMining('test-repos/git-5/', mv, only_in_main_branch=True).mine()
+
+# Only commits in main branch and no merges
+RepositoryMining('test-repos/git-5/', mv, only_in_main_branch=True, only_no_merge=True).mine()
+
+# Only commits that modified a java file
+RepositoryMining('test-repos/git-5/', mv, only_modifications_with_file_types=['.java']).mine()
+```
+
+## Commit
+A Commit contains a hash, a committer (name and email), an author (name, and email) a message, the date, a list of its parent hashes (if it's a merge commit, the commit has two parents), and the list of modification.
+
+For example:
+
+```
+class MyVisitor(CommitVisitor):
+    def process(self, repo: GitRepository, commit: Commit, writer: PersistenceMechanism):
+        print(
+            'Hash: {}\n'.format(commit.hash),
+            'Author: {}'.format(commit.author.name),
+            'Committer: {}'.format(commit.committer.name),
+            'Author date: {}'.format(commit.author_date.strftime("%Y-%m-%d %H:%M:%S")),
+            'Message: {}'.format(commit.msg),
+            'Merge: {}'.format(commit.merge),
+            'In main branch: {}'.format(commit.in_main_branch)
+        )
+```
+
+## Modifications
+You can get the list of modified files, as well as their diffs and current source code. To that, all you have to do is to get the list of _Modification_s that exists inside Commit. A modification object has the following fields:
+
+- *old_path*: old path of the file (can be _None_ if the file is added)
+- *new_path*: new path of the file (can be null if the file is deleted)
+- *change_type*: type of the change 
+- *diff*: diff of the change
+- *source_code*: source code of the file (can be null if the file is deleted)
+- *added*: number of lines added
+- *removed*: number of lines removed
+- *filename*: filename
+
+For example:
+
+```
+class MyVisitor(CommitVisitor):
+    def process(self, repo: GitRepository, commit: Commit, writer: PersistenceMechanism):
+        for m in commit.modifications:
+            print(
+                "Author {}".format(commit.author.name),
+                " modified {}".format(m.filename),
+                " with a change type of {}".format(m.change_type.name)
+            )
+```
 
 
 ## How do I cite PyDriller?

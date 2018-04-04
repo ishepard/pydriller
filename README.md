@@ -28,7 +28,7 @@ This will also install the necessary dependencies.
 
 # SOURCE CODE
 
-If you like to clone from source, you can do it like so:
+If you like to clone from source, you can do it with very simple steps.
 
 ## OPTIONAL
 
@@ -93,13 +93,13 @@ By default, PyDriller executes the visitor for all the commits in the repository
 
 - *single: str*: single hash of the commit. The visitor will be called only on this commit
 
-_FROM_
+_FROM_:
 
 - *since: datetime*: only commits after this date will be analyzed
 - *from_commit: str*: only commits after this commit hash will be analyzed
 - *from_tag: str*: only commits after this commit tag will be analyzed
 
-_TO_
+_TO_:
 
 - *to: datetime*: only commits up to this date will be analyzed
 - *to_commit: str*: only commits up to this commit hash will be analyzed
@@ -159,8 +159,17 @@ RepositoryMining('test-repos/git-5/', mv, only_in_main_branch=True, only_no_merg
 RepositoryMining('test-repos/git-5/', mv, only_modifications_with_file_types=['.java']).mine()
 ```
 
-## Commit
-A Commit contains a hash, a committer (name and email), an author (name, and email) a message, the date, a list of its parent hashes (if it's a merge commit, the commit has two parents), and the list of modification.
+## Threads
+PyDriller can divide the work of analyzing a repository among multiple threads. If your machine has several cores, this can significantly improve performance. However, your *CommitVisitors must be thread-safe*, and your analysis must tolerate visiting commits in a relatively arbitrary order. 
+By default, PyDriller uses only 1 thread.
+
+```
+RepositoryMining('path/to/repo/', mv, num_threads=5)
+```
+
+
+## Commit Object
+A Commit contains a hash, a committer (name and email), an author (name, and email), a message, the authored date, committed date, a list of its parent hashes (if it's a merge commit, the commit has two parents), and the list of modification.
 
 For example:
 
@@ -178,7 +187,7 @@ class MyVisitor(CommitVisitor):
         )
 ```
 
-## Modifications
+## Modifications 
 You can get the list of modified files, as well as their diffs and current source code. To that, all you have to do is to get the list of _Modification_s that exists inside Commit. A modification object has the following fields:
 
 - *old_path*: old path of the file (can be _None_ if the file is added)
@@ -202,7 +211,6 @@ class MyVisitor(CommitVisitor):
                 " with a change type of {}".format(m.change_type.name)
             )
 ```
-
 
 ## How do I cite PyDriller?
 

@@ -10,6 +10,10 @@ PyDriller documentation!
    :maxdepth: 2
    
    intro
+   tutorial
+   configuration
+   commit
+   modifications
 
 
 

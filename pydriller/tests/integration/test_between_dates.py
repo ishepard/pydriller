@@ -5,8 +5,8 @@ from datetime import datetime
 import pytest
 from dateutil import tz
 
-from repository_mining import RepositoryMining
-from tests.visitor_test import VisitorTest
+from pydriller.repository_mining import RepositoryMining
+from pydriller.tests.visitor_test import VisitorTest
 
 
 @pytest.yield_fixture(scope="function")

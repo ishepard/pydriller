@@ -2,9 +2,9 @@ import logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 import pytest
-from scm.git_repository import GitRepository
-from domain.change_set import ChangeSet
-from domain.modification_type import ModificationType
+from pydriller.scm.git_repository import GitRepository
+from pydriller.domain.change_set import ChangeSet
+from pydriller.domain.modification_type import ModificationType
 from datetime import datetime
 from dateutil import tz
 

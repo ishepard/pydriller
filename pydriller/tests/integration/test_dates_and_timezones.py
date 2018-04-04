@@ -6,9 +6,9 @@ from typing import List
 import pytest
 from dateutil import tz
 
-from domain.commit import Commit
-from repository_mining import RepositoryMining
-from tests.visitor_test import VisitorTest
+from pydriller.domain.commit import Commit
+from pydriller.repository_mining import RepositoryMining
+from pydriller.tests.visitor_test import VisitorTest
 
 from datetime import datetime
 path2 = 'test-repos/git-2/'

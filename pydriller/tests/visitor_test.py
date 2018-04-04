@@ -1,7 +1,7 @@
-from domain.commit import Commit
-from scm.commit_visitor import CommitVisitor
-from scm.git_repository import GitRepository
-from scm.persistence_mechanism import PersistenceMechanism
+from pydriller.domain.commit import Commit
+from pydriller.scm.commit_visitor import CommitVisitor
+from pydriller.scm.git_repository import GitRepository
+from pydriller.scm.persistence_mechanism import PersistenceMechanism
 
 
 class VisitorTest(CommitVisitor):

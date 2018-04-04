@@ -3,10 +3,10 @@ import logging
 from typing import List
 from git import Git, Repo, Diff, GitCommandError
 from git.objects.util import tzoffset
-from domain.change_set import ChangeSet
-from domain.commit import Commit
-from domain.developer import Developer
-from domain.modification_type import ModificationType
+from pydriller.domain.change_set import ChangeSet
+from pydriller.domain.commit import Commit
+from pydriller.domain.developer import Developer
+from pydriller.domain.modification_type import ModificationType
 from threading import Lock
 from datetime import datetime
 

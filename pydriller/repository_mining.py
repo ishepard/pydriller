@@ -1,12 +1,12 @@
 import logging
 
-from domain.commit import Commit
+from pydriller.domain.commit import Commit
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 from typing import List
-from scm.git_repository import GitRepository
-from domain.change_set import ChangeSet
-from scm.commit_visitor import CommitVisitor
+from pydriller.scm.git_repository import GitRepository
+from pydriller.domain.change_set import ChangeSet
+from pydriller.scm.commit_visitor import CommitVisitor
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 

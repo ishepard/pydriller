@@ -3,8 +3,8 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 
 import pytest
 
-from repository_mining import RepositoryMining
-from tests.visitor_test import VisitorTest
+from pydriller.repository_mining import RepositoryMining
+from pydriller.tests.visitor_test import VisitorTest
 
 
 @pytest.yield_fixture(scope="function")

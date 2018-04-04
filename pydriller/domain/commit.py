@@ -1,8 +1,8 @@
 from _datetime import datetime
 from typing import List
-from domain.developer import Developer
-from domain.modification import Modification
-from domain.modification_type import ModificationType
+from pydriller.domain.developer import Developer
+from pydriller.domain.modification import Modification
+from pydriller.domain.modification_type import ModificationType
 
 
 class Commit:

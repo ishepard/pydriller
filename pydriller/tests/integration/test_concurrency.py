@@ -1,7 +1,7 @@
 import pytest
 
-from repository_mining import RepositoryMining
-from tests.integration.concurrency_visitor_test import ConcurrencyVisitorTest
+from pydriller.repository_mining import RepositoryMining
+from pydriller.tests.integration.concurrency_visitor_test import ConcurrencyVisitorTest
 
 results = []
 

@@ -1,8 +1,8 @@
 import logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-from repository_mining import RepositoryMining
-from tests.visitor_test import VisitorTest
+from pydriller.repository_mining import RepositoryMining
+from pydriller.tests.visitor_test import VisitorTest
 
 
 def test_between_revisions():

@@ -2,14 +2,10 @@ import logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 import pytest
-from domain.commit import Commit
-from repository_mining import RepositoryMining
-from scm.commit_visitor import CommitVisitor
-from scm.git_repository import GitRepository
-from scm.persistence_mechanism import PersistenceMechanism
+from pydriller.repository_mining import RepositoryMining
 from datetime import datetime
 from dateutil import tz
-from tests.visitor_test import VisitorTest
+from pydriller.tests.visitor_test import VisitorTest
 
 to_zone = tz.gettz('GMT+1')
 dt = datetime(2018, 3, 22, 10, 41, 30, tzinfo=to_zone)

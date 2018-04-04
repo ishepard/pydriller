@@ -4,11 +4,11 @@ if 'TRAVIS' in os.environ:
     import logging
     logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-from domain.commit import Commit
-from repository_mining import RepositoryMining
-from scm.commit_visitor import CommitVisitor
-from scm.git_repository import GitRepository
-from scm.persistence_mechanism import PersistenceMechanism
+from pydriller.domain.commit import Commit
+from pydriller.repository_mining import RepositoryMining
+from pydriller.scm.commit_visitor import CommitVisitor
+from pydriller.scm.git_repository import GitRepository
+from pydriller.scm.persistence_mechanism import PersistenceMechanism
 from datetime import datetime
 
 

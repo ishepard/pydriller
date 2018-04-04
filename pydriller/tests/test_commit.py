@@ -3,8 +3,8 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 
 import pytest
 
-from domain.commit import Commit
-from scm.git_repository import GitRepository
+from pydriller.domain.commit import Commit
+from pydriller.scm.git_repository import GitRepository
 
 
 @pytest.yield_fixture(scope="module")

@@ -1,7 +1,7 @@
 import abc
-from scm.git_repository import GitRepository
-from domain.commit import Commit
-from scm.persistence_mechanism import PersistenceMechanism
+from pydriller.scm.git_repository import GitRepository
+from pydriller.domain.commit import Commit
+from pydriller.scm.persistence_mechanism import PersistenceMechanism
 
 
 class CommitVisitor(abc.ABC):

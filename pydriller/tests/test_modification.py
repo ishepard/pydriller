@@ -1,10 +1,8 @@
 import logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-import pytest
-
-from domain.modification import Modification
-from domain.modification_type import ModificationType
+from pydriller.domain.modification import Modification
+from pydriller.domain.modification_type import ModificationType
 
 
 def test_should_get_adds_and_removes():

@@ -64,7 +64,7 @@ For information on how to use PyDriller, refer to the ufficial documentation:
 
 - [http://pydriller.readthedocs.io](http://pydriller.readthedocs.io)
 
-or have a look at our _example_ folder.
+or have a look at our [example](https://github.com/ishepard/pydriller/tree/master/examples) folder.
 
 ## How do I cite PyDriller?
 

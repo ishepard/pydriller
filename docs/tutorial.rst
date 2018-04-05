@@ -19,9 +19,17 @@ Let's make another example: print all the modified files for every commit. This 
 
     for commit in RepositoryMining('path/to/the/repo').traverse_commits():
         for modification in commit.modifications:
-            if modification.change_type == ModificationType.MODIFY:
-                print('Author {} modified {} in commit {}'.format(commit.author.name, modification.filename, commit.hash))
+            print('Author {} modified {} in commit {}'.format(commit.author.name, modification.filename, commit.hash))
 
 That's it! It's simple, isn't it?
 
 Behind the scenes, PyDriller opens the Git repository and extracts all the necessary information. Then, the framework returns a generator that can iterate over the commits. 
+
+Ok, let's try a more difficult problem: let's count how many commits contain the word "bug" in the message. We can do it like this::
+
+    count = 0
+    for commit in RepositoryMining('path/to/the/repo').traverse_commits():
+        if 'bug' in commit.msg:
+            count += 1
+
+I bet you weren't expecting it to be that simple, right?

@@ -8,15 +8,21 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class RepositoryMining:
-    def __init__(self, path_to_repo: str, single: str = None, since: datetime = None,
-                 to: datetime = None, from_commit: str = None, to_commit: str = None, from_tag: str = None,
-                 to_tag: str = None, reversed_order: bool = False, only_in_main_branch: bool = False,
-                 only_in_branches: List[str]= None, only_modifications_with_file_types: List[str] = None,
-                 only_no_merge: bool = False, num_threads: int = 1):
+    def __init__(self, path_to_repo: str,
+                 single: str = None,
+                 since: datetime = None, to: datetime = None,
+                 from_commit: str = None, to_commit: str = None,
+                 from_tag: str = None, to_tag: str = None,
+                 reversed_order: bool = False,
+                 only_in_main_branch: bool = False,
+                 only_in_branches: List[str]= None,
+                 only_modifications_with_file_types: List[str] = None,
+                 only_no_merge: bool = False,
+                 num_threads: int = 1):
         """
         Init a repository mining.
 
-        :param str path_to_repo: absolute path to the repository you have to mine
+        :param str path_to_repo: absolute path to the repository you have to analyze
         :param str single: hash of a single commit to analyze
         :param datetime since: starting date
         :param datetime to: ending date
@@ -70,6 +76,10 @@ class RepositoryMining:
             self.to = self.git_repo.get_commit_from_tag(to_tag).author_date
 
     def traverse_commits(self) -> Generator[Commit, None, None]:
+        """
+        Analyze all the specified commits (all of them by default), returning
+        a generator of commits.
+        """
         logging.info('Git repository in {}'.format(self.git_repo.path))
         all_cs = self._apply_filters_on_changesets(self.git_repo.get_change_sets())
 

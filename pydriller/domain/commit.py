@@ -12,16 +12,19 @@ class Commit:
                  is_commit_in_main_branch: bool = False) -> None:
         """
         Create a commit object.
-        :param hash: hash of the commit
-        :param author: author of the commit
-        :param committer: committer of the commit
-        :param author_date: date when the author committed
-        :param committer_date: date when the committer committed
-        :param msg: message of the commit
-        :param parent: hash of the parent commit
-        :param merge: True if the commit is a merge commit
-        :param branches: branches that include the commit
-        :param is_commit_in_main_branch: True if the commit is in the main branch
+
+        :param str hash: hash of the commit
+        :param Developer author: author of the commit
+        :param Developer committer: committer of the commit
+        :param datetime author_date: date when the author committed
+        :param datetime committer_date: date when the committer committed
+        :param int author_timezone: seconds west from UTC
+        :param int committer_timezone: seconds west from UTC
+        :param str msg: message of the commit
+        :param List[str] parents: list of hashes of the parent commits
+        :param bool merge: True if the commit is a merge commit
+        :param set branches: branches that include the commit
+        :param bool is_commit_in_main_branch: True if the commit is in the main branch
         """
         self.hash = hash
         self.author = author
@@ -40,11 +43,12 @@ class Commit:
     def add_modifications(self, old_path: str, new_path: str, change: ModificationType, diff: str, sc: str):
         """
         Add a modification to the commit.
-        :param old_path: old path of the file (can be null if the file is added)
-        :param new_path: new path of the file (can be null if the file is deleted)
-        :param change: type of the change
-        :param diff: diff of the change
-        :param sc: source code of the file (can be null if the file is deleted)
+
+        :param str old_path: old path of the file (can be null if the file is added)
+        :param str new_path: new path of the file (can be null if the file is deleted)
+        :param ModificationType change: type of the change
+        :param str diff: diff of the change
+        :param str sc: source code of the file (can be null if the file is deleted)
         """
         m = Modification(old_path, new_path, change, diff, sc)
         self.modifications.append(m)
@@ -76,6 +80,13 @@ class Commit:
 
 class ChangeSet:
     def __init__(self, id: str, date: datetime):
+        """
+        Light-weight version of the commit, storing only the hash and the date. Used for filter out
+        commits before asking for more complex information (like diff and source code).
+
+        :param str id: hash of the commit
+        :param date: date of the commit
+        """
         self.id = id
         self.date = date
 

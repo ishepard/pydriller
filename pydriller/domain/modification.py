@@ -1,7 +1,6 @@
 from enum import Enum
-
-import re
 import os
+
 
 class ModificationType(Enum):
     ADD = 1,
@@ -16,6 +15,7 @@ class Modification:
         """
         Initialize a modification. A modification carries on information regarding
         the changed file.
+
         :param old_path: old path of the file (can be null if the file is added)
         :param new_path: new path of the file (can be null if the file is deleted)
         :param change_type: type of the change
@@ -30,7 +30,7 @@ class Modification:
         self.source_code = source_code
         self.added = 0
         self.removed = 0
-        self.filename = self.__get_filename()
+        self.filename = self._get_filename()
 
         for line in diff.replace('\r', '').split("\n"):
             if line.startswith('+') and not line.startswith('+++'):
@@ -38,14 +38,7 @@ class Modification:
             if line.startswith('-') and not line.startswith('---'):
                 self.removed += 1
 
-    def filename_ends_with(self, suffix: str) -> bool:
-        return self.new_path.lower().endswith(suffix.lower())
-
-    def filename_matches(self, regex: str) -> bool:
-        pattern = re.compile(regex)
-        return pattern.match(self.new_path.lower())
-
-    def __get_filename(self) -> str:
+    def _get_filename(self) -> str:
         if self.new_path is not None and self.new_path != "/dev/null":
             path = self.new_path
         else:

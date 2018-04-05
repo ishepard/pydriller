@@ -23,42 +23,48 @@ class GitRepository:
         self.main_branch = None
         self.lock = Lock()
 
-    def __open_git(self) -> Git:
-        self.__open_repository()
+    def _open_git(self) -> Git:
+        self._open_repository()
         return Git(self.path)
 
-    def __open_repository(self) -> Repo:
+    def _open_repository(self) -> Repo:
         repo = Repo(self.path)
         if self.main_branch is None:
-            self.__discover_main_branch(repo)
+            self._discover_main_branch(repo)
         return repo
 
-    def __discover_main_branch(self, repo):
+    def _discover_main_branch(self, repo):
         self.main_branch = repo.active_branch.name
 
     def get_head(self) -> ChangeSet:
         """
         Get the head commit.
+
         :return: ChangeSet of the head commit
         """
-        repo = self.__open_repository()
+        repo = self._open_repository()
         head_commit = repo.head.commit
         return ChangeSet(head_commit.hexsha, head_commit.committed_datetime)
 
     def get_change_sets(self) -> List[ChangeSet]:
-        return self.__get_all_commits()
+        """
+        Return the list of all the commits in the repo.
 
-    def __get_all_commits(self) -> List[ChangeSet]:
-        repo = self.__open_repository()
+        :return: List[ChangeSet], the list of all the commits in the repo
+        """
+        return self._get_all_commits()
+
+    def _get_all_commits(self) -> List[ChangeSet]:
+        repo = self._open_repository()
         commit_list = list(repo.iter_commits())
 
         change_sets = []
         for commit in commit_list:
-            committer_date = self.__get_time(commit.committed_date, commit.committer_tz_offset)
+            committer_date = self._get_time(commit.committed_date, commit.committer_tz_offset)
             change_sets.append(ChangeSet(commit.hexsha, committer_date))
         return change_sets
 
-    def __get_time(self, timestamp, tz_offset) -> datetime:
+    def _get_time(self, timestamp, tz_offset) -> datetime:
         try:
             dt = datetime.fromtimestamp(timestamp).astimezone(tzoffset(tz_offset))
         except ValueError:
@@ -68,12 +74,13 @@ class GitRepository:
 
     def get_commit(self, commit_id: str) -> Commit:
         """
-        Get the commit.
+        Get the specified commit.
+
         :param commit_id: hash of the commit to analyze
         :return: Commit
         """
-        git = self.__open_git()
-        repo = self.__open_repository()
+        git = self._open_git()
+        repo = self._open_repository()
         commit = repo.commit(commit_id)
 
         author = Developer(commit.author.name, commit.author.email)
@@ -84,8 +91,8 @@ class GitRepository:
         msg = commit.message.strip()
         commit_hash = commit.hexsha
 
-        author_date = self.__get_time(commit.authored_date, author_timezone)
-        committer_date = self.__get_time(commit.committed_date, author_timezone)
+        author_date = self._get_time(commit.authored_date, author_timezone)
+        committer_date = self._get_time(commit.committed_date, author_timezone)
 
         merge = True if len(commit.parents) > 1 else False
 
@@ -93,7 +100,7 @@ class GitRepository:
         for p in commit.parents:
             parents.append(p.hexsha)
 
-        branches = self.__get_branches(git, commit_hash)
+        branches = self._get_branches(git, commit_hash)
         is_in_main_branch = self.main_branch in branches
 
         the_commit = Commit(commit_hash, author, committer, author_date, committer_date, author_timezone,
@@ -107,15 +114,15 @@ class GitRepository:
             parent = repo.tree('4b825dc642cb6eb9a060e54bf8d69288fbee4904')
             diff_index = parent.diff(commit.tree, create_patch=True)
 
-        self.__parse_diff(diff_index, the_commit)
+        self._parse_diff(diff_index, the_commit)
 
         return the_commit
 
-    def __parse_diff(self, diff_index, the_commit) -> None:
+    def _parse_diff(self, diff_index, the_commit) -> None:
         for d in diff_index:
             old_path = d.a_path
             new_path = d.b_path
-            change_type = self.__from_change_to_modification_type(d)
+            change_type = self._from_change_to_modification_type(d)
             sc = ''
             diff_text = ''
             try:
@@ -126,13 +133,13 @@ class GitRepository:
 
             the_commit.add_modifications(old_path, new_path, change_type, diff_text, sc)
 
-    def __get_branches(self, git: Git, commit_hash: str) -> set():
+    def _get_branches(self, git: Git, commit_hash: str) -> set():
         branches = set()
         for branch in set(git.branch('--contains', commit_hash).split('\n')):
             branches.add(branch.strip().replace('* ', ''))
         return branches
 
-    def __from_change_to_modification_type(self, d: Diff):
+    def _from_change_to_modification_type(self, d: Diff):
         if d.new_file:
             return ModificationType.ADD
         elif d.deleted_file:
@@ -143,19 +150,31 @@ class GitRepository:
             return ModificationType.MODIFY
 
     def checkout(self, _hash: str) -> None:
+        """
+        Checkout the repo at the speficied commit.
+        BE CAREFUL: this will change the state of the repo, hence it should *not*
+        be used with more than 1 thread.
+
+        :param _hash: commit hash to checkout
+        """
         with self.lock:
-            git = self.__open_git()
-            self.__delete_tmp_branch()
+            git = self._open_git()
+            self._delete_tmp_branch()
             git.checkout('-f', _hash, b='_PD')
 
-    def __delete_tmp_branch(self) -> None:
-        repo = self.__open_repository()
+    def _delete_tmp_branch(self) -> None:
+        repo = self._open_repository()
         try:
             repo.delete_head('_PD')
         except GitCommandError:
             logging.debug("Branch _PD not found")
 
     def files(self) -> List[str]:
+        """
+        Obtain the list of the files (excluding .git directory).
+
+        :return: List[str], the list of the files
+        """
         _all = []
         for path, subdirs, files in os.walk(self.path):
             if '.git' in path:
@@ -165,16 +184,32 @@ class GitRepository:
         return _all
 
     def reset(self) -> None:
+        """
+        Reset the state of the repo, checking out the main branch and discarding
+        local changes (-f option).
+
+        """
         with self.lock:
-            git = self.__open_git()
+            git = self._open_git()
             git.checkout('-f', self.main_branch)
-            self.__delete_tmp_branch()
+            self._delete_tmp_branch()
 
     def total_commits(self) -> int:
+        """
+        Calculate total number of commits.
+
+        :return: the total number of commits
+        """
         return len(self.get_change_sets())
 
     def get_commit_from_tag(self, tag: str) -> Commit:
-        repo = self.__open_repository()
+        """
+        Obtain the tagged commit.
+
+        :param str tag: the tag
+        :return: Commit commit: the commit the tag referred to
+        """
+        repo = self._open_repository()
         try:
             selected_tag = repo.tags[tag]
             return self.get_commit(selected_tag.commit.hexsha)

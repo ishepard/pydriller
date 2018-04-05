@@ -105,7 +105,7 @@ class GitRepository:
 
         the_commit = Commit(commit_hash, author, committer, author_date, committer_date, author_timezone,
                             committer_timezone, msg,
-                            parents, merge, branches,is_in_main_branch)
+                            parents, merge, branches, is_in_main_branch)
 
         if len(parents) > 0:
             parent = repo.commit(parents[0])

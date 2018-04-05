@@ -2,13 +2,10 @@ import logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 from pydriller.repository_mining import RepositoryMining
-from pydriller.tests.visitor_test import VisitorTest
 
 
 def test_mod_with_file_types():
-    mv = VisitorTest()
-    RepositoryMining('test-repos/git-4/', mv, only_modifications_with_file_types=['.java']).mine()
-    lc = mv.list_commits
+    lc = list(RepositoryMining('test-repos/git-4/', only_modifications_with_file_types=['.java']).traverse_commits())
 
     assert 2 == len(lc)
     assert 'a1b6136f978644ff1d89816bc0f2bd86f6d9d7f5' == lc[0].hash
@@ -16,9 +13,7 @@ def test_mod_with_file_types():
 
 
 def test_only_in_main_branch():
-    mv = VisitorTest()
-    RepositoryMining('test-repos/git-5/', mv, only_in_main_branch=True).mine()
-    lc = mv.list_commits
+    lc = list(RepositoryMining('test-repos/git-5/', only_in_main_branch=True).traverse_commits())
 
     assert 5 == len(lc)
     assert '4a17f31c0d1285477a3a467d0bc3cb38e775097d' == lc[0].hash
@@ -29,9 +24,7 @@ def test_only_in_main_branch():
 
 
 def test_multiple_filters():
-    mv = VisitorTest()
-    RepositoryMining('test-repos/git-5/', mv, only_in_main_branch=True, only_no_merge=True).mine()
-    lc = mv.list_commits
+    lc = list(RepositoryMining('test-repos/git-5/', only_in_main_branch=True, only_no_merge=True).traverse_commits())
 
     assert 4 == len(lc)
     assert '4a17f31c0d1285477a3a467d0bc3cb38e775097d' == lc[0].hash
@@ -39,10 +32,9 @@ def test_multiple_filters():
     assert 'fa8217c324e7fb46c80e1ddf907f4e141449637e' == lc[2].hash
     assert '377e0f474d70f6205784d0150ee0069a050c29ed' == lc[3].hash
 
+
 def test_no_filters():
-    mv = VisitorTest()
-    RepositoryMining('test-repos/git-4/', mv).mine()
-    lc = mv.list_commits
+    lc = list(RepositoryMining('test-repos/git-4/').traverse_commits())
 
     assert 3 == len(lc)
     assert 'a1b6136f978644ff1d89816bc0f2bd86f6d9d7f5' == lc[0].hash

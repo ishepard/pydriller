@@ -1,18 +1,14 @@
 import logging
-
 from pydriller.domain.commit import Commit
-logging.getLogger(__name__).addHandler(logging.NullHandler())
-
-from typing import List
-from pydriller.scm.git_repository import GitRepository
-from pydriller.domain.change_set import ChangeSet
-from pydriller.scm.commit_visitor import CommitVisitor
+from typing import List, Generator
+from pydriller.git_repository import GitRepository
+from pydriller.domain.commit import ChangeSet
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class RepositoryMining:
-    def __init__(self, path_to_repo: str, visitor: CommitVisitor, single: str = None, since: datetime = None,
+    def __init__(self, path_to_repo: str, single: str = None, since: datetime = None,
                  to: datetime = None, from_commit: str = None, to_commit: str = None, from_tag: str = None,
                  to_tag: str = None, reversed_order: bool = False, only_in_main_branch: bool = False,
                  only_in_branches: List[str]= None, only_modifications_with_file_types: List[str] = None,
@@ -35,7 +31,6 @@ class RepositoryMining:
         :param bool only_no_merge: if True, merges will not be analyzed
         """
         self.git_repo = GitRepository(path_to_repo)
-        self.visitor = visitor
         self.single = single
         self.since = since
         self.to = to
@@ -74,33 +69,51 @@ class RepositoryMining:
                 raise Exception('You can not specify <to date> or <to commit> when using <to tag>')
             self.to = self.git_repo.get_commit_from_tag(to_tag).author_date
 
-    def mine(self):
-        """
-        Starts the mining.
-        """
-        logging.info('Started the mining process')
-        self.__process_repo()
-
-    def __process_repo(self):
+    def traverse_commits(self) -> Generator[Commit, None, None]:
         logging.info('Git repository in {}'.format(self.git_repo.path))
         all_cs = self.__apply_filters_on_changesets(self.git_repo.get_change_sets())
 
         if not self.reversed_order:
             all_cs.reverse()
 
-        with ThreadPoolExecutor(max_workers=self.num_threads) as executor:
-            [executor.submit(self.__process_cs, cs) for cs in all_cs]
+        for cs in all_cs:
+            commit = self.git_repo.get_commit(cs.id)
+            logging.info('Commit #{} in {} from {} with {} modifications'
+                         .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
 
-    def __process_cs(self, cs: ChangeSet):
-        commit = self.git_repo.get_commit(cs.id)
-        logging.info('Commit #{} in {} from {} with {} modifications'
-                     .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
+            if self.__is_commit_filtered(commit):
+                logging.info('Commit #{} filtered'.format(commit.hash))
+                continue
 
-        if self.__is_commit_filtered(commit):
-            logging.info('Commit #{} filtered'.format(commit.hash))
-            return
+            yield commit
 
-        self.visitor.process(self.git_repo, commit, None)
+    # def mine(self):
+    #     """
+    #     Starts the mining.
+    #     """
+    #     logging.info('Started the mining process')
+    #     self.__process_repo()
+
+    # def __process_repo(self):
+    #     logging.info('Git repository in {}'.format(self.git_repo.path))
+    #     all_cs = self.__apply_filters_on_changesets(self.git_repo.get_change_sets())
+    #
+    #     if not self.reversed_order:
+    #         all_cs.reverse()
+    #
+    #     # with ThreadPoolExecutor(max_workers=self.num_threads) as executor:
+    #     #     [executor.submit(self.__process_cs, cs) for cs in all_cs]
+    #
+    # def __process_cs(self, cs: ChangeSet):
+    #     commit = self.git_repo.get_commit(cs.id)
+    #     logging.info('Commit #{} in {} from {} with {} modifications'
+    #                  .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
+    #
+    #     if self.__is_commit_filtered(commit):
+    #         logging.info('Commit #{} filtered'.format(commit.hash))
+    #         return
+    #
+    #     self.visitor.process(self.git_repo, commit, None)
 
     def __is_commit_filtered(self, commit: Commit):
         if self.only_in_main_branch is True and commit.in_main_branch is False:
@@ -148,4 +161,5 @@ class RepositoryMining:
 
     def __all_filters_are_none(self):
         return self.single is None and self.since is None and self.to is None
+
 

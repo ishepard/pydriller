@@ -1,4 +1,4 @@
 gitpython
-pytest
+pytest>=3.5.0
 python-dateutil
 psutil

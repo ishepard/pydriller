@@ -1,8 +1,7 @@
 import logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-from pydriller.domain.modification import Modification
-from pydriller.domain.modification_type import ModificationType
+from pydriller.domain.modification import Modification, ModificationType
 
 
 def test_should_get_adds_and_removes():
@@ -17,7 +16,7 @@ def test_should_get_adds_and_removes():
        + "+++ more git stuff\n" \
        + "--- more git stuff\n"
 
-    m =  Modification("old", "new", ModificationType.ADD, diff, "class Java {} ");
+    m = Modification("old", "new", ModificationType.ADD, diff, "class Java {} ");
 
     assert 3 == m.added
     assert 2 == m.removed

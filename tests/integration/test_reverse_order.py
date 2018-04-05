@@ -4,15 +4,12 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 import pytest
 
 from pydriller.repository_mining import RepositoryMining
-from pydriller.tests.visitor_test import VisitorTest
 
 
 @pytest.yield_fixture(scope="function")
 def lc(request):
     reversed = request.param
-    mv = VisitorTest()
-    RepositoryMining('test-repos/git-4', mv, reversed_order=reversed).mine()
-    yield mv.list_commits
+    yield list(RepositoryMining('test-repos/git-4', reversed_order=reversed).traverse_commits())
 
 
 @pytest.mark.parametrize('lc', [False], indirect=True)

@@ -2,15 +2,13 @@ import logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 from pydriller.repository_mining import RepositoryMining
-from pydriller.tests.visitor_test import VisitorTest
 
 
 def test_between_revisions():
-    mv = VisitorTest()
     from_tag = 'tag1'
     to_tag = 'tag3'
-    RepositoryMining('test-repos/git-8/', mv, from_tag=from_tag, to_tag=to_tag).mine()
-    lc = mv.list_commits
+
+    lc = list(RepositoryMining('test-repos/git-8/', from_tag=from_tag, to_tag=to_tag).traverse_commits())
 
     assert 5 == len(lc)
     assert '6bb9e2c6a8080e6b5b34e6e316c894b2ddbf7fcd' == lc[0].hash

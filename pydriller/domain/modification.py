@@ -1,6 +1,14 @@
-from pydriller.domain.modification_type import ModificationType
+from enum import Enum
+
 import re
 import os
+
+class ModificationType(Enum):
+    ADD = 1,
+    COPY = 2,
+    RENAME = 3,
+    DELETE = 4,
+    MODIFY = 5
 
 
 class Modification:

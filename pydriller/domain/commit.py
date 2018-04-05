@@ -1,8 +1,7 @@
 from _datetime import datetime
 from typing import List
 from pydriller.domain.developer import Developer
-from pydriller.domain.modification import Modification
-from pydriller.domain.modification_type import ModificationType
+from pydriller.domain.modification import Modification, ModificationType
 
 
 class Commit:
@@ -73,3 +72,17 @@ class Commit:
                 'Branches: \n{}'.format("\n".join(map(str, self.branches))) + '\n'
                 'In main branch: {}'.format(self.in_main_branch)
                 )
+
+
+class ChangeSet:
+    def __init__(self, id: str, date: datetime):
+        self.id = id
+        self.date = date
+
+    def __eq__(self, other):
+        if not isinstance(other, ChangeSet):
+            return NotImplemented
+        elif self is other:
+            return True
+        else:
+            return self.__dict__ == other.__dict__

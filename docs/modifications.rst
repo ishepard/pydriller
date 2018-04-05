@@ -4,7 +4,7 @@
 Modifications
 =============
 
-You can get the list of modified files, as well as their diffs and current source code. To that, all you have to do is to get the list of *Modification*s that exists inside Commit. A modification object has the following fields:
+You can get the list of modified files, as well as their diffs and current source code. To that, all you have to do is to get the list of *Modifications* that exists inside Commit. A modification object has the following fields:
 
 * *old_path*: old path of the file (can be _None_ if the file is added)
 * *new_path*: new path of the file (can be null if the file is deleted)
@@ -17,12 +17,11 @@ You can get the list of modified files, as well as their diffs and current sourc
 
 For example::
 
-    class MyVisitor(CommitVisitor):
-        def process(self, repo: GitRepository, commit: Commit, writer: PersistenceMechanism):
-            for m in commit.modifications:
-                print(
-                    "Author {}".format(commit.author.name),
-                    " modified {}".format(m.filename),
-                    " with a change type of {}".format(m.change_type.name)
-                )
+    for commit in RepositoryMining('path/to/the/repo').traverse_commits():
+        for m in commit.modifications:
+            print(
+                "Author {}".format(commit.author.name),
+                " modified {}".format(m.filename),
+                " with a change type of {}".format(m.change_type.name)
+            )
 

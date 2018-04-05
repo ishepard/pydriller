@@ -13,14 +13,13 @@ logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 
 class GitRepository:
-    def __init__(self, path: str, first_parent_only: str = False):
+    def __init__(self, path: str):
         """
-        Init the Git Repository
+        Init the Git Repository.
+
         :param path: path to the repository
-        :param first_parent_only: True if it has to analyze only the non merge commits
         """
         self.path = path
-        self.first_parent_only = first_parent_only
         self.main_branch = None
         self.lock = Lock()
 

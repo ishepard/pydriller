@@ -15,8 +15,8 @@ class RepositoryMining:
                  only_no_merge: bool = False, num_threads: int = 1):
         """
         Init a repository mining.
+
         :param str path_to_repo: absolute path to the repository you have to mine
-        :param CommitVisitor visitor: CommitVisitor that will visit all the specified commits
         :param str single: hash of a single commit to analyze
         :param datetime since: starting date
         :param datetime to: ending date
@@ -41,9 +41,9 @@ class RepositoryMining:
         self.only_no_merge = only_no_merge
         self.num_threads = num_threads
 
-        self.__check_filters(from_commit, from_tag, since, single, to, to_commit, to_tag)
+        self._check_filters(from_commit, from_tag, since, single, to, to_commit, to_tag)
 
-    def __check_filters(self, from_commit, from_tag, since, single, to, to_commit, to_tag):
+    def _check_filters(self, from_commit, from_tag, since, single, to, to_commit, to_tag):
         if single is not None:
             if since is not None or to is not None or from_commit is not None or \
                    to_commit is not None or from_tag is not None or to_tag is not None:
@@ -71,7 +71,7 @@ class RepositoryMining:
 
     def traverse_commits(self) -> Generator[Commit, None, None]:
         logging.info('Git repository in {}'.format(self.git_repo.path))
-        all_cs = self.__apply_filters_on_changesets(self.git_repo.get_change_sets())
+        all_cs = self._apply_filters_on_changesets(self.git_repo.get_change_sets())
 
         if not self.reversed_order:
             all_cs.reverse()
@@ -81,7 +81,7 @@ class RepositoryMining:
             logging.info('Commit #{} in {} from {} with {} modifications'
                          .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
 
-            if self.__is_commit_filtered(commit):
+            if self._is_commit_filtered(commit):
                 logging.info('Commit #{} filtered'.format(commit.hash))
                 continue
 
@@ -115,39 +115,39 @@ class RepositoryMining:
     #
     #     self.visitor.process(self.git_repo, commit, None)
 
-    def __is_commit_filtered(self, commit: Commit):
+    def _is_commit_filtered(self, commit: Commit):
         if self.only_in_main_branch is True and commit.in_main_branch is False:
             logging.debug('Commit filtered for main branch')
             return True
         if self.only_in_branches is not None:
             logging.debug('Commit filtered for only in branches')
-            if not self.__commit_branch_in_branches(commit):
+            if not self._commit_branch_in_branches(commit):
                 return True
         if self.only_modifications_with_file_types is not None:
             logging.debug('Commit filtered for modification types')
-            if not self.__has_modification_with_file_type(commit):
+            if not self._has_modification_with_file_type(commit):
                 return True
         if self.only_no_merge is True and commit.merge is True:
             logging.debug('Commit filtered for no merge')
             return True
         return False
 
-    def __commit_branch_in_branches(self, commit: Commit):
+    def _commit_branch_in_branches(self, commit: Commit):
         for branch in commit.branches:
             if branch in self.only_in_branches:
                 return True
         return False
 
-    def __has_modification_with_file_type(self, commit):
+    def _has_modification_with_file_type(self, commit):
         for mod in commit.modifications:
             if mod.filename.endswith(tuple(self.only_modifications_with_file_types)):
                 return True
         return False
 
-    def __apply_filters_on_changesets(self, all_cs: List[ChangeSet]) -> List[ChangeSet]:
+    def _apply_filters_on_changesets(self, all_cs: List[ChangeSet]) -> List[ChangeSet]:
         res = []
 
-        if self.__all_filters_are_none():
+        if self._all_filters_are_none():
             return all_cs
 
         for cs in all_cs:
@@ -159,7 +159,7 @@ class RepositoryMining:
                     continue
         return res
 
-    def __all_filters_are_none(self):
+    def _all_filters_are_none(self):
         return self.single is None and self.since is None and self.to is None
 
 

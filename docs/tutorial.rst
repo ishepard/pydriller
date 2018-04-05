@@ -6,24 +6,22 @@
 Getting Started
 ==================
 
-Using PyDriller is very simple. First, create a `RepositoryMining`: this class will receive in input the path to the repository and the visitor that will be called for every commit. For example::
+Using PyDriller is very simple. You only need to create `RepositoryMining`: this class will receive in input the path to the repository and return a generator that iterates over the commits. For example::
 
-    rp = RepositoryMining('path/to/the/repo', <visitor>)
-    rp.mine()
+    for commit in RepositoryMining('path/to/the/repo').traverse_commits():
+        print('Hash {}, author {}'.format(commit.hash, commit.author.name))
 
-Inside `RepositoryMining`, you will have to configure which projects to analyze, with how many threads, for which commits, etc. 
+will print the name of the developers for each commit. It's simple, isn't it? 
 
-Let's start with something simple: we will print the name of the developers for each commit. For now, you should not care about all possible configurations. This does the magic::
+Inside `RepositoryMining`, you will have to configure which projects to analyze, for which commits, for which dates etc. For all the possible configurations, have a look at :ref:`configuration_toplevel`.
 
-    mv = MyVisitor()
-    rp = RepositoryMining('test-repos/test1/', mv)
-    rp.mine()
+Let's make another example: print all the modified files for every commit. This does the magic::
 
-At this point, PyDriller will open the Git repository and will extract all information. Then, the framework will pass each commit to the visitor. Let's write our first visitor, it is fairly simple. All we will do is to implement CommitVisitor. And, inside of process(), we print the commit hash and the name of the developer::
-
-    class MyVisitor(CommitVisitor):
-        def process(self, repo: GitRepository, commit: Commit, writer: PersistenceMechanism):
-            print("The hash: " + commit.hash)
-            print("and the author: " + commit.author)
+    for commit in RepositoryMining('path/to/the/repo').traverse_commits():
+        for modification in commit.modifications:
+            if modification.change_type == ModificationType.MODIFY:
+                print('Author {} modified {} in commit {}'.format(commit.author.name, modification.filename, commit.hash))
 
 That's it! It's simple, isn't it?
+
+Behind the scenes, PyDriller opens the Git repository and extracts all the necessary information. Then, the framework returns a generator that can iterate over the commits. 

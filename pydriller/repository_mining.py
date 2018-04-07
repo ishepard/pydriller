@@ -1,3 +1,17 @@
+# Copyright 2018 Davide Spadini
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import logging
 from pydriller.domain.commit import Commit
 from typing import List, Generator
@@ -96,34 +110,6 @@ class RepositoryMining:
                 continue
 
             yield commit
-
-    # def mine(self):
-    #     """
-    #     Starts the mining.
-    #     """
-    #     logging.info('Started the mining process')
-    #     self.__process_repo()
-
-    # def __process_repo(self):
-    #     logging.info('Git repository in {}'.format(self.git_repo.path))
-    #     all_cs = self.__apply_filters_on_changesets(self.git_repo.get_change_sets())
-    #
-    #     if not self.reversed_order:
-    #         all_cs.reverse()
-    #
-    #     # with ThreadPoolExecutor(max_workers=self.num_threads) as executor:
-    #     #     [executor.submit(self.__process_cs, cs) for cs in all_cs]
-    #
-    # def __process_cs(self, cs: ChangeSet):
-    #     commit = self.git_repo.get_commit(cs.id)
-    #     logging.info('Commit #{} in {} from {} with {} modifications'
-    #                  .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
-    #
-    #     if self.__is_commit_filtered(commit):
-    #         logging.info('Commit #{} filtered'.format(commit.hash))
-    #         return
-    #
-    #     self.visitor.process(self.git_repo, commit, None)
 
     def _is_commit_filtered(self, commit: Commit):
         if self.only_in_main_branch is True and commit.in_main_branch is False:

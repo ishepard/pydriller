@@ -14,6 +14,7 @@ PyDriller documentation!
    configuration
    commit
    modifications
+   gitrepository
    reference
 
 

@@ -69,7 +69,6 @@ def test_get_first_commit():
     assert 'First commit adding 2 files' == c.msg
     assert c.in_main_branch is True
 
-
 def test_files():
     gr = GitRepository('test-repos/test2/')
     all = gr.files()

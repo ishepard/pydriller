@@ -1,7 +1,7 @@
 import os
 import logging
 from pprint import pprint
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from git import Git, Repo, Diff, GitCommandError
 from git.objects.util import tzoffset
 from pydriller.domain.commit import Commit, ChangeSet
@@ -218,7 +218,7 @@ class GitRepository:
             logging.debug('Tag {} not found'.format(tag))
             raise
 
-    def parse_diff(self, diff: str) -> Dict[str, List[(int, str)]]:
+    def parse_diff(self, diff: str) -> Dict[str, List[Tuple(int, str)]]:
         """
         Given a diff, returns a dictionary with the added and deleted lines.
         The dictionary has 2 keys: "added" and "deleted", each containing the

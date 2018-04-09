@@ -19,8 +19,7 @@ import pytest
 from pydriller.git_repository import GitRepository
 from pydriller.domain.commit import ChangeSet
 from pydriller.domain.modification import ModificationType
-from datetime import datetime
-from dateutil import tz
+from datetime import datetime, timezone, timedelta
 
 
 def test_get_head():
@@ -37,7 +36,7 @@ def test_get_change_sets():
     gr = GitRepository('test-repos/test1/')
     assert gr is not None
     change_sets = gr.get_change_sets()
-    to_zone = tz.gettz('GMT+1')
+    to_zone = timezone(timedelta(hours=1))
 
     cs1 = ChangeSet('a88c84ddf42066611e76e6cb690144e5357d132c',
                     datetime(2018, 3, 22, 10, 41, 11, tzinfo=to_zone))
@@ -45,7 +44,7 @@ def test_get_change_sets():
                     datetime(2018, 3, 22, 10, 41, 47, tzinfo=to_zone))
     cs3 = ChangeSet('09f6182cef737db02a085e1d018963c7a29bde5a',
                     datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone))
-    to_zone = tz.gettz('GMT+2')
+    to_zone = timezone(timedelta(hours=2))
     cs4 = ChangeSet('1f99848edadfffa903b8ba1286a935f1b92b2845',
                     datetime(2018, 3, 27, 17, 10, 52, tzinfo=to_zone))
 
@@ -59,7 +58,7 @@ def test_get_change_sets():
 def test_get_commit():
     gr = GitRepository('test-repos/test1/')
     c = gr.get_commit('09f6182cef737db02a085e1d018963c7a29bde5a')
-    to_zone = tz.gettz('GMT+1')
+    to_zone = timezone(timedelta(hours=1))
 
     assert '09f6182cef737db02a085e1d018963c7a29bde5a' == c.hash
     assert 'ishepard' == c.author.name
@@ -73,7 +72,7 @@ def test_get_commit():
 def test_get_first_commit():
     gr = GitRepository('test-repos/test1/')
     c = gr.get_commit('a88c84ddf42066611e76e6cb690144e5357d132c')
-    to_zone = tz.gettz('GMT+1')
+    to_zone = timezone(timedelta(hours=1))
 
     assert 'a88c84ddf42066611e76e6cb690144e5357d132c' == c.hash
     assert 'ishepard' == c.author.name

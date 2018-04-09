@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import logging
-from datetime import datetime
-from dateutil import tz
+from datetime import datetime, timezone, timedelta
 from pydriller.repository_mining import RepositoryMining
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 
-to_zone = tz.gettz('GMT-4')
+to_zone = timezone(timedelta(hours=-4))
 dt1 = datetime(2016, 10, 8, 17, 0, 0, tzinfo=to_zone)
 dt2 = datetime(2016, 10, 8, 17, 59, 0, tzinfo=to_zone)
 

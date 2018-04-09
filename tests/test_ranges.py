@@ -17,14 +17,13 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 
 import pytest
 from pydriller.repository_mining import RepositoryMining
-from datetime import datetime
-from dateutil import tz
+from datetime import datetime, timezone, timedelta
 
-to_zone = tz.gettz('GMT+1')
+to_zone = timezone(timedelta(hours=1))
 dt = datetime(2018, 3, 22, 10, 41, 30, tzinfo=to_zone)
 dt1 = datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone)
 dt2 = datetime(2018, 3, 22, 10, 41, 45, tzinfo=to_zone)
-to_zone = tz.gettz('GMT+2')
+to_zone = timezone(timedelta(hours=2))
 dt3 = datetime(2018, 3, 27, 17, 20, 3, tzinfo=to_zone)
 
 

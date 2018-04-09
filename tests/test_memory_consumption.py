@@ -14,11 +14,15 @@
 
 import os
 import psutil
+import json
+import requests
 if 'TRAVIS' in os.environ:
     import logging
     logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 from pydriller.repository_mining import RepositoryMining
-from datetime import datetime, timezone
+from datetime import datetime
+
+webhook_url = os.environ['WEBHOOK_URL']
 
 
 def test_memory():
@@ -48,3 +52,15 @@ def test_memory():
     logging.info('All: {}'.format(', '.join(map(str, all_commits))))
     logging.info('Time {}:{}:{}'.format(diff.seconds//3600, (diff.seconds % 3600) // 60, diff.seconds % 60))
     logging.info('Commits per second: {}'.format(len(all_commits) / diff.seconds))
+
+    slack_data = {'text': "Max memory {} Mb \nMin memory {} Mb\nTime {}:{}:{}\nCommits per second: {}".format(
+        max(all_commits),
+        min(all_commits),
+        diff.seconds // 3600, (diff.seconds % 3600) // 60, diff.seconds % 60,
+        len(all_commits) / diff.seconds
+    )}
+
+    requests.post(
+        webhook_url, data=json.dumps(slack_data),
+        headers={'Content-Type': 'application/json'}
+    )

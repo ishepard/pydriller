@@ -31,7 +31,7 @@ def test_memory():
 
     dt1 = datetime(2015, 1, 1)
     dt2 = datetime(2016, 1, 1)
-    dt1.astimezone(timezone.utc)
+
     start = datetime.now()
     for _ in RepositoryMining('test-repos/hadoop',
                               since=dt1,

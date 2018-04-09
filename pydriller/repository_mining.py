@@ -13,6 +13,9 @@
 # limitations under the License.
 
 import logging
+
+import pytz as pytz
+
 from pydriller.domain.commit import Commit
 from typing import List, Generator
 from pydriller.git_repository import GitRepository
@@ -161,7 +164,9 @@ class RepositoryMining:
         return self.single is None and self.since is None and self.to is None
 
     def _check_timezones(self):
-        if self.since is not None and self.since.tzinfo is None:
-            self.since = self.since.astimezone(timezone.utc)
-        if self.to is not None and self.to.tzinfo is None:
-            self.to = self.to.astimezone(timezone.utc)
+        if self.since is not None:
+            if self.since.tzinfo is None or self.since.tzinfo.utcoffset(self.since) is None:
+                self.since = self.since.replace(tzinfo=pytz.utc)
+        if self.to is not None:
+            if self.to.tzinfo is None or self.to.tzinfo.utcoffset(self.to) is None:
+                self.to = self.to.replace(tzinfo=pytz.utc)

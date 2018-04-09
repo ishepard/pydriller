@@ -14,17 +14,14 @@
 
 import os
 import logging
-from pprint import pprint
 from typing import List, Dict, Tuple
 from git import Git, Repo, Diff, GitCommandError
-from git.objects.util import tzoffset
 from pydriller.domain.commit import Commit, ChangeSet
 from pydriller.domain.developer import Developer
 from pydriller.domain.modification import ModificationType
 from threading import Lock
-from datetime import datetime
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
+logger = logging.getLogger(__name__)
 
 
 class GitRepository:
@@ -75,17 +72,9 @@ class GitRepository:
 
         change_sets = []
         for commit in commit_list:
-            committer_date = self._get_time(commit.committed_date, commit.committer_tz_offset)
+            committer_date = commit.committed_datetime
             change_sets.append(ChangeSet(commit.hexsha, committer_date))
         return change_sets
-
-    def _get_time(self, timestamp, tz_offset) -> datetime:
-        try:
-            dt = datetime.fromtimestamp(timestamp).astimezone(tzoffset(tz_offset))
-        except ValueError:
-            dt = datetime.fromtimestamp(timestamp).astimezone(tzoffset(0, 'UTC'))
-            print('Error in retrieving dates information')
-        return dt
 
     def get_commit(self, commit_id: str) -> Commit:
         """
@@ -106,8 +95,8 @@ class GitRepository:
         msg = commit.message.strip()
         commit_hash = commit.hexsha
 
-        author_date = self._get_time(commit.authored_date, author_timezone)
-        committer_date = self._get_time(commit.committed_date, author_timezone)
+        author_date = commit.authored_datetime
+        committer_date = commit.committed_datetime
 
         merge = True if len(commit.parents) > 1 else False
 
@@ -144,7 +133,7 @@ class GitRepository:
                 sc = d.b_blob.data_stream.read().decode('utf-8')
                 diff_text = d.diff.decode('utf-8')
             except (UnicodeDecodeError, AttributeError, ValueError):
-                logging.debug('Could not load source code or the diff of a file in commit {}'.format(the_commit.hash))
+                logger.debug('Could not load source code or the diff of a file in commit {}'.format(the_commit.hash))
 
             the_commit.add_modifications(old_path, new_path, change_type, diff_text, sc)
 
@@ -182,7 +171,7 @@ class GitRepository:
         try:
             repo.delete_head('_PD')
         except GitCommandError:
-            logging.debug("Branch _PD not found")
+            logger.debug("Branch _PD not found")
 
     def files(self) -> List[str]:
         """
@@ -229,7 +218,7 @@ class GitRepository:
             selected_tag = repo.tags[tag]
             return self.get_commit(selected_tag.commit.hexsha)
         except (IndexError, AttributeError):
-            logging.debug('Tag {} not found'.format(tag))
+            logger.debug('Tag {} not found'.format(tag))
             raise
 
     def parse_diff(self, diff: str) -> Dict[str, List[Tuple[int, str]]]:

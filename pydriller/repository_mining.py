@@ -17,8 +17,9 @@ from pydriller.domain.commit import Commit
 from typing import List, Generator
 from pydriller.git_repository import GitRepository
 from pydriller.domain.commit import ChangeSet
-from datetime import datetime
-logging.getLogger(__name__).addHandler(logging.NullHandler())
+from datetime import datetime, timezone
+
+logger = logging.getLogger(__name__)
 
 
 class RepositoryMining:
@@ -62,6 +63,7 @@ class RepositoryMining:
         self.num_threads = num_threads
 
         self._check_filters(from_commit, from_tag, since, single, to, to_commit, to_tag)
+        self._check_timezones()
 
     def _check_filters(self, from_commit, from_tag, since, single, to, to_commit, to_tag):
         if single is not None:
@@ -94,7 +96,7 @@ class RepositoryMining:
         Analyze all the specified commits (all of them by default), returning
         a generator of commits.
         """
-        logging.info('Git repository in {}'.format(self.git_repo.path))
+        logger.info('Git repository in {}'.format(self.git_repo.path))
         all_cs = self._apply_filters_on_changesets(self.git_repo.get_change_sets())
 
         if not self.reversed_order:
@@ -102,29 +104,29 @@ class RepositoryMining:
 
         for cs in all_cs:
             commit = self.git_repo.get_commit(cs.id)
-            logging.info('Commit #{} in {} from {} with {} modifications'
+            logger.info('Commit #{} in {} from {} with {} modifications'
                          .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
 
             if self._is_commit_filtered(commit):
-                logging.info('Commit #{} filtered'.format(commit.hash))
+                logger.info('Commit #{} filtered'.format(commit.hash))
                 continue
 
             yield commit
 
     def _is_commit_filtered(self, commit: Commit):
         if self.only_in_main_branch is True and commit.in_main_branch is False:
-            logging.debug('Commit filtered for main branch')
+            logger.debug('Commit filtered for main branch')
             return True
         if self.only_in_branches is not None:
-            logging.debug('Commit filtered for only in branches')
+            logger.debug('Commit filtered for only in branches')
             if not self._commit_branch_in_branches(commit):
                 return True
         if self.only_modifications_with_file_types is not None:
-            logging.debug('Commit filtered for modification types')
+            logger.debug('Commit filtered for modification types')
             if not self._has_modification_with_file_type(commit):
                 return True
         if self.only_no_merge is True and commit.merge is True:
-            logging.debug('Commit filtered for no merge')
+            logger.debug('Commit filtered for no merge')
             return True
         return False
 
@@ -158,4 +160,8 @@ class RepositoryMining:
     def _all_filters_are_none(self):
         return self.single is None and self.since is None and self.to is None
 
-
+    def _check_timezones(self):
+        if self.since is not None and self.since.tzinfo is None:
+            self.since = self.since.astimezone(timezone.utc)
+        if self.to is not None and self.to.tzinfo is None:
+            self.to = self.to.astimezone(timezone.utc)

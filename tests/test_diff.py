@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from pprint import pprint
 
 from pydriller import GitRepository
 
@@ -141,11 +142,7 @@ def test_tabs():
 
 
 def test_real_example():
-    diff = 'diff --git a/GitRepository.java b/GitRepository.java\r\n'+ \
-        'index f38a97d..2b96b0e 100644\r\n'+ \
-        '--- a/GitRepository.java\r\n'+ \
-        '+++ b/GitRepository.java\r\n'+ \
-        '@@ -72,7 +72,7 @@ public class GitRepository implements SCM {\r\n'+ \
+    diff = '@@ -72,7 +72,7 @@ public class GitRepository implements SCM {\r\n'+ \
         ' \r\n'+ \
         '        private static Logger log = Logger.getLogger(GitRepository.class);\r\n'+ \
         ' \r\n'+ \

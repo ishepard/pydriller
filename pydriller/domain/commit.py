@@ -50,7 +50,7 @@ class Commit:
         self.msg = msg
         self.parents = parents
         self.merge = merge
-        self.modifications: List[Modification] = []
+        self.modifications = []  # type: List[Modification]
         self.branches = branches
         self.in_main_branch = is_commit_in_main_branch
 

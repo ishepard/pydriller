@@ -17,11 +17,8 @@ import psutil
 if 'TRAVIS' in os.environ:
     import logging
     logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
-
-from pydriller.domain.commit import Commit
 from pydriller.repository_mining import RepositoryMining
-from pydriller.git_repository import GitRepository
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def test_memory():
@@ -32,10 +29,13 @@ def test_memory():
     number_of_commits = 0
     all_commits = []
 
+    dt1 = datetime(2015, 1, 1)
+    dt2 = datetime(2016, 1, 1)
+    dt1.astimezone(timezone.utc)
     start = datetime.now()
-    for _ in RepositoryMining('test-repos/rails',
-                              from_commit='977b4be208c2c54eeaaf7b46953174ef402f49d4',
-                              to_commit='ede505592cfab0212e53ca8ad1c38026a7b5d042').traverse_commits():
+    for _ in RepositoryMining('test-repos/hadoop',
+                              since=dt1,
+                              to=dt2).traverse_commits():
         memory = p.memory_info()[0] / (2 ** 20)
         all_commits.append(memory)
         number_of_commits += 1

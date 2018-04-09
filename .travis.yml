@@ -12,5 +12,6 @@ before_install:
   - cd ..
 install:
   - pip install -r requirements.txt
+  - pip install requests
 script:
   - pytest -v -s

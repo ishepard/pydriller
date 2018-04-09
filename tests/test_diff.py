@@ -76,6 +76,7 @@ def test_additions():
     assert len(deleted) == 0
     assert len(added) == 1
 
+
 def test_deletions():
     diff = '@@ -2,6 +2,7 @@ aa\r\n'+\
         ' bb\r\n'+\

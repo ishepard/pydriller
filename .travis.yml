@@ -1,4 +1,6 @@
 language: python
+notifications:
+    slack: pydriller:GY8wzJPkOMy22cPAH7umESp9
 python:
   - "3.4"
   - "3.5"

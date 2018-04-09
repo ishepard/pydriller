@@ -10,12 +10,12 @@ long_description = 'PyDriller is a Python framework that helps developers on min
                    'modifications, diffs, and source codes, and quickly export CSV files.'
 
 setup(
-    name='pydriller',
+    name='PyDriller',
     description='Framework for MSR',
     long_description = long_description,
     author='Davide Spadini',
     author_email='spadini.davide@gmail.com',
-    version='1.0.1',
+    version='1.0',
     packages=find_packages('.'),
     url='https://github.com/ishepard/pydriller',
     license='Apache License',

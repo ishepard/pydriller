@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
-install_requires = ['gitpython']
-test_requires = ['pytest', 'python-dateutil', 'psutil']
+install_requires = ['gitpython', 'typing', 'pytz']
+test_requires = ['pytest', 'psutil']
 
 # Get the long description from the relevant file
 long_description = 'PyDriller is a Python framework that helps developers on mining software repositories. ' \

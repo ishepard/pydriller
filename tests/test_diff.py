@@ -125,6 +125,8 @@ def test_tabs():
     deleted = parsed_lines['deleted']
 
     assert (3, 'c') in deleted
+    assert 1 == len(deleted)
+
     assert (3, '\td') in added
     assert (4, 'cc') in added
     assert (5, '') in added
@@ -139,6 +141,7 @@ def test_tabs():
     assert (14, '\tg') in added
     assert (15, '') in added
     assert (16, 'j') in added
+    assert 14 == len(added)
 
 
 def test_real_example():
@@ -177,6 +180,9 @@ def test_real_example():
 
     assert (75, '       public GitRepository(String path) {') in deleted
     assert (158, '       public ChangeSet getHead() {') in deleted
+    assert 2 == len(deleted)
+
     assert (75, '       public GitRepository2(String path) {') in added
     assert (158, '       public ChangeSet getHead2() {') in added
     assert (323, '       newline') in added
+    assert 3 == len(added)

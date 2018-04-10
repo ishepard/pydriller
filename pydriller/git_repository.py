@@ -20,8 +20,9 @@ from pydriller.domain.commit import Commit, ChangeSet
 from pydriller.domain.developer import Developer
 from pydriller.domain.modification import ModificationType
 from threading import Lock
-
 logger = logging.getLogger(__name__)
+
+NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
 class GitRepository:
@@ -112,10 +113,12 @@ class GitRepository:
                             parents, merge, branches, is_in_main_branch)
 
         if len(parents) > 0:
+            # the commit has a parent
             parent = repo.commit(parents[0])
             diff_index = parent.diff(commit, create_patch=True)
         else:
-            parent = repo.tree('4b825dc642cb6eb9a060e54bf8d69288fbee4904')
+            # this is the first commit of the repo. Comparing it with git NULL TREE
+            parent = repo.tree(NULL_TREE)
             diff_index = parent.diff(commit.tree, create_patch=True)
 
         self._parse_diff(diff_index, the_commit)

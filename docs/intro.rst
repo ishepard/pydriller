@@ -11,7 +11,7 @@ PyDriller is a Python framework that helps developers on mining software reposit
 Requirements
 ============
 
-* `Python`_ 3.6 or newer
+* `Python`_ 3.4 or newer
 * `Git`_
 * `GitPython`_ - python library for Git
 * `pytest`_ - used for running the tests

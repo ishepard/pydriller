@@ -13,6 +13,9 @@
 # limitations under the License.
 
 import logging
+
+from git import Repo
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 import pytest

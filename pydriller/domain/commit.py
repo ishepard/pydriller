@@ -11,11 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import logging
 from _datetime import datetime
 from typing import List
+
+from git import Repo, Diff
+
+logger = logging.getLogger(__name__)
 from pydriller.domain.developer import Developer
 from pydriller.domain.modification import Modification, ModificationType
+
+NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
 class Commit:
@@ -23,7 +29,7 @@ class Commit:
                  author_date: datetime, committer_date: datetime,
                  author_timezone: int, committer_timezone: int,
                  msg: str, parents: List[str], merge: bool = False, branches: set = set(),
-                 is_commit_in_main_branch: bool = False) -> None:
+                 is_commit_in_main_branch: bool = False, path: str = None) -> None:
         """
         Create a commit object.
 
@@ -50,22 +56,52 @@ class Commit:
         self.msg = msg
         self.parents = parents
         self.merge = merge
-        self.modifications = []  # type: List[Modification]
         self.branches = branches
         self.in_main_branch = is_commit_in_main_branch
+        self.path = path
 
-    def add_modifications(self, old_path: str, new_path: str, change: ModificationType, diff: str, sc: str):
-        """
-        Add a modification to the commit.
+    @property
+    def modifications(self):
+        repo = Repo(self.path)
+        commit = repo.commit(self.hash)
 
-        :param str old_path: old path of the file (can be null if the file is added)
-        :param str new_path: new path of the file (can be null if the file is deleted)
-        :param ModificationType change: type of the change
-        :param str diff: diff of the change
-        :param str sc: source code of the file (can be null if the file is deleted)
-        """
-        m = Modification(old_path, new_path, change, diff, sc)
-        self.modifications.append(m)
+        if len(self.parents) > 0:
+            # the commit has a parent
+            parent = repo.commit(self.parents[0])
+            diff_index = parent.diff(commit, create_patch=True)
+        else:
+            # this is the first commit of the repo. Comparing it with git NULL TREE
+            parent = repo.tree(NULL_TREE)
+            diff_index = parent.diff(commit.tree, create_patch=True)
+
+        return self._parse_diff(diff_index)
+
+    def _parse_diff(self, diff_index) -> List[Modification]:
+        modifications_list = []
+        for d in diff_index:
+            old_path = d.a_path
+            new_path = d.b_path
+            change_type = self._from_change_to_modification_type(d)
+            sc = ''
+            diff_text = ''
+            try:
+                sc = d.b_blob.data_stream.read().decode('utf-8')
+                diff_text = d.diff.decode('utf-8')
+            except (UnicodeDecodeError, AttributeError, ValueError):
+                logger.debug('Could not load source code or the diff of a file in commit {}'.format(self.hash))
+
+            modifications_list.append(Modification(old_path, new_path, change_type, diff_text, sc))
+        return modifications_list
+
+    def _from_change_to_modification_type(self, d: Diff):
+        if d.new_file:
+            return ModificationType.ADD
+        elif d.deleted_file:
+            return ModificationType.DELETE
+        elif d.renamed_file:
+            return ModificationType.RENAME
+        elif d.a_blob and d.b_blob and d.a_blob != d.b_blob:
+            return ModificationType.MODIFY
 
     def __eq__(self, other):
         if not isinstance(other, Commit):

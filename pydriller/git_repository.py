@@ -104,18 +104,9 @@ class GitRepository:
         for p in commit.parents:
             parents.append(p.hexsha)
 
-        branches = self._get_branches(git, commit_hash)
-        is_in_main_branch = self.main_branch in branches
-
         return Commit(commit_hash, author, committer, author_date, committer_date, author_timezone,
                             committer_timezone, msg,
-                            parents, merge, branches, is_in_main_branch, self.path)
-
-    def _get_branches(self, git: Git, commit_hash: str) -> set():
-        branches = set()
-        for branch in set(git.branch('--contains', commit_hash).split('\n')):
-            branches.add(branch.strip().replace('* ', ''))
-        return branches
+                            parents, merge, self.main_branch, self.path)
 
     def checkout(self, _hash: str) -> None:
         """

@@ -15,7 +15,7 @@ import logging
 from _datetime import datetime
 from typing import List
 
-from git import Repo, Diff
+from git import Repo, Diff, Git
 
 logger = logging.getLogger(__name__)
 from pydriller.domain.developer import Developer
@@ -28,8 +28,8 @@ class Commit:
     def __init__(self, hash: str, author: Developer, committer: Developer,
                  author_date: datetime, committer_date: datetime,
                  author_timezone: int, committer_timezone: int,
-                 msg: str, parents: List[str], merge: bool = False, branches: set = set(),
-                 is_commit_in_main_branch: bool = False, path: str = None) -> None:
+                 msg: str, parents: List[str], merge: bool = False, main_branch: str = '',
+                 path: str = None) -> None:
         """
         Create a commit object.
 
@@ -56,9 +56,8 @@ class Commit:
         self.msg = msg
         self.parents = parents
         self.merge = merge
-        self.branches = branches
-        self.in_main_branch = is_commit_in_main_branch
         self.path = path
+        self.main_branch = main_branch
 
     @property
     def modifications(self):
@@ -75,6 +74,18 @@ class Commit:
             diff_index = parent.diff(commit.tree, create_patch=True)
 
         return self._parse_diff(diff_index)
+
+    @property
+    def branches(self):
+        git = Git(self.path)
+        branches = set()
+        for branch in set(git.branch('--contains', self.hash).split('\n')):
+            branches.add(branch.strip().replace('* ', ''))
+        return branches
+
+    @property
+    def in_main_branch(self):
+        return self.main_branch in self.branches
 
     def _parse_diff(self, diff_index) -> List[Modification]:
         modifications_list = []

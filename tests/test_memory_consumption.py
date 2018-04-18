@@ -37,23 +37,59 @@ def test_memory():
     dt2 = datetime(2016, 1, 1)
 
     start = datetime.now()
-    for _ in RepositoryMining('test-repos/hadoop',
+    for commit in RepositoryMining('test-repos/hadoop',
                               since=dt1,
                               to=dt2).traverse_commits():
+        l = len(commit.modifications)
+        b = commit.branches
+        s = commit.in_main_branch
+
         memory = p.memory_info()[0] / (2 ** 20)
         all_commits.append(memory)
         number_of_commits += 1
-
     end = datetime.now()
 
     diff = end - start
+    logging.info("WITH EVERYTHING")
     logging.info('Max memory {} Mb'.format(max(all_commits)))
     logging.info('Min memory {} Mb'.format(min(all_commits)))
     logging.info('All: {}'.format(', '.join(map(str, all_commits))))
     logging.info('Time {}:{}:{}'.format(diff.seconds//3600, (diff.seconds % 3600) // 60, diff.seconds % 60))
     logging.info('Commits per second: {}'.format(len(all_commits) / diff.seconds))
 
-    slack_data = {'text': "PYTHON V{}.{}\nMax memory {} Mb \nMin memory {} Mb\nTime {}:{}:{}\nCommits per second: {}".format(
+    slack_data = {
+        'text': "*WITH EVERYTHING*\nPYTHON V{}.{}\nMax memory {} Mb \nMin memory {} Mb\nTime {}:{}:{}\nCommits per second: {}".format(
+            sys.version_info[0], sys.version_info[1],
+            max(all_commits),
+            min(all_commits),
+            diff.seconds // 3600, (diff.seconds % 3600) // 60, diff.seconds % 60,
+            len(all_commits) / diff.seconds
+        )}
+
+    requests.post(
+        webhook_url, data=json.dumps(slack_data),
+        headers={'Content-Type': 'application/json'}
+    )
+
+    start = datetime.now()
+    for _ in RepositoryMining('test-repos/hadoop',
+                              since=dt1,
+                              to=dt2).traverse_commits():
+        memory = p.memory_info()[0] / (2 ** 20)
+        all_commits.append(memory)
+        number_of_commits += 1
+    end = datetime.now()
+
+    diff = end - start
+    logging.info("WITH NOTHING")
+    logging.info('Max memory {} Mb'.format(max(all_commits)))
+    logging.info('Min memory {} Mb'.format(min(all_commits)))
+    logging.info('All: {}'.format(', '.join(map(str, all_commits))))
+    logging.info('Time {}:{}:{}'.format(diff.seconds//3600, (diff.seconds % 3600) // 60, diff.seconds % 60))
+    logging.info('Commits per second: {}'.format(len(all_commits) / diff.seconds))
+
+    slack_data = {
+        'text': "*WITH NOTHING*\nPYTHON V{}.{}\nMax memory {} Mb \nMin memory {} Mb\nTime {}:{}:{}\nCommits per second: {}".format(
         sys.version_info[0], sys.version_info[1],
         max(all_commits),
         min(all_commits),

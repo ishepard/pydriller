@@ -17,7 +17,6 @@ import logging
 from typing import List, Dict, Tuple
 from git import Git, Repo, Diff, GitCommandError
 from pydriller.domain.commit import Commit, ChangeSet
-from pydriller.domain.developer import Developer
 from threading import Lock
 logger = logging.getLogger(__name__)
 
@@ -83,30 +82,8 @@ class GitRepository:
         :param commit_id: hash of the commit to analyze
         :return: Commit
         """
-        git = self._open_git()
         repo = self._open_repository()
-        commit = repo.commit(commit_id)
-
-        author = Developer(commit.author.name, commit.author.email)
-        committer = Developer(commit.committer.name, commit.committer.email)
-        author_timezone = commit.author_tz_offset
-        committer_timezone = commit.committer_tz_offset
-
-        msg = commit.message.strip()
-        commit_hash = commit.hexsha
-
-        author_date = commit.authored_datetime
-        committer_date = commit.committed_datetime
-
-        merge = True if len(commit.parents) > 1 else False
-
-        parents = []
-        for p in commit.parents:
-            parents.append(p.hexsha)
-
-        return Commit(commit_hash, author, committer, author_date, committer_date, author_timezone,
-                            committer_timezone, msg,
-                            parents, merge, self.main_branch, self.path)
+        return Commit(repo.commit(commit_id), self.path, self.main_branch)
 
     def checkout(self, _hash: str) -> None:
         """

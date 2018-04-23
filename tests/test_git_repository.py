@@ -13,16 +13,12 @@
 # limitations under the License.
 
 import logging
-
-from git import Repo
-
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
-
 import pytest
 from pydriller.git_repository import GitRepository
 from pydriller.domain.commit import ChangeSet
-from pydriller.domain.modification import ModificationType
+from pydriller.domain.commit import ModificationType
 from datetime import datetime, timezone, timedelta
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 
 def test_get_head():
@@ -230,6 +226,9 @@ def test_number_of_modifications():
 def test_modification_status():
     gr = GitRepository('test-repos/git-1/')
     commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
+    print(commit.modifications[0].change_type)
+    print(type(commit.modifications[0].change_type))
+    print(type(ModificationType.ADD))
     assert ModificationType.ADD == commit.modifications[0].change_type
 
     commit = gr.get_commit('57dbd017d1a744b949e7ca0b1c1a3b3dd4c1cbc1')

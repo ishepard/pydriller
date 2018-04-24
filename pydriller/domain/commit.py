@@ -14,7 +14,7 @@
 import logging
 import os
 from _datetime import datetime
-from typing import List
+from typing import List, Set
 from enum import Enum
 
 from git import Repo, Diff, Git, Commit as GitCommit
@@ -41,43 +41,43 @@ class Modification:
                  modifications_list=None):
         """
         Initialize a modification. A modification carries on information regarding
-        the changed file.
-
-        :param old_path: old path of the file (can be null if the file is added)
-        :param new_path: new path of the file (can be null if the file is deleted)
-        :param change_type: type of the change
-        :param parents: type of the change
-        :param hash
-        :param path
-        :param modifications_list
+        the changed file. Normally, you shouldn't initialize a new one.
         """
-
         self.old_path = old_path
         self.new_path = new_path
         self.change_type = change_type
-        self.filename = self._get_filename()
         self._parents = parents
         self._hash = hash
         self._path = path
         self._modifications_list = modifications_list
 
     @property
-    def diff(self):
+    def diff(self) -> str:
+        """
+        Return the diff of the file of the current commit.
+
+        :return: str diff
+        """
         key = '{},{}'.format(self.old_path, self.new_path)
         if self._modifications_list[key][0] is None:
-            self.save_diff_and_sc()
+            self._save_diff_and_sc()
 
         return self._modifications_list[key][0]
 
     @property
-    def source_code(self):
+    def source_code(self) -> str:
+        """
+        Return the source code of the file on the current commit.
+
+        :return: str source_code
+        """
         key = '{},{}'.format(self.old_path, self.new_path)
         if self._modifications_list[key][1] is None:
-            self.save_diff_and_sc()
+            self._save_diff_and_sc()
 
         return self._modifications_list[key][1]
 
-    def save_diff_and_sc(self):
+    def _save_diff_and_sc(self):
         repo = Repo(self._path)
         commit = repo.commit(self._hash)
         if len(self._parents) > 0:
@@ -106,7 +106,12 @@ class Modification:
             self._modifications_list[key] = (diff, sc)
 
     @property
-    def added(self):
+    def added(self) -> int:
+        """
+        Return the total number of added lines in the file.
+
+        :return: int lines_added
+        """
         added = 0
         for line in self.diff.replace('\r', '').split("\n"):
             if line.startswith('+') and not line.startswith('+++'):
@@ -115,13 +120,26 @@ class Modification:
 
     @property
     def removed(self):
+        """
+        Return the total number of deleted lines in the file.
+
+        :return: int lines_deleted
+        """
         removed = 0
         for line in self.diff.replace('\r', '').split("\n"):
             if line.startswith('-') and not line.startswith('---'):
                 removed += 1
         return removed
 
-    def _get_filename(self) -> str:
+    @property
+    def filename(self) -> str:
+        """
+        Return the filename. Given a path-like-string (e.g.
+        "/Users/dspadini/pydriller/myfile.py") returns only the filename
+        (e.g. "myfile.py")
+
+        :return: str filename
+        """
         if self.new_path is not None and self.new_path != "/dev/null":
             path = self.new_path
         else:
@@ -156,60 +174,111 @@ class Commit:
     def __init__(self, commit: GitCommit, path: str, main_branch: str) -> None:
         """
         Create a commit object.
-
-        :param commit
-        :param path
-        :param main_branch
         """
         self._c_object = commit
         self._path = path
         self._main_branch = main_branch
 
     @property
-    def hash(self):
+    def hash(self) -> str:
+        """
+        Return the SHA of the commit.
+
+        :return: str hash
+        """
         return self._c_object.hexsha
 
     @property
-    def author(self):
+    def author(self) -> Developer:
+        """
+        Return the author of the commit as a Developer object.
+
+        :return: author
+        """
         return Developer(self._c_object.author.name, self._c_object.author.email)
 
     @property
-    def committer(self):
+    def committer(self) -> Developer:
+        """
+        Return the committer of the commit as a Developer object.
+
+        :return: committer
+        """
         return Developer(self._c_object.committer.name, self._c_object.committer.email)
 
     @property
-    def author_date(self):
+    def author_date(self) -> datetime:
+        """
+        Return the authored datetime.
+
+        :return: datetime author_datetime
+        """
         return self._c_object.authored_datetime
 
     @property
-    def committer_date(self):
+    def committer_date(self) -> datetime:
+        """
+        Return the committed datetime.
+
+        :return: datetime committer_datetime
+        """
         return self._c_object.committed_datetime
 
     @property
-    def author_timezone(self):
+    def author_timezone(self) -> int:
+        """
+        Author timezone expressed in seconds from epoch.
+
+        :return: int timezone
+        """
         return self._c_object.author_tz_offset
 
     @property
-    def committer_timezone(self):
+    def committer_timezone(self) -> int:
+        """
+        Author timezone expressed in seconds from epoch.
+
+        :return: int timezone
+        """
         return self._c_object.committer_tz_offset
 
     @property
-    def msg(self):
+    def msg(self) -> str:
+        """
+        Return commit message.
+
+        :return: str commit_message
+        """
         return self._c_object.message.strip()
 
     @property
-    def parents(self):
+    def parents(self) -> List[str]:
+        """
+        Return the list of parents SHAs.
+
+        :return: List[str] parents
+        """
         parents = []
         for p in self._c_object.parents:
             parents.append(p.hexsha)
         return parents
 
     @property
-    def merge(self):
+    def merge(self) -> bool:
+        """
+        Return True if the commit is a merge, False otherwise.
+
+        :return: bool merge
+        """
         return len(self._c_object.parents) > 1
 
     @property
-    def modifications(self):
+    def modifications(self) -> List[Modification]:
+        """
+        Return a list of modified files.
+
+        :return: List[Modification] modifications
+        """
         repo = Repo(self._path)
         commit = repo.commit(self.hash)
 
@@ -244,11 +313,21 @@ class Commit:
         return modifications_list
 
     @property
-    def in_main_branch(self):
+    def in_main_branch(self) -> bool:
+        """
+        Return True if the commit is in the main branch, False otherwise.
+
+        :return: bool in_main_branch
+        """
         return self._main_branch in self.branches
 
     @property
-    def branches(self):
+    def branches(self) -> Set[str]:
+        """
+        Return the set of branches that contain the commit.
+
+        :return: set(str) branches
+        """
         git = Git(self._path)
         branches = set()
         for branch in set(git.branch('--contains', self.hash).split('\n')):

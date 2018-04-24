@@ -28,7 +28,7 @@ class GitRepository:
         """
         Init the Git Repository.
 
-        :param path: path to the repository
+        :param str path: path to the repository
         """
         self.path = path
         self.main_branch = None
@@ -79,7 +79,7 @@ class GitRepository:
         """
         Get the specified commit.
 
-        :param commit_id: hash of the commit to analyze
+        :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
         repo = self._open_repository()

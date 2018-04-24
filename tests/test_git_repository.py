@@ -226,9 +226,6 @@ def test_number_of_modifications():
 def test_modification_status():
     gr = GitRepository('test-repos/git-1/')
     commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
-    print(commit.modifications[0].change_type)
-    print(type(commit.modifications[0].change_type))
-    print(type(ModificationType.ADD))
     assert ModificationType.ADD == commit.modifications[0].change_type
 
     commit = gr.get_commit('57dbd017d1a744b949e7ca0b1c1a3b3dd4c1cbc1')
@@ -237,6 +234,21 @@ def test_modification_status():
     commit = gr.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71')
     assert ModificationType.DELETE == commit.modifications[0].change_type
 
+
+def test_diffs():
+    gr = GitRepository('test-repos/test4/')
+    commit = gr.get_commit('93b4b18673ca6fb5d563bbf930c45cd1198e979b')
+
+    assert 2 == len(commit.modifications)
+
+    for mod in commit.modifications:
+        if mod.filename == 'file4.java':
+            assert 8 == mod.removed
+            assert 0 == mod.added
+
+        if mod.filename == 'file2.java':
+            assert 12 == mod.removed
+            assert 0 == mod.added
 
 def test_detail_rename():
     gr = GitRepository('test-repos/git-1/')

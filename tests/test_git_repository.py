@@ -13,13 +13,12 @@
 # limitations under the License.
 
 import logging
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
-
 import pytest
 from pydriller.git_repository import GitRepository
 from pydriller.domain.commit import ChangeSet
-from pydriller.domain.modification import ModificationType
+from pydriller.domain.commit import ModificationType
 from datetime import datetime, timezone, timedelta
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 
 def test_get_head():
@@ -235,6 +234,21 @@ def test_modification_status():
     commit = gr.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71')
     assert ModificationType.DELETE == commit.modifications[0].change_type
 
+
+def test_diffs():
+    gr = GitRepository('test-repos/test4/')
+    commit = gr.get_commit('93b4b18673ca6fb5d563bbf930c45cd1198e979b')
+
+    assert 2 == len(commit.modifications)
+
+    for mod in commit.modifications:
+        if mod.filename == 'file4.java':
+            assert 8 == mod.removed
+            assert 0 == mod.added
+
+        if mod.filename == 'file2.java':
+            assert 12 == mod.removed
+            assert 0 == mod.added
 
 def test_detail_rename():
     gr = GitRepository('test-repos/git-1/')

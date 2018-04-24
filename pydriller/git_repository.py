@@ -17,8 +17,6 @@ import logging
 from typing import List, Dict, Tuple
 from git import Git, Repo, Diff, GitCommandError
 from pydriller.domain.commit import Commit, ChangeSet
-from pydriller.domain.developer import Developer
-from pydriller.domain.modification import ModificationType
 from threading import Lock
 logger = logging.getLogger(__name__)
 
@@ -30,7 +28,7 @@ class GitRepository:
         """
         Init the Git Repository.
 
-        :param path: path to the repository
+        :param str path: path to the repository
         """
         self.path = path
         self.main_branch = None
@@ -81,80 +79,11 @@ class GitRepository:
         """
         Get the specified commit.
 
-        :param commit_id: hash of the commit to analyze
+        :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
-        git = self._open_git()
         repo = self._open_repository()
-        commit = repo.commit(commit_id)
-
-        author = Developer(commit.author.name, commit.author.email)
-        committer = Developer(commit.committer.name, commit.committer.email)
-        author_timezone = commit.author_tz_offset
-        committer_timezone = commit.committer_tz_offset
-
-        msg = commit.message.strip()
-        commit_hash = commit.hexsha
-
-        author_date = commit.authored_datetime
-        committer_date = commit.committed_datetime
-
-        merge = True if len(commit.parents) > 1 else False
-
-        parents = []
-        for p in commit.parents:
-            parents.append(p.hexsha)
-
-        branches = self._get_branches(git, commit_hash)
-        is_in_main_branch = self.main_branch in branches
-
-        the_commit = Commit(commit_hash, author, committer, author_date, committer_date, author_timezone,
-                            committer_timezone, msg,
-                            parents, merge, branches, is_in_main_branch)
-
-        if len(parents) > 0:
-            # the commit has a parent
-            parent = repo.commit(parents[0])
-            diff_index = parent.diff(commit, create_patch=True)
-        else:
-            # this is the first commit of the repo. Comparing it with git NULL TREE
-            parent = repo.tree(NULL_TREE)
-            diff_index = parent.diff(commit.tree, create_patch=True)
-
-        self._parse_diff(diff_index, the_commit)
-
-        return the_commit
-
-    def _parse_diff(self, diff_index, the_commit) -> None:
-        for d in diff_index:
-            old_path = d.a_path
-            new_path = d.b_path
-            change_type = self._from_change_to_modification_type(d)
-            sc = ''
-            diff_text = ''
-            try:
-                sc = d.b_blob.data_stream.read().decode('utf-8')
-                diff_text = d.diff.decode('utf-8')
-            except (UnicodeDecodeError, AttributeError, ValueError):
-                logger.debug('Could not load source code or the diff of a file in commit {}'.format(the_commit.hash))
-
-            the_commit.add_modifications(old_path, new_path, change_type, diff_text, sc)
-
-    def _get_branches(self, git: Git, commit_hash: str) -> set():
-        branches = set()
-        for branch in set(git.branch('--contains', commit_hash).split('\n')):
-            branches.add(branch.strip().replace('* ', ''))
-        return branches
-
-    def _from_change_to_modification_type(self, d: Diff):
-        if d.new_file:
-            return ModificationType.ADD
-        elif d.deleted_file:
-            return ModificationType.DELETE
-        elif d.renamed_file:
-            return ModificationType.RENAME
-        elif d.a_blob and d.b_blob and d.a_blob != d.b_blob:
-            return ModificationType.MODIFY
+        return Commit(repo.commit(commit_id), self.path, self.main_branch)
 
     def checkout(self, _hash: str) -> None:
         """

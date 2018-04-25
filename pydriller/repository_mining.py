@@ -35,8 +35,7 @@ class RepositoryMining:
                  only_in_main_branch: bool = False,
                  only_in_branches: List[str]= None,
                  only_modifications_with_file_types: List[str] = None,
-                 only_no_merge: bool = False,
-                 num_threads: int = 1):
+                 only_no_merge: bool = False):
         """
         Init a repository mining.
 
@@ -63,7 +62,6 @@ class RepositoryMining:
         self.only_in_branches = only_in_branches
         self.only_modifications_with_file_types = only_modifications_with_file_types
         self.only_no_merge = only_no_merge
-        self.num_threads = num_threads
 
         self._check_filters(from_commit, from_tag, since, single, to, to_commit, to_tag)
         self._check_timezones()

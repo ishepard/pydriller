@@ -8,6 +8,8 @@ PyDriller is a Python framework that helps developers on mining software reposit
 
 .. _Repodriller: https://github.com/mauricioaniche/repodriller
 
+.. image:: mygif.*
+
 Requirements
 ============
 

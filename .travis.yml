@@ -10,10 +10,10 @@ before_install:
   - cd test-repos
   - git clone https://github.com/apache/hadoop.git
   - cd ..
-  - pip install codecov
 install:
   - pip install -r requirements.txt
   - pip install requests
+  - pip install codecov coverage
 script:
   - pytest -v -s --cov=pydriller/
 after_success:

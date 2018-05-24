@@ -15,6 +15,6 @@ install:
   - pip install -r requirements.txt
   - pip install requests
 script:
-  - pytest -v -s
+  - pytest -v -s --cov=pydriller/
 after_success:
   - codecov

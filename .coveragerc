@@ -8,5 +8,6 @@ exclude_lines =
     raise NotImplementedError
     if __name__ == .__main__.:
 ignore_errors = True
+include = */pydriller/*
 omit =
     tests/*

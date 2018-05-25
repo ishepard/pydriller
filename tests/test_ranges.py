@@ -162,3 +162,6 @@ def test_multiple_filters_exceptions():
 
     with pytest.raises(Exception):
         RepositoryMining('test-repos/test1/', single=from_commit, to=dt2, to_tag=from_tag)
+
+    with pytest.raises(Exception):
+        RepositoryMining('test-repos/test1/', to_commit=from_commit, to=dt1)

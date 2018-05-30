@@ -5,9 +5,9 @@
 
 # PyDriller
 
-PyDriller is a Python framework that helps developers on mining software repositories. Born as a fork of [RepoDriller](https://github.com/mauricioaniche/repodriller), with PyDriller you can easily extract information from any Git repository, such as commits, developers, modifications, diffs, and source codes, and quickly export CSV files.
+PyDriller is a Python framework that helps developers on mining software repositories. With PyDriller you can easily extract information from any Git repository, such as commits, developers, modifications, diffs, and source codes, and quickly export to CSV files.
 
-<!--Take a look at our [manual folder](https://www.github.com/mauricioaniche/repodriller/tree/master/manual) and [our many examples](https://github.com/mauricioaniche/repodriller-tutorial).-->
+![Alt Text](http://www.davidespadini.it/mygif.gif)
 
 
 # REQUIREMENTS

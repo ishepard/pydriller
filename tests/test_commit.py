@@ -13,6 +13,9 @@
 # limitations under the License.
 
 import logging
+
+from pydriller.domain.commit import Modification, ModificationType
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 import pytest
@@ -33,3 +36,15 @@ def test_equal(resource):
     assert c1.parents[0] == 'a4ece0762e797d2e2dcbd471115108dd6e05ff58'
     assert c2 == c3
     assert c1 != c3
+
+def test_filename():
+    m1 = Modification('/Users/dspadini/pydriller/myfile.py', "/Users/dspadini/pydriller/mynewfile.py", ModificationType.ADD, [], '')
+    m3 = Modification('/Users/dspadini/pydriller/myfile.py', "/Users/dspadini/pydriller/mynewfile.py",
+                      ModificationType.ADD, [], '')
+    m2 = Modification('/Users/dspadini/pydriller/myfile.py', None,
+                      ModificationType.ADD, [], '')
+
+    assert m1.filename == 'mynewfile.py'
+    assert m2.filename == 'myfile.py'
+    assert m1 != m2
+    assert m1 == m3

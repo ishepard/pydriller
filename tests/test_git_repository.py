@@ -283,3 +283,39 @@ def test_tags():
 
     with pytest.raises(IndexError):
         gr.get_commit_from_tag('tag4')
+
+
+def test_bug_inducing_commit_simple():
+    gr = GitRepository('test-repos/test5/')
+
+    buggy_commits = gr.get_bug_inducing_commits(gr.get_commit('e6d3b38a9ef683e8184eac10a0471075c2808bbd'))
+
+    assert len(buggy_commits) == 1
+    assert '540c7f31c18664a38190fafb6721b5174ff4a166' in buggy_commits
+
+def test_bug_inducing_commit_multiple():
+    gr = GitRepository('test-repos/test5/')
+
+    buggy_commits = gr.get_bug_inducing_commits(gr.get_commit('9942ee9dcdd1103e5808d544a84e6bc8cade0e54'))
+
+    assert len(buggy_commits) == 3
+    assert '2eb905e5e7be414fd184d6b4f1571b142621f4de' in buggy_commits
+    assert '20a40688521c1802569e60f9d55342c3bfdd772c' in buggy_commits
+    assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits
+
+
+def test_bug_inducing_commit_rename1():
+    gr = GitRepository('test-repos/test5/')
+
+    buggy_commits = gr.get_bug_inducing_commits(gr.get_commit('45ba0a61ccc448625bce0fea0301cf0c1ab32696'))
+
+    assert len(buggy_commits) == 1
+    assert 'e358878a00e78aca8366264d61a7319d00dd8186' in buggy_commits
+
+
+def test_bug_inducing_commit_rename2():
+    gr = GitRepository('test-repos/test5/')
+    # in this case the algorithm doesn't work because the file has been renamed 2 times!
+
+    buggy_commits = gr.get_bug_inducing_commits(gr.get_commit('9e858753b3d69f560cf72aaaa297f2608145ebcf'))
+    assert len(buggy_commits) == 0

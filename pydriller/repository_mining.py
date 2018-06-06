@@ -105,8 +105,8 @@ class RepositoryMining:
 
         for cs in all_cs:
             commit = self.git_repo.get_commit(cs.id)
-            logger.info('Commit #{} in {} from {} with {} modifications'
-                         .format(commit.hash, commit.author_date, commit.author.name, len(commit.modifications)))
+            logger.info('Commit #{} in {} from {}'
+                         .format(commit.hash, commit.author_date, commit.author.name))
 
             if self._is_commit_filtered(commit):
                 logger.info('Commit #{} filtered'.format(commit.hash))

@@ -16,7 +16,7 @@ import os
 import logging
 from typing import List, Dict, Tuple
 from git import Git, Repo, Diff, GitCommandError
-from pydriller.domain.commit import Commit, ChangeSet
+from pydriller.domain.commit import Commit, ChangeSet, ModificationType
 from threading import Lock
 logger = logging.getLogger(__name__)
 
@@ -195,3 +195,39 @@ class GitRepository:
         delete_line_number = int(numbers_old_file.split(",")[0].replace("-", "")) - 1
         additions_line_number = int(numbers_new_file.split(",")[0]) - 1
         return delete_line_number, additions_line_number
+
+    def get_bug_inducing_commits(self, commit: Commit):
+        """
+        Given the Commit object, returns a set of bug inducing commit. It applies SZZ.
+        The algorithm works as follow: (for every file)
+        1- obtain the diff
+        2- obtain the list of deleted lines
+        3- blame the file and obtain the commits were those lines were added
+
+
+        :param Commit commit: the buggy commit to analyze
+        :return: the set containing all the bug inducing commits
+        """
+        g = self._open_git()
+        buggy_commits = set()
+        for mod in commit.modifications:
+            path = mod.new_path
+            if mod.change_type == ModificationType.RENAME or mod.change_type == ModificationType.DELETE:
+                path = mod.old_path
+
+            deleted_lines = self.parse_diff(mod.diff)['deleted']
+            try:
+                blame = g.blame(commit.hash+'^', '--', path).split('\n')
+                for num_line, line in deleted_lines:
+                    if not self._useless_line(line.strip()):
+                        buggy_commit = blame[num_line - 1].split(' ')[0].replace('^','')
+                        buggy_commits.add(self.get_commit(buggy_commit).hash)
+            except GitCommandError:
+                logger.debug("Could not found file %s in commit %s. Probably a double rename!", mod.filename, commit.hash)
+
+        return buggy_commits
+
+    def _useless_line(self, line: str):
+        # this covers comments in Java and Python, as well as empty lines. More have to be added!
+        return line.startswith('//') or line.startswith('#') or line.startswith("/*") or \
+               line.startswith("'''") or line.startswith('"""') or line == '' or line.startswith("*")

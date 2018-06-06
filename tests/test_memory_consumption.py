@@ -22,7 +22,6 @@ if 'TRAVIS' in os.environ:
 from pydriller.repository_mining import RepositoryMining
 from datetime import datetime
 
-
 def test_memory():
     if 'TRAVIS' not in os.environ:
         return
@@ -71,7 +70,7 @@ def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing, diff_wit
 def mine(_type):
     p = psutil.Process(os.getpid())
     dt1 = datetime(2015, 1, 1)
-    dt2 = datetime(2016, 1, 1)
+    dt2 = datetime(2015, 6, 1)
     all_commits = []
 
     start = datetime.now()

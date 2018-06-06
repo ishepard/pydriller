@@ -18,8 +18,6 @@ import json
 import requests
 import sys
 if 'TRAVIS' in os.environ:
-    import logging
-    logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
     webhook_url = os.environ['WEBHOOK_URL']
 from pydriller.repository_mining import RepositoryMining
 from datetime import datetime

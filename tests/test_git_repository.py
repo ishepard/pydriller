@@ -319,3 +319,11 @@ def test_bug_inducing_commit_rename2():
 
     buggy_commits = gr.get_bug_inducing_commits(gr.get_commit('9e858753b3d69f560cf72aaaa297f2608145ebcf'))
     assert len(buggy_commits) == 0
+
+def test_bug_inducing_commit_rename3():
+    gr = GitRepository('test-repos/test5/')
+    # in this case the algorithm doesn't work because the file has been renamed 2 times!
+
+    buggy_commits = gr.get_bug_inducing_commits(gr.get_commit('4e287ab8e6dba110219404fb8a43993f3dda674c'))
+    assert len(buggy_commits) == 1
+    assert '06b9ff31cd3475d9fd9ef668cc0844ab169da726' in buggy_commits

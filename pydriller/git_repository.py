@@ -206,7 +206,7 @@ class GitRepository:
         3- blame the file and obtain the commits were those lines were added
 
 
-        :param Commit commit: the buggy commit to analyze
+        :param Commit commit: the commit to analyze
         :return: the set containing all the bug inducing commits
         """
         g = self._open_git()

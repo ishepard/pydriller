@@ -15,7 +15,7 @@ setup(
     long_description = long_description,
     author='Davide Spadini',
     author_email='spadini.davide@gmail.com',
-    version='1.1',
+    version='1.2',
     packages=find_packages('.'),
     url='https://github.com/ishepard/pydriller',
     license='Apache License',
@@ -28,7 +28,7 @@ setup(
             #   3 - Alpha
             #   4 - Beta
             #   5 - Production/Stable
-            'Development Status :: 3 - Alpha',
+            'Development Status :: 4 - Alpha',
             'Environment :: Console',
             'Intended Audience :: Developers',
             'Intended Audience :: Science/Research',

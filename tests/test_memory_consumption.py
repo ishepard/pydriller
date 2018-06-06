@@ -26,7 +26,6 @@ from datetime import datetime
 def test_memory():
     if 'TRAVIS' not in os.environ:
         return
-
     diff_with_nothing, all_commits_with_nothing = mine(0)
     diff_with_files, all_commits_with_files = mine(1)
     diff_with_everything, all_commits_with_everything = mine(2)

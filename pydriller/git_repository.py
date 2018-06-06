@@ -219,7 +219,7 @@ class GitRepository:
             try:
                 blame = g.blame(commit.hash+'^', '--', path).split('\n')
                 for num_line, line in deleted_lines:
-                    if not self._useless_line(line):
+                    if not self._useless_line(line.strip()):
                         buggy_commit = blame[num_line - 1].split(' ')[0].replace('^','')
                         buggy_commits.add(self.get_commit(buggy_commit).hash)
             except GitCommandError:
@@ -229,5 +229,5 @@ class GitRepository:
 
     def _useless_line(self, line: str):
         # this covers comments in Java and Python, as well as empty lines. More have to be added!
-        return line.startswith('//') and line.startswith('#') and line.startswith("/*") and \
-               line.startswith("'''") and line == '' and line.startswith("*")
+        return line.startswith('//') or line.startswith('#') or line.startswith("/*") or \
+               line.startswith("'''") or line.startswith('"""') or line == '' or line.startswith("*")

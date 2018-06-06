@@ -328,3 +328,17 @@ def test_bug_inducing_commit_rename_simple_more_commits():
     buggy_commits = gr.get_bug_inducing_commits(gr.get_commit('4e287ab8e6dba110219404fb8a43993f3dda674c'))
     assert len(buggy_commits) == 1
     assert '06b9ff31cd3475d9fd9ef668cc0844ab169da726' in buggy_commits
+
+
+def test_bug_inducing_commit_useless_lines():
+    gr = GitRepository('test-repos/test5/')
+
+    buggy_commits = gr.get_bug_inducing_commits(gr.get_commit('3bc7295c16b7dfc15d5f82eb6962a2774e1b8420'))
+    assert len(buggy_commits) == 1
+    assert 'c7fc2e870ce03b0b8dc29ed0eeb26d14e235ea3b' in buggy_commits
+
+def test_bug_inducing_commit_useless_lines2():
+    gr = GitRepository('test-repos/test5/')
+
+    buggy_commits = gr.get_bug_inducing_commits(gr.get_commit('4155c421ee5cbb3c34feee7b68aa78a2ee1bbeae'))
+    assert len(buggy_commits) == 0

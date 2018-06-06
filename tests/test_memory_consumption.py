@@ -18,28 +18,17 @@ import json
 import requests
 import sys
 if 'TRAVIS' in os.environ:
-    import logging
-    logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.WARNING)
     webhook_url = os.environ['WEBHOOK_URL']
 from pydriller.repository_mining import RepositoryMining
 from datetime import datetime
-
 
 def test_memory():
     if 'TRAVIS' not in os.environ:
         return
 
-    logging.warning("Started with nothing..")
     diff_with_nothing, all_commits_with_nothing = mine(0)
-    logging.warning("Ended with nothing..")
-
-    logging.warning("Started with only files..")
     diff_with_files, all_commits_with_files = mine(1)
-    logging.warning("Ended with only files..")
-
-    logging.warning("Started with everything..")
     diff_with_everything, all_commits_with_everything = mine(2)
-    logging.warning("Ended with everything..")
 
     logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing, diff_with_files,
                            all_commits_with_files, diff_with_everything, all_commits_with_everything)
@@ -81,7 +70,7 @@ def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing, diff_wit
 def mine(_type):
     p = psutil.Process(os.getpid())
     dt1 = datetime(2015, 1, 1)
-    dt2 = datetime(2016, 1, 1)
+    dt2 = datetime(2015, 6, 1)
     all_commits = []
 
     start = datetime.now()

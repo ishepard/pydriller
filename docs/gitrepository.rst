@@ -32,14 +32,32 @@ of lines added or deleted for future analysis. For example, if we run this::
     added = parsed_lines['added']
     deleted = parsed_lines['deleted']
 
-    print('Added: {}'.format(added))
-    print('Deleted: {}'.format(deleted))
+    print('Added: {}'.format(added))      # result: Added: [(4, 'log.debug("b")')]
+    print('Deleted: {}'.format(deleted))  # result: Deleted: [(3, 'cc')]
 
 the result is::
 
     Added: [(4, 'log.debug("b")')]
     Deleted: [(3, 'cc')]
 
+Another very useful API (especially for researchers ;) ) is the one that, given a commit, allows you to retrieve
+all the commits that last "touched" the modified lines of the commit. Let's see an example::
+
+    # commit abc modified line 1 of file A
+    # commit def modified line 2 of file A
+    # commit ghi modified line 3 of file A
+    # commit lmn deleted lines 1 and 2 of file A
+    
+    gr = GitRepository('test-repos/test5')
+    
+    commit = 'lmn'
+    buggy_commits = gr.get_bug_inducing_commits(commit)
+    print(buggy_commits)      # result: (abc, def)
+
+Since in commit **lmn** 2 lines were deleted (line 1 and 2), PyDriller can retrieve the commits in which those lines
+were last modified (in our example, commit **abc** and **def**).
+
+Isn't it cool? :) 
 
 Checkout the API reference of this class for the complete list of the available functions.
 

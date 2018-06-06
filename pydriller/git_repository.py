@@ -196,10 +196,11 @@ class GitRepository:
         additions_line_number = int(numbers_new_file.split(",")[0]) - 1
         return delete_line_number, additions_line_number
 
-    def get_bug_inducing_commits(self, commit: Commit):
+    def get_commits_that_modified_lines(self, commit: Commit):
         """
-        Given the Commit object, returns a set of bug inducing commit. It applies SZZ.
-        The algorithm works as follow: (for every file)
+        Given the Commit object, returns the set of commits that last "touched" the lines
+        that are modified in the commit. It applies SZZ.
+        The algorithm works as follow: (for every file in the commit)
         1- obtain the diff
         2- obtain the list of deleted lines
         3- blame the file and obtain the commits were those lines were added

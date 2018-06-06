@@ -15,6 +15,6 @@ install:
   - pip install requests
   - pip install codecov pytest-cov
 script:
-  - travis_wait pytest -v --cov=pydriller/
+  - pytest -v --log-cli-level=WARNING --cov=pydriller/
 after_success:
   - codecov

@@ -41,7 +41,7 @@ the result is::
     Deleted: [(3, 'cc')]
 
 Another very useful API (especially for researchers ;) ) is the one that, given a commit, allows you to retrieve
-all the commits that last "touched" the modified lines of the commit. Let's see an example::
+all the commits that last "touched" the modified lines of the file. Let's see an example::
 
     # commit abc modified line 1 of file A
     # commit def modified line 2 of file A
@@ -50,8 +50,8 @@ all the commits that last "touched" the modified lines of the commit. Let's see 
     
     gr = GitRepository('test-repos/test5')
     
-    commit = 'lmn'
-    buggy_commits = gr.get_bug_inducing_commits(commit)
+    commit = gr.getcommit('lmn')
+    buggy_commits = gr.get_commits_last_modified_lines(commit)
     print(buggy_commits)      # result: (abc, def)
 
 Since in commit **lmn** 2 lines were deleted (line 1 and 2), PyDriller can retrieve the commits in which those lines

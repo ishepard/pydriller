@@ -16,7 +16,7 @@ import os
 import logging
 from typing import List, Dict, Tuple
 from git import Git, Repo, Diff, GitCommandError
-from pydriller.domain.commit import Commit, ChangeSet, ModificationType
+from pydriller.domain.commit import Commit, ChangeSet, ModificationType, Modification
 from threading import Lock
 logger = logging.getLogger(__name__)
 
@@ -196,22 +196,34 @@ class GitRepository:
         additions_line_number = int(numbers_new_file.split(",")[0]) - 1
         return delete_line_number, additions_line_number
 
-    def get_commits_that_modified_lines(self, commit: Commit):
+    def get_commits_last_modified_lines(self, commit: Commit, modification: Modification = None):
         """
         Given the Commit object, returns the set of commits that last "touched" the lines
-        that are modified in the commit. It applies SZZ.
+        that are modified in the files included in the commit. It applies SZZ.
         The algorithm works as follow: (for every file in the commit)
+
         1- obtain the diff
+
         2- obtain the list of deleted lines
+
         3- blame the file and obtain the commits were those lines were added
 
+        Can also be passed as parameter a single Modification, in this case only this file
+        will be analyzed.
 
         :param Commit commit: the commit to analyze
+        :param Modification modification: single modification to analyze
         :return: the set containing all the bug inducing commits
         """
         g = self._open_git()
         buggy_commits = set()
-        for mod in commit.modifications:
+
+        if modification is not None:
+            modifications = [modification]
+        else:
+            modifications = commit.modifications
+
+        for mod in modifications:
             path = mod.new_path
             if mod.change_type == ModificationType.RENAME or mod.change_type == ModificationType.DELETE:
                 path = mod.old_path

@@ -14,7 +14,7 @@
 
 import os
 import logging
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Set
 from git import Git, Repo, Diff, GitCommandError
 from pydriller.domain.commit import Commit, ChangeSet, ModificationType, Modification
 from threading import Lock
@@ -196,7 +196,7 @@ class GitRepository:
         additions_line_number = int(numbers_new_file.split(",")[0]) - 1
         return delete_line_number, additions_line_number
 
-    def get_commits_last_modified_lines(self, commit: Commit, modification: Modification = None):
+    def get_commits_last_modified_lines(self, commit: Commit, modification: Modification = None) -> Set[str]:
         """
         Given the Commit object, returns the set of commits that last "touched" the lines
         that are modified in the files included in the commit. It applies SZZ.

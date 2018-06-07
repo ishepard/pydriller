@@ -356,3 +356,10 @@ def test_get_commits_last_modified_lines_for_single_file():
 
     assert len(buggy_commits) == 1
     assert 'e2ed043eb96c05ebde653a44ae733ded9ef90750' in buggy_commits
+
+def test_get_commits_last_modified_lines_with_more_modification():
+    gr = GitRepository('test-repos/test5/')
+
+    buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('c7002fb321a8ba32a28fac200538f7c2ba76f175'))
+    assert len(buggy_commits) == 1
+    assert '5cb9e9ae44a0949ec91d06a955975289be766f34' in buggy_commits

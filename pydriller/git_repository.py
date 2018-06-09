@@ -15,7 +15,7 @@
 import os
 import logging
 from typing import List, Dict, Tuple, Set
-from git import Git, Repo, Diff, GitCommandError
+from git import Git, Repo, Diff, GitCommandError, Commit as git_commit
 from pydriller.domain.commit import Commit, ChangeSet, ModificationType, Modification
 from threading import Lock
 logger = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ class GitRepository:
         head_commit = repo.head.commit
         return ChangeSet(head_commit.hexsha, head_commit.committed_datetime)
 
-    def get_change_sets(self) -> List[ChangeSet]:
+    def get_change_sets(self) -> List[git_commit]:
         """
         Return the list of all the commits in the repo.
 
@@ -65,23 +65,24 @@ class GitRepository:
         """
         return self._get_all_commits()
 
-    def _get_all_commits(self) -> List[ChangeSet]:
+    def _get_all_commits(self) -> List[git_commit]:
         repo = self._open_repository()
-        commit_list = list(repo.iter_commits())
 
-        change_sets = []
-        for commit in commit_list:
-            committer_date = commit.committed_datetime
-            change_sets.append(ChangeSet(commit.hexsha, committer_date))
-        return change_sets
+        all_commits = []
+        for commit in repo.iter_commits():
+            all_commits.append(commit)
+        return all_commits
 
-    def get_commit(self, commit_id: str) -> Commit:
+    def get_commit(self, commit_id: str, commit: git_commit = None) -> Commit:
         """
         Get the specified commit.
 
         :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
+        if commit is not None:
+            return Commit(commit, self.path, self.main_branch)
+
         repo = self._open_repository()
         return Commit(repo.commit(commit_id), self.path, self.main_branch)
 

@@ -36,8 +36,8 @@ class ModificationType(Enum):
 
 class Modification:
     def __init__(self, old_path: str, new_path: str,
-                 change_type: ModificationType, parents: List[str],
-                 hash: str, path: str = None,
+                 change_type: ModificationType,
+                 commit: GitCommit, path: str = None,
                  modifications_list=None):
         """
         Initialize a modification. A modification carries on information regarding
@@ -46,8 +46,7 @@ class Modification:
         self.old_path = old_path
         self.new_path = new_path
         self.change_type = change_type
-        self._parents = parents
-        self._hash = hash
+        self._commit = commit
         self._path = path
         self._modifications_list = modifications_list
 
@@ -79,15 +78,13 @@ class Modification:
 
     def _save_diff_and_sc(self):
         repo = Repo(self._path)
-        commit = repo.commit(self._hash)
-        if len(self._parents) > 0:
+        if len(self._commit.parents) > 0:
             # the commit has a parent
-            parent = repo.commit(self._parents[0])
-            diff_index = parent.diff(commit, create_patch=True)
+            diff_index = self._commit.parents[0].diff(self._commit, create_patch=True)
         else:
             # this is the first commit of the repo. Comparing it with git NULL TREE
             parent = repo.tree(NULL_TREE)
-            diff_index = parent.diff(commit.tree, create_patch=True)
+            diff_index = parent.diff(self._commit.tree, create_patch=True)
         self._parse_diff(diff_index)
 
     def _parse_diff(self, diff_index):
@@ -100,9 +97,9 @@ class Modification:
                 diff = d.diff.decode('utf-8')
                 sc = d.b_blob.data_stream.read().decode('utf-8')
             except (UnicodeDecodeError, AttributeError, ValueError):
-                logger.debug('Could not load source code or the diff of a file in commit {}'.format(self._hash))
+                logger.debug('Could not load source code or the diff of a file in commit {}'.format(self._commit.hexsha))
 
-            key = '{},{}'.format(old_path ,new_path)
+            key = '{},{}'.format(old_path, new_path)
             self._modifications_list[key] = (diff, sc)
 
     @property
@@ -280,12 +277,11 @@ class Commit:
         :return: List[Modification] modifications
         """
         repo = Repo(self._path)
-        commit = repo.commit(self.hash)
+        commit = self._c_object
 
         if len(self.parents) > 0:
             # the commit has a parent
-            parent = repo.commit(self.parents[0])
-            diff_index = parent.diff(commit)
+            diff_index = self._c_object.parents[0].diff(commit)
         else:
             # this is the first commit of the repo. Comparing it with git NULL TREE
             parent = repo.tree(NULL_TREE)
@@ -308,7 +304,7 @@ class Commit:
 
             key = '{},{}'.format(old_path, new_path)
             modifications_list_w_sc[key] = (None,None)
-            modifications_list.append(Modification(old_path, new_path, change_type, self.parents, self.hash,
+            modifications_list.append(Modification(old_path, new_path, change_type, self._c_object,
                                                    self._path, modifications_list_w_sc))
         return modifications_list
 

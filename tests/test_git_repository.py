@@ -15,7 +15,6 @@
 import logging
 import pytest
 from pydriller.git_repository import GitRepository
-from pydriller.domain.commit import ChangeSet
 from pydriller.domain.commit import ModificationType
 from datetime import datetime, timezone, timedelta
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -27,30 +26,21 @@ def test_get_head():
     cs = gr.get_head()
     assert cs is not None
 
-    assert cs.id == 'da39b1326dbc2edfe518b90672734a08f3c13458'
-    assert 1522164679 == cs.date.timestamp()
+    assert cs.hash == 'da39b1326dbc2edfe518b90672734a08f3c13458'
+    assert 1522164679 == cs.author_date.timestamp()
 
 
-def test_get_change_sets():
+def test_list_commits():
     gr = GitRepository('test-repos/test1/')
     assert gr is not None
-    change_sets = gr.get_change_sets()
-    to_zone = timezone(timedelta(hours=1))
+    change_sets = gr.get_list_commits()
 
-    cs1 = ChangeSet('a88c84ddf42066611e76e6cb690144e5357d132c',
-                    datetime(2018, 3, 22, 10, 41, 11, tzinfo=to_zone))
-    cs2 = ChangeSet('6411e3096dd2070438a17b225f44475136e54e3a',
-                    datetime(2018, 3, 22, 10, 41, 47, tzinfo=to_zone))
-    cs3 = ChangeSet('09f6182cef737db02a085e1d018963c7a29bde5a',
-                    datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone))
-    to_zone = timezone(timedelta(hours=2))
-    cs4 = ChangeSet('1f99848edadfffa903b8ba1286a935f1b92b2845',
-                    datetime(2018, 3, 27, 17, 10, 52, tzinfo=to_zone))
+    list_commits = ['a88c84ddf42066611e76e6cb690144e5357d132c', '6411e3096dd2070438a17b225f44475136e54e3a',
+                    '09f6182cef737db02a085e1d018963c7a29bde5a', '1f99848edadfffa903b8ba1286a935f1b92b2845',
+                    'da39b1326dbc2edfe518b90672734a08f3c13458']
 
-    assert cs1 in change_sets
-    assert cs2 in change_sets
-    assert cs3 in change_sets
-    assert cs4 in change_sets
+    for commit in change_sets:
+        assert commit.hash in list_commits
     assert 5 == len(change_sets)
 
 
@@ -131,11 +121,11 @@ def test_list_files_in_commit():
 
 def test_get_all_commits():
     gr = GitRepository('test-repos/git-1/')
-    change_sets = gr.get_change_sets()
+    change_sets = gr.get_list_commits()
 
     assert 13 == len(change_sets)
-    assert 'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2' == change_sets[0].id
-    assert '866e997a9e44cb4ddd9e00efe49361420aff2559' == change_sets[12].id
+    assert 'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2' == change_sets[0].hash
+    assert '866e997a9e44cb4ddd9e00efe49361420aff2559' == change_sets[12].hash
 
 
 def test_branches_from_commit():
@@ -170,7 +160,7 @@ def test_other_branches_with_merge():
 
 def test_commit_in_master_branch():
     gr = GitRepository('test-repos/git-2/')
-    assert '29e929fbc5dc6a2e9c620069b24e2a143af4285f' == gr.get_head().id
+    assert '29e929fbc5dc6a2e9c620069b24e2a143af4285f' == gr.get_head().hash
 
     gr.checkout('8986af2a679759e5a15794f6d56e6d46c3f302f1')
 
@@ -182,7 +172,7 @@ def test_commit_in_master_branch():
     assert True == commit.in_main_branch
 
     gr.reset()
-    assert '29e929fbc5dc6a2e9c620069b24e2a143af4285f' == gr.get_head().id
+    assert '29e929fbc5dc6a2e9c620069b24e2a143af4285f' == gr.get_head().hash
 
 
 def test_should_detail_a_commit():

@@ -22,43 +22,41 @@ if 'TRAVIS' in os.environ:
 from pydriller.repository_mining import RepositoryMining
 from datetime import datetime
 
+
 def test_memory():
     if 'TRAVIS' not in os.environ:
         return
 
     diff_with_nothing, all_commits_with_nothing = mine(0)
-    diff_with_files, all_commits_with_files = mine(1)
-    diff_with_everything, all_commits_with_everything = mine(2)
+    diff_with_everything, all_commits_with_everything = mine(1)
 
-    logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing, diff_with_files,
-                           all_commits_with_files, diff_with_everything, all_commits_with_everything)
+    logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
+                           diff_with_everything, all_commits_with_everything)
 
 
-def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing, diff_with_files,
-                           all_commits_with_files, diff_with_everything, all_commits_with_everything):
+def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
+                           diff_with_everything, all_commits_with_everything):
 
     text = "*PYTHON V{}.{}*\n" \
            "*Max memory (MB)*\n" \
-           "With nothing: {}, with files: {}, with everything: {} \n" \
+           "With nothing: {}, with everything: {} \n" \
            "*Min memory (MB)*\n" \
-           "With nothing: {}, with files: {}, with everything: {} \n" \
+           "With nothing: {}, with everything: {} \n" \
            "*Time*\n" \
-           "With nothing: {}:{}:{}, with files: {}:{}:{}, with everything: {}:{}:{} \n" \
+           "With nothing: {}:{}:{}, with everything: {}:{}:{} \n" \
            "*Total number of commits*: {}\n" \
            "*Commits per second:*\n" \
-            "With nothing: {}, with files: {}, with everything: {}"
+            "With nothing: {}, with everything: {}"
 
     slack_data = {
         'text': text.format(
                 sys.version_info[0], sys.version_info[1],
-                max(all_commits_with_nothing), max(all_commits_with_files), max(all_commits_with_everything),
-                min(all_commits_with_nothing), min(all_commits_with_files), min(all_commits_with_everything),
+                max(all_commits_with_nothing), max(all_commits_with_everything),
+                min(all_commits_with_nothing), min(all_commits_with_everything),
                 diff_with_nothing.seconds // 3600, (diff_with_nothing.seconds % 3600) // 60, diff_with_nothing.seconds % 60,
-                diff_with_files.seconds // 3600, (diff_with_files.seconds % 3600) // 60, diff_with_files.seconds % 60,
                 diff_with_everything.seconds // 3600, (diff_with_everything.seconds % 3600) // 60, diff_with_everything.seconds % 60,
                 len(all_commits_with_nothing),
                 len(all_commits_with_nothing) / diff_with_nothing.seconds,
-                len(all_commits_with_files) / diff_with_files.seconds,
                 len(all_commits_with_everything) / diff_with_everything.seconds
         )}
     requests.post(
@@ -70,7 +68,7 @@ def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing, diff_wit
 def mine(_type):
     p = psutil.Process(os.getpid())
     dt1 = datetime(2015, 1, 1)
-    dt2 = datetime(2015, 6, 1)
+    dt2 = datetime(2016, 1, 1)
     all_commits = []
 
     start = datetime.now()
@@ -86,10 +84,7 @@ def mine(_type):
             continue
 
         for mod in commit.modifications:
-            a = mod.old_path
-
-            if _type == 2:
-                dd = mod.diff
+            dd = mod.diff
     end = datetime.now()
 
     diff = end - start

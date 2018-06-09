@@ -19,8 +19,7 @@ import pytz as pytz
 from pydriller.domain.commit import Commit
 from typing import List, Generator
 from pydriller.git_repository import GitRepository
-from pydriller.domain.commit import ChangeSet
-from datetime import datetime, timezone
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -98,13 +97,12 @@ class RepositoryMining:
         a generator of commits.
         """
         logger.info('Git repository in {}'.format(self.git_repo.path))
-        all_cs = self._apply_filters_on_changesets(self.git_repo.get_change_sets())
+        all_cs = self._apply_filters_on_commits(self.git_repo.get_list_commits())
 
         if not self.reversed_order:
             all_cs.reverse()
 
-        for cs in all_cs:
-            commit = self.git_repo.get_commit(cs.id)
+        for commit in all_cs:
             logger.info('Commit #{} in {} from {}'
                          .format(commit.hash, commit.author_date, commit.author.name))
 
@@ -143,18 +141,18 @@ class RepositoryMining:
                 return True
         return False
 
-    def _apply_filters_on_changesets(self, all_cs: List[ChangeSet]) -> List[ChangeSet]:
+    def _apply_filters_on_commits(self, all_commits: List[Commit]):
         res = []
 
         if self._all_filters_are_none():
-            return all_cs
+            return all_commits
 
-        for cs in all_cs:
-            if self.single is not None and cs.id == self.single:
-                return [cs]
-            if self.since is None or self.since <= cs.date:
-                if self.to is None or cs.date <= self.to:
-                    res.append(cs)
+        for commit in all_commits:
+            if self.single is not None and commit.hash == self.single:
+                return [commit]
+            if self.since is None or self.since <= commit.author_date:
+                if self.to is None or commit.author_date <= self.to:
+                    res.append(commit)
                     continue
         return res
 

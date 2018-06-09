@@ -18,7 +18,6 @@ import pytz as pytz
 
 from pydriller.domain.commit import Commit
 from typing import List, Generator
-from git import Commit as GitCommit
 from pydriller.git_repository import GitRepository
 from datetime import datetime
 
@@ -98,13 +97,12 @@ class RepositoryMining:
         a generator of commits.
         """
         logger.info('Git repository in {}'.format(self.git_repo.path))
-        all_cs = self._apply_filters_on_changesets(self.git_repo.get_change_sets())
+        all_cs = self._apply_filters_on_commits(self.git_repo.get_list_commits())
 
         if not self.reversed_order:
             all_cs.reverse()
 
-        for git_commit in all_cs:
-            commit = self.git_repo.get_commit_from_gitpython(git_commit)
+        for commit in all_cs:
             logger.info('Commit #{} in {} from {}'
                          .format(commit.hash, commit.author_date, commit.author.name))
 
@@ -143,17 +141,17 @@ class RepositoryMining:
                 return True
         return False
 
-    def _apply_filters_on_changesets(self, all_commits: List[GitCommit]):
+    def _apply_filters_on_commits(self, all_commits: List[Commit]):
         res = []
 
         if self._all_filters_are_none():
             return all_commits
 
         for commit in all_commits:
-            if self.single is not None and commit.hexsha == self.single:
+            if self.single is not None and commit.hash == self.single:
                 return [commit]
-            if self.since is None or self.since <= commit.authored_datetime:
-                if self.to is None or commit.authored_datetime <= self.to:
+            if self.since is None or self.since <= commit.author_date:
+                if self.to is None or commit.author_date <= self.to:
                     res.append(commit)
                     continue
         return res

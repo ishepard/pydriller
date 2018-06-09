@@ -15,7 +15,6 @@
 import logging
 import pytest
 from pydriller.git_repository import GitRepository
-from git import Repo
 from pydriller.domain.commit import ModificationType
 from datetime import datetime, timezone, timedelta
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -31,22 +30,17 @@ def test_get_head():
     assert 1522164679 == cs.author_date.timestamp()
 
 
-def test_get_change_sets():
-    repo = Repo('test-repos/test1/')
-
+def test_list_commits():
     gr = GitRepository('test-repos/test1/')
     assert gr is not None
-    change_sets = gr.get_change_sets()
+    change_sets = gr.get_list_commits()
 
-    c1 = repo.commit('a88c84ddf42066611e76e6cb690144e5357d132c')
-    c2 = repo.commit('6411e3096dd2070438a17b225f44475136e54e3a')
-    c3 = repo.commit('09f6182cef737db02a085e1d018963c7a29bde5a')
-    c4 = repo.commit('1f99848edadfffa903b8ba1286a935f1b92b2845')
+    list_commits = ['a88c84ddf42066611e76e6cb690144e5357d132c', '6411e3096dd2070438a17b225f44475136e54e3a',
+                    '09f6182cef737db02a085e1d018963c7a29bde5a', '1f99848edadfffa903b8ba1286a935f1b92b2845',
+                    'da39b1326dbc2edfe518b90672734a08f3c13458']
 
-    assert c1 in change_sets
-    assert c2 in change_sets
-    assert c3 in change_sets
-    assert c4 in change_sets
+    for commit in change_sets:
+        assert commit.hash in list_commits
     assert 5 == len(change_sets)
 
 
@@ -127,11 +121,11 @@ def test_list_files_in_commit():
 
 def test_get_all_commits():
     gr = GitRepository('test-repos/git-1/')
-    change_sets = gr.get_change_sets()
+    change_sets = gr.get_list_commits()
 
     assert 13 == len(change_sets)
-    assert 'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2' == change_sets[0].hexsha
-    assert '866e997a9e44cb4ddd9e00efe49361420aff2559' == change_sets[12].hexsha
+    assert 'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2' == change_sets[0].hash
+    assert '866e997a9e44cb4ddd9e00efe49361420aff2559' == change_sets[12].hash
 
 
 def test_branches_from_commit():

@@ -15,7 +15,7 @@
 import os
 import logging
 from typing import List, Dict, Tuple, Set
-from git import Git, Repo, Diff, GitCommandError, Commit as GitCommit
+from git import Git, Repo, GitCommandError, Commit as GitCommit
 from pydriller.domain.commit import Commit, ModificationType, Modification
 from threading import Lock
 logger = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ class GitRepository:
         head_commit = repo.head.commit
         return Commit(head_commit, self.path, self.main_branch)
 
-    def get_change_sets(self) -> List[GitCommit]:
+    def get_list_commits(self) -> List[Commit]:
         """
         Return the list of all the commits in the repo.
 
@@ -65,12 +65,12 @@ class GitRepository:
         """
         return self._get_all_commits()
 
-    def _get_all_commits(self) -> List[GitCommit]:
+    def _get_all_commits(self) -> List[Commit]:
         repo = self._open_repository()
 
         all_commits = []
         for commit in repo.iter_commits():
-            all_commits.append(commit)
+            all_commits.append(self.get_commit_from_gitpython(commit))
         return all_commits
 
     def get_commit(self, commit_id: str) -> Commit:
@@ -145,7 +145,7 @@ class GitRepository:
 
         :return: the total number of commits
         """
-        return len(self.get_change_sets())
+        return len(self.get_list_commits())
 
     def get_commit_from_tag(self, tag: str) -> Commit:
         """

@@ -18,10 +18,9 @@ import pytz as pytz
 
 from pydriller.domain.commit import Commit
 from typing import List, Generator
-from git import Commit as git_commit
+from git import Commit as GitCommit
 from pydriller.git_repository import GitRepository
-from pydriller.domain.commit import ChangeSet
-from datetime import datetime, timezone
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -104,8 +103,8 @@ class RepositoryMining:
         if not self.reversed_order:
             all_cs.reverse()
 
-        for commit in all_cs:
-            commit = self.git_repo.get_commit(commit.hexsha, commit)
+        for git_commit in all_cs:
+            commit = self.git_repo.get_commit_from_gitpython(git_commit)
             logger.info('Commit #{} in {} from {}'
                          .format(commit.hash, commit.author_date, commit.author.name))
 
@@ -144,7 +143,7 @@ class RepositoryMining:
                 return True
         return False
 
-    def _apply_filters_on_changesets(self, all_commits: List[git_commit]):
+    def _apply_filters_on_changesets(self, all_commits: List[GitCommit]):
         res = []
 
         if self._all_filters_are_none():

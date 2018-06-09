@@ -37,8 +37,7 @@ class ModificationType(Enum):
 class Modification:
     def __init__(self, old_path: str, new_path: str,
                  change_type: ModificationType,
-                 commit: GitCommit, path: str = None,
-                 modifications_list=None):
+                 diff_text: str, sc: str):
         """
         Initialize a modification. A modification carries on information regarding
         the changed file. Normally, you shouldn't initialize a new one.
@@ -46,61 +45,8 @@ class Modification:
         self.old_path = old_path
         self.new_path = new_path
         self.change_type = change_type
-        self._commit = commit
-        self._path = path
-        self._modifications_list = modifications_list
-
-    @property
-    def diff(self) -> str:
-        """
-        Return the diff of the file of the current commit.
-
-        :return: str diff
-        """
-        key = '{},{}'.format(self.old_path, self.new_path)
-        if self._modifications_list[key][0] is None:
-            self._save_diff_and_sc()
-
-        return self._modifications_list[key][0]
-
-    @property
-    def source_code(self) -> str:
-        """
-        Return the source code of the file on the current commit.
-
-        :return: str source_code
-        """
-        key = '{},{}'.format(self.old_path, self.new_path)
-        if self._modifications_list[key][1] is None:
-            self._save_diff_and_sc()
-
-        return self._modifications_list[key][1]
-
-    def _save_diff_and_sc(self):
-        repo = Repo(self._path)
-        if len(self._commit.parents) > 0:
-            # the commit has a parent
-            diff_index = self._commit.parents[0].diff(self._commit, create_patch=True)
-        else:
-            # this is the first commit of the repo. Comparing it with git NULL TREE
-            parent = repo.tree(NULL_TREE)
-            diff_index = parent.diff(self._commit.tree, create_patch=True)
-        self._parse_diff(diff_index)
-
-    def _parse_diff(self, diff_index):
-        for d in diff_index:
-            old_path = d.a_path
-            new_path = d.b_path
-            diff = ''
-            sc = ''
-            try:
-                diff = d.diff.decode('utf-8')
-                sc = d.b_blob.data_stream.read().decode('utf-8')
-            except (UnicodeDecodeError, AttributeError, ValueError):
-                logger.debug('Could not load source code or the diff of a file in commit {}'.format(self._commit.hexsha))
-
-            key = '{},{}'.format(old_path, new_path)
-            self._modifications_list[key] = (diff, sc)
+        self.diff = diff_text
+        self.source_code = sc
 
     @property
     def added(self) -> int:
@@ -281,31 +227,32 @@ class Commit:
 
         if len(self.parents) > 0:
             # the commit has a parent
-            diff_index = self._c_object.parents[0].diff(commit)
+            diff_index = self._c_object.parents[0].diff(commit, create_patch=True)
         else:
             # this is the first commit of the repo. Comparing it with git NULL TREE
             parent = repo.tree(NULL_TREE)
-            diff_index = parent.diff(commit.tree)
+            diff_index = parent.diff(commit.tree, create_patch=True)
 
         return self._parse_diff(diff_index)
 
     def _parse_diff(self, diff_index) -> List[Modification]:
         modifications_list = []
-        modifications_list_w_sc = {}
         for d in diff_index:
             old_path = d.a_path
             new_path = d.b_path
             change_type = self._from_change_to_modification_type(d)
 
-            if change_type == ModificationType.ADD:
-                old_path = None
-            elif change_type == ModificationType.DELETE:
-                new_path = None
+            diff_text = ''
+            sc = ''
+            try:
+                diff_text = d.diff.decode('utf-8')
+                sc = d.b_blob.data_stream.read().decode('utf-8')
+            except (UnicodeDecodeError, AttributeError, ValueError):
+                logger.debug(
+                    'Could not load source code or the diff of a file in commit {}'.format(self._c_object.hexsha))
 
-            key = '{},{}'.format(old_path, new_path)
-            modifications_list_w_sc[key] = (None,None)
-            modifications_list.append(Modification(old_path, new_path, change_type, self._c_object,
-                                                   self._path, modifications_list_w_sc))
+            modifications_list.append(Modification(old_path, new_path, change_type, diff_text, sc))
+
         return modifications_list
 
     @property
@@ -331,13 +278,13 @@ class Commit:
         return branches
 
     def _from_change_to_modification_type(self, d: Diff):
-        if d.change_type == 'A':
+        if d.new_file:
             return ModificationType.ADD
-        elif d.change_type == 'D':
+        elif d.deleted_file:
             return ModificationType.DELETE
-        elif d.change_type.startswith('R'):
+        elif d.renamed_file:
             return ModificationType.RENAME
-        elif d.change_type == 'M':
+        elif d.a_blob and d.b_blob and d.a_blob != d.b_blob:
             return ModificationType.MODIFY
 
     def __eq__(self, other):
@@ -363,24 +310,3 @@ class Commit:
                 'Branches: \n{}'.format("\n".join(map(str, self.branches))) + '\n'
                 'In main branch: {}'.format(self.in_main_branch)
                 )
-
-
-class ChangeSet:
-    def __init__(self, id: str, date: datetime):
-        """
-        Light-weight version of the commit, storing only the hash and the date. Used for filter out
-        commits before asking for more complex information (like diff and source code).
-
-        :param str id: hash of the commit
-        :param date: date of the commit
-        """
-        self.id = id
-        self.date = date
-
-    def __eq__(self, other):
-        if not isinstance(other, ChangeSet):
-            return NotImplemented
-        elif self is other:
-            return True
-        else:
-            return self.__dict__ == other.__dict__

@@ -15,8 +15,8 @@
 import os
 import logging
 from typing import List, Dict, Tuple, Set
-from git import Git, Repo, Diff, GitCommandError, Commit as git_commit
-from pydriller.domain.commit import Commit, ChangeSet, ModificationType, Modification
+from git import Git, Repo, Diff, GitCommandError, Commit as GitCommit
+from pydriller.domain.commit import Commit, ModificationType, Modification
 from threading import Lock
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class GitRepository:
     def _discover_main_branch(self, repo):
         self.main_branch = repo.active_branch.name
 
-    def get_head(self) -> ChangeSet:
+    def get_head(self) -> Commit:
         """
         Get the head commit.
 
@@ -55,9 +55,9 @@ class GitRepository:
         """
         repo = self._open_repository()
         head_commit = repo.head.commit
-        return ChangeSet(head_commit.hexsha, head_commit.committed_datetime)
+        return Commit(head_commit, self.path, self.main_branch)
 
-    def get_change_sets(self) -> List[git_commit]:
+    def get_change_sets(self) -> List[GitCommit]:
         """
         Return the list of all the commits in the repo.
 
@@ -65,7 +65,7 @@ class GitRepository:
         """
         return self._get_all_commits()
 
-    def _get_all_commits(self) -> List[git_commit]:
+    def _get_all_commits(self) -> List[GitCommit]:
         repo = self._open_repository()
 
         all_commits = []
@@ -73,18 +73,26 @@ class GitRepository:
             all_commits.append(commit)
         return all_commits
 
-    def get_commit(self, commit_id: str, commit: git_commit = None) -> Commit:
+    def get_commit(self, commit_id: str) -> Commit:
         """
         Get the specified commit.
 
         :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
-        if commit is not None:
-            return Commit(commit, self.path, self.main_branch)
-
         repo = self._open_repository()
         return Commit(repo.commit(commit_id), self.path, self.main_branch)
+
+    def get_commit_from_gitpython(self, commit: GitCommit) -> Commit:
+        """
+        Build a PyDriller commit object from a GitPython commit object.
+        This is internal of PyDriller, I don't think users generally will need
+        it.
+
+        :param GitCommit commit: GitPython commit
+        :return: Commit commit: PyDriller commit
+        """
+        return Commit(commit, self.path, self.main_branch)
 
     def checkout(self, _hash: str) -> None:
         """

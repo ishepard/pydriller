@@ -15,7 +15,7 @@
 import logging
 import pytest
 from pydriller.git_repository import GitRepository
-from git import Commit as GitCommit, Repo
+from git import Repo
 from pydriller.domain.commit import ModificationType
 from datetime import datetime, timezone, timedelta
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -27,8 +27,8 @@ def test_get_head():
     cs = gr.get_head()
     assert cs is not None
 
-    assert cs.id == 'da39b1326dbc2edfe518b90672734a08f3c13458'
-    assert 1522164679 == cs.date.timestamp()
+    assert cs.hash == 'da39b1326dbc2edfe518b90672734a08f3c13458'
+    assert 1522164679 == cs.author_date.timestamp()
 
 
 def test_get_change_sets():
@@ -166,7 +166,7 @@ def test_other_branches_with_merge():
 
 def test_commit_in_master_branch():
     gr = GitRepository('test-repos/git-2/')
-    assert '29e929fbc5dc6a2e9c620069b24e2a143af4285f' == gr.get_head().id
+    assert '29e929fbc5dc6a2e9c620069b24e2a143af4285f' == gr.get_head().hash
 
     gr.checkout('8986af2a679759e5a15794f6d56e6d46c3f302f1')
 
@@ -178,7 +178,7 @@ def test_commit_in_master_branch():
     assert True == commit.in_main_branch
 
     gr.reset()
-    assert '29e929fbc5dc6a2e9c620069b24e2a143af4285f' == gr.get_head().id
+    assert '29e929fbc5dc6a2e9c620069b24e2a143af4285f' == gr.get_head().hash
 
 
 def test_should_detail_a_commit():

@@ -41,7 +41,7 @@ the result is::
     Deleted: [(3, 'cc')]
 
 Another very useful API (especially for researchers ;) ) is the one that, given a commit, allows you to retrieve
-all the commits that last "touched" the modified lines of the file. Let's see an example::
+all the commits that last "touched" the modified lines of the file (if you pass a bug fixing commit, it will retrieve the bug inducing). Let's see an example::
 
     # commit abc modified line 1 of file A
     # commit def modified line 2 of file A

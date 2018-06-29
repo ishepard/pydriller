@@ -15,17 +15,9 @@ Requirements
 
 * `Python`_ 3.4 or newer
 * `Git`_
-* `GitPython`_ - python library for Git
-* `pytest`_ - used for running the tests
-* `dateutil`_ used for handling dates
-* `psutil`_ used for tests
 
 .. _Python: https://www.python.org
 .. _Git: https://git-scm.com/
-.. _GitPython: http://gitpython.readthedocs.io/en/stable/
-.. _pytest: https://docs.pytest.org/en/latest/
-.. _dateutil: https://dateutil.readthedocs.io/en/stable/
-.. _psutil: http://psutil.readthedocs.io/en/latest/
 
 Installing PyDriller
 ====================
@@ -64,6 +56,7 @@ Optionally (but suggested), make use of virtualenv::
 Install the requirements::
     
     $ pip install -r requirements
+    $ unzip test-repos.zip
 
 and run the tests using pytest::
 

@@ -58,10 +58,10 @@ Filtering commits
 
 PyDriller comes with a set of common commit filters that you can apply:
 
-* *only\_in\_branches: List[str]*: only visits commits that belong to certain branches.
-* *only\_in\_main\_branch: bool*: only visits commits that belong to the main branch of the repository.
-* *only\_no\_merge: bool*: only visits commits that are not merge commits.
-* *only\_modifications\_with\_file\_types: List[str]*: only visits commits in which at least one modification was done in that file type, e.g., if you pass ".java", then, the it will visit only commits in which at least one Java file was modified; clearly, it will skip other commits.
+* *only\_in\_branches: List[str]*: only analyses commits that belong to certain branches.
+* *only\_in\_main\_branch: bool*: only analyses commits that belong to the main branch of the repository.
+* *only\_no\_merge: bool*: only analyses commits that are not merge commits.
+* *only\_modifications\_with\_file\_types: List[str]*: only analyses commits in which at least one modification was done in that file type, e.g., if you pass ".java", then, the it will visit only commits in which at least one Java file was modified; clearly, it will skip other commits.
 
 Examples::
 
@@ -73,15 +73,4 @@ Examples::
 
     # Only commits that modified a java file
     RepositoryMining('path/to/the/repo', only_modifications_with_file_types=['.java']).traverse_commits()
-
-
-Threads
-=======
-TODO
-
-PyDriller can divide the work of analyzing a repository among multiple threads. If your machine has several cores, this can significantly improve performance. However, your *CommitVisitors must be thread-safe*, and your analysis must tolerate visiting commits in a relatively arbitrary order. 
-By default, PyDriller uses only 1 thread.
-::
-
-    RepositoryMining('path/to/repo/', mv, num_threads=5)
 

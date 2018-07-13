@@ -65,6 +65,7 @@ and run the tests using pytest:
 For information on how to use PyDriller, refer to the ufficial documentation:
 
 - [http://pydriller.readthedocs.io](http://pydriller.readthedocs.io)
+- a video on Youtube: [https://www.youtube.com/watch?v=7Oui4bP9eN8](https://www.youtube.com/watch?v=7Oui4bP9eN8)
 
 or have a look at our [example](https://github.com/ishepard/pydriller/tree/master/examples) folder.
 

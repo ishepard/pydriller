@@ -33,9 +33,10 @@ class GitRepository:
         self.path = path
         self.main_branch = None
         self.lock = Lock()
+        self.git = self._open_git()
+        self.repo = self._open_repository()
 
     def _open_git(self) -> Git:
-        self._open_repository()
         return Git(self.path)
 
     def _open_repository(self) -> Repo:
@@ -53,8 +54,7 @@ class GitRepository:
 
         :return: ChangeSet of the head commit
         """
-        repo = self._open_repository()
-        head_commit = repo.head.commit
+        head_commit = self.repo.head.commit
         return Commit(head_commit, self.path, self.main_branch)
 
     def get_list_commits(self) -> List[Commit]:
@@ -66,10 +66,8 @@ class GitRepository:
         return self._get_all_commits()
 
     def _get_all_commits(self) -> List[Commit]:
-        repo = self._open_repository()
-
         all_commits = []
-        for commit in repo.iter_commits():
+        for commit in self.repo.iter_commits():
             all_commits.append(self.get_commit_from_gitpython(commit))
         return all_commits
 
@@ -80,8 +78,7 @@ class GitRepository:
         :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
-        repo = self._open_repository()
-        return Commit(repo.commit(commit_id), self.path, self.main_branch)
+        return Commit(self.repo.commit(commit_id), self.path, self.main_branch)
 
     def get_commit_from_gitpython(self, commit: GitCommit) -> Commit:
         """
@@ -103,14 +100,12 @@ class GitRepository:
         :param _hash: commit hash to checkout
         """
         with self.lock:
-            git = self._open_git()
             self._delete_tmp_branch()
-            git.checkout('-f', _hash, b='_PD')
+            self.git.checkout('-f', _hash, b='_PD')
 
     def _delete_tmp_branch(self) -> None:
-        repo = self._open_repository()
         try:
-            repo.delete_head('_PD')
+            self.repo.delete_head('_PD')
         except GitCommandError:
             logger.debug("Branch _PD not found")
 
@@ -135,8 +130,7 @@ class GitRepository:
 
         """
         with self.lock:
-            git = self._open_git()
-            git.checkout('-f', self.main_branch)
+            self.git.checkout('-f', self.main_branch)
             self._delete_tmp_branch()
 
     def total_commits(self) -> int:
@@ -154,9 +148,8 @@ class GitRepository:
         :param str tag: the tag
         :return: Commit commit: the commit the tag referred to
         """
-        repo = self._open_repository()
         try:
-            selected_tag = repo.tags[tag]
+            selected_tag = self.repo.tags[tag]
             return self.get_commit(selected_tag.commit.hexsha)
         except (IndexError, AttributeError):
             logger.debug('Tag {} not found'.format(tag))
@@ -224,7 +217,6 @@ class GitRepository:
         :param Modification modification: single modification to analyze
         :return: the set containing all the bug inducing commits
         """
-        g = self._open_git()
         buggy_commits = set()
 
         if modification is not None:
@@ -239,7 +231,7 @@ class GitRepository:
 
             deleted_lines = self.parse_diff(mod.diff)['deleted']
             try:
-                blame = g.blame(commit.hash+'^', '--', path).split('\n')
+                blame = self.git.blame(commit.hash+'^', '--', path).split('\n')
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):
                         buggy_commit = blame[num_line - 1].split(' ')[0].replace('^','')

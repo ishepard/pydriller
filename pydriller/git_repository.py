@@ -105,7 +105,7 @@ class GitRepository:
 
     def _delete_tmp_branch(self) -> None:
         try:
-            self.repo.delete_head('_PD')
+            self.repo.delete_head('_PD', force=True)
         except GitCommandError:
             logger.debug("Branch _PD not found")
 

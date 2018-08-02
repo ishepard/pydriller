@@ -118,6 +118,19 @@ def test_list_files_in_commit():
     assert 3 == len(files3)
     gr.reset()
 
+def test_checkout_with_commit_not_fully_merged_to_master():
+    gr = GitRepository('test-repos/git-9/')
+    gr.checkout('developing')
+    files1 = gr.files()
+    assert 2 == len(files1)
+    gr.reset()
+    assert len(gr.repo.branches) == 4, "temp branch should be cleared."
+    files2 = gr.files()
+    assert 1 == len(files2)
+    gr.checkout('developing')
+    files1 = gr.files()
+    assert 2 == len(files1)
+    gr.reset()
 
 def test_get_all_commits():
     gr = GitRepository('test-repos/git-1/')

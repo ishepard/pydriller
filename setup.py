@@ -5,7 +5,7 @@ test_requires = ['pytest', 'psutil', 'requests']
 
 # Get the long description from the relevant file
 long_description = 'PyDriller is a Python framework that helps developers on mining software repositories. ' \
-                   'Born as a fork of RepoDriller, with PyDriller' \
+                   'With PyDriller' \
                    ' you can easily extract information from any Git repository, such as commits, developers, ' \
                    'modifications, diffs, and source codes, and quickly export CSV files.'
 

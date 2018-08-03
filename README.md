@@ -9,12 +9,12 @@ PyDriller is a Python framework that helps developers on mining software reposit
 
 ![Alt Text](https://ishepard.github.io/images/mygif.gif)
 
-### Table of contents
-**[Requirements](#requirements)**<br>
-**[Install](#install)**<br>
-**[Source code](#source-code)**<br>
-**[Tutorial](#tutorial)**<br>
-**[How to cite PyDriller](#how-to-cite-pydriller)**<br>
+## Table of contents
+* **[Requirements](#requirements)**
+* **[Install](#install)**
+* **[Source code](#source-code)**
+* **[Tutorial](#tutorial)**
+* **[How to cite PyDriller](#how-to-cite-pydriller)**
 
 
 ## REQUIREMENTS

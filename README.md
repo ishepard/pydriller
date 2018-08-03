@@ -34,7 +34,7 @@ pip install pydriller
 ```
 This will also install the necessary dependencies.
 
-### SOURCE CODE
+## SOURCE CODE
 
 If you like to clone from source, you can do it with very simple steps.
 

@@ -23,7 +23,7 @@ Very few! Just:
 - Python3
 - Git
 
-The list of dependencies are listed in ./requirements.txt, however the installer takes care of installing them for you.
+The list of dependencies is shown in `./requirements.txt`, however the installer takes care of installing them for you.
 
 ## INSTALL
 

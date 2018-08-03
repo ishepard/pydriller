@@ -14,7 +14,7 @@ PyDriller is a Python framework that helps developers on mining software reposit
 **[Install](#install)**<br>
 **[Source code](#source-code)**<br>
 **[Tutorial](#tutorial)**<br>
-**[How do I cite PyDriller?](#how-do-i-cite-pydriller?)**<br>
+**[How to cite PyDriller](#how-to-cite-pydriller)**<br>
 
 
 ## REQUIREMENTS
@@ -76,7 +76,7 @@ For information on how to use PyDriller, refer to the ufficial documentation:
 
 or have a look at our [example](https://github.com/ishepard/pydriller/tree/master/examples) folder.
 
-## How do I cite PyDriller?
+## How to cite PyDriller
 
 ```
 @inbook{PyDriller,

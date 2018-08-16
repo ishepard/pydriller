@@ -69,7 +69,7 @@ and run the tests using pytest:
 
 
 ## TUTORIAL
-For information on how to use PyDriller, refer to the ufficial documentation:
+For information on how to use PyDriller, refer to the official documentation:
 
 - [http://pydriller.readthedocs.io](http://pydriller.readthedocs.io)
 - a video on Youtube: [https://www.youtube.com/watch?v=7Oui4bP9eN8](https://www.youtube.com/watch?v=7Oui4bP9eN8)

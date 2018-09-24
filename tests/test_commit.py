@@ -54,7 +54,7 @@ def test_filename():
 
 
 def test_metrics_python():
-    with  open('test-repos/test6/git_repository.py') as f:
+    with open('test-repos/test6/git_repository.py') as f:
         sc = f.read()
 
     m1 = Modification('test-repos/test6/git_repository.py', "test-repos/test6/git_repository.py",
@@ -68,7 +68,7 @@ def test_metrics_python():
 
 
 def test_metrics_cpp():
-    with  open('test-repos/test6/FileCPP.cpp') as f:
+    with open('test-repos/test6/FileCPP.cpp') as f:
         sc = f.read()
 
     m1 = Modification('test-repos/test6/FileCPP.cpp', "test-repos/test6/FileCPP.cpp",
@@ -82,7 +82,7 @@ def test_metrics_cpp():
 
 
 def test_metrics_java():
-    with  open('test-repos/test6/FileJava.java') as f:
+    with open('test-repos/test6/FileJava.java') as f:
         sc = f.read()
 
     m1 = Modification('test-repos/test6/FileJava.java', "test-repos/test6/FileJava.java",

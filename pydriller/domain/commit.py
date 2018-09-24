@@ -118,22 +118,44 @@ class Modification:
         return filename[-1]
 
     @property
-    def nloc(self):
+    def nloc(self) -> int:
+        """
+        Calculate the LOC of the file.
+
+        :return: LOC of the file
+        """
         self.calculate_metrics()
         return self._nloc
 
     @property
-    def complexity(self):
+    def complexity(self) -> int:
+        """
+        Calculate the Cyclomatic Complexity of the file.
+
+        :return: Cyclomatic Complexity of the file
+        """
         self.calculate_metrics()
         return self._complexity
 
     @property
-    def token_count(self):
+    def token_count(self) -> int:
+        """
+        Calculate the token count of functions.
+
+        :return: token count
+        """
         self.calculate_metrics()
         return self._token_count
 
     @property
-    def methods(self):
+    def methods(self) -> List[Method]:
+        """
+        Return the list of methods in the file. Every method
+        contains various information like complexity, loc, name,
+        number of parameters, etc.
+
+        :return: list of methods
+        """
         self.calculate_metrics()
         return self._function_list
 

@@ -97,7 +97,6 @@ def mine(_type):
                 continue
 
             cc = mod.complexity
-            logging.info(cc)
 
     end = datetime.now()
 

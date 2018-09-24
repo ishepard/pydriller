@@ -15,6 +15,6 @@ install:
   - pip install requests
   - pip install codecov pytest-cov
 script:
-  - pytest -v --cov=pydriller/
+  - pytest -s -v --cov=pydriller/
 after_success:
   - codecov

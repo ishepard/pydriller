@@ -64,6 +64,8 @@ def test_metrics_python():
     assert 1009 == m1.token_count
     assert 43 == m1.complexity
 
+    assert 19 == len(m1.methods)
+
 
 def test_metrics_cpp():
     with  open('test-repos/test6/FileCPP.cpp') as f:
@@ -76,6 +78,8 @@ def test_metrics_cpp():
     assert 2511 == m1.token_count
     assert 83 == m1.complexity
 
+    assert 23 == len(m1.methods)
+
 
 def test_metrics_java():
     with  open('test-repos/test6/FileJava.java') as f:
@@ -87,3 +91,5 @@ def test_metrics_java():
     assert 466 == m1.nloc
     assert 3809 == m1.token_count
     assert 92 == m1.complexity
+
+    assert 46 == len(m1.methods)

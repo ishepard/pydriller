@@ -34,6 +34,24 @@ class ModificationType(Enum):
     MODIFY = 5
 
 
+class Method():
+    def __init__(self, func):
+        self.name = func.name
+        self.long_name = func.long_name
+        self.filename = func.filename
+        self.nloc = func.nloc
+        self.cyclomatic_complexity = func.cyclomatic_complexity
+        self.token_count = func.token_count
+        self.parameters = func.parameters
+        self.start_line = func.start_line
+        self.end_line = func.end_line
+        self.fan_in = func.fan_in
+        self.fan_out = func.fan_out
+        self.general_fan_out = func.general_fan_out
+        self.length = func.length
+        self.top_nesting_level = func.top_nesting_level
+
+
 class Modification:
     def __init__(self, old_path: str, new_path: str,
                  change_type: ModificationType,
@@ -51,6 +69,7 @@ class Modification:
         self._nloc = None
         self._complexity = None
         self._token_count = None
+        self._function_list = []
 
     @property
     def added(self) -> int:
@@ -113,6 +132,11 @@ class Modification:
         self.calculate_metrics()
         return self._token_count
 
+    @property
+    def methods(self):
+        self.calculate_metrics()
+        return self._function_list
+
     def calculate_metrics(self):
         if self.source_code != '' and self._nloc is None:
             l = lizard.analyze_file.analyze_source_code(self.filename, self.source_code)
@@ -120,6 +144,9 @@ class Modification:
             self._nloc = l.nloc
             self._complexity = l.CCN
             self._token_count = l.token_count
+
+            for func in l.function_list:
+                self._function_list.append(Method(func))
 
     def __eq__(self, other):
         if not isinstance(other, Modification):

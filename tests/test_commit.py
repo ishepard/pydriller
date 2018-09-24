@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+from pprint import pprint
 
 from pydriller.domain.commit import Modification, ModificationType
 

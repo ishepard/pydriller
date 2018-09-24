@@ -16,7 +16,7 @@ import os
 from _datetime import datetime
 from typing import List, Set
 from enum import Enum
-
+import lizard
 from git import Repo, Diff, Git, Commit as GitCommit
 
 
@@ -47,6 +47,10 @@ class Modification:
         self.change_type = change_type
         self.diff = diff_text
         self.source_code = sc
+
+        self._nloc = None
+        self._complexity = None
+        self._token_count = None
 
     @property
     def added(self) -> int:
@@ -93,6 +97,29 @@ class Modification:
 
         filename = path.split(os.sep)
         return filename[-1]
+
+    @property
+    def nloc(self):
+        self.calculate_metrics()
+        return self._nloc
+
+    @property
+    def complexity(self):
+        self.calculate_metrics()
+        return self._complexity
+
+    @property
+    def token_count(self):
+        self.calculate_metrics()
+        return self._token_count
+
+    def calculate_metrics(self):
+        if self.source_code != '' and self._nloc is None:
+            l = lizard.analyze_file.analyze_source_code(self.filename, self.source_code)
+
+            self._nloc = l.nloc
+            self._complexity = l.CCN
+            self._token_count = l.token_count
 
     def __eq__(self, other):
         if not isinstance(other, Modification):

@@ -93,3 +93,13 @@ def test_metrics_java():
     assert 92 == m1.complexity
 
     assert 46 == len(m1.methods)
+
+
+def test_metrics_not_supported_file():
+    sc = 'asd !&%@*&^@\n jjdkj'
+
+    m1 = Modification('test-repos/test6/NotSupported.pdf', "test-repos/test6/NotSupported.pdf",
+                      ModificationType.MODIFY, '', sc)
+
+    assert 2 == m1.nloc
+    assert 0 == len(m1.methods)

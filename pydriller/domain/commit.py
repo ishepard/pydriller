@@ -160,7 +160,7 @@ class Modification:
         return self._function_list
 
     def calculate_metrics(self):
-        if self.source_code != '' and self._nloc is None:
+        if self.source_code and self._nloc is None:
             l = lizard.analyze_file.analyze_source_code(self.filename, self.source_code)
 
             self._nloc = l.nloc

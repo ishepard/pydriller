@@ -18,8 +18,6 @@ import json
 import sys
 if 'TRAVIS' in os.environ:
     import requests
-    import logging
-    logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
     webhook_url = os.environ['WEBHOOK_URL']
 from pydriller.repository_mining import RepositoryMining
 from datetime import datetime
@@ -36,6 +34,8 @@ def test_memory():
     logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
                            diff_with_everything, all_commits_with_everything,
                            diff_with_metrics, all_commits_with_metrics)
+
+    assert 1240 == len(all_commits_with_nothing) == len(all_commits_with_everything) == len(all_commits_with_metrics)
 
 
 def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,

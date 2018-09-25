@@ -74,8 +74,8 @@ def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
 
 def mine(_type):
     p = psutil.Process(os.getpid())
-    dt1 = datetime(2015, 1, 1)
-    dt2 = datetime(2016, 1, 1)
+    dt1 = datetime(2017, 1, 1)
+    dt2 = datetime(2017, 7, 1)
     all_commits = []
 
     start = datetime.now()

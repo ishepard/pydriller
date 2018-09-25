@@ -40,12 +40,16 @@ def test_equal(resource):
 
 
 def test_filename():
+    diff_and_sc = {
+        'diff': '',
+        'source_code': ''
+    }
     m1 = Modification('/Users/dspadini/pydriller/myfile.py', "/Users/dspadini/pydriller/mynewfile.py",
-                      ModificationType.ADD, '', '')
+                      ModificationType.ADD, diff_and_sc)
     m3 = Modification('/Users/dspadini/pydriller/myfile.py', "/Users/dspadini/pydriller/mynewfile.py",
-                      ModificationType.ADD, '', '')
+                      ModificationType.ADD, diff_and_sc)
     m2 = Modification('/Users/dspadini/pydriller/myfile.py', None,
-                      ModificationType.ADD, '', '')
+                      ModificationType.ADD, diff_and_sc)
 
     assert m1.filename == 'mynewfile.py'
     assert m2.filename == 'myfile.py'
@@ -57,8 +61,13 @@ def test_metrics_python():
     with open('test-repos/test6/git_repository.py') as f:
         sc = f.read()
 
+    diff_and_sc = {
+        'diff': '',
+        'source_code': sc
+    }
+
     m1 = Modification('test-repos/test6/git_repository.py', "test-repos/test6/git_repository.py",
-                      ModificationType.MODIFY, '', sc)
+                      ModificationType.MODIFY, diff_and_sc)
 
     assert 196 == m1.nloc
     assert 1009 == m1.token_count
@@ -71,8 +80,13 @@ def test_metrics_cpp():
     with open('test-repos/test6/FileCPP.cpp') as f:
         sc = f.read()
 
+    diff_and_sc = {
+        'diff': '',
+        'source_code': sc
+    }
+
     m1 = Modification('test-repos/test6/FileCPP.cpp', "test-repos/test6/FileCPP.cpp",
-                      ModificationType.MODIFY, '', sc)
+                      ModificationType.MODIFY, diff_and_sc)
 
     assert 332 == m1.nloc
     assert 2511 == m1.token_count
@@ -85,8 +99,13 @@ def test_metrics_java():
     with open('test-repos/test6/FileJava.java') as f:
         sc = f.read()
 
+    diff_and_sc = {
+        'diff': '',
+        'source_code': sc
+    }
+
     m1 = Modification('test-repos/test6/FileJava.java', "test-repos/test6/FileJava.java",
-                      ModificationType.MODIFY, '', sc)
+                      ModificationType.MODIFY, diff_and_sc)
 
     assert 466 == m1.nloc
     assert 3809 == m1.token_count
@@ -98,8 +117,13 @@ def test_metrics_java():
 def test_metrics_not_supported_file():
     sc = 'asd !&%@*&^@\n jjdkj'
 
+    diff_and_sc = {
+        'diff': '',
+        'source_code': sc
+    }
+
     m1 = Modification('test-repos/test6/NotSupported.pdf', "test-repos/test6/NotSupported.pdf",
-                      ModificationType.MODIFY, '', sc)
+                      ModificationType.MODIFY, diff_and_sc)
 
     assert 2 == m1.nloc
     assert 0 == len(m1.methods)

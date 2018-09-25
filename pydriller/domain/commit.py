@@ -14,7 +14,7 @@
 import logging
 import os
 from _datetime import datetime
-from typing import List, Set
+from typing import List, Set, Dict
 from enum import Enum
 import lizard
 from git import Repo, Diff, Git, Commit as GitCommit
@@ -55,7 +55,7 @@ class Method():
 class Modification:
     def __init__(self, old_path: str, new_path: str,
                  change_type: ModificationType,
-                 diff_text: str, sc: str):
+                 diff_and_sc: Dict[str, str]):
         """
         Initialize a modification. A modification carries on information regarding
         the changed file. Normally, you shouldn't initialize a new one.
@@ -63,8 +63,8 @@ class Modification:
         self.old_path = old_path
         self.new_path = new_path
         self.change_type = change_type
-        self.diff = diff_text
-        self.source_code = sc
+        self.diff = diff_and_sc['diff']
+        self.source_code = diff_and_sc['source_code']
 
         self._nloc = None
         self._complexity = None
@@ -318,16 +318,19 @@ class Commit:
             new_path = d.b_path
             change_type = self._from_change_to_modification_type(d)
 
-            diff_text = ''
-            sc = ''
+            diff_and_sc = {
+                'diff': '',
+                'source_code': ''
+            }
+
             try:
-                diff_text = d.diff.decode('utf-8')
-                sc = d.b_blob.data_stream.read().decode('utf-8')
+                diff_and_sc['diff'] = d.diff.decode('utf-8')
+                diff_and_sc['source_code'] = d.b_blob.data_stream.read().decode('utf-8')
             except (UnicodeDecodeError, AttributeError, ValueError):
                 logger.debug(
                     'Could not load source code or the diff of a file in commit {}'.format(self._c_object.hexsha))
 
-            modifications_list.append(Modification(old_path, new_path, change_type, diff_text, sc))
+            modifications_list.append(Modification(old_path, new_path, change_type, diff_and_sc))
 
         return modifications_list
 

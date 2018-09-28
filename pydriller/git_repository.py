@@ -243,5 +243,5 @@ class GitRepository:
 
     def _useless_line(self, line: str):
         # this covers comments in Java and Python, as well as empty lines. More have to be added!
-        return line.startswith('//') or line.startswith('#') or line.startswith("/*") or \
-               line.startswith("'''") or line.startswith('"""') or line == '' or line.startswith("*")
+        return not line or line.startswith('//') or line.startswith('#') or line.startswith("/*") or \
+               line.startswith("'''") or line.startswith('"""') or line.startswith("*")

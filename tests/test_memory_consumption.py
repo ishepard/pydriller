@@ -29,35 +29,42 @@ def test_memory():
 
     diff_with_nothing, all_commits_with_nothing = mine(0)
     diff_with_everything, all_commits_with_everything = mine(1)
+    diff_with_metrics, all_commits_with_metrics = mine(2)
 
     logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
-                           diff_with_everything, all_commits_with_everything)
+                           diff_with_everything, all_commits_with_everything,
+                           diff_with_metrics, all_commits_with_metrics)
+
+    assert 1240 == len(all_commits_with_nothing) == len(all_commits_with_everything) == len(all_commits_with_metrics)
 
 
 def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
-                           diff_with_everything, all_commits_with_everything):
+                           diff_with_everything, all_commits_with_everything,
+                           diff_with_metrics, all_commits_with_metrics):
 
     text = "*PYTHON V{}.{}*\n" \
            "*Max memory (MB)*\n" \
-           "With nothing: {}, with everything: {} \n" \
+           "With nothing: {}, with everything: {}, with metrics: {}\n" \
            "*Min memory (MB)*\n" \
-           "With nothing: {}, with everything: {} \n" \
+           "With nothing: {}, with everything: {}, with metrics: {} \n" \
            "*Time*\n" \
-           "With nothing: {}:{}:{}, with everything: {}:{}:{} \n" \
+           "With nothing: {}:{}:{}, with everything: {}:{}:{}, with metrics: {}:{}:{} \n" \
            "*Total number of commits*: {}\n" \
            "*Commits per second:*\n" \
-            "With nothing: {}, with everything: {}"
+            "With nothing: {}, with everything: {}, with metrics: {}"
 
     slack_data = {
         'text': text.format(
                 sys.version_info[0], sys.version_info[1],
-                max(all_commits_with_nothing), max(all_commits_with_everything),
-                min(all_commits_with_nothing), min(all_commits_with_everything),
+                max(all_commits_with_nothing), max(all_commits_with_everything), max(all_commits_with_metrics),
+                min(all_commits_with_nothing), min(all_commits_with_everything), min(all_commits_with_metrics),
                 diff_with_nothing.seconds // 3600, (diff_with_nothing.seconds % 3600) // 60, diff_with_nothing.seconds % 60,
                 diff_with_everything.seconds // 3600, (diff_with_everything.seconds % 3600) // 60, diff_with_everything.seconds % 60,
+                diff_with_metrics.seconds // 3600, (diff_with_metrics.seconds % 3600) // 60, diff_with_metrics.seconds % 60,
                 len(all_commits_with_nothing),
                 len(all_commits_with_nothing) / diff_with_nothing.seconds,
-                len(all_commits_with_everything) / diff_with_everything.seconds
+                len(all_commits_with_everything) / diff_with_everything.seconds,
+                len(all_commits_with_metrics) / diff_with_metrics.seconds
         )}
     requests.post(
         webhook_url, data=json.dumps(slack_data),
@@ -67,8 +74,8 @@ def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
 
 def mine(_type):
     p = psutil.Process(os.getpid())
-    dt1 = datetime(2015, 1, 1)
-    dt2 = datetime(2016, 1, 1)
+    dt1 = datetime(2017, 1, 1)
+    dt2 = datetime(2017, 7, 1)
     all_commits = []
 
     start = datetime.now()
@@ -85,6 +92,12 @@ def mine(_type):
 
         for mod in commit.modifications:
             dd = mod.diff
+
+            if _type == 1:
+                continue
+
+            cc = mod.complexity
+
     end = datetime.now()
 
     diff = end - start

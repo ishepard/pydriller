@@ -4,3 +4,4 @@ psutil
 typing
 pytz
 python-hglib
+lizard

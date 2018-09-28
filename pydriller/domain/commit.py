@@ -34,8 +34,15 @@ class ModificationType(Enum):
     MODIFY = 5
 
 
-class Method():
+class Method:
     def __init__(self, func):
+        """
+        Initialize a method object. This is calculated using Lizard: it parses
+        the source code of all the modifications in a commit, extracting information
+        of the methods contained in the file (if the file is a source code written
+        in one of the supported programming languages).
+        """
+
         self.name = func.name
         self.long_name = func.long_name
         self.filename = func.filename
@@ -124,7 +131,7 @@ class Modification:
 
         :return: LOC of the file
         """
-        self.calculate_metrics()
+        self._calculate_metrics()
         return self._nloc
 
     @property
@@ -134,7 +141,7 @@ class Modification:
 
         :return: Cyclomatic Complexity of the file
         """
-        self.calculate_metrics()
+        self._calculate_metrics()
         return self._complexity
 
     @property
@@ -144,7 +151,7 @@ class Modification:
 
         :return: token count
         """
-        self.calculate_metrics()
+        self._calculate_metrics()
         return self._token_count
 
     @property
@@ -156,10 +163,10 @@ class Modification:
 
         :return: list of methods
         """
-        self.calculate_metrics()
+        self._calculate_metrics()
         return self._function_list
 
-    def calculate_metrics(self):
+    def _calculate_metrics(self):
         if self.source_code and self._nloc is None:
             l = lizard.analyze_file.analyze_source_code(self.filename, self.source_code)
 

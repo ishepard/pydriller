@@ -1,0 +1,5 @@
+-r requirements.txt
+
+pytest>=3.5.0
+psutil
+requests

@@ -1,7 +1,19 @@
 from setuptools import setup, find_packages
 
-install_requires = ['gitpython', 'typing', 'pytz']
-test_requires = ['pytest', 'psutil', 'requests']
+
+def read_reqs(filename: str):
+    req = []
+    with open(filename, 'r') as f:
+        for line in f:
+            if line.strip() and not line.startswith('-r'):
+                req.append(line.strip())
+
+    return req
+
+
+install_requires = read_reqs("requirements.txt")
+test_requires = read_reqs("test-requirements.txt")
+
 
 # Get the long description from the relevant file
 long_description = 'PyDriller is a Python framework that helps developers on mining software repositories. ' \
@@ -15,7 +27,7 @@ setup(
     long_description = long_description,
     author='Davide Spadini',
     author_email='spadini.davide@gmail.com',
-    version='1.2.3',
+    version='1.3',
     packages=find_packages('.'),
     url='https://github.com/ishepard/pydriller',
     license='Apache License',

@@ -11,8 +11,7 @@ before_install:
   - git clone https://github.com/apache/hadoop.git
   - cd ..
 install:
-  - pip install -r requirements.txt
-  - pip install requests
+  - pip install -r test-requirements.txt
   - pip install codecov pytest-cov
 script:
   - travis_wait 30 pytest -v --cov=pydriller/

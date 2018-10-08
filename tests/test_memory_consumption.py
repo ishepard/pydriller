@@ -96,7 +96,8 @@ def mine(_type):
             if _type == 1:
                 continue
 
-            cc = mod.complexity
+            if mod.filename.endswith('.java'):
+                cc = mod.complexity
 
     end = datetime.now()
 

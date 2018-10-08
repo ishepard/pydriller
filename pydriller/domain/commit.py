@@ -47,7 +47,7 @@ class Method:
         self.long_name = func.long_name
         self.filename = func.filename
         self.nloc = func.nloc
-        self.cyclomatic_complexity = func.cyclomatic_complexity
+        self.complexity = func.cyclomatic_complexity
         self.token_count = func.token_count
         self.parameters = func.parameters
         self.start_line = func.start_line

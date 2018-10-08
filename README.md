@@ -54,16 +54,17 @@ Clone the repo:
 > git clone https://github.com/ishepard/pydriller.git
 ```
 
-install the requirements:
+and install the requirements:
 
 ```
 > cd pydriller
-> pip install -r requirements
-> unzip test-repos.zip
+> pip install -r requirements.txt
 ```
-and run the tests using pytest:
+to run the tests (using pytest):
 
 ```
+> unzip test-repos.zip
+> pip install -r test-requirements.txt
 > pytest
 ```
 

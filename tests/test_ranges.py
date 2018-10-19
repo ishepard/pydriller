@@ -149,19 +149,25 @@ def test_multiple_filters_exceptions():
     from_tag = 'v1.4'
 
     with pytest.raises(Exception):
-        RepositoryMining('test-repos/test1/', from_commit=from_commit, from_tag=from_tag)
+        for commit in RepositoryMining('test-repos/test1/', from_commit=from_commit, from_tag=from_tag).traverse_commits():
+            print(commit.hash)
 
     with pytest.raises(Exception):
-        RepositoryMining('test-repos/test1/', since=dt2, from_commit=from_commit)
+        for commit in RepositoryMining('test-repos/test1/', since=dt2, from_commit=from_commit).traverse_commits():
+            print(commit.hash)
 
     with pytest.raises(Exception):
-        RepositoryMining('test-repos/test1/', since=dt2, from_tag=from_tag)
+        for commit in RepositoryMining('test-repos/test1/', since=dt2, from_tag=from_tag).traverse_commits():
+            print(commit.hash)
 
     with pytest.raises(Exception):
-        RepositoryMining('test-repos/test1/', to=dt2, to_tag=from_tag)
+        for commit in RepositoryMining('test-repos/test1/', to=dt2, to_tag=from_tag).traverse_commits():
+            print(commit.hash)
 
     with pytest.raises(Exception):
-        RepositoryMining('test-repos/test1/', single=from_commit, to=dt2, to_tag=from_tag)
+        for commit in RepositoryMining('test-repos/test1/', single=from_commit, to=dt2, to_tag=from_tag).traverse_commits():
+            print(commit.hash)
 
     with pytest.raises(Exception):
-        RepositoryMining('test-repos/test1/', to_commit=from_commit, to=dt2)
+        for commit in RepositoryMining('test-repos/test1/', to_commit=from_commit, to=dt2).traverse_commits():
+            print(commit.hash)

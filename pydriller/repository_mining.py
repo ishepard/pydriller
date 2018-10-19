@@ -25,7 +25,8 @@ logger = logging.getLogger(__name__)
 
 
 class RepositoryMining:
-    def __init__(self, path_to_repo: str,
+    def __init__(self, path_to_repo = None,
+                 path_to_remote_repo = None,
                  single: str = None,
                  since: datetime = None, to: datetime = None,
                  from_commit: str = None, to_commit: str = None,
@@ -52,7 +53,15 @@ class RepositoryMining:
         :param List[str] only_modifications_with_file_types: only modifications with that file types will be analyzed
         :param bool only_no_merge: if True, merges will not be analyzed
         """
-        self.git_repo = GitRepository(path_to_repo)
+
+        self._check_paths_to_repos(path_to_repo, path_to_remote_repo)
+        self._path_to_repo = path_to_repo
+        self._path_to_remote_repo = path_to_remote_repo
+
+        self.from_commit = from_commit
+        self.to_commit = to_commit
+        self.from_tag = from_tag
+        self.to_tag = to_tag
         self.single = single
         self.since = since
         self.to = to
@@ -62,10 +71,11 @@ class RepositoryMining:
         self.only_modifications_with_file_types = only_modifications_with_file_types
         self.only_no_merge = only_no_merge
 
-        self._check_filters(from_commit, from_tag, since, single, to, to_commit, to_tag)
-        self._check_timezones()
+    def _check_paths_to_repos(self, path_to_repo, path_to_remote_repo):
+        if path_to_repo is None and path_to_remote_repo is None:
+            raise Exception('You have to specify at least 1 repo to analyze')
 
-    def _check_filters(self, from_commit, from_tag, since, single, to, to_commit, to_tag):
+    def _check_filters(self, git_repo, from_commit, from_tag, since, single, to, to_commit, to_tag):
         if single is not None:
             if since is not None or to is not None or from_commit is not None or \
                    to_commit is not None or from_tag is not None or to_tag is not None:
@@ -74,43 +84,55 @@ class RepositoryMining:
         if from_commit is not None:
             if since is not None:
                 raise Exception('You can not specify both <since date> and <from commit>')
-            self.since = self.git_repo.get_commit(from_commit).author_date
+            self.since = git_repo.get_commit(from_commit).author_date
 
         if to_commit is not None:
             if to is not None:
                 raise Exception('You can not specify both <to date> and <to commit>')
-            self.to = self.git_repo.get_commit(to_commit).author_date
+            self.to = git_repo.get_commit(to_commit).author_date
 
         if from_tag is not None:
             if since is not None or from_commit is not None:
                 raise Exception('You can not specify <since date> or <from commit> when using <from tag>')
-            self.since = self.git_repo.get_commit_from_tag(from_tag).author_date
+            self.since = git_repo.get_commit_from_tag(from_tag).author_date
 
         if to_tag is not None:
             if to is not None or to_commit is not None:
                 raise Exception('You can not specify <to date> or <to commit> when using <to tag>')
-            self.to = self.git_repo.get_commit_from_tag(to_tag).author_date
+            self.to = git_repo.get_commit_from_tag(to_tag).author_date
 
     def traverse_commits(self) -> Generator[Commit, None, None]:
         """
         Analyze all the specified commits (all of them by default), returning
         a generator of commits.
         """
-        logger.info('Git repository in {}'.format(self.git_repo.path))
-        all_cs = self._apply_filters_on_commits(self.git_repo.get_list_commits())
 
-        if not self.reversed_order:
-            all_cs.reverse()
+        if self._path_to_repo is not None:
+            if isinstance(self._path_to_repo, str):
+                self._path_to_repo = [self._path_to_repo]
 
-        for commit in all_cs:
-            logger.info('Commit #{} in {} from {}'
-                         .format(commit.hash, commit.author_date, commit.author.name))
+        for path_repo in self._path_to_repo:
+            git_repo = GitRepository(path_repo)
 
-            if self._is_commit_filtered(commit):
-                logger.info('Commit #{} filtered'.format(commit.hash))
-                continue
+            print(self.from_commit, self.from_tag, self.since, self.single, self.to, self.to_commit, self.to_tag)
+            self._check_filters(git_repo, self.from_commit, self.from_tag, self.since, self.single, self.to, self.to_commit, self.to_tag)
+            self._check_timezones()
 
-            yield commit
+            logger.info('Git repository in {}'.format(git_repo.path))
+            all_cs = self._apply_filters_on_commits(git_repo.get_list_commits())
+
+            if not self.reversed_order:
+                all_cs.reverse()
+
+            for commit in all_cs:
+                logger.info('Commit #{} in {} from {}'
+                             .format(commit.hash, commit.author_date, commit.author.name))
+
+                if self._is_commit_filtered(commit):
+                    logger.info('Commit #{} filtered'.format(commit.hash))
+                    continue
+
+                yield commit
 
     def _is_commit_filtered(self, commit: Commit):
         if self.only_in_main_branch is True and commit.in_main_branch is False:

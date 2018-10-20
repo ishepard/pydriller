@@ -23,6 +23,7 @@ from datetime import datetime
 from git import Repo
 import tempfile
 import os
+import shutil
 
 logger = logging.getLogger(__name__)
 
@@ -129,6 +130,7 @@ class RepositoryMining:
         else:
             self._path_to_repo = []
 
+        tmp_folder = None
         if self._path_to_remote_repo is not None:
             if isinstance(self._path_to_repo, str):
                 self._path_to_remote_repo = [self._path_to_remote_repo]
@@ -160,6 +162,9 @@ class RepositoryMining:
                     continue
 
                 yield commit
+
+        # clean up!
+        self.cleanup(tmp_folder)
 
     def _is_commit_filtered(self, commit: Commit):
         if self.only_in_main_branch is True and commit.in_main_branch is False:
@@ -227,3 +232,10 @@ class RepositoryMining:
 
         return url[last_slash_index + 1:last_suffix_index]
 
+    def cleanup(self, tmp_folder):
+        if not tmp_folder is None:
+            logger.info("Deleting folder {}".format(tmp_folder))
+            if os.path.isdir(tmp_folder):
+                shutil.rmtree(tmp_folder)
+            else:
+                logger.info("Could not find the temporary folder, maybe already deleted?")

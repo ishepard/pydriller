@@ -20,6 +20,9 @@ from pydriller.domain.commit import Commit
 from typing import List, Generator
 from pydriller.git_repository import GitRepository
 from datetime import datetime
+from git import Repo
+import tempfile
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +57,7 @@ class RepositoryMining:
         :param bool only_no_merge: if True, merges will not be analyzed
         """
 
-        self._check_paths_to_repos(path_to_repo, path_to_remote_repo)
+        self._sanity_check_repos(path_to_repo, path_to_remote_repo)
         self._path_to_repo = path_to_repo
         self._path_to_remote_repo = path_to_remote_repo
 
@@ -71,11 +74,15 @@ class RepositoryMining:
         self.only_modifications_with_file_types = only_modifications_with_file_types
         self.only_no_merge = only_no_merge
 
-    def _check_paths_to_repos(self, path_to_repo, path_to_remote_repo):
+    def _sanity_check_repos(self, path_to_repo, path_to_remote_repo):
         if path_to_repo is None and path_to_remote_repo is None:
             raise Exception('You have to specify at least 1 repo to analyze')
+        if path_to_repo is not None and (not isinstance(path_to_repo, str) and not isinstance(path_to_repo, list)):
+            raise Exception('The path to the repo has to be of type \"string\" or \"list of strings\"!')
+        if path_to_remote_repo is not None and (not isinstance(path_to_remote_repo, str) and not isinstance(path_to_remote_repo, list)):
+            raise Exception('The path to the remote repo has to be of type \"string\" or \"List of strings\"!')
 
-    def _check_filters(self, git_repo, from_commit, from_tag, since, single, to, to_commit, to_tag):
+    def _sanity_check_filters(self, git_repo, from_commit, from_tag, since, single, to, to_commit, to_tag):
         if single is not None:
             if since is not None or to is not None or from_commit is not None or \
                    to_commit is not None or from_tag is not None or to_tag is not None:
@@ -101,21 +108,41 @@ class RepositoryMining:
                 raise Exception('You can not specify <to date> or <to commit> when using <to tag>')
             self.to = git_repo.get_commit_from_tag(to_tag).author_date
 
+    def clone_remote_repo(self, tmp_folder: str, path_to_remote_repo: List) -> List[str]:
+        local_repos = []
+
+        for repo_url in path_to_remote_repo:
+            repo_folder = os.path.join(tmp_folder, self.get_repo_name_from_url(repo_url))
+            Repo.clone_from(url=repo_url, to_path=repo_folder)
+            local_repos.append(repo_url)
+
+        return local_repos
+
     def traverse_commits(self) -> Generator[Commit, None, None]:
         """
         Analyze all the specified commits (all of them by default), returning
         a generator of commits.
         """
-
         if self._path_to_repo is not None:
             if isinstance(self._path_to_repo, str):
                 self._path_to_repo = [self._path_to_repo]
+        else:
+            self._path_to_repo = []
+
+        if self._path_to_remote_repo is not None:
+            if isinstance(self._path_to_repo, str):
+                self._path_to_remote_repo = [self._path_to_remote_repo]
+
+            tmp_folder = tempfile.mkdtemp()
+            self._path_to_remote_repo = self.clone_remote_repo(tmp_folder.name, self._path_to_remote_repo)
+
+            self._path_to_repo = self._path_to_repo + self._path_to_remote_repo
 
         for path_repo in self._path_to_repo:
             git_repo = GitRepository(path_repo)
 
-            print(self.from_commit, self.from_tag, self.since, self.single, self.to, self.to_commit, self.to_tag)
-            self._check_filters(git_repo, self.from_commit, self.from_tag, self.since, self.single, self.to, self.to_commit, self.to_tag)
+            self._sanity_check_filters(git_repo, self.from_commit, self.from_tag, self.since,
+                                       self.single, self.to, self.to_commit, self.to_tag)
             self._check_timezones()
 
             logger.info('Git repository in {}'.format(git_repo.path))
@@ -188,3 +215,15 @@ class RepositoryMining:
         if self.to is not None:
             if self.to.tzinfo is None or self.to.tzinfo.utcoffset(self.to) is None:
                 self.to = self.to.replace(tzinfo=pytz.utc)
+
+    def get_repo_name_from_url(self, url: str) -> str:
+        last_slash_index = url.rfind("/")
+        last_suffix_index = url.rfind(".git")
+        if last_suffix_index < 0:
+            last_suffix_index = len(url)
+
+        if last_slash_index < 0 or last_suffix_index <= last_slash_index:
+            raise Exception("Badly formatted url {}".format(url))
+
+        return url[last_slash_index + 1:last_suffix_index]
+

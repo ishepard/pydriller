@@ -17,10 +17,10 @@ import logging
 import pytz as pytz
 
 from pydriller.domain.commit import Commit
-from typing import List, Generator
+from typing import List, Generator, Union
 from pydriller.git_repository import GitRepository
 from datetime import datetime
-from git import Repo
+from git import Repo, GitCommandError
 import tempfile
 import os
 import shutil
@@ -29,8 +29,8 @@ logger = logging.getLogger(__name__)
 
 
 class RepositoryMining:
-    def __init__(self, path_to_repo = None,
-                 path_to_remote_repo = None,
+    def __init__(self, path_to_repo: Union[str, List[str]] = None,
+                 path_to_remote_repo: Union[str, List[str]] = None,
                  single: str = None,
                  since: datetime = None, to: datetime = None,
                  from_commit: str = None, to_commit: str = None,
@@ -109,13 +109,18 @@ class RepositoryMining:
                 raise Exception('You can not specify <to date> or <to commit> when using <to tag>')
             self.to = git_repo.get_commit_from_tag(to_tag).author_date
 
-    def clone_remote_repo(self, tmp_folder: str, path_to_remote_repo: List) -> List[str]:
+    def clone_remote_repo(self, tmp_folder: str, path_to_remote_repo: List[str]) -> List[str]:
         local_repos = []
 
         for repo_url in path_to_remote_repo:
             repo_folder = os.path.join(tmp_folder, self.get_repo_name_from_url(repo_url))
-            Repo.clone_from(url=repo_url, to_path=repo_folder)
-            local_repos.append(repo_url)
+            logger.info("Cloning {} in temporary folder {}".format(repo_url, repo_folder))
+            try:
+                Repo.clone_from(url=repo_url, to_path=repo_folder)
+            except GitCommandError:
+                raise Exception("Could not clone {} in temporary folder {} since the folder "
+                                "already exists or it is not an empty directory".format(repo_url, repo_folder))
+            local_repos.append(repo_folder)
 
         return local_repos
 
@@ -132,11 +137,11 @@ class RepositoryMining:
 
         tmp_folder = None
         if self._path_to_remote_repo is not None:
-            if isinstance(self._path_to_repo, str):
+            if isinstance(self._path_to_remote_repo, str):
                 self._path_to_remote_repo = [self._path_to_remote_repo]
 
             tmp_folder = tempfile.mkdtemp()
-            self._path_to_remote_repo = self.clone_remote_repo(tmp_folder.name, self._path_to_remote_repo)
+            self._path_to_remote_repo = self.clone_remote_repo(tmp_folder, self._path_to_remote_repo)
 
             self._path_to_repo = self._path_to_repo + self._path_to_remote_repo
 
@@ -147,7 +152,7 @@ class RepositoryMining:
                                        self.single, self.to, self.to_commit, self.to_tag)
             self._check_timezones()
 
-            logger.info('Git repository in {}'.format(git_repo.path))
+            logger.info('Analyzing git repository in {}'.format(git_repo.path))
             all_cs = self._apply_filters_on_commits(git_repo.get_list_commits())
 
             if not self.reversed_order:

@@ -24,13 +24,13 @@ from git import Repo, GitCommandError
 import tempfile
 import os
 import shutil
+import atexit
 
 logger = logging.getLogger(__name__)
 
 
 class RepositoryMining:
-    def __init__(self, path_to_repo: Union[str, List[str]] = None,
-                 path_to_remote_repo: Union[str, List[str]] = None,
+    def __init__(self, path_to_repo: Union[str, List[str]],
                  single: str = None,
                  since: datetime = None, to: datetime = None,
                  from_commit: str = None, to_commit: str = None,
@@ -58,9 +58,8 @@ class RepositoryMining:
         :param bool only_no_merge: if True, merges will not be analyzed
         """
 
-        self._sanity_check_repos(path_to_repo, path_to_remote_repo)
+        self._sanity_check_repos(path_to_repo)
         self._path_to_repo = path_to_repo
-        self._path_to_remote_repo = path_to_remote_repo
 
         self.from_commit = from_commit
         self.to_commit = to_commit
@@ -75,13 +74,9 @@ class RepositoryMining:
         self.only_modifications_with_file_types = only_modifications_with_file_types
         self.only_no_merge = only_no_merge
 
-    def _sanity_check_repos(self, path_to_repo, path_to_remote_repo):
-        if path_to_repo is None and path_to_remote_repo is None:
-            raise Exception('You have to specify at least 1 repo to analyze')
-        if path_to_repo is not None and (not isinstance(path_to_repo, str) and not isinstance(path_to_repo, list)):
+    def _sanity_check_repos(self, path_to_repo):
+        if not isinstance(path_to_repo, str) and not isinstance(path_to_repo, list):
             raise Exception('The path to the repo has to be of type \"string\" or \"list of strings\"!')
-        if path_to_remote_repo is not None and (not isinstance(path_to_remote_repo, str) and not isinstance(path_to_remote_repo, list)):
-            raise Exception('The path to the remote repo has to be of type \"string\" or \"List of strings\"!')
 
     def _sanity_check_filters(self, git_repo, from_commit, from_tag, since, single, to, to_commit, to_tag):
         if single is not None:
@@ -109,18 +104,24 @@ class RepositoryMining:
                 raise Exception('You can not specify <to date> or <to commit> when using <to tag>')
             self.to = git_repo.get_commit_from_tag(to_tag).author_date
 
-    def clone_remote_repo(self, tmp_folder: str, path_to_remote_repo: List[str]) -> List[str]:
+    def isremote(self, repo: str) -> bool:
+        return repo.startswith("git@") or repo.startswith("https://")
+
+    def clone_remote_repos(self, tmp_folder: str, path_to_repo: List[str]) -> List[str]:
         local_repos = []
 
-        for repo_url in path_to_remote_repo:
-            repo_folder = os.path.join(tmp_folder, self.get_repo_name_from_url(repo_url))
-            logger.info("Cloning {} in temporary folder {}".format(repo_url, repo_folder))
-            try:
-                Repo.clone_from(url=repo_url, to_path=repo_folder)
-            except GitCommandError:
-                raise Exception("Could not clone {} in temporary folder {} since the folder "
-                                "already exists or it is not an empty directory".format(repo_url, repo_folder))
-            local_repos.append(repo_folder)
+        for repo in path_to_repo:
+            if not self.isremote(repo):
+                local_repos.append(repo)
+            else:
+                repo_folder = os.path.join(tmp_folder, self.get_repo_name_from_url(repo))
+                logger.info("Cloning {} in temporary folder {}".format(repo, repo_folder))
+                try:
+                    Repo.clone_from(url=repo, to_path=repo_folder)
+                except GitCommandError:
+                    raise Exception("Could not clone {} in temporary folder {} since the folder "
+                                    "already exists or it is not an empty directory".format(repo, repo_folder))
+                local_repos.append(repo_folder)
 
         return local_repos
 
@@ -129,21 +130,15 @@ class RepositoryMining:
         Analyze all the specified commits (all of them by default), returning
         a generator of commits.
         """
-        if self._path_to_repo is not None:
-            if isinstance(self._path_to_repo, str):
-                self._path_to_repo = [self._path_to_repo]
-        else:
-            self._path_to_repo = []
 
-        tmp_folder = None
-        if self._path_to_remote_repo is not None:
-            if isinstance(self._path_to_remote_repo, str):
-                self._path_to_remote_repo = [self._path_to_remote_repo]
+        if isinstance(self._path_to_repo, str):
+            self._path_to_repo = [self._path_to_repo]
 
-            tmp_folder = tempfile.mkdtemp()
-            self._path_to_remote_repo = self.clone_remote_repo(tmp_folder, self._path_to_remote_repo)
+        tmp_folder = tempfile.mkdtemp()
+        self._path_to_repo = self.clone_remote_repos(tmp_folder, self._path_to_repo)
 
-            self._path_to_repo = self._path_to_repo + self._path_to_remote_repo
+        # register the function to clean up the system
+        atexit.register(self.cleanup, tmp_folder=tmp_folder)
 
         for path_repo in self._path_to_repo:
             git_repo = GitRepository(path_repo)
@@ -167,9 +162,6 @@ class RepositoryMining:
                     continue
 
                 yield commit
-
-        # clean up!
-        self.cleanup(tmp_folder)
 
     def _is_commit_filtered(self, commit: Commit):
         if self.only_in_main_branch is True and commit.in_main_branch is False:
@@ -238,9 +230,8 @@ class RepositoryMining:
         return url[last_slash_index + 1:last_suffix_index]
 
     def cleanup(self, tmp_folder):
-        if not tmp_folder is None:
-            logger.info("Deleting folder {}".format(tmp_folder))
-            if os.path.isdir(tmp_folder):
-                shutil.rmtree(tmp_folder)
-            else:
-                logger.info("Could not find the temporary folder, maybe already deleted?")
+        logger.info("Deleting folder {}".format(tmp_folder))
+        if os.path.isdir(tmp_folder):
+            shutil.rmtree(tmp_folder)
+        else:
+            logger.info("Could not find the temporary folder, maybe already deleted?")

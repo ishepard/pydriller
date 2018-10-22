@@ -25,13 +25,13 @@ def test_two_local_urls():
 
 def test_simple_remote_url():
     dt2 = datetime(2018, 10, 20)
-    assert 158 == len(list(RepositoryMining(path_to_remote_repo="https://github.com/ishepard/pydriller.git", to=dt2).traverse_commits()))
+    assert 158 == len(list(RepositoryMining(path_to_repo="https://github.com/ishepard/pydriller.git", to=dt2).traverse_commits()))
 
 
 def test_two_remote_urls():
     urls = ["https://github.com/mauricioaniche/repodriller.git", "https://github.com/ishepard/pydriller.git"]
     dt2 = datetime(2018, 10, 20)
-    assert 517 == len(list(RepositoryMining(path_to_remote_repo=urls, to=dt2).traverse_commits()))
+    assert 517 == len(list(RepositoryMining(path_to_repo=urls, to=dt2).traverse_commits()))
 
 
 def test_2_identical_local_urls():
@@ -44,20 +44,18 @@ def test_2_identical_remote_urls():
     urls = ["https://github.com/ishepard/pydriller.git", "https://github.com/ishepard/pydriller.git"]
     dt2 = datetime(2018, 10, 20)
     with pytest.raises(Exception):
-        list(RepositoryMining(path_to_remote_repo=urls, to=dt2).traverse_commits())
+        list(RepositoryMining(path_to_repo=urls, to=dt2).traverse_commits())
 
 
 def test_both_local_and_remote_urls():
     dt2 = datetime(2018, 10, 20)
-    assert 163 == len(list(RepositoryMining(path_to_repo="test-repos/test1",
-                                          path_to_remote_repo="https://github.com/ishepard/pydriller.git",
-                                          to=dt2).traverse_commits()))
+    assert 163 == len(list(RepositoryMining(path_to_repo=["test-repos/test1","https://github.com/ishepard/pydriller.git"],
+                                            to=dt2).traverse_commits()))
 
 
 def test_both_local_and_remote_urls_list():
     dt2 = datetime(2018, 10, 20)
-    urls_local = ["test-repos/test1", "test-repos/test3"]
-    urls_remote = ["https://github.com/mauricioaniche/repodriller.git", "https://github.com/ishepard/pydriller.git"]
-    assert 528 == len(list(RepositoryMining(path_to_repo=urls_local,
-                                          path_to_remote_repo=urls_remote,
-                                          to=dt2).traverse_commits()))
+    urls = ["test-repos/test1", "https://github.com/mauricioaniche/repodriller.git", "test-repos/test3", "https://github.com/ishepard/pydriller.git"]
+    assert 528 == len(list(RepositoryMining(path_to_repo=urls,
+                                            to=dt2).traverse_commits()))
+

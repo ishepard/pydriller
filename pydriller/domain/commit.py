@@ -14,11 +14,11 @@
 import logging
 import os
 from _datetime import datetime
-from typing import List, Set, Dict
 from enum import Enum
+from typing import List, Set, Dict
+
 import lizard
 from git import Repo, Diff, Git, Commit as GitCommit
-
 
 logger = logging.getLogger(__name__)
 from pydriller.domain.developer import Developer
@@ -187,23 +187,24 @@ class Modification:
 
     def __str__(self):
         return (
-            'MODIFICATION\n' +
-            'Old Path: {}\n'.format(self.old_path) +
-            'New Path: {}\n'.format(self.new_path) +
-            'Type: {}\n'.format(self.change_type.name) +
-            'Diff: {}\n'.format(self.diff) +
-            'Source code: {}\n'.format(self.source_code)
+                'MODIFICATION\n' +
+                'Old Path: {}\n'.format(self.old_path) +
+                'New Path: {}\n'.format(self.new_path) +
+                'Type: {}\n'.format(self.change_type.name) +
+                'Diff: {}\n'.format(self.diff) +
+                'Source code: {}\n'.format(self.source_code)
         )
 
 
 class Commit:
-    def __init__(self, commit: GitCommit, path: str, main_branch: str) -> None:
+    def __init__(self, commit: GitCommit, path: str, project_name: str, main_branch: str) -> None:
         """
         Create a commit object.
         """
         self._c_object = commit
         self._path = path
         self._main_branch = main_branch
+        self.project_name = project_name
 
     @property
     def hash(self) -> str:
@@ -383,16 +384,22 @@ class Commit:
 
     def __str__(self):
         return ('Hash: {}'.format(self.hash) + '\n'
-                'Author: {}'.format(self.author.name) + '\n'
-                'Author email: {}'.format(self.author.email) + '\n'
-                'Committer: {}'.format(self.committer.name) + '\n'
-                'Committer email: {}'.format(self.committer.email) + '\n'
-                'Author date: {}'.format(self.author_date.strftime("%Y-%m-%d %H:%M:%S")) + '\n'
-                'Committer date: {}'.format(self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) + '\n'
-                'Message: {}'.format(self.msg) + '\n'
-                'Parent: {}'.format("\n".join(map(str, self.parents))) + '\n'
-                'Merge: {}'.format(self.merge) + '\n'
-                'Modifications: \n{}'.format("\n".join(map(str, self.modifications))) + '\n'
-                'Branches: \n{}'.format("\n".join(map(str, self.branches))) + '\n'
-                'In main branch: {}'.format(self.in_main_branch)
+                                               'Author: {}'.format(self.author.name) + '\n'
+                                                                                       'Author email: {}'.format(
+            self.author.email) + '\n'
+                                 'Committer: {}'.format(self.committer.name) + '\n'
+                                                                               'Committer email: {}'.format(
+            self.committer.email) + '\n'
+                                    'Author date: {}'.format(self.author_date.strftime("%Y-%m-%d %H:%M:%S")) + '\n'
+                                                                                                               'Committer date: {}'.format(
+            self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) + '\n'
+                                                                 'Message: {}'.format(self.msg) + '\n'
+                                                                                                  'Parent: {}'.format(
+            "\n".join(map(str, self.parents))) + '\n'
+                                                 'Merge: {}'.format(self.merge) + '\n'
+                                                                                  'Modifications: \n{}'.format(
+            "\n".join(map(str, self.modifications))) + '\n'
+                                                       'Branches: \n{}'.format(
+            "\n".join(map(str, self.branches))) + '\n'
+                                                  'In main branch: {}'.format(self.in_main_branch)
                 )

@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import logging
-from typing import List, Dict, Tuple, Set
-from git import Git, Repo, GitCommandError, Commit as GitCommit
-from pydriller.domain.commit import Commit, ModificationType, Modification
+import os
 from threading import Lock
+from typing import List, Dict, Tuple, Set
+
+from git import Git, Repo, GitCommandError, Commit as GitCommit
+
+from pydriller.domain.commit import Commit, ModificationType, Modification
+
 logger = logging.getLogger(__name__)
 
 NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
@@ -31,6 +34,7 @@ class GitRepository:
         :param str path: path to the repository
         """
         self.path = path
+        self.project_name = self._get_projectname(self.path)
         self.main_branch = None
         self.lock = Lock()
         self.git = self._open_git()
@@ -48,20 +52,28 @@ class GitRepository:
     def _discover_main_branch(self, repo):
         self.main_branch = repo.active_branch.name
 
+    def _get_projectname(self, path: str) -> str:
+        split_path = path.split("/")
+        project_name = next((pname for pname in reversed(split_path) if pname), None)
+
+        if project_name is None:
+            raise Exception("Could not find the name of the project in path {}".format(path))
+        return project_name
+
     def get_head(self) -> Commit:
         """
         Get the head commit.
 
-        :return: ChangeSet of the head commit
+        :return: Commit of the head commit
         """
         head_commit = self.repo.head.commit
-        return Commit(head_commit, self.path, self.main_branch)
+        return Commit(head_commit, self.path, self.project_name, self.main_branch)
 
     def get_list_commits(self) -> List[Commit]:
         """
         Return the list of all the commits in the repo.
 
-        :return: List[ChangeSet], the list of all the commits in the repo
+        :return: List[Commit], the list of all the commits in the repo
         """
         return self._get_all_commits()
 
@@ -78,7 +90,7 @@ class GitRepository:
         :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
-        return Commit(self.repo.commit(commit_id), self.path, self.main_branch)
+        return Commit(self.repo.commit(commit_id), self.path, self.project_name, self.main_branch)
 
     def get_commit_from_gitpython(self, commit: GitCommit) -> Commit:
         """
@@ -89,7 +101,7 @@ class GitRepository:
         :param GitCommit commit: GitPython commit
         :return: Commit commit: PyDriller commit
         """
-        return Commit(commit, self.path, self.main_branch)
+        return Commit(commit, self.path, self.project_name, self.main_branch)
 
     def checkout(self, _hash: str) -> None:
         """
@@ -231,13 +243,14 @@ class GitRepository:
 
             deleted_lines = self.parse_diff(mod.diff)['deleted']
             try:
-                blame = self.git.blame(commit.hash+'^', '--', path).split('\n')
+                blame = self.git.blame(commit.hash + '^', '--', path).split('\n')
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):
-                        buggy_commit = blame[num_line - 1].split(' ')[0].replace('^','')
+                        buggy_commit = blame[num_line - 1].split(' ')[0].replace('^', '')
                         buggy_commits.add(self.get_commit(buggy_commit).hash)
             except GitCommandError:
-                logger.debug("Could not found file %s in commit %s. Probably a double rename!", mod.filename, commit.hash)
+                logger.debug("Could not found file %s in commit %s. Probably a double rename!", mod.filename,
+                             commit.hash)
 
         return buggy_commits
 

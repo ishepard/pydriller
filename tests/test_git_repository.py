@@ -17,7 +17,16 @@ import pytest
 from pydriller.git_repository import GitRepository
 from pydriller.domain.commit import ModificationType
 from datetime import datetime, timezone, timedelta
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+
+def test_projectname():
+    gr = GitRepository('test-repos/test1/')
+    assert gr.project_name == "test1"
+
+    gr = GitRepository('test-repos/test1')
+    assert gr.project_name == "test1"
 
 
 def test_get_head():
@@ -66,10 +75,11 @@ def test_get_first_commit():
     assert 'a88c84ddf42066611e76e6cb690144e5357d132c' == c.hash
     assert 'ishepard' == c.author.name
     assert 'ishepard' == c.committer.name
-    assert datetime(2018,3,22,10,41,11,tzinfo=to_zone).timestamp() == c.author_date.timestamp()
+    assert datetime(2018, 3, 22, 10, 41, 11, tzinfo=to_zone).timestamp() == c.author_date.timestamp()
     assert 2 == len(c.modifications)
     assert 'First commit adding 2 files' == c.msg
     assert c.in_main_branch is True
+
 
 def test_files():
     gr = GitRepository('test-repos/test2/')
@@ -118,6 +128,7 @@ def test_list_files_in_commit():
     assert 3 == len(files3)
     gr.reset()
 
+
 def test_checkout_with_commit_not_fully_merged_to_master():
     gr = GitRepository('test-repos/git-9/')
     gr.checkout('developing')
@@ -131,6 +142,7 @@ def test_checkout_with_commit_not_fully_merged_to_master():
     files1 = gr.files()
     assert 2 == len(files1)
     gr.reset()
+
 
 def test_get_all_commits():
     gr = GitRepository('test-repos/git-1/')
@@ -253,6 +265,7 @@ def test_diffs():
             assert 12 == mod.removed
             assert 0 == mod.added
 
+
 def test_detail_rename():
     gr = GitRepository('test-repos/git-1/')
     commit = gr.get_commit('f0dd1308bd904a9b108a6a40865166ee962af3d4')
@@ -359,6 +372,7 @@ def test_get_commits_last_modified_lines_for_single_file():
 
     assert len(buggy_commits) == 1
     assert 'e2ed043eb96c05ebde653a44ae733ded9ef90750' in buggy_commits
+
 
 def test_get_commits_last_modified_lines_with_more_modification():
     gr = GitRepository('test-repos/test5/')

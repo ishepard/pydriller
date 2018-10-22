@@ -10,8 +10,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 # It should fail when no URLs are specified
 def test_no_url():
     with pytest.raises(Exception):
-        for commit in RepositoryMining().traverse_commits():
-            c = commit.hash
+        list(RepositoryMining().traverse_commits())
 
 
 def test_simple_url():

@@ -43,7 +43,7 @@ class RepositoryMining:
         """
         Init a repository mining.
 
-        :param str path_to_repo: absolute path to the repository you have to analyze
+        :param str or List[str] path_to_repo: absolute path to the repository (or list of absolute paths) you have to analyze
         :param str single: hash of a single commit to analyze
         :param datetime since: starting date
         :param datetime to: ending date

@@ -14,10 +14,17 @@ Furthermore, PyDriller supports both local and remote repositories: if you pass 
 
 For example, the following are all possible inputs for `RepositoryMining`::
     
-    url = "repos/pydriller/" # analyze only 1 local repository
-    url = ["repos/pydriller/", "repos/anotherrepo/"]  # analyze 2 local repositories
-    url = ["repos/pydriller/", "https://github.com/apache/hadoop.git", "repos/anotherrepo"] # analyze both local and remote
-    url = "https://github.com/apache/hadoop.git" # analyze 1 remote repository
+    # analyze only 1 local repository
+    url = "repos/pydriller/" 
+    
+    # analyze 2 local repositories
+    url = ["repos/pydriller/", "repos/anotherrepo/"]  
+    
+    # analyze both local and remote
+    url = ["repos/pydriller/", "https://github.com/apache/hadoop.git", "repos/anotherrepo"] 
+    
+    # analyze 1 remote repository
+    url = "https://github.com/apache/hadoop.git" 
 
 Selecting the Commit Range
 ==========================

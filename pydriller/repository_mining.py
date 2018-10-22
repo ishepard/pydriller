@@ -41,9 +41,14 @@ class RepositoryMining:
                  only_modifications_with_file_types: List[str] = None,
                  only_no_merge: bool = False):
         """
-        Init a repository mining.
+        Init a repository mining. The only required parameter is "path_to_repo": to analyze a single repo, pass the absolute
+        path to the repo; if you need to analyze more repos, pass a list of absolute paths.
 
-        :param str or List[str] path_to_repo: absolute path to the repository (or list of absolute paths) you have to analyze
+        Furthermore, PyDriller supports local and remote repositories: if you pass a path to a repo, PyDriller will run the study
+        on that repo; if you pass an URL, PyDriller will clone the repo in a temporary folder, run the study, and
+        delete the temporary folder.
+
+        :param Union[str,List[str]] path_to_repo: absolute path (or list of absolute paths) to the repository(ies) to analyze
         :param str single: hash of a single commit to analyze
         :param datetime since: starting date
         :param datetime to: ending date
@@ -104,10 +109,10 @@ class RepositoryMining:
                 raise Exception('You can not specify <to date> or <to commit> when using <to tag>')
             self.to = git_repo.get_commit_from_tag(to_tag).author_date
 
-    def isremote(self, repo: str) -> bool:
+    def _isremote(self, repo: str) -> bool:
         return repo.startswith("git@") or repo.startswith("https://")
 
-    def clone_remote_repos(self, tmp_folder: str, repo: str) -> str:
+    def _clone_remote_repos(self, tmp_folder: str, repo: str) -> str:
 
         repo_folder = os.path.join(tmp_folder, self.get_repo_name_from_url(repo))
         logger.info("Cloning {} in temporary folder {}".format(repo, repo_folder))
@@ -130,9 +135,9 @@ class RepositoryMining:
 
         for path_repo in self._path_to_repo:
             # if it is a remote repo, clone it first in a temporary folder!
-            if self.isremote(path_repo):
+            if self._isremote(path_repo):
                 tmp_folder = tempfile.TemporaryDirectory()
-                path_repo = self.clone_remote_repos(tmp_folder.name, path_repo)
+                path_repo = self._clone_remote_repos(tmp_folder.name, path_repo)
 
             git_repo = GitRepository(path_repo)
 

@@ -24,13 +24,13 @@ def test_two_local_urls():
 
 def test_simple_remote_url():
     dt2 = datetime(2018, 10, 20)
-    assert 158 == len(list(RepositoryMining(path_to_repo="https://github.com/ishepard/pydriller.git", to=dt2).traverse_commits()))
+    assert 159 == len(list(RepositoryMining(path_to_repo="https://github.com/ishepard/pydriller.git", to=dt2).traverse_commits()))
 
 
 def test_two_remote_urls():
     urls = ["https://github.com/mauricioaniche/repodriller.git", "https://github.com/ishepard/pydriller.git"]
     dt2 = datetime(2018, 10, 20)
-    assert 517 == len(list(RepositoryMining(path_to_repo=urls, to=dt2).traverse_commits()))
+    assert 518 == len(list(RepositoryMining(path_to_repo=urls, to=dt2).traverse_commits()))
 
 
 def test_2_identical_local_urls():
@@ -38,23 +38,15 @@ def test_2_identical_local_urls():
     assert 10 == len(list(RepositoryMining(path_to_repo=urls).traverse_commits()))
 
 
-# I should fail since the directory already exists
-def test_2_identical_remote_urls():
-    urls = ["https://github.com/ishepard/pydriller.git", "https://github.com/ishepard/pydriller.git"]
-    dt2 = datetime(2018, 10, 20)
-    with pytest.raises(Exception):
-        list(RepositoryMining(path_to_repo=urls, to=dt2).traverse_commits())
-
-
 def test_both_local_and_remote_urls():
     dt2 = datetime(2018, 10, 20)
-    assert 163 == len(list(RepositoryMining(path_to_repo=["test-repos/test1","https://github.com/ishepard/pydriller.git"],
+    assert 164 == len(list(RepositoryMining(path_to_repo=["test-repos/test1","https://github.com/ishepard/pydriller.git"],
                                             to=dt2).traverse_commits()))
 
 
 def test_both_local_and_remote_urls_list():
     dt2 = datetime(2018, 10, 20)
     urls = ["test-repos/test1", "https://github.com/mauricioaniche/repodriller.git", "test-repos/test3", "https://github.com/ishepard/pydriller.git"]
-    assert 528 == len(list(RepositoryMining(path_to_repo=urls,
+    assert 529 == len(list(RepositoryMining(path_to_repo=urls,
                                             to=dt2).traverse_commits()))
 

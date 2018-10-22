@@ -107,23 +107,17 @@ class RepositoryMining:
     def isremote(self, repo: str) -> bool:
         return repo.startswith("git@") or repo.startswith("https://")
 
-    def clone_remote_repos(self, tmp_folder: str, path_to_repo: List[str]) -> List[str]:
-        local_repos = []
+    def clone_remote_repos(self, tmp_folder: str, repo: str) -> str:
 
-        for repo in path_to_repo:
-            if not self.isremote(repo):
-                local_repos.append(repo)
-            else:
-                repo_folder = os.path.join(tmp_folder, self.get_repo_name_from_url(repo))
-                logger.info("Cloning {} in temporary folder {}".format(repo, repo_folder))
-                try:
-                    Repo.clone_from(url=repo, to_path=repo_folder)
-                except GitCommandError:
-                    raise Exception("Could not clone {} in temporary folder {} since the folder "
-                                    "already exists or it is not an empty directory".format(repo, repo_folder))
-                local_repos.append(repo_folder)
+        repo_folder = os.path.join(tmp_folder, self.get_repo_name_from_url(repo))
+        logger.info("Cloning {} in temporary folder {}".format(repo, repo_folder))
+        try:
+            Repo.clone_from(url=repo, to_path=repo_folder)
+        except GitCommandError:
+            raise Exception("Could not clone {} in temporary folder {} since the folder "
+                            "already exists or it is not an empty directory".format(repo, repo_folder))
 
-        return local_repos
+        return repo_folder
 
     def traverse_commits(self) -> Generator[Commit, None, None]:
         """
@@ -134,13 +128,12 @@ class RepositoryMining:
         if isinstance(self._path_to_repo, str):
             self._path_to_repo = [self._path_to_repo]
 
-        tmp_folder = tempfile.mkdtemp()
-        self._path_to_repo = self.clone_remote_repos(tmp_folder, self._path_to_repo)
-
-        # register the function to clean up the system
-        atexit.register(self.cleanup, tmp_folder=tmp_folder)
-
         for path_repo in self._path_to_repo:
+            # if it is a remote repo, clone it first in a temporary folder!
+            if self.isremote(path_repo):
+                tmp_folder = tempfile.TemporaryDirectory()
+                path_repo = self.clone_remote_repos(tmp_folder.name, path_repo)
+
             git_repo = GitRepository(path_repo)
 
             self._sanity_check_filters(git_repo, self.from_commit, self.from_tag, self.since,
@@ -228,10 +221,3 @@ class RepositoryMining:
             raise Exception("Badly formatted url {}".format(url))
 
         return url[last_slash_index + 1:last_suffix_index]
-
-    def cleanup(self, tmp_folder):
-        logger.info("Deleting folder {}".format(tmp_folder))
-        if os.path.isdir(tmp_folder):
-            shutil.rmtree(tmp_folder)
-        else:
-            logger.info("Could not find the temporary folder, maybe already deleted?")

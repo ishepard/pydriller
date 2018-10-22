@@ -6,10 +6,23 @@ Configuration
 
 One of the main advantage of using PyDriller to mine software repositories, is that is highly configurable. Let's start with selecting which commit to analyze.
 
+Selecting projects to analyze
+=============================
+The only required parameter of `RepositoryMining` is **path_to_repo**, which specifies the repo(s) to analyze. It must be of type `str` or `List[str]`, meaning analyze only one repository or more than one.
+
+Furthermore, PyDriller supports both local and remote repositories: if you pass an URL, PyDriller will automatically create a temporary folder, clone the repository, run the study, and finally delete the temporary folder. 
+
+For example, the following are all possible inputs for `RepositoryMining`::
+    
+    url = "repos/pydriller/" # analyze only 1 local repository
+    url = ["repos/pydriller/", "repos/anotherrepo/"]  # analyze 2 local repositories
+    url = ["repos/pydriller/", "https://github.com/apache/hadoop.git", "repos/anotherrepo"] # analyze both local and remote
+    url = "https://github.com/apache/hadoop.git" # analyze 1 remote repository
+
 Selecting the Commit Range
 ==========================
 
-By default, PyDriller executes the visitor for all the commits in the repository. However, filters can be applied to `RepositoryMining` to visit *only specific* commits. 
+By default, PyDriller analyzes all the commits in the repository. However, filters can be applied to `RepositoryMining` to visit *only specific* commits. 
 
 * *single: str*: single hash of the commit. The visitor will be called only on this commit
 

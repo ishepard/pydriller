@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import atexit
 import logging
-
-import pytz as pytz
-
-from pydriller.domain.commit import Commit
-from typing import List, Generator, Union
-from pydriller.git_repository import GitRepository
-from datetime import datetime
-from git import Repo, GitCommandError
-import tempfile
 import os
 import shutil
-import atexit
+import tempfile
+from datetime import datetime
+from typing import List, Generator, Union
+
+import pytz as pytz
+from git import Repo, GitCommandError
+
+from pydriller.domain.commit import Commit
+from pydriller.git_repository import GitRepository
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class RepositoryMining:
                  from_tag: str = None, to_tag: str = None,
                  reversed_order: bool = False,
                  only_in_main_branch: bool = False,
-                 only_in_branches: List[str]= None,
+                 only_in_branches: List[str] = None,
                  only_modifications_with_file_types: List[str] = None,
                  only_no_merge: bool = False):
         """
@@ -81,7 +81,7 @@ class RepositoryMining:
     def _sanity_check_filters(self, git_repo, from_commit, from_tag, since, single, to, to_commit, to_tag):
         if single is not None:
             if since is not None or to is not None or from_commit is not None or \
-                   to_commit is not None or from_tag is not None or to_tag is not None:
+                    to_commit is not None or from_tag is not None or to_tag is not None:
                 raise Exception('You can not specify a single commit with other filters')
 
         if from_commit is not None:
@@ -155,7 +155,7 @@ class RepositoryMining:
 
             for commit in all_cs:
                 logger.info('Commit #{} in {} from {}'
-                             .format(commit.hash, commit.author_date, commit.author.name))
+                            .format(commit.hash, commit.author_date, commit.author.name))
 
                 if self._is_commit_filtered(commit):
                     logger.info('Commit #{} filtered'.format(commit.hash))

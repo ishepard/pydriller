@@ -12,12 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import psutil
 import json
+import os
 import sys
+
+import psutil
+
 if 'TRAVIS' in os.environ:
     import requests
+
     webhook_url = os.environ['WEBHOOK_URL']
 from pydriller.repository_mining import RepositoryMining
 from datetime import datetime
@@ -41,7 +44,6 @@ def test_memory():
 def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
                            diff_with_everything, all_commits_with_everything,
                            diff_with_metrics, all_commits_with_metrics):
-
     text = "*PYTHON V{}.{}*\n" \
            "*Max memory (MB)*\n" \
            "With nothing: {}, with everything: {}, with metrics: {}\n" \
@@ -51,20 +53,21 @@ def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
            "With nothing: {}:{}:{}, with everything: {}:{}:{}, with metrics: {}:{}:{} \n" \
            "*Total number of commits*: {}\n" \
            "*Commits per second:*\n" \
-            "With nothing: {}, with everything: {}, with metrics: {}"
+           "With nothing: {}, with everything: {}, with metrics: {}"
 
     slack_data = {
         'text': text.format(
-                sys.version_info[0], sys.version_info[1],
-                max(all_commits_with_nothing), max(all_commits_with_everything), max(all_commits_with_metrics),
-                min(all_commits_with_nothing), min(all_commits_with_everything), min(all_commits_with_metrics),
-                diff_with_nothing.seconds // 3600, (diff_with_nothing.seconds % 3600) // 60, diff_with_nothing.seconds % 60,
-                diff_with_everything.seconds // 3600, (diff_with_everything.seconds % 3600) // 60, diff_with_everything.seconds % 60,
-                diff_with_metrics.seconds // 3600, (diff_with_metrics.seconds % 3600) // 60, diff_with_metrics.seconds % 60,
-                len(all_commits_with_nothing),
-                len(all_commits_with_nothing) / diff_with_nothing.seconds,
-                len(all_commits_with_everything) / diff_with_everything.seconds,
-                len(all_commits_with_metrics) / diff_with_metrics.seconds
+            sys.version_info[0], sys.version_info[1],
+            max(all_commits_with_nothing), max(all_commits_with_everything), max(all_commits_with_metrics),
+            min(all_commits_with_nothing), min(all_commits_with_everything), min(all_commits_with_metrics),
+            diff_with_nothing.seconds // 3600, (diff_with_nothing.seconds % 3600) // 60, diff_with_nothing.seconds % 60,
+            diff_with_everything.seconds // 3600, (diff_with_everything.seconds % 3600) // 60,
+            diff_with_everything.seconds % 60,
+            diff_with_metrics.seconds // 3600, (diff_with_metrics.seconds % 3600) // 60, diff_with_metrics.seconds % 60,
+            len(all_commits_with_nothing),
+            len(all_commits_with_nothing) / diff_with_nothing.seconds,
+            len(all_commits_with_everything) / diff_with_everything.seconds,
+            len(all_commits_with_metrics) / diff_with_metrics.seconds
         )}
     requests.post(
         webhook_url, data=json.dumps(slack_data),

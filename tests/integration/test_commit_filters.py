@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 from pydriller.repository_mining import RepositoryMining

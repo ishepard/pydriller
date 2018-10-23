@@ -55,14 +55,14 @@ def test_extract_line_number_and_content():
 
 
 def test_additions():
-    diff = '@@ -2,6 +2,7 @@ aa\r\n'+\
-        ' bb\r\n'+\
-        ' cc\r\n'+\
-        ' log.info(\"aa\")\r\n'+\
-        '+log.debug(\"b\")\r\n'+\
-        ' dd\r\n'+\
-        ' ee\r\n'+\
-        ' ff'
+    diff = '@@ -2,6 +2,7 @@ aa\r\n' + \
+           ' bb\r\n' + \
+           ' cc\r\n' + \
+           ' log.info(\"aa\")\r\n' + \
+           '+log.debug(\"b\")\r\n' + \
+           ' dd\r\n' + \
+           ' ee\r\n' + \
+           ' ff'
 
     gr = GitRepository('test-repos/test1')
     parsed_lines = gr.parse_diff(diff)
@@ -76,14 +76,14 @@ def test_additions():
 
 
 def test_deletions():
-    diff = '@@ -2,6 +2,7 @@ aa\r\n'+\
-        ' bb\r\n'+\
-        ' cc\r\n'+\
-        ' log.info(\"aa\")\r\n'+\
-        '-log.debug(\"b\")\r\n'+\
-        ' dd\r\n'+\
-        ' ee\r\n'+\
-        ' ff'
+    diff = '@@ -2,6 +2,7 @@ aa\r\n' + \
+           ' bb\r\n' + \
+           ' cc\r\n' + \
+           ' log.info(\"aa\")\r\n' + \
+           '-log.debug(\"b\")\r\n' + \
+           ' dd\r\n' + \
+           ' ee\r\n' + \
+           ' ff'
 
     gr = GitRepository('test-repos/test1')
     parsed_lines = gr.parse_diff(diff)
@@ -97,25 +97,25 @@ def test_deletions():
 
 
 def test_tabs():
-    diff = '@@ -1,4 +1,17 @@\r\n'+ \
-        ' a\r\n'+ \
-        ' b\r\n'+ \
-        '-c\r\n'+ \
-        '+\td\r\n'+ \
-        '+cc\r\n'+ \
-        '+\r\n'+ \
-        '+\r\n'+ \
-        '+\r\n'+ \
-        '+\r\n'+ \
-        '+\r\n'+ \
-        '+\r\n'+ \
-        '+\r\n'+ \
-        '+\r\n'+ \
-        '+\r\n'+ \
-        '+\tg\r\n'+ \
-        '+\r\n'+ \
-        '+j\r\n'+ \
-        ' '
+    diff = '@@ -1,4 +1,17 @@\r\n' + \
+           ' a\r\n' + \
+           ' b\r\n' + \
+           '-c\r\n' + \
+           '+\td\r\n' + \
+           '+cc\r\n' + \
+           '+\r\n' + \
+           '+\r\n' + \
+           '+\r\n' + \
+           '+\r\n' + \
+           '+\r\n' + \
+           '+\r\n' + \
+           '+\r\n' + \
+           '+\r\n' + \
+           '+\r\n' + \
+           '+\tg\r\n' + \
+           '+\r\n' + \
+           '+j\r\n' + \
+           ' '
 
     gr = GitRepository('test-repos/test1')
     parsed_lines = gr.parse_diff(diff)
@@ -144,32 +144,32 @@ def test_tabs():
 
 
 def test_real_example():
-    diff = '@@ -72,7 +72,7 @@ public class GitRepository implements SCM {\r\n'+ \
-        ' \r\n'+ \
-        '        private static Logger log = Logger.getLogger(GitRepository.class);\r\n'+ \
-        ' \r\n'+ \
-        '-       public GitRepository(String path) {\r\n'+ \
-        '+       public GitRepository2(String path) {\r\n'+ \
-        '                this.path = path;\r\n'+ \
-        '                this.maxNumberFilesInACommit = checkMaxNumberOfFiles();\r\n'+ \
-        '                this.maxSizeOfDiff = checkMaxSizeOfDiff();\r\n'+ \
-        '@@ -155,7 +155,7 @@ public class GitRepository implements SCM {\r\n'+ \
-        '                return git.getRepository().getBranch();\r\n'+ \
-        '        }\r\n'+ \
-        ' \r\n'+ \
-        '-       public ChangeSet getHead() {\r\n'+ \
-        '+       public ChangeSet getHead2() {\r\n'+ \
-        '                Git git = null;\r\n'+ \
-        '                try {\r\n'+ \
-        '                        git = openRepository();\r\n'+ \
-        '@@ -320,6 +320,7 @@ public class GitRepository implements SCM {\r\n'+ \
-        ' \r\n'+ \
-        '                return diffs;\r\n'+ \
-        '        }\r\n'+ \
-        '+       newline\r\n'+ \
-        ' \r\n'+ \
-        '        private void setContext(DiffFormatter df) {\r\n'+ \
-        '                String context = System.getProperty(\"git.diffcontext\");'
+    diff = '@@ -72,7 +72,7 @@ public class GitRepository implements SCM {\r\n' + \
+           ' \r\n' + \
+           '        private static Logger log = Logger.getLogger(GitRepository.class);\r\n' + \
+           ' \r\n' + \
+           '-       public GitRepository(String path) {\r\n' + \
+           '+       public GitRepository2(String path) {\r\n' + \
+           '                this.path = path;\r\n' + \
+           '                this.maxNumberFilesInACommit = checkMaxNumberOfFiles();\r\n' + \
+           '                this.maxSizeOfDiff = checkMaxSizeOfDiff();\r\n' + \
+           '@@ -155,7 +155,7 @@ public class GitRepository implements SCM {\r\n' + \
+           '                return git.getRepository().getBranch();\r\n' + \
+           '        }\r\n' + \
+           ' \r\n' + \
+           '-       public ChangeSet getHead() {\r\n' + \
+           '+       public ChangeSet getHead2() {\r\n' + \
+           '                Git git = null;\r\n' + \
+           '                try {\r\n' + \
+           '                        git = openRepository();\r\n' + \
+           '@@ -320,6 +320,7 @@ public class GitRepository implements SCM {\r\n' + \
+           ' \r\n' + \
+           '                return diffs;\r\n' + \
+           '        }\r\n' + \
+           '+       newline\r\n' + \
+           ' \r\n' + \
+           '        private void setContext(DiffFormatter df) {\r\n' + \
+           '                String context = System.getProperty(\"git.diffcontext\");'
 
     gr = GitRepository('test-repos/test1')
     parsed_lines = gr.parse_diff(diff)

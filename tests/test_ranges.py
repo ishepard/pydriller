@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 import pytest
@@ -149,7 +150,8 @@ def test_multiple_filters_exceptions():
     from_tag = 'v1.4'
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/', from_commit=from_commit, from_tag=from_tag).traverse_commits():
+        for commit in RepositoryMining('test-repos/test1/', from_commit=from_commit,
+                                       from_tag=from_tag).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
@@ -165,7 +167,8 @@ def test_multiple_filters_exceptions():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/', single=from_commit, to=dt2, to_tag=from_tag).traverse_commits():
+        for commit in RepositoryMining('test-repos/test1/', single=from_commit, to=dt2,
+                                       to_tag=from_tag).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):

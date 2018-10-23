@@ -13,13 +13,13 @@
 # limitations under the License.
 
 import logging
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 from pydriller.repository_mining import RepositoryMining
 
 
 def test_mod_with_file_types():
-
     lc = list(RepositoryMining('test-repos/git-7/', only_modifications_with_file_types=['.java']).traverse_commits())
 
     assert 2 == len(lc)

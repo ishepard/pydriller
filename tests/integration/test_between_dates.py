@@ -14,9 +14,10 @@
 
 import logging
 from datetime import datetime, timezone, timedelta
-from pydriller.repository_mining import RepositoryMining
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
+from pydriller.repository_mining import RepositoryMining
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 to_zone = timezone(timedelta(hours=-4))
 dt1 = datetime(2016, 10, 8, 17, 0, 0, tzinfo=to_zone)

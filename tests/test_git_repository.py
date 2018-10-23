@@ -13,10 +13,12 @@
 # limitations under the License.
 
 import logging
-import pytest
-from pydriller.git_repository import GitRepository
-from pydriller.domain.commit import ModificationType
 from datetime import datetime, timezone, timedelta
+
+import pytest
+
+from pydriller.domain.commit import ModificationType
+from pydriller.git_repository import GitRepository
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 

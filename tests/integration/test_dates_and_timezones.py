@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 from pydriller.repository_mining import RepositoryMining
@@ -21,7 +22,8 @@ from datetime import datetime, timezone, timedelta
 
 
 def test_one_timezone():
-    lc = list(RepositoryMining('test-repos/git-2/', single='29e929fbc5dc6a2e9c620069b24e2a143af4285f').traverse_commits())
+    lc = list(
+        RepositoryMining('test-repos/git-2/', single='29e929fbc5dc6a2e9c620069b24e2a143af4285f').traverse_commits())
 
     to_zone = timezone(timedelta(hours=2))
     dt = datetime(2016, 4, 4, 13, 21, 25, tzinfo=to_zone)

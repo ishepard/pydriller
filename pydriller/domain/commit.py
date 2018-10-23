@@ -202,8 +202,8 @@ class Commit:
         Create a commit object.
         """
         self._c_object = commit
-        self._path = path
         self._main_branch = main_branch
+        self.project_path = path
         self.project_name = project_name
 
     @property
@@ -306,7 +306,7 @@ class Commit:
 
         :return: List[Modification] modifications
         """
-        repo = Repo(self._path)
+        repo = Repo(self.project_path)
         commit = self._c_object
 
         if len(self.parents) > 0:
@@ -358,7 +358,7 @@ class Commit:
 
         :return: set(str) branches
         """
-        git = Git(self._path)
+        git = Git(self.project_path)
         branches = set()
         for branch in set(git.branch('--contains', self.hash).split('\n')):
             branches.add(branch.strip().replace('* ', ''))

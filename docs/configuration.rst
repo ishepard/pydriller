@@ -26,6 +26,8 @@ For example, the following are all possible inputs for `RepositoryMining`::
     # analyze 1 remote repository
     url = "https://github.com/apache/hadoop.git" 
 
+To keep track of what project PyDriller is analyzing, the `Commit` object has a property called **project_name**.
+
 Selecting the Commit Range
 ==========================
 

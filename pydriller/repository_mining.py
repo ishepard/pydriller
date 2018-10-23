@@ -66,55 +66,60 @@ class RepositoryMining:
         self._sanity_check_repos(path_to_repo)
         self._path_to_repo = path_to_repo
 
-        self.from_commit = from_commit
-        self.to_commit = to_commit
-        self.from_tag = from_tag
-        self.to_tag = to_tag
-        self.single = single
-        self.since = since
-        self.to = to
-        self.reversed_order = reversed_order
-        self.only_in_main_branch = only_in_main_branch
-        self.only_in_branches = only_in_branches
-        self.only_modifications_with_file_types = only_modifications_with_file_types
-        self.only_no_merge = only_no_merge
+        self._from_commit = from_commit
+        self._to_commit = to_commit
+        self._from_tag = from_tag
+        self._to_tag = to_tag
+        self._single = single
+        self._since = since
+        self._to = to
+        self._reversed_order = reversed_order
+        self._only_in_main_branch = only_in_main_branch
+        self._only_in_branches = only_in_branches
+        self._only_modifications_with_file_types = only_modifications_with_file_types
+        self._only_no_merge = only_no_merge
 
     def _sanity_check_repos(self, path_to_repo):
         if not isinstance(path_to_repo, str) and not isinstance(path_to_repo, list):
             raise Exception('The path to the repo has to be of type \"string\" or \"list of strings\"!')
 
-    def _sanity_check_filters(self, git_repo, from_commit, from_tag, since, single, to, to_commit, to_tag):
-        if single is not None:
-            if since is not None or to is not None or from_commit is not None or \
-                    to_commit is not None or from_tag is not None or to_tag is not None:
+    def _sanity_check_filters(self, git_repo: GitRepository):
+        # If single is defined, not other filters should be
+        if self._single is not None:
+            if self._since is not None or self._to is not None or self._from_commit is not None or \
+                    self._to_commit is not None or self._from_tag is not None or self._to_tag is not None:
                 raise Exception('You can not specify a single commit with other filters')
 
-        if from_commit is not None:
-            if since is not None:
+        # If from_commit is defined, since should not be
+        if self._from_commit is not None:
+            if self._since is not None:
                 raise Exception('You can not specify both <since date> and <from commit>')
-            self.since = git_repo.get_commit(from_commit).author_date
+            self._since = git_repo.get_commit(self._from_commit).author_date
 
-        if to_commit is not None:
-            if to is not None:
+        # If to_commit is defined, to should not be
+        if self._to_commit is not None:
+            if self._to is not None:
                 raise Exception('You can not specify both <to date> and <to commit>')
-            self.to = git_repo.get_commit(to_commit).author_date
+            self._to = git_repo.get_commit(self._to_commit).author_date
 
-        if from_tag is not None:
-            if since is not None or from_commit is not None:
+        # If from_tag is defined, since and from_commit should not be
+        if self._from_tag is not None:
+            if self._since is not None or self._from_commit is not None:
                 raise Exception('You can not specify <since date> or <from commit> when using <from tag>')
-            self.since = git_repo.get_commit_from_tag(from_tag).author_date
+            self._since = git_repo.get_commit_from_tag(self._from_tag).author_date
 
-        if to_tag is not None:
-            if to is not None or to_commit is not None:
+        # If to_tag is defined, to and to_commit should not be
+        if self._to_tag is not None:
+            if self._to is not None or self._to_commit is not None:
                 raise Exception('You can not specify <to date> or <to commit> when using <to tag>')
-            self.to = git_repo.get_commit_from_tag(to_tag).author_date
+            self._to = git_repo.get_commit_from_tag(self._to_tag).author_date
 
     def _isremote(self, repo: str) -> bool:
         return repo.startswith("git@") or repo.startswith("https://")
 
     def _clone_remote_repos(self, tmp_folder: str, repo: str) -> str:
 
-        repo_folder = os.path.join(tmp_folder, self.get_repo_name_from_url(repo))
+        repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
         logger.info("Cloning {} in temporary folder {}".format(repo, repo_folder))
         try:
             Repo.clone_from(url=repo, to_path=repo_folder)
@@ -141,14 +146,13 @@ class RepositoryMining:
 
             git_repo = GitRepository(path_repo)
 
-            self._sanity_check_filters(git_repo, self.from_commit, self.from_tag, self.since,
-                                       self.single, self.to, self.to_commit, self.to_tag)
+            self._sanity_check_filters(git_repo)
             self._check_timezones()
 
             logger.info('Analyzing git repository in {}'.format(git_repo.path))
             all_cs = self._apply_filters_on_commits(git_repo.get_list_commits())
 
-            if not self.reversed_order:
+            if not self._reversed_order:
                 all_cs.reverse()
 
             for commit in all_cs:
@@ -162,31 +166,31 @@ class RepositoryMining:
                 yield commit
 
     def _is_commit_filtered(self, commit: Commit):
-        if self.only_in_main_branch is True and commit.in_main_branch is False:
+        if self._only_in_main_branch is True and commit.in_main_branch is False:
             logger.debug('Commit filtered for main branch')
             return True
-        if self.only_in_branches is not None:
+        if self._only_in_branches is not None:
             logger.debug('Commit filtered for only in branches')
             if not self._commit_branch_in_branches(commit):
                 return True
-        if self.only_modifications_with_file_types is not None:
+        if self._only_modifications_with_file_types is not None:
             logger.debug('Commit filtered for modification types')
             if not self._has_modification_with_file_type(commit):
                 return True
-        if self.only_no_merge is True and commit.merge is True:
+        if self._only_no_merge is True and commit.merge is True:
             logger.debug('Commit filtered for no merge')
             return True
         return False
 
     def _commit_branch_in_branches(self, commit: Commit):
         for branch in commit.branches:
-            if branch in self.only_in_branches:
+            if branch in self._only_in_branches:
                 return True
         return False
 
     def _has_modification_with_file_type(self, commit):
         for mod in commit.modifications:
-            if mod.filename.endswith(tuple(self.only_modifications_with_file_types)):
+            if mod.filename.endswith(tuple(self._only_modifications_with_file_types)):
                 return True
         return False
 
@@ -197,26 +201,26 @@ class RepositoryMining:
             return all_commits
 
         for commit in all_commits:
-            if self.single is not None and commit.hash == self.single:
+            if self._single is not None and commit.hash == self._single:
                 return [commit]
-            if self.since is None or self.since <= commit.author_date:
-                if self.to is None or commit.author_date <= self.to:
+            if self._since is None or self._since <= commit.author_date:
+                if self._to is None or commit.author_date <= self._to:
                     res.append(commit)
                     continue
         return res
 
     def _all_filters_are_none(self):
-        return self.single is None and self.since is None and self.to is None
+        return self._single is None and self._since is None and self._to is None
 
     def _check_timezones(self):
-        if self.since is not None:
-            if self.since.tzinfo is None or self.since.tzinfo.utcoffset(self.since) is None:
-                self.since = self.since.replace(tzinfo=pytz.utc)
-        if self.to is not None:
-            if self.to.tzinfo is None or self.to.tzinfo.utcoffset(self.to) is None:
-                self.to = self.to.replace(tzinfo=pytz.utc)
+        if self._since is not None:
+            if self._since.tzinfo is None or self._since.tzinfo.utcoffset(self._since) is None:
+                self._since = self._since.replace(tzinfo=pytz.utc)
+        if self._to is not None:
+            if self._to.tzinfo is None or self._to.tzinfo.utcoffset(self._to) is None:
+                self._to = self._to.replace(tzinfo=pytz.utc)
 
-    def get_repo_name_from_url(self, url: str) -> str:
+    def _get_repo_name_from_url(self, url: str) -> str:
         last_slash_index = url.rfind("/")
         last_suffix_index = url.rfind(".git")
         if last_suffix_index < 0:

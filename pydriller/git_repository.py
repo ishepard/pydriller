@@ -37,8 +37,14 @@ class GitRepository:
         self.project_name = self._get_projectname(self.path)
         self.main_branch = None
         self.lock = Lock()
-        self.git = self._open_git()
-        self.repo = self._open_repository()
+
+    @property
+    def git(self):
+        return self._open_git()
+
+    @property
+    def repo(self):
+        return self._open_repository()
 
     def _open_git(self) -> Git:
         return Git(self.path)

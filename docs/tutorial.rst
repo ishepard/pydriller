@@ -15,6 +15,14 @@ will print the name of the developers for each commit.
 
 Inside `RepositoryMining`, you will have to configure which projects to analyze, for which commits, for which dates etc. For all the possible configurations, have a look at :ref:`configuration_toplevel`.
 
+We can also pass a list of repositories (both local and remote), and PyDriller will analyze sequentially. In case of a remote repository, PyDriller will clone it in a temporary folder, and delete it afterwards. For example::
+
+    urls = ["repos/repo1", "repos/repo2", "https://github.com/ishepard/pydriller.git", "repos/repo3", "https://github.com/apache/hadoop.git"]
+    for commit in RepositoryMining(path_to_repo=urls).traverse_commits():
+        print("Project {}, commit {}, date {}".format(
+               commit.project_path, commit.hash, commit.author_date))
+
+
 Let's make another example: print all the modified files for every commit. This does the magic::
 
     for commit in RepositoryMining('path/to/the/repo').traverse_commits():

@@ -197,13 +197,18 @@ class Modification:
 
 
 class Commit:
-    def __init__(self, commit: GitCommit, path: str, project_name: str, main_branch: str) -> None:
+    def __init__(self, commit: GitCommit, project_path: str, project_name: str, main_branch: str) -> None:
         """
         Create a commit object.
+
+        :param commit GitCommit: GitPython Commit object
+        :param project_path: path to the project (temporary folder in case of a remote repository)
+        :param project_name: name of the project
+        :param main_branch: main branch of the repo
         """
         self._c_object = commit
         self._main_branch = main_branch
-        self.project_path = path
+        self.project_path = project_path
         self.project_name = project_name
 
     @property

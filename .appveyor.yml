@@ -2,9 +2,6 @@ environment:
   GIT_DAEMON_PATH: "C:\\Program Files\\Git\\mingw64\\libexec\\git-core"
 
   matrix:
-    - PYTHON: "C:\\Python34-x64"
-      PYTHON_VERSION: "3.4"
-      GIT_PATH: "%GIT_DAEMON_PATH%"
     - PYTHON: "C:\\Python35-x64"
       PYTHON_VERSION: "3.5"
       GIT_PATH: "%GIT_DAEMON_PATH%"

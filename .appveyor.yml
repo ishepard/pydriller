@@ -24,20 +24,15 @@ install:
       echo %PATH%
       uname -a
       git --version
-      where git git-daemon python pip pip3 pip34 sh
+      where git git-daemon python pip
       python --version
       python -c "import struct; print(struct.calcsize('P') * 8)"
 
   - jar xf test-repos.zip
-  - dir test-repos
-  - git clone https://github.com/apache/hadoop.git
-  - dir ..
-
   - pip install -r test-requirements.txt
-
   - pip install -e .
 
 build: false
 
 test_script:
-  - pytest -v
+  - pytest -s -v

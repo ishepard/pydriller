@@ -1,43 +1,21 @@
-environment:
-  GIT_DAEMON_PATH: "C:\\Program Files\\Git\\mingw64\\libexec\\git-core"
-
-  matrix:
-    - PYTHON: "C:\\Python34-x64"
-      PYTHON_VERSION: "3.4"
-      GIT_PATH: "%GIT_DAEMON_PATH%"
-    - PYTHON: "C:\\Python35-x64"
-      PYTHON_VERSION: "3.5"
-      GIT_PATH: "%GIT_DAEMON_PATH%"
-    - PYTHON: "C:\\Python36-x64"
-      PYTHON_VERSION: "3.6"
-      GIT_PATH: "%GIT_DAEMON_PATH%"
-    - PYTHON: "C:\\Python37-x64"
-      PYTHON_VERSION: "3.7"
-      GIT_PATH: "%GIT_DAEMON_PATH%"
-
-install:
-  - set PATH=%PYTHON%;%PYTHON%\Scripts;%GIT_PATH%;%PATH%
-
-  ## Print configuration for debugging.
-  #
-  - |
-      echo %PATH%
-      uname -a
-      git --version
-      where git git-daemon python pip pip3 pip34 sh
-      python --version
-      python -c "import struct; print(struct.calcsize('P') * 8)"
-
-  - jar xf test-repos.zip
-  - dir test-repos
-  - git clone https://github.com/apache/hadoop.git
-  - dir ..
-
-  - pip install -r test-requirements.txt
-
-  - pip install -e .
-
 build: false
 
+environment:
+  matrix:
+    - PYTHON: "C:\\Python33"
+      PYTHON_VERSION: "3.3.5"
+      PYTHON_ARCH: "32"
+
+    - PYTHON: "C:\\Python34"
+      PYTHON_VERSION: "3.4.1"
+      PYTHON_ARCH: "32"
+
+
+init:
+  - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
+
+install:
+  - "%PYTHON%/Scripts/pip.exe install pytest"
+
 test_script:
-  - pytest -v
+  - "%PYTHON%/Scripts/pytest -s -v"

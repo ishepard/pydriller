@@ -1,13 +1,15 @@
 environment:
   GIT_DAEMON_PATH: "C:\\Program Files\\Git\\mingw64\\libexec\\git-core"
+
   matrix:
-      ## MINGW
-      #
-    - PYTHON: "C:\\Python34-x64"
-      PYTHON_VERSION: "3.4"
-      GIT_PATH: "%GIT_DAEMON_PATH%"
     - PYTHON: "C:\\Python35-x64"
       PYTHON_VERSION: "3.5"
+      GIT_PATH: "%GIT_DAEMON_PATH%"
+    - PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6"
+      GIT_PATH: "%GIT_DAEMON_PATH%"
+    - PYTHON: "C:\\Python37-x64"
+      PYTHON_VERSION: "3.7"
       GIT_PATH: "%GIT_DAEMON_PATH%"
 
 install:
@@ -19,20 +21,15 @@ install:
       echo %PATH%
       uname -a
       git --version
-      where git git-daemon python pip pip3 pip34 sh
+      where git git-daemon python pip
       python --version
       python -c "import struct; print(struct.calcsize('P') * 8)"
 
   - jar xf test-repos.zip
-  - dir test-repos
-  - git clone https://github.com/apache/hadoop.git
-  - dir ..
-
   - pip install -r test-requirements.txt
-
   - pip install -e .
 
 build: false
 
 test_script:
-  - pytest -v
+  - pytest -s -v

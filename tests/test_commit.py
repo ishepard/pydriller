@@ -19,7 +19,7 @@ from pydriller.domain.commit import Modification, ModificationType
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 import pytest
-
+import os
 from pydriller.git_repository import GitRepository
 
 
@@ -43,11 +43,11 @@ def test_filename():
         'diff': '',
         'source_code': ''
     }
-    m1 = Modification('/Users/dspadini/pydriller/myfile.py', "/Users/dspadini/pydriller/mynewfile.py",
+    m1 = Modification(os.path.join('dspadini','pydriller','myfile.py'), os.path.join('dspadini','pydriller','mynewfile.py'),
                       ModificationType.ADD, diff_and_sc)
-    m3 = Modification('/Users/dspadini/pydriller/myfile.py', "/Users/dspadini/pydriller/mynewfile.py",
+    m3 = Modification(os.path.join('dspadini','pydriller','myfile.py'), os.path.join('dspadini','pydriller','mynewfile.py'),
                       ModificationType.ADD, diff_and_sc)
-    m2 = Modification('/Users/dspadini/pydriller/myfile.py', None,
+    m2 = Modification(os.path.join('dspadini','pydriller','myfile.py'), None,
                       ModificationType.ADD, diff_and_sc)
 
     assert m1.filename == 'mynewfile.py'

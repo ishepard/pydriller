@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+import os
 from datetime import datetime, timezone, timedelta
 
 import pytest
@@ -84,18 +85,18 @@ def test_get_first_commit():
 
 
 def test_files():
-    gr = GitRepository('test-repos/test2/')
+    gr = GitRepository(os.path.join('test-repos', 'test2'))
     all = gr.files()
 
     assert 8 == len(all)
-    assert 'test-repos/test2/tmp1.py' in all
-    assert 'test-repos/test2/tmp2.py' in all
-    assert 'test-repos/test2/fold1/tmp3.py' in all
-    assert 'test-repos/test2/fold1/tmp4.py' in all
-    assert 'test-repos/test2/fold2/tmp5.py' in all
-    assert 'test-repos/test2/fold2/tmp6.py' in all
-    assert 'test-repos/test2/fold2/fold3/tmp7.py' in all
-    assert 'test-repos/test2/fold2/fold3/tmp8.py' in all
+    assert os.path.join('test-repos', 'test2', 'tmp1.py') in all
+    assert os.path.join('test-repos', 'test2', 'tmp2.py') in all
+    assert os.path.join('test-repos', 'test2', 'fold1', 'tmp3.py') in all
+    assert os.path.join('test-repos', 'test2', 'fold1', 'tmp4.py') in all
+    assert os.path.join('test-repos', 'test2', 'fold2', 'tmp5.py') in all
+    assert os.path.join('test-repos', 'test2', 'fold2', 'tmp6.py') in all
+    assert os.path.join('test-repos', 'test2', 'fold2', 'fold3', 'tmp7.py') in all
+    assert os.path.join('test-repos', 'test2', 'fold2', 'fold3', 'tmp8.py') in all
 
 
 def test_total_commits():

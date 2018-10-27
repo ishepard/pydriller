@@ -17,6 +17,8 @@ from _datetime import datetime
 from enum import Enum
 from typing import List, Set, Dict
 
+from pathlib import Path
+
 import lizard
 from git import Repo, Diff, Git, Commit as GitCommit
 
@@ -118,11 +120,9 @@ class Modification:
         else:
             path = self.old_path
 
-        if os.sep not in path:
-            return path
+        real_path = Path(path)
 
-        filename = path.split(os.sep)
-        return filename[-1]
+        return real_path.name
 
     @property
     def nloc(self) -> int:

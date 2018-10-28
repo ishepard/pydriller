@@ -126,3 +126,13 @@ def test_metrics_not_supported_file():
 
     assert 2 == m1.nloc
     assert 0 == len(m1.methods)
+
+
+def test_filepahs():
+    gr = GitRepository('test-repos/test7')
+
+    c = gr.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
+
+    mod0 = c.modifications[0]
+
+    assert mod0.filename == 'a.java'

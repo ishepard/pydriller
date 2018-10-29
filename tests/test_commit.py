@@ -130,9 +130,11 @@ def test_metrics_not_supported_file():
 
 def test_filepahs():
     gr = GitRepository('test-repos/test7')
-
     c = gr.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
     mod0 = c.modifications[0]
 
     assert mod0.filename == 'a.java'
+    assert mod0.new_path == str(Path('dir2/a.java'))
+    assert mod0.old_path == str(Path('dir2/a.java'))
+

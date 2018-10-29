@@ -16,6 +16,7 @@ import logging
 import os
 from threading import Lock
 from typing import List, Dict, Tuple, Set
+from pathlib import Path
 
 from git import Git, Repo, GitCommandError, Commit as GitCommit
 
@@ -33,8 +34,8 @@ class GitRepository:
 
         :param str path: path to the repository
         """
-        self.path = path
-        self.project_name = self._get_projectname(self.path)
+        self.path = Path(path)
+        self.project_name = self.path.name
         self.main_branch = None
         self.lock = Lock()
 
@@ -58,14 +59,6 @@ class GitRepository:
     def _discover_main_branch(self, repo):
         self.main_branch = repo.active_branch.name
 
-    def _get_projectname(self, path: str) -> str:
-        split_path = path.split("/")
-        project_name = next((pname for pname in reversed(split_path) if pname), None)
-
-        if project_name is None:
-            raise Exception("Could not find the name of the project in path {}".format(path))
-        return project_name
-
     def get_head(self) -> Commit:
         """
         Get the head commit.
@@ -73,7 +66,7 @@ class GitRepository:
         :return: Commit of the head commit
         """
         head_commit = self.repo.head.commit
-        return Commit(head_commit, self.path, self.project_name, self.main_branch)
+        return Commit(head_commit, self.path, self.main_branch)
 
     def get_list_commits(self) -> List[Commit]:
         """
@@ -96,7 +89,7 @@ class GitRepository:
         :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
-        return Commit(self.repo.commit(commit_id), self.path, self.project_name, self.main_branch)
+        return Commit(self.repo.commit(commit_id), self.path, self.main_branch)
 
     def get_commit_from_gitpython(self, commit: GitCommit) -> Commit:
         """
@@ -107,7 +100,7 @@ class GitRepository:
         :param GitCommit commit: GitPython commit
         :return: Commit commit: PyDriller commit
         """
-        return Commit(commit, self.path, self.project_name, self.main_branch)
+        return Commit(commit, self.path, self.main_branch)
 
     def checkout(self, _hash: str) -> None:
         """

@@ -69,8 +69,8 @@ class Modification:
         Initialize a modification. A modification carries on information regarding
         the changed file. Normally, you shouldn't initialize a new one.
         """
-        self.old_path = old_path
-        self.new_path = new_path
+        self._old_path = Path(old_path) if old_path is not None else None
+        self._new_path = Path(new_path) if new_path is not None else None
         self.change_type = change_type
         self.diff = diff_and_sc['diff']
         self.source_code = diff_and_sc['source_code']
@@ -107,6 +107,18 @@ class Modification:
         return removed
 
     @property
+    def old_path(self):
+        if self._old_path:
+            return str(self._old_path)
+        return self._old_path
+
+    @property
+    def new_path(self):
+        if self._new_path:
+            return str(self._new_path)
+        return self._new_path
+
+    @property
     def filename(self) -> str:
         """
         Return the filename. Given a path-like-string (e.g.
@@ -115,14 +127,12 @@ class Modification:
 
         :return: str filename
         """
-        if self.new_path is not None and self.new_path != "/dev/null":
-            path = self.new_path
+        if self._new_path is not None and str(self._new_path) != "/dev/null":
+            path = self._new_path
         else:
-            path = self.old_path
+            path = self._old_path
 
-        real_path = Path(path)
-
-        return real_path.name
+        return path.name
 
     @property
     def nloc(self) -> int:
@@ -197,7 +207,7 @@ class Modification:
 
 
 class Commit:
-    def __init__(self, commit: GitCommit, project_path: str, project_name: str, main_branch: str) -> None:
+    def __init__(self, commit: GitCommit, project_path: Path, main_branch: str) -> None:
         """
         Create a commit object.
 
@@ -209,7 +219,6 @@ class Commit:
         self._c_object = commit
         self._main_branch = main_branch
         self.project_path = project_path
-        self.project_name = project_name
 
     @property
     def hash(self) -> str:
@@ -237,6 +246,15 @@ class Commit:
         :return: committer
         """
         return Developer(self._c_object.committer.name, self._c_object.committer.email)
+
+    @property
+    def project_name(self) -> str:
+        """
+        Return the project name.
+
+        :return: project name
+        """
+        return self.project_path.name
 
     @property
     def author_date(self) -> datetime:

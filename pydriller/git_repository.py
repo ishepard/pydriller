@@ -116,6 +116,9 @@ class GitRepository:
 
     def _delete_tmp_branch(self) -> None:
         try:
+            # we are already in _PD, so checkout the master branch before deleting it
+            if self.repo.active_branch.name == '_PD':
+                self.git.checkout('-f', self.main_branch)
             self.repo.delete_head('_PD', force=True)
         except GitCommandError:
             logger.debug("Branch _PD not found")

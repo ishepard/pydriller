@@ -150,6 +150,7 @@ class RepositoryMining:
             self._check_timezones()
 
             logger.info('Analyzing git repository in {}'.format(git_repo.path))
+
             all_cs = self._apply_filters_on_commits(git_repo.get_list_commits())
 
             if not self._reversed_order:
@@ -170,12 +171,12 @@ class RepositoryMining:
             logger.debug('Commit filtered for main branch')
             return True
         if self._only_in_branches is not None:
-            logger.debug('Commit filtered for only in branches')
             if not self._commit_branch_in_branches(commit):
+                logger.debug('Commit filtered for only in branches')
                 return True
         if self._only_modifications_with_file_types is not None:
-            logger.debug('Commit filtered for modification types')
             if not self._has_modification_with_file_type(commit):
+                logger.debug('Commit filtered for modification types')
                 return True
         if self._only_no_merge is True and commit.merge is True:
             logger.debug('Commit filtered for no merge')
@@ -200,9 +201,13 @@ class RepositoryMining:
         if self._all_filters_are_none():
             return all_commits
 
+        if self._single is not None:
+            for commit in all_commits:
+                if commit.hash == self._single:
+                    return [commit]
+            raise Exception("Could not found commit {}".format(self._single))
+
         for commit in all_commits:
-            if self._single is not None and commit.hash == self._single:
-                return [commit]
             if self._since is None or self._since <= commit.author_date:
                 if self._to is None or commit.author_date <= self._to:
                     res.append(commit)

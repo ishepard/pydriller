@@ -14,6 +14,8 @@
 
 import logging
 
+import pytest
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 from pydriller.repository_mining import RepositoryMining
@@ -55,3 +57,8 @@ def test_no_filters():
     assert 'a1b6136f978644ff1d89816bc0f2bd86f6d9d7f5' == lc[0].hash
     assert '375de7a8275ecdc0b28dc8de2568f47241f443e9' == lc[1].hash
     assert 'b8c2be250786975f1c6f47e96922096f1bb25e39' == lc[2].hash
+
+def test_no_single_commit():
+    with pytest.raises(Exception):
+        for commit in RepositoryMining('test-repos/git-5', single="6fe83d9fbf9a63cc1c51e5fe6fd5230f7fbbce6f").traverse_commits():
+            print(commit.hash)

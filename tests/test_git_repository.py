@@ -133,6 +133,16 @@ def test_list_files_in_commit():
     gr.reset()
 
 
+def test_checkout_consecutive_commits():
+    gr = GitRepository('test-repos/git-1/')
+    gr.checkout('a7053a4dcd627f5f4f213dc9aa002eb1caf926f8')
+    gr.checkout('f0dd1308bd904a9b108a6a40865166ee962af3d4')
+    gr.checkout('9e71dd5726d775fb4a5f08506a539216e878adbb')
+    files3 = gr.files()
+    assert 3 == len(files3)
+    gr.reset()
+
+
 def test_checkout_with_commit_not_fully_merged_to_master():
     gr = GitRepository('test-repos/git-9/')
     gr.checkout('developing')

@@ -36,8 +36,7 @@ class RepositoryMining:
                  from_commit: str = None, to_commit: str = None,
                  from_tag: str = None, to_tag: str = None,
                  reversed_order: bool = False,
-                 only_in_main_branch: bool = False,
-                 only_in_branches: List[str] = None,
+                 only_in_branch: str = None,
                  only_modifications_with_file_types: List[str] = None,
                  only_no_merge: bool = False):
         """
@@ -57,8 +56,7 @@ class RepositoryMining:
         :param str from_tag: starting the analysis from specified tag (only if `since` and `from_commit` are None)
         :param str to_tag: ending the analysis from specified tag (only if `to` and `to_commit` are None)
         :param bool reversed_order: whether the commits should be analyzed in reversed order
-        :param bool only_in_main_branch: whether only commits in main branch should be analyzed
-        :param List[str] only_in_branches: only commits in these branches will be analyzed
+        :param str only_in_branch: only commits in this branch will be analyzed
         :param List[str] only_modifications_with_file_types: only modifications with that file types will be analyzed
         :param bool only_no_merge: if True, merges will not be analyzed
         """
@@ -74,14 +72,13 @@ class RepositoryMining:
         self._since = since
         self._to = to
         self._reversed_order = reversed_order
-        self._only_in_main_branch = only_in_main_branch
-        self._only_in_branches = only_in_branches
+        self._only_in_branch = only_in_branch
         self._only_modifications_with_file_types = only_modifications_with_file_types
         self._only_no_merge = only_no_merge
 
     def _sanity_check_repos(self, path_to_repo):
         if not isinstance(path_to_repo, str) and not isinstance(path_to_repo, list):
-            raise Exception('The path to the repo has to be of type \"string\" or \"list of strings\"!')
+            raise Exception("The path to the repo has to be of type 'string' or 'list of strings'!")
 
     def _sanity_check_filters(self, git_repo: GitRepository):
         # If single is defined, not other filters should be
@@ -121,12 +118,8 @@ class RepositoryMining:
 
         repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
         logger.info("Cloning {} in temporary folder {}".format(repo, repo_folder))
-        try:
-            Repo.clone_from(url=repo, to_path=repo_folder)
-        except GitCommandError:
-            raise Exception("Could not clone {} in temporary folder {} since the folder "
-                            "already exists or it is not an empty directory".format(repo, repo_folder))
-
+        Repo.clone_from(url=repo, to_path=repo_folder)
+        
         return repo_folder
 
     def traverse_commits(self) -> Generator[Commit, None, None]:
@@ -151,14 +144,13 @@ class RepositoryMining:
 
             logger.info('Analyzing git repository in {}'.format(git_repo.path))
 
-            all_cs = self._apply_filters_on_commits(git_repo.get_list_commits())
+            all_cs = self._apply_filters_on_commits(git_repo.get_list_commits(self._only_in_branch))
 
             if not self._reversed_order:
                 all_cs.reverse()
 
             for commit in all_cs:
-                logger.info('Commit #{} in {} from {}'
-                            .format(commit.hash, commit.author_date, commit.author.name))
+                logger.info('Commit #{} in {} from {}'.format(commit.hash, commit.author_date, commit.author.name))
 
                 if self._is_commit_filtered(commit):
                     logger.info('Commit #{} filtered'.format(commit.hash))
@@ -167,13 +159,6 @@ class RepositoryMining:
                 yield commit
 
     def _is_commit_filtered(self, commit: Commit):
-        if self._only_in_main_branch is True and commit.in_main_branch is False:
-            logger.debug('Commit filtered for main branch')
-            return True
-        if self._only_in_branches is not None:
-            if not self._commit_branch_in_branches(commit):
-                logger.debug('Commit filtered for only in branches')
-                return True
         if self._only_modifications_with_file_types is not None:
             if not self._has_modification_with_file_type(commit):
                 logger.debug('Commit filtered for modification types')
@@ -181,12 +166,6 @@ class RepositoryMining:
         if self._only_no_merge is True and commit.merge is True:
             logger.debug('Commit filtered for no merge')
             return True
-        return False
-
-    def _commit_branch_in_branches(self, commit: Commit):
-        for branch in commit.branches:
-            if branch in self._only_in_branches:
-                return True
         return False
 
     def _has_modification_with_file_type(self, commit):

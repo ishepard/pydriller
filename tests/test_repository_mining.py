@@ -34,7 +34,7 @@ def test_simple_remote_url():
 
 
 def test_two_remote_urls():
-    urls = ["https://github.com/mauricioaniche/repodriller.git", "https://github.com/ishepard/pydriller.git"]
+    urls = ["https://github.com/mauricioaniche/repodriller.git", "https://github.com/ishepard/pydriller"]
     dt2 = datetime(2018, 10, 20)
     assert 518 == len(list(RepositoryMining(path_to_repo=urls, to=dt2).traverse_commits()))
 
@@ -57,3 +57,11 @@ def test_both_local_and_remote_urls_list():
             "https://github.com/ishepard/pydriller.git"]
     assert 529 == len(list(RepositoryMining(path_to_repo=urls,
                                             to=dt2).traverse_commits()))
+
+
+def test_badly_formatted_url():
+    with pytest.raises(Exception):
+        list(RepositoryMining(path_to_repo='https://github.com/ishepard.git/test').traverse_commits())
+
+    with pytest.raises(Exception):
+        list(RepositoryMining(path_to_repo='test').traverse_commits())

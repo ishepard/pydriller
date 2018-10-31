@@ -80,6 +80,7 @@ def test_get_first_commit():
     assert 'ishepard' == c.author.name
     assert 'ishepard' == c.committer.name
     assert datetime(2018, 3, 22, 10, 41, 11, tzinfo=to_zone).timestamp() == c.author_date.timestamp()
+    assert datetime(2018, 3, 22, 10, 41, 11, tzinfo=to_zone).timestamp() == c.committer_date.timestamp()
     assert 2 == len(c.modifications)
     assert 'First commit adding 2 files' == c.msg
     assert c.in_main_branch is True
@@ -256,12 +257,15 @@ def test_modification_status():
     gr = GitRepository('test-repos/git-1/')
     commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
     assert ModificationType.ADD == commit.modifications[0].change_type
+    assert None == commit.modifications[0].old_path
 
     commit = gr.get_commit('57dbd017d1a744b949e7ca0b1c1a3b3dd4c1cbc1')
     assert ModificationType.MODIFY == commit.modifications[0].change_type
+    assert commit.modifications[0].old_path == commit.modifications[0].new_path
 
     commit = gr.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71')
     assert ModificationType.DELETE == commit.modifications[0].change_type
+    assert None == commit.modifications[0].new_path
 
 
 def test_diffs():

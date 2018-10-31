@@ -118,12 +118,8 @@ class RepositoryMining:
 
         repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
         logger.info("Cloning {} in temporary folder {}".format(repo, repo_folder))
-        try:
-            Repo.clone_from(url=repo, to_path=repo_folder)
-        except GitCommandError:
-            raise Exception("Could not clone {} in temporary folder {} since the folder "
-                            "already exists or it is not an empty directory".format(repo, repo_folder))
-
+        Repo.clone_from(url=repo, to_path=repo_folder)
+        
         return repo_folder
 
     def traverse_commits(self) -> Generator[Commit, None, None]:

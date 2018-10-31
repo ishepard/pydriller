@@ -57,3 +57,11 @@ def test_both_local_and_remote_urls_list():
             "https://github.com/ishepard/pydriller.git"]
     assert 529 == len(list(RepositoryMining(path_to_repo=urls,
                                             to=dt2).traverse_commits()))
+
+
+def test_badly_formatted_url():
+    with pytest.raises(Exception):
+        list(RepositoryMining(path_to_repo='https://github.com/ishepard.git/test').traverse_commits())
+
+    with pytest.raises(Exception):
+        list(RepositoryMining(path_to_repo='test').traverse_commits())

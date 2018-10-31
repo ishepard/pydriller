@@ -154,8 +154,7 @@ class RepositoryMining:
                 all_cs.reverse()
 
             for commit in all_cs:
-                logger.info('Commit #{} in {} from {}'
-                            .format(commit.hash, commit.author_date, commit.author.name))
+                logger.info('Commit #{} in {} from {}'.format(commit.hash, commit.author_date, commit.author.name))
 
                 if self._is_commit_filtered(commit):
                     logger.info('Commit #{} filtered'.format(commit.hash))

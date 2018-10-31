@@ -30,7 +30,7 @@ def test_mod_with_file_types():
 
 
 def test_only_in_main_branch():
-    lc = list(RepositoryMining('test-repos/git-5/', only_in_main_branch=True).traverse_commits())
+    lc = list(RepositoryMining('test-repos/git-5/').traverse_commits())
 
     assert 5 == len(lc)
     assert '4a17f31c0d1285477a3a467d0bc3cb38e775097d' == lc[0].hash
@@ -41,7 +41,7 @@ def test_only_in_main_branch():
 
 
 def test_multiple_filters():
-    lc = list(RepositoryMining('test-repos/git-5/', only_in_main_branch=True, only_no_merge=True).traverse_commits())
+    lc = list(RepositoryMining('test-repos/git-5/', only_no_merge=True).traverse_commits())
 
     assert 4 == len(lc)
     assert '4a17f31c0d1285477a3a467d0bc3cb38e775097d' == lc[0].hash
@@ -58,7 +58,20 @@ def test_no_filters():
     assert '375de7a8275ecdc0b28dc8de2568f47241f443e9' == lc[1].hash
     assert 'b8c2be250786975f1c6f47e96922096f1bb25e39' == lc[2].hash
 
+
 def test_no_single_commit():
     with pytest.raises(Exception):
         for commit in RepositoryMining('test-repos/git-5', single="6fe83d9fbf9a63cc1c51e5fe6fd5230f7fbbce6f").traverse_commits():
             print(commit.hash)
+
+
+def test_only_in_branch():
+    lc = list(RepositoryMining('test-repos/git-5/', only_in_branch='branch2').traverse_commits())
+    assert 6 == len(lc)
+
+    assert '4a17f31c0d1285477a3a467d0bc3cb38e775097d' == lc[0].hash
+    assert 'ff663cf1931a67d5e47b75fc77dcea432c728052' == lc[1].hash
+    assert 'fa8217c324e7fb46c80e1ddf907f4e141449637e' == lc[2].hash
+    assert '5d9d79607d7e82b6f236aa29be4ba89a28fb4f15' == lc[3].hash
+    assert '377e0f474d70f6205784d0150ee0069a050c29ed' == lc[4].hash
+    assert '6fe83d9fbf9a63cc1c51e5fe6fd5230f7fbbce6f' == lc[5].hash

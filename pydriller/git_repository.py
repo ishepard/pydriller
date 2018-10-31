@@ -68,17 +68,17 @@ class GitRepository:
         head_commit = self.repo.head.commit
         return Commit(head_commit, self.path, self.main_branch)
 
-    def get_list_commits(self) -> List[Commit]:
+    def get_list_commits(self, branch: str = None) -> List[Commit]:
         """
         Return the list of all the commits in the repo.
 
         :return: List[Commit], the list of all the commits in the repo
         """
-        return self._get_all_commits()
+        return self._get_all_commits(branch)
 
-    def _get_all_commits(self) -> List[Commit]:
+    def _get_all_commits(self, branch: str = None) -> List[Commit]:
         all_commits = []
-        for commit in self.repo.iter_commits():
+        for commit in self.repo.iter_commits(branch):
             all_commits.append(self.get_commit_from_gitpython(commit))
         return all_commits
 

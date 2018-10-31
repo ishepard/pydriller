@@ -34,7 +34,7 @@ def test_simple_remote_url():
 
 
 def test_two_remote_urls():
-    urls = ["https://github.com/mauricioaniche/repodriller.git", "https://github.com/ishepard/pydriller.git"]
+    urls = ["https://github.com/mauricioaniche/repodriller.git", "https://github.com/ishepard/pydriller"]
     dt2 = datetime(2018, 10, 20)
     assert 518 == len(list(RepositoryMining(path_to_repo=urls, to=dt2).traverse_commits()))
 

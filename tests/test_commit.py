@@ -138,3 +138,9 @@ def test_filepahs():
     assert mod0.new_path == str(Path('dir2/a.java'))
     assert mod0.old_path == str(Path('dir2/a.java'))
 
+
+def test_projectname():
+    gr = GitRepository('test-repos/test7')
+    c = gr.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
+
+    assert 'test7' == c.project_name

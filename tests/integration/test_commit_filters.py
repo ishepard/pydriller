@@ -75,3 +75,17 @@ def test_only_in_branch():
     assert '5d9d79607d7e82b6f236aa29be4ba89a28fb4f15' == lc[3].hash
     assert '377e0f474d70f6205784d0150ee0069a050c29ed' == lc[4].hash
     assert '6fe83d9fbf9a63cc1c51e5fe6fd5230f7fbbce6f' == lc[5].hash
+
+
+def test_only_in_branches():
+    # by default, only analyze master
+    assert 3 == len(list(RepositoryMining('test-repos/test8/').traverse_commits()))
+    # only analyze b2
+    assert 4 == len(list(RepositoryMining('test-repos/test8/', only_in_branch='b2').traverse_commits()))
+    # only analyze b1
+    assert 5 == len(list(RepositoryMining('test-repos/test8/', only_in_branch='b1').traverse_commits()))
+
+
+def test_only_in_branch_not_exist():
+    with pytest.raises(Exception):
+        list(RepositoryMining('test-repos/git-5/', only_in_branch='branch7').traverse_commits())

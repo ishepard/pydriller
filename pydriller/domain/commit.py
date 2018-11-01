@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import logging
-import os
 from _datetime import datetime
 from enum import Enum
-from typing import List, Set, Dict
-
 from pathlib import Path
+from typing import List, Set, Dict
 
 import lizard
 from git import Repo, Diff, Git, Commit as GitCommit

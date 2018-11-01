@@ -49,4 +49,3 @@ def test_between_dates_reversed():
     assert 2 == len(lc)
     assert '375de7a8275ecdc0b28dc8de2568f47241f443e9' == lc[0].hash
     assert 'a1b6136f978644ff1d89816bc0f2bd86f6d9d7f5' == lc[1].hash
-

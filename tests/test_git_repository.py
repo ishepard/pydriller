@@ -13,11 +13,10 @@
 # limitations under the License.
 
 import logging
-import os
 from datetime import datetime, timezone, timedelta
+from pathlib import Path
 
 import pytest
-from pathlib import Path
 
 from pydriller.domain.commit import ModificationType
 from pydriller.git_repository import GitRepository

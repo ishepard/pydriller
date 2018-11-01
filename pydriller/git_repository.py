@@ -14,9 +14,9 @@
 
 import logging
 import os
+from pathlib import Path
 from threading import Lock
 from typing import List, Dict, Tuple, Set
-from pathlib import Path
 
 from git import Git, Repo, GitCommandError, Commit as GitCommit
 

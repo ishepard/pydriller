@@ -61,7 +61,8 @@ def test_no_filters():
 
 def test_no_single_commit():
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/git-5', single="6fe83d9fbf9a63cc1c51e5fe6fd5230f7fbbce6f").traverse_commits():
+        for commit in RepositoryMining('test-repos/git-5',
+                                       single="6fe83d9fbf9a63cc1c51e5fe6fd5230f7fbbce6f").traverse_commits():
             print(commit.hash)
 
 

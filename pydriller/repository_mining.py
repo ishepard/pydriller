@@ -89,25 +89,25 @@ class RepositoryMining:
         if self._from_commit is not None:
             if self._since is not None:
                 raise Exception('You can not specify both <since date> and <from commit>')
-            self._since = git_repo.get_commit(self._from_commit).author_date
+            self._since = git_repo.get_commit(self._from_commit).committer_date
 
         # If to_commit is defined, to should not be
         if self._to_commit is not None:
             if self._to is not None:
                 raise Exception('You can not specify both <to date> and <to commit>')
-            self._to = git_repo.get_commit(self._to_commit).author_date
+            self._to = git_repo.get_commit(self._to_commit).committer_date
 
         # If from_tag is defined, since and from_commit should not be
         if self._from_tag is not None:
             if self._since is not None or self._from_commit is not None:
                 raise Exception('You can not specify <since date> or <from commit> when using <from tag>')
-            self._since = git_repo.get_commit_from_tag(self._from_tag).author_date
+            self._since = git_repo.get_commit_from_tag(self._from_tag).committer_date
 
         # If to_tag is defined, to and to_commit should not be
         if self._to_tag is not None:
             if self._to is not None or self._to_commit is not None:
                 raise Exception('You can not specify <to date> or <to commit> when using <to tag>')
-            self._to = git_repo.get_commit_from_tag(self._to_tag).author_date
+            self._to = git_repo.get_commit_from_tag(self._to_tag).committer_date
 
     def _isremote(self, repo: str) -> bool:
         return repo.startswith("git@") or repo.startswith("https://")
@@ -185,8 +185,8 @@ class RepositoryMining:
             raise Exception("Could not found commit {}".format(self._single))
 
         for commit in all_commits:
-            if self._since is None or self._since <= commit.author_date:
-                if self._to is None or commit.author_date <= self._to:
+            if self._since is None or self._since <= commit.committer_date:
+                if self._to is None or commit.committer_date <= self._to:
                     res.append(commit)
                     continue
         return res

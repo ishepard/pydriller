@@ -13,10 +13,12 @@ def test_no_url():
     with pytest.raises(Exception):
         list(RepositoryMining().traverse_commits())
 
+
 # It should fail when URL is not a string or a List
 def test_badly_formatted_repo_url():
     with pytest.raises(Exception):
         list(RepositoryMining(path_to_repo=set('repo')).traverse_commits())
+
 
 def test_simple_url():
     assert 5 == len(list(RepositoryMining(path_to_repo="test-repos/test1").traverse_commits()))

@@ -38,7 +38,7 @@ def test_memory():
                            diff_with_everything, all_commits_with_everything,
                            diff_with_metrics, all_commits_with_metrics)
 
-    assert 1240 == len(all_commits_with_nothing) == len(all_commits_with_everything) == len(all_commits_with_metrics)
+    assert 973 == len(all_commits_with_nothing) == len(all_commits_with_everything) == len(all_commits_with_metrics)
 
 
 def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,

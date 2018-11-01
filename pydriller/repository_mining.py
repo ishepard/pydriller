@@ -12,16 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import atexit
 import logging
 import os
-import shutil
 import tempfile
 from datetime import datetime
 from typing import List, Generator, Union
 
 import pytz as pytz
-from git import Repo, GitCommandError
+from git import Repo
 
 from pydriller.domain.commit import Commit
 from pydriller.git_repository import GitRepository
@@ -119,7 +117,7 @@ class RepositoryMining:
         repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
         logger.info("Cloning {} in temporary folder {}".format(repo, repo_folder))
         Repo.clone_from(url=repo, to_path=repo_folder)
-        
+
         return repo_folder
 
     def traverse_commits(self) -> Generator[Commit, None, None]:

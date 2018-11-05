@@ -106,12 +106,22 @@ class Modification:
 
     @property
     def old_path(self):
+        """
+        Old path of the file. Can be None if the file is added.
+
+        :return: str old_path
+        """
         if self._old_path:
             return str(self._old_path)
         return self._old_path
 
     @property
     def new_path(self):
+        """
+        New path of the file. Can be None if the file is deleted.
+
+        :return: str new_path
+        """
         if self._new_path:
             return str(self._new_path)
         return self._new_path
@@ -211,7 +221,6 @@ class Commit:
 
         :param commit GitCommit: GitPython Commit object
         :param project_path: path to the project (temporary folder in case of a remote repository)
-        :param project_name: name of the project
         :param main_branch: main branch of the repo
         """
         self._c_object = commit

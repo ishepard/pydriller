@@ -41,10 +41,20 @@ class GitRepository:
 
     @property
     def git(self):
+        """
+        GitPython object Git.
+
+        :return: Git
+        """
         return self._open_git()
 
     @property
     def repo(self):
+        """
+        GitPython object Repo.
+
+        :return: Repo
+        """
         return self._open_repository()
 
     def _open_git(self) -> Git:

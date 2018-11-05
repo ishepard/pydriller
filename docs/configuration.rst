@@ -86,11 +86,11 @@ PyDriller comes with a set of common commit filters that you can apply:
 
 Examples::
 
-    # Only commits in main branch
-    RepositoryMining('path/to/the/repo', only_in_main_branch=True).traverse_commits()
+    # Only commits in branch1
+    RepositoryMining('path/to/the/repo', only_in_branch='branch1').traverse_commits()
 
-    # Only commits in main branch and no merges
-    RepositoryMining('path/to/the/repo', only_in_main_branch=True, only_no_merge=True).traverse_commits()
+    # Only commits in branch1 and no merges
+    RepositoryMining('path/to/the/repo', only_in_branch='branch1', only_no_merge=True).traverse_commits()
 
     # Only commits that modified a java file
     RepositoryMining('path/to/the/repo', only_modifications_with_file_types=['.java']).traverse_commits()

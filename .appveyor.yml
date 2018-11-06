@@ -12,6 +12,12 @@ environment:
       PYTHON_VERSION: "3.7"
       GIT_PATH: "%GIT_DAEMON_PATH%"
 
+notifications:
+  - provider: Slack
+    auth_token:
+      secure: "%SLACK_TOKEN%"
+    channel: '#general'
+
 install:
   - set PATH=%PYTHON%;%PYTHON%\Scripts;%GIT_PATH%;%PATH%
 

@@ -16,7 +16,12 @@ environment:
 
 notifications:
   - provider: Slack
-    incoming_webhook: "%SLACK_WEBHOOK%"
+    incoming_webhook: https://hooks.slack.com/services/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
+
+  - provider: Email
+    to:
+      - spadini.davide@gmail.com
+    on_build_status_changed: true
 
 install:
   - set PATH=%PYTHON%;%PYTHON%\Scripts;%GIT_PATH%;%PATH%

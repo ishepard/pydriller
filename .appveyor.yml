@@ -1,3 +1,5 @@
+version: 1.5.{build}
+
 environment:
   GIT_DAEMON_PATH: "C:\\Program Files\\Git\\mingw64\\libexec\\git-core"
 
@@ -14,8 +16,7 @@ environment:
 
 notifications:
   - provider: Slack
-    auth_token: "%SLACK_TOKEN%"
-    channel: '#general'
+    incoming_webhook: "%SLACK_WEBHOOK%"
 
 install:
   - set PATH=%PYTHON%;%PYTHON%\Scripts;%GIT_PATH%;%PATH%

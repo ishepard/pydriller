@@ -22,6 +22,8 @@ notifications:
   - provider: Email
     to:
       - spadini.davide@gmail.com
+    on_build_success: false
+    on_build_failure: true
     on_build_status_changed: true
 
 install:

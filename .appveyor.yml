@@ -15,7 +15,7 @@ environment:
 notifications:
   - provider: Slack
     auth_token:
-      secure: "%SLACK_TOKEN%"
+      secure: %SLACK_TOKEN%
     channel: '#general'
 
 install:

@@ -2,7 +2,6 @@ version: 1.5.{build}
 
 environment:
   GIT_DAEMON_PATH: "C:\\Program Files\\Git\\mingw64\\libexec\\git-core"
-  SLACK_WEBHOOK: "https://hooks.slack.com/services/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"
 
   matrix:
     - PYTHON: "C:\\Python35-x64"
@@ -17,7 +16,8 @@ environment:
 
 notifications:
   - provider: Slack
-    incoming_webhook: "%SLACK_WEBHOOK%"
+    incoming_webhook: 
+      secure: pIuy/qP0oJmXuYm+DKX3oGLNcXuQ376bfiB2sSHFlTsGG0xKxFInQGXN8fwZEyMZWTzrghdZavXgTBtk3caO8/pseTOjeqSIrqiJnZx4Wv8=
 
   - provider: Email
     to:

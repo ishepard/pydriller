@@ -90,3 +90,11 @@ def test_only_in_branches():
 def test_only_in_branch_not_exist():
     with pytest.raises(Exception):
         list(RepositoryMining('test-repos/git-5/', only_in_branch='branch7').traverse_commits())
+
+
+def test_only_authors():
+    lc = list(RepositoryMining('test-repos/git-10/', only_authors=["Maurício Aniche"]).traverse_commits())
+    assert 4 == len(lc)
+
+    lc = list(RepositoryMining('test-repos/git-10/', only_authors=["ishepard"]).traverse_commits())
+    assert 1 == len(lc)

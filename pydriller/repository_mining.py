@@ -36,7 +36,8 @@ class RepositoryMining:
                  reversed_order: bool = False,
                  only_in_branch: str = None,
                  only_modifications_with_file_types: List[str] = None,
-                 only_no_merge: bool = False):
+                 only_no_merge: bool = False,
+                 only_authors: List[str] = None):
         """
         Init a repository mining. The only required parameter is "path_to_repo": to analyze a single repo, pass the absolute
         path to the repo; if you need to analyze more repos, pass a list of absolute paths.
@@ -57,6 +58,7 @@ class RepositoryMining:
         :param str only_in_branch: only commits in this branch will be analyzed
         :param List[str] only_modifications_with_file_types: only modifications with that file types will be analyzed
         :param bool only_no_merge: if True, merges will not be analyzed
+        :param List[str] only_authors: only commits of these authors will be analyzed
         """
 
         self._sanity_check_repos(path_to_repo)
@@ -73,6 +75,7 @@ class RepositoryMining:
         self._only_in_branch = only_in_branch
         self._only_modifications_with_file_types = only_modifications_with_file_types
         self._only_no_merge = only_no_merge
+        self._only_authors = only_authors
 
     def _sanity_check_repos(self, path_to_repo):
         if not isinstance(path_to_repo, str) and not isinstance(path_to_repo, list):
@@ -164,11 +167,21 @@ class RepositoryMining:
         if self._only_no_merge is True and commit.merge is True:
             logger.debug('Commit filtered for no merge')
             return True
+        if self._only_authors is not None:
+            if not self._has_commit_specified_author(commit):
+                logger.debug("Commit filtered for author")
+                return True
         return False
 
     def _has_modification_with_file_type(self, commit):
         for mod in commit.modifications:
             if mod.filename.endswith(tuple(self._only_modifications_with_file_types)):
+                return True
+        return False
+
+    def _has_commit_specified_author(self, commit):
+        for author_name in self._only_authors:
+            if author_name == commit.author.name:
                 return True
         return False
 

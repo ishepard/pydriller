@@ -36,7 +36,9 @@ class RepositoryMining:
                  reversed_order: bool = False,
                  only_in_branch: str = None,
                  only_modifications_with_file_types: List[str] = None,
-                 only_no_merge: bool = False):
+                 only_no_merge: bool = False,
+                 only_authors: List[str] = None,
+                 only_commits: List[str] = None):
         """
         Init a repository mining. The only required parameter is "path_to_repo": to analyze a single repo, pass the absolute
         path to the repo; if you need to analyze more repos, pass a list of absolute paths.
@@ -57,6 +59,7 @@ class RepositoryMining:
         :param str only_in_branch: only commits in this branch will be analyzed
         :param List[str] only_modifications_with_file_types: only modifications with that file types will be analyzed
         :param bool only_no_merge: if True, merges will not be analyzed
+        :param List[str] only_authors: only commits of these authors will be analyzed
         """
 
         self._sanity_check_repos(path_to_repo)
@@ -73,6 +76,8 @@ class RepositoryMining:
         self._only_in_branch = only_in_branch
         self._only_modifications_with_file_types = only_modifications_with_file_types
         self._only_no_merge = only_no_merge
+        self._only_authors = only_authors
+        self._only_commits = only_commits
 
     def _sanity_check_repos(self, path_to_repo):
         if not isinstance(path_to_repo, str) and not isinstance(path_to_repo, list):
@@ -163,6 +168,12 @@ class RepositoryMining:
                 return True
         if self._only_no_merge is True and commit.merge is True:
             logger.debug('Commit filtered for no merge')
+            return True
+        if self._only_authors is not None and commit.author.name not in self._only_authors:
+            logger.debug("Commit filtered for author")
+            return True
+        if self._only_commits is not None and commit.hash not in self._only_commits:
+            logger.debug("Commit filtered because it is not one of the specified commits")
             return True
         return False
 

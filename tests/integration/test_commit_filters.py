@@ -99,32 +99,39 @@ def test_only_authors():
     lc = list(RepositoryMining('test-repos/git-10/', only_authors=["ishepard"]).traverse_commits())
     assert 1 == len(lc)
 
+
 def test_only_commits():
     # 4e669cb4f69245dc669e116517d80d038d8e0434
     # 29e929fbc5dc6a2e9c620069b24e2a143af4285f
     # 8986af2a679759e5a15794f6d56e6d46c3f302f1
     # 8169f76a3d7add54b4fc7bca7160d1f1eede6eda
     # 168b3aab057ed61a769acf336a4ef5e64f76c9fd
-    lc = list(RepositoryMining('test-repos/git-10/', only_commits=["4e669cb4f69245dc669e116517d80d038d8e0434"]).traverse_commits())
+    lc = list(RepositoryMining('test-repos/git-10/',
+                               only_commits=["4e669cb4f69245dc669e116517d80d038d8e0434"]).traverse_commits())
     assert 1 == len(lc)
+    assert "4e669cb4f69245dc669e116517d80d038d8e0434" == lc[0].hash
 
     lc = list(RepositoryMining('test-repos/git-10/', only_commits=["4e669cb4f69245dc669e116517d80d038d8e0434",
                                                                    "8986af2a679759e5a15794f6d56e6d46c3f302f1"]).traverse_commits())
     assert 2 == len(lc)
+    assert "8986af2a679759e5a15794f6d56e6d46c3f302f1" == lc[0].hash
+    assert "4e669cb4f69245dc669e116517d80d038d8e0434" == lc[1].hash
 
     lc = list(RepositoryMining('test-repos/git-10/', only_commits=["4e669cb4f69245dc669e116517d80d038d8e0434",
                                                                    "8986af2a679759e5a15794f6d56e6d46c3f302f1",
                                                                    "29e929fbc5dc6a2e9c620069b24e2a143af4285f"]).traverse_commits())
     assert 3 == len(lc)
+    assert "8986af2a679759e5a15794f6d56e6d46c3f302f1" == lc[0].hash
+    assert "29e929fbc5dc6a2e9c620069b24e2a143af4285f" == lc[1].hash
+    assert "4e669cb4f69245dc669e116517d80d038d8e0434" == lc[2].hash
 
     lc = list(RepositoryMining('test-repos/git-10/', only_commits=["fake hash"]).traverse_commits())
     assert 0 == len(lc)
 
-    assert len(list(RepositoryMining('test-repos/git-10/', only_commits=["4e669cb4f69245dc669e116517d80d038d8e0434",
-                                                                   "29e929fbc5dc6a2e9c620069b24e2a143af4285f",
-                                                                   "8986af2a679759e5a15794f6d56e6d46c3f302f1",
-                                                                   "8169f76a3d7add54b4fc7bca7160d1f1eede6eda",
-                                                                   "168b3aab057ed61a769acf336a4ef5e64f76c9fd",]).traverse_commits())) \
-           == len(list(RepositoryMining('test-repos/git-10/').traverse_commits()))
-
-
+    assert len(list(RepositoryMining('test-repos/git-10/',
+                                     only_commits=["4e669cb4f69245dc669e116517d80d038d8e0434",
+                                                   "29e929fbc5dc6a2e9c620069b24e2a143af4285f",
+                                                   "8986af2a679759e5a15794f6d56e6d46c3f302f1",
+                                                   "8169f76a3d7add54b4fc7bca7160d1f1eede6eda",
+                                                   "168b3aab057ed61a769acf336a4ef5e64f76c9fd"])
+                    .traverse_commits())) == len(list(RepositoryMining('test-repos/git-10/').traverse_commits()))

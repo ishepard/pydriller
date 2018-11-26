@@ -39,6 +39,8 @@ class GitRepository:
         self.main_branch = None
         self.lock = Lock()
 
+        self._all_commits = None
+
     @property
     def git(self):
         """
@@ -87,9 +89,14 @@ class GitRepository:
         return self._get_all_commits(branch)
 
     def _get_all_commits(self, branch: str = None) -> List[Commit]:
+        if self._all_commits:
+            return self._all_commits
+
         all_commits = []
         for commit in self.repo.iter_commits(branch):
             all_commits.append(self.get_commit_from_gitpython(commit))
+        self._all_commits = all_commits
+
         return all_commits
 
     def get_commit(self, commit_id: str) -> Commit:
@@ -284,6 +291,6 @@ class GitRepository:
         for commit in commits:
             # I don't have a better idea than this:
             # unfortunately, this will call `git` for every commit
-            list_commits.append(dict_commits[commit])
+            list_commits.append(dict_commits[commit.strip()])
 
         return list_commits

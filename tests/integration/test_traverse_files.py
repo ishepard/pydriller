@@ -10,6 +10,6 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 
 def test_simple():
     list_files = RepositoryMining("test-repos/test9").traverse_files()
-    assert 2 == len(list_files)
+    assert 2 == len(list(list_files))
 
-    print(list_files.keys())
+    # print(list_files)

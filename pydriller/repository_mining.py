@@ -223,3 +223,23 @@ class RepositoryMining:
             raise Exception("Badly formatted url {}".format(url))
 
         return url[last_slash_index + 1:last_suffix_index]
+
+    def traverse_files(self):
+        if isinstance(self._path_to_repo, str):
+            self._path_to_repo = [self._path_to_repo]
+
+        for path_repo in self._path_to_repo:
+            # if it is a remote repo, clone it first in a temporary folder!
+            if self._isremote(path_repo):
+                tmp_folder = tempfile.TemporaryDirectory()
+                path_repo = self._clone_remote_repos(tmp_folder.name, path_repo)
+
+            git_repo = GitRepository(path_repo)
+
+            assert True is self._all_filters_are_none()
+
+            list_of_files = git_repo.files()
+
+            for ffile in list_of_files:
+                for c in git_repo.get_commits_modified_file(ffile):
+                    yield c

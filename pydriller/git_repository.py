@@ -140,11 +140,9 @@ class GitRepository:
         :return: List[str], the list of the files
         """
         _all = []
-        for path, subdirs, files in os.walk(str(self.path)):
-            if '.git' in path:
-                continue
-            for name in files:
-                _all.append(os.path.join(path, name))
+        for file in self.path.glob("**/*"):
+            if ".git" not in str(file.absolute()) and file.is_file():
+                _all.append(str(file))
         return _all
 
     def reset(self) -> None:
@@ -272,11 +270,20 @@ class GitRepository:
                line.startswith("'''") or line.startswith('"""') or line.startswith("*")
 
     def get_commits_modified_file(self, filepath: str) -> List[Commit]:
-        path = Path(filepath)
-        commits = self.git.log("--follow", "--format=%H", path.name).split('\n')
+        all_commits = self._get_all_commits()
+
+        dict_commits = {}
+        for commit in all_commits:
+            dict_commits[commit.hash] = commit
+
+        # getting the absolute path of the file
+        path = str(Path(filepath).absolute())
+        commits = self.git.log("--follow", "--format=%H", path).split('\n')
 
         list_commits = []
         for commit in commits:
-            list_commits.append(self.get_commit_from_gitpython(self.repo.commit(commit)))
+            # I don't have a better idea than this:
+            # unfortunately, this will call `git` for every commit
+            list_commits.append(dict_commits[commit])
 
         return list_commits

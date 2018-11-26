@@ -16,6 +16,8 @@ import logging
 import os
 import tempfile
 from datetime import datetime
+from pprint import pprint
+
 from typing import List, Generator, Union
 
 import pytz as pytz
@@ -243,8 +245,5 @@ class RepositoryMining:
 
             list_of_files = git_repo.files()
 
-            commits_per_file = {}
             for ffile in list_of_files:
-                commits_per_file[ffile] = git_repo.get_commits_modified_file(ffile)
-
-            return commits_per_file
+                yield ffile, git_repo.get_commits_modified_file(ffile)

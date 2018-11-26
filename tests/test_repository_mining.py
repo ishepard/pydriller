@@ -67,3 +67,12 @@ def test_badly_formatted_url():
 
     with pytest.raises(Exception):
         list(RepositoryMining(path_to_repo='test').traverse_commits())
+
+
+def test_no_filters_with_traverse_files():
+    dt2 = datetime(2018, 10, 20)
+    with pytest.raises(Exception):
+        RepositoryMining("https://github.com/ishepard/pydriller", since=dt2).traverse_files()
+
+    with pytest.raises(Exception):
+        RepositoryMining("https://github.com/ishepard/pydriller", only_authors=["test"]).traverse_files()

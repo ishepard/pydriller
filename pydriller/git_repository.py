@@ -275,5 +275,8 @@ class GitRepository:
         path = Path(filepath)
         commits = self.git.log("--follow", "--format=%H", path.name).split('\n')
 
+        list_commits = []
         for commit in commits:
-            yield self.get_commit_from_gitpython(self.repo.commit(commit))
+            list_commits.append(self.get_commit_from_gitpython(self.repo.commit(commit)))
+
+        return list_commits

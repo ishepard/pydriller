@@ -236,10 +236,15 @@ class RepositoryMining:
 
             git_repo = GitRepository(path_repo)
 
-            assert True is self._all_filters_are_none()
+            if not self._all_filters_are_none() or \
+                    self._only_in_branch or self._only_modifications_with_file_types or \
+                    self._only_no_merge or self._only_authors or self._only_commits:
+                raise Exception("You can not use filters with 'traverse_files'")
 
             list_of_files = git_repo.files()
 
+            commits_per_file = {}
             for ffile in list_of_files:
-                for c in git_repo.get_commits_modified_file(ffile):
-                    yield c
+                commits_per_file[ffile] = git_repo.get_commits_modified_file(ffile)
+
+            return commits_per_file

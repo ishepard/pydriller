@@ -134,7 +134,6 @@ class RepositoryMining:
         if isinstance(self._path_to_repo, str):
             self._path_to_repo = [self._path_to_repo]
 
-        tmp_folder = None
         for path_repo in self._path_to_repo:
             # if it is a remote repo, clone it first in a temporary folder!
             if self._isremote(path_repo):
@@ -161,12 +160,6 @@ class RepositoryMining:
                     continue
 
                 yield commit
-
-            # cleanup
-            if tmp_folder:
-                tmp_folder.cleanup()
-                tmp_folder = None
-
 
     def _is_commit_filtered(self, commit: Commit):
         if self._only_modifications_with_file_types is not None:

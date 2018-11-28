@@ -144,3 +144,12 @@ def test_projectname():
     c = gr.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
     assert 'test7' == c.project_name
+
+
+def test_modification_type_unknown():
+    gr = GitRepository('test-repos/git-11')
+    c = gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
+
+    mod0 = c.modifications[0]
+
+    assert mod0.change_type.name == 'UNKNOWN'

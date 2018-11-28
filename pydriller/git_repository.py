@@ -285,7 +285,11 @@ class GitRepository:
 
         # getting the absolute path of the file
         path = str(Path(filepath).absolute())
-        commits = self.git.log("--follow", "--format=%H", path).split('\n')
+        commits = []
+        try:
+            commits = self.git.log("--follow", "--format=%H", path).split('\n')
+        except:
+            logger.debug("Could not find information of file %s", path)
 
         list_commits = []
         for commit in commits:

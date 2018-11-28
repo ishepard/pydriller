@@ -243,7 +243,7 @@ class RepositoryMining:
                     self._only_no_merge or self._only_authors or self._only_commits:
                 raise Exception("You can not use filters with 'traverse_files'")
 
-            list_of_files = git_repo.files()
+            list_of_files = git_repo.git.ls_files().split("\n")
 
             for ffile in list_of_files:
                 yield ffile, git_repo.get_commits_modified_file(ffile)

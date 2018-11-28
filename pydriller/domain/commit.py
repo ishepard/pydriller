@@ -31,7 +31,8 @@ class ModificationType(Enum):
     COPY = 2,
     RENAME = 3,
     DELETE = 4,
-    MODIFY = 5
+    MODIFY = 5,
+    UNKNOWN = 6
 
 
 class Method:
@@ -403,6 +404,8 @@ class Commit:
             return ModificationType.RENAME
         elif d.a_blob and d.b_blob and d.a_blob != d.b_blob:
             return ModificationType.MODIFY
+        else:
+            return ModificationType.UNKNOWN
 
     def __eq__(self, other):
         if not isinstance(other, Commit):

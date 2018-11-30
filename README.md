@@ -91,6 +91,8 @@ or have a look at our [example](https://github.com/ishepard/pydriller/tree/maste
 }
 ```
 
+This project has received funding from the European Unions’ Horizon 2020 research and innovation programme under the Marie Sklodowska-Curie grant agreement No. 642954.
+
 ## License
 
 This software is licensed under the Apache 2.0 License.

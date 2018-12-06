@@ -174,6 +174,41 @@ class Modification:
         return self._token_count
 
     @property
+    def methods_modified(self) -> List[Method]:
+        """
+        Return the list of methods modified in the file. Every method
+        contains various information like complexity, loc, name,
+        number of parameters, etc.
+
+        :return: list of methods modified
+        """
+        self._identified_methods_modified()
+        return self._function_list_modified
+
+    def _identified_methods_modified(self):
+        if self.source_code and self._nloc is None:
+            l = lizard.analyze_file.analyze_source_code(self.filename, self.source_code)
+
+            self._nloc = l.nloc
+            self._complexity = l.CCN
+            self._token_count = l.token_count
+
+            lines = self.diff.split('\n')
+            for line in lines:
+                line = line.rstrip()
+                if line.startswith('@@'):
+                    token = line.split(" ")
+                    numbers_new_file = token[2]
+                    start_line = int(numbers_new_file.split(",")[0])
+                    end_line = int(numbers_new_file.split(",")[1]) - 1 + start_line
+                    for func in l.function_list:
+                        if((func.start_line <= start_line and start_line <= func.end_line) 
+                            or (func.start_line <= end_line and end_line <= func.end_line)
+                            or (start_line <= func.start_line and func.start_line <= end_line) 
+                            or (start_line <= func.end_line and func.end_line <= end_line)):
+                            self._function_list_modified.append(Method(func))
+
+    @property
     def methods(self) -> List[Method]:
         """
         Return the list of methods in the file. Every method

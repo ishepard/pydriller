@@ -78,6 +78,7 @@ class Modification:
         self._complexity = None
         self._token_count = None
         self._function_list = []
+        self._function_list_modified = []
 
     @property
     def added(self) -> int:

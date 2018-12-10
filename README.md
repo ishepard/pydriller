@@ -15,7 +15,7 @@ PyDriller is a Python framework that helps developers in analyzing Git repositor
 * **[Install](#install)**
 * **[Source code](#source-code)**
 * **[Tutorial](#tutorial)**
-* **[How to contribute](#hot-to-contribute)**
+* **[How to contribute](#how-to-contribute)**
 * **[How to cite PyDriller](#how-to-cite-pydriller)**
 
 

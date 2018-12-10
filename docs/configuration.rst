@@ -33,19 +33,23 @@ Selecting the Commit Range
 
 By default, PyDriller analyzes all the commits in the repository. However, filters can be applied to `RepositoryMining` to visit *only specific* commits. 
 
-* *single: str*: single hash of the commit. The visitor will be called only on this commit
+* **single** *(str)*: single hash of the commit. The visitor will be called only on this commit
 
 *FROM*:
 
-* *since: datetime*: only commits after this date will be analyzed
-* *from_commit: str*: only commits after this commit hash will be analyzed
-* *from_tag: str*: only commits after this commit tag will be analyzed
+* **since** *(datetime)*: only commits after this date will be analyzed
+* **from_commit** *(str)*: only commits after this commit hash will be analyzed
+* **from_tag** *(str)*: only commits after this commit tag will be analyzed
 
 *TO*:
 
-* *to: datetime*: only commits up to this date will be analyzed
-* *to_commit: str*: only commits up to this commit hash will be analyzed
-* *to_tag: str*: only commits up to this commit tag will be analyzed
+* **to** *(datetime)*: only commits up to this date will be analyzed
+* **to_commit** *(str)*: only commits up to this commit hash will be analyzed
+* **to_tag** *(str)*: only commits up to this commit tag will be analyzed
+
+*ORDER*:
+
+* **reverse\_order** *(bool)*: by default PyDriller returns the commits in chronological order (from the oldest to the newest, the contrary of `git log`). If you need viceversa instead, put this field to **True**.
 
 Examples::
 
@@ -80,9 +84,11 @@ Filtering commits
 
 PyDriller comes with a set of common commit filters that you can apply:
 
-* *only\_in\_branch: str*: only analyses commits that belong to this branch.
-* *only\_no\_merge: bool*: only analyses commits that are not merge commits.
-* *only\_modifications\_with\_file\_types: List[str]*: only analyses commits in which at least one modification was done in that file type, e.g., if you pass ".java", then, the it will visit only commits in which at least one Java file was modified; clearly, it will skip other commits.
+* **only\_in\_branch** *(str)*: only analyses commits that belong to this branch.
+* **only\_no\_merge** *(bool)*: only analyses commits that are not merge commits.
+* **only\_authors** *(List[str])*: only analyses commits that are made by these authors. The check is made on the username, NOT the email.
+* **only\_commits** *(List[str])*: only these commits will be analyzed.
+* **only\_modifications\_with\_file\_types** *(List[str])*: only analyses commits in which at least one modification was done in that file type, e.g., if you pass ".java", then, the it will visit only commits in which at least one Java file was modified; clearly, it will skip other commits.
 
 Examples::
 
@@ -91,6 +97,12 @@ Examples::
 
     # Only commits in branch1 and no merges
     RepositoryMining('path/to/the/repo', only_in_branch='branch1', only_no_merge=True).traverse_commits()
+
+    # Only commits of author "ishepard" (yeah, that's me)
+    RepositoryMining('path/to/the/repo', only_authors=['ishepard']).traverse_commits()
+
+    # Only these 3 commits
+    RepositoryMining('path/to/the/repo', only_commits=['hash1', 'hash2', 'hash3']).traverse_commits()
 
     # Only commits that modified a java file
     RepositoryMining('path/to/the/repo', only_modifications_with_file_types=['.java']).traverse_commits()

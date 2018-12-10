@@ -59,7 +59,8 @@ class RepositoryMining:
         :param str only_in_branch: only commits in this branch will be analyzed
         :param List[str] only_modifications_with_file_types: only modifications with that file types will be analyzed
         :param bool only_no_merge: if True, merges will not be analyzed
-        :param List[str] only_authors: only commits of these authors will be analyzed
+        :param List[str] only_authors: only commits of these authors will be analyzed (the check is done on the username, NOT the email)
+        :param List[str] only_commits: only these commits will be analyzed
         """
 
         self._sanity_check_repos(path_to_repo)

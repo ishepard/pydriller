@@ -148,12 +148,7 @@ class RepositoryMining:
 
             logger.info('Analyzing git repository in {}'.format(git_repo.path))
 
-            all_cs = self._apply_filters_on_commits(git_repo.get_list_commits(self._only_in_branch))
-
-            if not self._reversed_order:
-                all_cs.reverse()
-
-            for commit in all_cs:
+            for commit in git_repo.get_list_commits(self._only_in_branch, not self._reversed_order):
                 logger.info('Commit #{} in {} from {}'.format(commit.hash, commit.committer_date, commit.author.name))
 
                 if self._is_commit_filtered(commit):
@@ -163,6 +158,13 @@ class RepositoryMining:
                 yield commit
 
     def _is_commit_filtered(self, commit: Commit):
+        if self._single is not None:
+            if commit.hash != self._single:
+                logger.debug('Commit filtered because is not the defined in single')
+                return True
+        if (self._since is not None and commit.committer_date < self._since) or \
+                (self._to is not None and commit.committer_date > self._to):
+                return True
         if self._only_modifications_with_file_types is not None:
             if not self._has_modification_with_file_type(commit):
                 logger.debug('Commit filtered for modification types')
@@ -183,28 +185,6 @@ class RepositoryMining:
             if mod.filename.endswith(tuple(self._only_modifications_with_file_types)):
                 return True
         return False
-
-    def _apply_filters_on_commits(self, all_commits: List[Commit]):
-        res = []
-
-        if self._all_filters_are_none():
-            return all_commits
-
-        if self._single is not None:
-            for commit in all_commits:
-                if commit.hash == self._single:
-                    return [commit]
-            raise Exception("Could not found commit {}".format(self._single))
-
-        for commit in all_commits:
-            if self._since is None or self._since <= commit.committer_date:
-                if self._to is None or commit.committer_date <= self._to:
-                    res.append(commit)
-                    continue
-        return res
-
-    def _all_filters_are_none(self):
-        return self._single is None and self._since is None and self._to is None
 
     def _check_timezones(self):
         if self._since is not None:

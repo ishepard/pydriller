@@ -59,13 +59,6 @@ def test_no_filters():
     assert 'b8c2be250786975f1c6f47e96922096f1bb25e39' == lc[2].hash
 
 
-def test_no_single_commit():
-    with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/git-5',
-                                       single="6fe83d9fbf9a63cc1c51e5fe6fd5230f7fbbce6f").traverse_commits():
-            print(commit.hash)
-
-
 def test_only_in_branch():
     lc = list(RepositoryMining('test-repos/git-5/', only_in_branch='branch2').traverse_commits())
     assert 6 == len(lc)

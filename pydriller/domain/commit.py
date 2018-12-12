@@ -220,13 +220,16 @@ class Commit:
         """
         Create a commit object.
 
-        :param commit GitCommit: GitPython Commit object
+        :param commit: GitPython Commit object
         :param project_path: path to the project (temporary folder in case of a remote repository)
         :param main_branch: main branch of the repo
         """
         self._c_object = commit
         self._main_branch = main_branch
         self.project_path = project_path
+
+        self._modifications = None
+        self._branches = None
 
     @property
     def hash(self) -> str:
@@ -337,6 +340,12 @@ class Commit:
 
         :return: List[Modification] modifications
         """
+        if self._modifications is None:
+            self._modifications = self._get_modifications()
+
+        return self._modifications
+
+    def _get_modifications(self):
         repo = Repo(str(self.project_path))
         commit = self._c_object
 
@@ -389,6 +398,12 @@ class Commit:
 
         :return: set(str) branches
         """
+        if self._branches is None:
+            self._branches = self._get_branches()
+
+        return self._branches
+
+    def _get_branches(self):
         git = Git(str(self.project_path))
         branches = set()
         for branch in set(git.branch('--contains', self.hash).split('\n')):

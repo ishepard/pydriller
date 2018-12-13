@@ -80,13 +80,10 @@ class GitRepository:
 
     def get_list_commits(self, branch: str = None, reverse_order: bool = True) -> Generator[Commit, None, None]:
         """
-        Return the list of all the commits in the repo.
+        Return a generator of commits of all the commits in the repo.
 
-        :return: List[Commit], the list of all the commits in the repo
+        :return: Generator[Commit], the generator of all the commits in the repo
         """
-        return self._get_all_commits(branch, reverse_order)
-
-    def _get_all_commits(self, branch: str = None, reverse_order: bool = True) -> Generator[Commit, None, None]:
         for commit in self.repo.iter_commits(branch, reverse=reverse_order):
             yield self.get_commit_from_gitpython(commit)
 

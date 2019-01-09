@@ -49,7 +49,7 @@ By default, PyDriller analyzes all the commits in the repository. However, filte
 
 *ORDER*:
 
-* **reverse\_order** *(bool)*: by default PyDriller returns the commits in chronological order (from the oldest to the newest, the contrary of `git log`). If you need viceversa instead, put this field to **True**.
+* **reversed\_order** *(bool)*: by default PyDriller returns the commits in chronological order (from the oldest to the newest, the contrary of `git log`). If you need viceversa instead, put this field to **True**.
 
 Examples::
 

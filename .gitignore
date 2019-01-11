@@ -198,6 +198,7 @@ fabric.properties
 # End of https://www.gitignore.io/api/pycharm
 
 test-repos/*
+test-repos-mercurial/*
 .idea/vcs.xml
 
 _build

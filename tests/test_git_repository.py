@@ -11,8 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import logging
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -20,8 +18,6 @@ import pytest
 
 from pydriller.domain.commit import ModificationType
 from pydriller.git_repository import GitRepository
-
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 
 def test_projectname():

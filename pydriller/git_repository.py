@@ -207,6 +207,10 @@ class GitRepository:
                 modified_lines['added'].append((count_additions, line[1:]))
                 count_deletions -= 1
 
+            if line == r'\ No newline at end of file':
+                count_deletions -= 1
+                count_additions -= 1
+
         return modified_lines
 
     def _get_line_numbers(self, line):

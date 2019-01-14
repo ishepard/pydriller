@@ -185,3 +185,22 @@ def test_real_example():
     assert (158, '       public ChangeSet getHead2() {') in added
     assert (323, '       newline') in added
     assert 3 == len(added)
+
+
+def test_diff_no_newline():
+    """
+    If a file ends without a newline git represents this with the additional line
+        \\ No newline at end of file
+    in diffs. This test asserts these additional lines are parsed correctly.
+    """
+    gr = GitRepository('test-repos/test9')
+
+    diff = gr.get_commit('52a78c1ee5d100528eccba0a3d67371dbd22d898').modifications[0].diff
+    parsed_lines = gr.parse_diff(diff)
+
+    added = parsed_lines['added']
+    deleted = parsed_lines['deleted']
+
+    assert (1, 'test1') in deleted # is considered as deleted as a 'newline' command is added
+    assert (1, 'test1') in added   # now with added 'newline'
+    assert (2, 'test2') in added

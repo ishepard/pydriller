@@ -278,7 +278,7 @@ class GitRepository:
         commits = []
         try:
             commits = self.git.log("--follow", "--format=%H", path).split('\n')
-        except:
+        except GitCommandError:
             logger.debug("Could not find information of file %s", path)
 
         list_commits = []

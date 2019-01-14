@@ -42,7 +42,7 @@ def test_memory(caplog):
     diff_with_metrics, all_commits_with_metrics = mine(2)
 
     max_values = [max(all_commits_with_nothing), max(all_commits_with_everything), max(all_commits_with_metrics)]
-    logging.warning("Max values are: ".format(max_values))
+    logging.warning("Max values are: {}".format(max_values))
 
     minutes_with_everything = (diff_with_everything.seconds % 3600) // 60
     minutes_with_metrics = (diff_with_metrics.seconds % 3600) // 60

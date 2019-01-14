@@ -34,9 +34,19 @@ def test_memory():
     diff_with_everything, all_commits_with_everything = mine(1)
     diff_with_metrics, all_commits_with_metrics = mine(2)
 
-    logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
-                           diff_with_everything, all_commits_with_everything,
-                           diff_with_metrics, all_commits_with_metrics)
+    max_values = [max(all_commits_with_nothing), max(all_commits_with_everything), max(all_commits_with_metrics)]
+
+    minutes_with_everything = (diff_with_everything.seconds % 3600) // 60
+    minutes_with_metrics = (diff_with_metrics.seconds % 3600) // 60
+
+    if any(val > 250 for val in max_values) or \
+            minutes_with_everything >= 1 or \
+            minutes_with_metrics >= 5:
+        # if to analyze 1000 commits requires more than 250MB of RAM, more than 1 minute without metrics or
+        # 5 minutes with metrics, print it on the Slack channel
+        logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
+                               diff_with_everything, all_commits_with_everything,
+                               diff_with_metrics, all_commits_with_metrics)
 
     assert 973 == len(all_commits_with_nothing) == len(all_commits_with_everything) == len(all_commits_with_metrics)
 

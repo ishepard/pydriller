@@ -38,7 +38,8 @@ class RepositoryMining:
                  only_modifications_with_file_types: List[str] = None,
                  only_no_merge: bool = False,
                  only_authors: List[str] = None,
-                 only_commits: List[str] = None):
+                 only_commits: List[str] = None,
+                 filepath: str = None):
         """
         Init a repository mining. The only required parameter is "path_to_repo": to analyze a single repo, pass the absolute
         path to the repo; if you need to analyze more repos, pass a list of absolute paths.
@@ -79,6 +80,7 @@ class RepositoryMining:
         self._only_no_merge = only_no_merge
         self._only_authors = only_authors
         self._only_commits = only_commits
+        self._filepath = filepath
 
     def _sanity_check_repos(self, path_to_repo):
         if not isinstance(path_to_repo, str) and not isinstance(path_to_repo, list):
@@ -147,6 +149,13 @@ class RepositoryMining:
             self._check_timezones()
 
             logger.info('Analyzing git repository in {}'.format(git_repo.path))
+
+            if self._filepath is not None:
+                commits = git_repo.get_commits_modified_file(self._filepath)
+                for commit in commits:
+                    logger.info('Commit #{} in {} from {}'.format(commit.hash, commit.committer_date, commit.author.name))
+                    yield commit
+                continue
 
             for commit in git_repo.get_list_commits(self._only_in_branch, not self._reversed_order):
                 logger.info('Commit #{} in {} from {}'.format(commit.hash, commit.committer_date, commit.author.name))

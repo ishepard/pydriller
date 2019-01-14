@@ -397,3 +397,10 @@ def test_get_commits_last_modified_lines_with_more_modification():
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('c7002fb321a8ba32a28fac200538f7c2ba76f175'))
     assert len(buggy_commits) == 1
     assert '5cb9e9ae44a0949ec91d06a955975289be766f34' in buggy_commits
+
+
+def test_get_commits_modified_file():
+    gr = GitRepository('test-repos/test1/')
+
+    commits = gr.get_commits_modified_file('test-repos/test1/file2.java')
+    assert len(commits) == 3

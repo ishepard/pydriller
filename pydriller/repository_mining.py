@@ -188,11 +188,14 @@ class RepositoryMining:
 
     def _check_timezones(self):
         if self._since is not None:
-            if self._since.tzinfo is None or self._since.tzinfo.utcoffset(self._since) is None:
-                self._since = self._since.replace(tzinfo=pytz.utc)
+            self._since = self._replace_timezone(self._since)
         if self._to is not None:
-            if self._to.tzinfo is None or self._to.tzinfo.utcoffset(self._to) is None:
-                self._to = self._to.replace(tzinfo=pytz.utc)
+            self._to = self._replace_timezone(self._to)
+
+    def _replace_timezone(self, dt: datetime):
+        if dt.tzinfo is None or dt.tzinfo.utcoffset(dt) is None:
+            dt = dt.replace(tzinfo=pytz.utc)
+        return dt
 
     def _get_repo_name_from_url(self, url: str) -> str:
         last_slash_index = url.rfind("/")

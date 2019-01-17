@@ -403,4 +403,16 @@ def test_get_commits_modified_file():
     gr = GitRepository('test-repos/test1/')
 
     commits = gr.get_commits_modified_file('test-repos/test1/file2.java')
+
     assert len(commits) == 3
+    assert '09f6182cef737db02a085e1d018963c7a29bde5a' in commits
+    assert '6411e3096dd2070438a17b225f44475136e54e3a' in commits
+    assert 'a88c84ddf42066611e76e6cb690144e5357d132c' in commits
+
+
+def test_get_commits_modified_file_missing_file():
+    gr = GitRepository('test-repos/test1/')
+
+    commits = gr.get_commits_modified_file('test-repos/test1/non-existing-file.java')
+
+    assert len(commits) == 0

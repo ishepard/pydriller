@@ -67,3 +67,24 @@ def test_badly_formatted_url():
 
     with pytest.raises(Exception):
         list(RepositoryMining(path_to_repo='test').traverse_commits())
+
+
+def test_filepath():
+    dt = datetime(2018, 6, 6)
+    assert 4 == len(list(RepositoryMining(
+        path_to_repo='test-repos/test5',
+        filepath='test-repos/test5/A.java',
+        to=dt).traverse_commits()))
+
+def test_filepath_with_rename():
+    dt = datetime(2018, 6, 6)
+    commits = list(RepositoryMining(
+        path_to_repo='test-repos/test1',
+        filepath='test-repos/test1/file4.java',
+        to=dt).traverse_commits())
+    assert 2 == len(commits)
+
+    commit_hashes = [commit.hash for commit in commits]
+
+    assert 'da39b1326dbc2edfe518b90672734a08f3c13458' in commit_hashes
+    assert 'a88c84ddf42066611e76e6cb690144e5357d132c' in commit_hashes

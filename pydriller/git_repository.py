@@ -266,14 +266,13 @@ class GitRepository:
         return not line or line.startswith('//') or line.startswith('#') or line.startswith("/*") or \
                line.startswith("'''") or line.startswith('"""') or line.startswith("*")
 
-    def get_commits_modified_file(self, filepath: str) -> List[Commit]:
+    def get_commits_modified_file(self, filepath: str) -> List[str]:
         all_commits = self.get_list_commits()
 
         dict_commits = {}
         for commit in all_commits:
             dict_commits[commit.hash] = commit
 
-        # getting the absolute path of the file
         path = str(Path(filepath).absolute())
         commits = []
         try:
@@ -281,10 +280,4 @@ class GitRepository:
         except GitCommandError:
             logger.debug("Could not find information of file %s", path)
 
-        list_commits = []
-        for commit in commits:
-            # I don't have a better idea than this:
-            # unfortunately, this will call `git` for every commit
-            list_commits.append(dict_commits[commit.strip()])
-
-        return list_commits
+        return commits

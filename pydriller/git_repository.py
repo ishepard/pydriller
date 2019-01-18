@@ -271,13 +271,8 @@ class GitRepository:
                line.startswith("'''") or line.startswith('"""') or line.startswith("*")
 
     def get_commits_modified_file(self, filepath: str) -> List[str]:
-        all_commits = self.get_list_commits()
+        path = str(Path(filepath))
 
-        dict_commits = {}
-        for commit in all_commits:
-            dict_commits[commit.hash] = commit
-
-        path = str(Path(filepath).absolute())
         commits = []
         try:
             commits = self.git.log("--follow", "--format=%H", path).split('\n')

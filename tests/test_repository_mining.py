@@ -73,14 +73,14 @@ def test_filepath():
     dt = datetime(2018, 6, 6)
     assert 4 == len(list(RepositoryMining(
         path_to_repo='test-repos/test5',
-        filepath='test-repos/test5/A.java',
+        filepath='A.java',
         to=dt).traverse_commits()))
 
 def test_filepath_with_rename():
     dt = datetime(2018, 6, 6)
     commits = list(RepositoryMining(
         path_to_repo='test-repos/test1',
-        filepath='test-repos/test1/file4.java',
+        filepath='file4.java',
         to=dt).traverse_commits())
     assert 2 == len(commits)
 

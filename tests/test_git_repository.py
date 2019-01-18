@@ -398,7 +398,7 @@ def test_get_commits_last_modified_lines_with_more_modification():
 def test_get_commits_modified_file():
     gr = GitRepository('test-repos/test1/')
 
-    commits = gr.get_commits_modified_file('test-repos/test1/file2.java')
+    commits = gr.get_commits_modified_file('file2.java')
 
     assert len(commits) == 3
     assert '09f6182cef737db02a085e1d018963c7a29bde5a' in commits
@@ -409,6 +409,6 @@ def test_get_commits_modified_file():
 def test_get_commits_modified_file_missing_file():
     gr = GitRepository('test-repos/test1/')
 
-    commits = gr.get_commits_modified_file('test-repos/test1/non-existing-file.java')
+    commits = gr.get_commits_modified_file('non-existing-file.java')
 
     assert len(commits) == 0

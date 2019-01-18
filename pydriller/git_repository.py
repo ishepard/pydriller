@@ -269,3 +269,19 @@ class GitRepository:
         # this covers comments in Java and Python, as well as empty lines. More have to be added!
         return not line or line.startswith('//') or line.startswith('#') or line.startswith("/*") or \
                line.startswith("'''") or line.startswith('"""') or line.startswith("*")
+
+    def get_commits_modified_file(self, filepath: str) -> List[str]:
+        all_commits = self.get_list_commits()
+
+        dict_commits = {}
+        for commit in all_commits:
+            dict_commits[commit.hash] = commit
+
+        path = str(Path(filepath).absolute())
+        commits = []
+        try:
+            commits = self.git.log("--follow", "--format=%H", path).split('\n')
+        except GitCommandError:
+            logger.debug("Could not find information of file %s", path)
+
+        return commits

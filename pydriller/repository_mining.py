@@ -38,7 +38,8 @@ class RepositoryMining:
                  only_modifications_with_file_types: List[str] = None,
                  only_no_merge: bool = False,
                  only_authors: List[str] = None,
-                 only_commits: List[str] = None):
+                 only_commits: List[str] = None,
+                 filepath: str = None):
         """
         Init a repository mining. The only required parameter is "path_to_repo": to analyze a single repo, pass the absolute
         path to the repo; if you need to analyze more repos, pass a list of absolute paths.
@@ -79,6 +80,8 @@ class RepositoryMining:
         self._only_no_merge = only_no_merge
         self._only_authors = only_authors
         self._only_commits = only_commits
+        self._filepath = filepath
+        self._filepath_commits = None
 
     def _sanity_check_repos(self, path_to_repo):
         if not isinstance(path_to_repo, str) and not isinstance(path_to_repo, list):
@@ -148,6 +151,9 @@ class RepositoryMining:
 
             logger.info('Analyzing git repository in {}'.format(git_repo.path))
 
+            if self._filepath is not None:
+                self._filepath_commits = git_repo.get_commits_modified_file(self._filepath)
+
             for commit in git_repo.get_list_commits(self._only_in_branch, not self._reversed_order):
                 logger.info('Commit #{} in {} from {}'.format(commit.hash, commit.committer_date, commit.author.name))
 
@@ -178,6 +184,11 @@ class RepositoryMining:
         if self._only_commits is not None and commit.hash not in self._only_commits:
             logger.debug("Commit filtered because it is not one of the specified commits")
             return True
+        if self._filepath is not None:
+            if self._filepath_commits is not None:
+                if commit.hash not in self._filepath_commits:
+                    return True
+
         return False
 
     def _has_modification_with_file_type(self, commit):

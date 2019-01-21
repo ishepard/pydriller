@@ -34,7 +34,7 @@ def test_equal(resource):
     c3 = resource.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58')
 
     assert c1.parents[0] == 'a4ece0762e797d2e2dcbd471115108dd6e05ff58'
-    assert c2 == c3
+    assert c3 == c2
     assert c1 != c3
 
 
@@ -53,7 +53,7 @@ def test_filename():
     assert m1.filename == 'mynewfile.py'
     assert m2.filename == 'myfile.py'
     assert m1 != m2
-    assert m1 == m3
+    assert m3 == m1
 
 
 def test_metrics_python():
@@ -68,11 +68,11 @@ def test_metrics_python():
     m1 = Modification('test-repos/test6/git_repository.py', "test-repos/test6/git_repository.py",
                       ModificationType.MODIFY, diff_and_sc)
 
-    assert 196 == m1.nloc
-    assert 1009 == m1.token_count
-    assert 43 == m1.complexity
+    assert m1.nloc == 196
+    assert m1.token_count == 1009
+    assert m1.complexity == 43
 
-    assert 19 == len(m1.methods)
+    assert len(m1.methods) == 19
 
 
 def test_metrics_cpp():
@@ -87,11 +87,11 @@ def test_metrics_cpp():
     m1 = Modification('test-repos/test6/FileCPP.cpp', "test-repos/test6/FileCPP.cpp",
                       ModificationType.MODIFY, diff_and_sc)
 
-    assert 332 == m1.nloc
-    assert 2511 == m1.token_count
-    assert 83 == m1.complexity
+    assert m1.nloc == 332
+    assert m1.token_count == 2511
+    assert m1.complexity == 83
 
-    assert 23 == len(m1.methods)
+    assert len(m1.methods) == 23
 
 
 def test_metrics_java():
@@ -106,11 +106,11 @@ def test_metrics_java():
     m1 = Modification('test-repos/test6/FileJava.java', "test-repos/test6/FileJava.java",
                       ModificationType.MODIFY, diff_and_sc)
 
-    assert 466 == m1.nloc
-    assert 3809 == m1.token_count
-    assert 92 == m1.complexity
+    assert m1.nloc == 466
+    assert m1.token_count == 3809
+    assert m1.complexity == 92
 
-    assert 46 == len(m1.methods)
+    assert len(m1.methods) == 46
 
 
 def test_metrics_not_supported_file():
@@ -124,8 +124,8 @@ def test_metrics_not_supported_file():
     m1 = Modification('test-repos/test6/NotSupported.pdf', "test-repos/test6/NotSupported.pdf",
                       ModificationType.MODIFY, diff_and_sc)
 
-    assert 2 == m1.nloc
-    assert 0 == len(m1.methods)
+    assert m1.nloc == 2
+    assert len(m1.methods) == 0
 
 
 def test_filepahs():
@@ -143,7 +143,7 @@ def test_projectname():
     gr = GitRepository('test-repos/test7')
     c = gr.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
-    assert 'test7' == c.project_name
+    assert c.project_name == 'test7'
 
 
 def test_modification_type_unknown():

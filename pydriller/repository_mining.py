@@ -170,7 +170,7 @@ class RepositoryMining:
                 return True
         if (self._since is not None and commit.committer_date < self._since) or \
                 (self._to is not None and commit.committer_date > self._to):
-                return True
+            return True
         if self._only_modifications_with_file_types is not None:
             if not self._has_modification_with_file_type(commit):
                 logger.debug('Commit filtered for modification types')

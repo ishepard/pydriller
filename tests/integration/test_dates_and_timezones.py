@@ -28,7 +28,7 @@ def test_one_timezone():
     to_zone = timezone(timedelta(hours=2))
     dt = datetime(2016, 4, 4, 13, 21, 25, tzinfo=to_zone)
 
-    assert dt == lc[0].author_date
+    assert lc[0].author_date == dt
 
 
 def test_between_dates_reversed():
@@ -38,4 +38,4 @@ def test_between_dates_reversed():
     to_zone = timezone(timedelta(hours=-4))
     dt = datetime(2016, 10, 8, 17, 57, 49, tzinfo=to_zone)
 
-    assert dt == lc[0].author_date
+    assert lc[0].author_date == dt

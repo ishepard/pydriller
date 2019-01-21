@@ -35,7 +35,7 @@ def test_get_head():
     assert cs is not None
 
     assert cs.hash == 'da39b1326dbc2edfe518b90672734a08f3c13458'
-    assert 1522164679 == cs.author_date.timestamp()
+    assert cs.author_date.timestamp() == 1522164679
 
 
 def test_list_commits():
@@ -49,7 +49,8 @@ def test_list_commits():
 
     for commit in change_sets:
         assert commit.hash in list_commits
-    assert 5 == len(change_sets)
+
+    assert len(change_sets) == 5
 
 
 def test_get_commit():
@@ -57,12 +58,12 @@ def test_get_commit():
     c = gr.get_commit('09f6182cef737db02a085e1d018963c7a29bde5a')
     to_zone = timezone(timedelta(hours=1))
 
-    assert '09f6182cef737db02a085e1d018963c7a29bde5a' == c.hash
-    assert 'ishepard' == c.author.name
-    assert 'ishepard' == c.committer.name
-    assert datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone).timestamp() == c.author_date.timestamp()
-    assert 1 == len(c.modifications)
-    assert 'Ooops file2' == c.msg
+    assert c.hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
+    assert c.author.name == 'ishepard'
+    assert c.committer.name == 'ishepard'
+    assert c.author_date.timestamp() == datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone).timestamp()
+    assert len(c.modifications) == 1
+    assert c.msg == 'Ooops file2'
     assert c.in_main_branch is True
 
 
@@ -71,13 +72,13 @@ def test_get_first_commit():
     c = gr.get_commit('a88c84ddf42066611e76e6cb690144e5357d132c')
     to_zone = timezone(timedelta(hours=1))
 
-    assert 'a88c84ddf42066611e76e6cb690144e5357d132c' == c.hash
-    assert 'ishepard' == c.author.name
-    assert 'ishepard' == c.committer.name
-    assert datetime(2018, 3, 22, 10, 41, 11, tzinfo=to_zone).timestamp() == c.author_date.timestamp()
-    assert datetime(2018, 3, 22, 10, 41, 11, tzinfo=to_zone).timestamp() == c.committer_date.timestamp()
-    assert 2 == len(c.modifications)
-    assert 'First commit adding 2 files' == c.msg
+    assert c.hash == 'a88c84ddf42066611e76e6cb690144e5357d132c'
+    assert c.author.name == 'ishepard'
+    assert c.committer.name == 'ishepard'
+    assert c.author_date.timestamp() == datetime(2018, 3, 22, 10, 41, 11, tzinfo=to_zone).timestamp()
+    assert c.committer_date.timestamp() == datetime(2018, 3, 22, 10, 41, 11, tzinfo=to_zone).timestamp()
+    assert len(c.modifications) == 2
+    assert c.msg == 'First commit adding 2 files'
     assert c.in_main_branch is True
 
 
@@ -85,7 +86,7 @@ def test_files():
     gr = GitRepository('test-repos/test2')
     all = gr.files()
 
-    assert 8 == len(all)
+    assert len(all) == 8
     assert str(Path('test-repos/test2/tmp1.py')) in all
     assert str(Path('test-repos/test2/tmp2.py')) in all
     assert str(Path('test-repos/test2/fold1/tmp3.py')) in all
@@ -98,7 +99,7 @@ def test_files():
 
 def test_total_commits():
     gr = GitRepository('test-repos/test1/')
-    assert 5 == gr.total_commits()
+    assert gr.total_commits() == 5
 
 
 def test_get_commit_from_tag():
@@ -106,7 +107,7 @@ def test_get_commit_from_tag():
 
     commit = gr.get_commit_from_tag('v1.4')
 
-    assert '09f6182cef737db02a085e1d018963c7a29bde5a' == commit.hash
+    assert commit.hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
     with pytest.raises(IndexError):
         gr.get_commit_from_tag('v1.5')
 
@@ -115,17 +116,17 @@ def test_list_files_in_commit():
     gr = GitRepository('test-repos/git-1/')
     gr.checkout('a7053a4dcd627f5f4f213dc9aa002eb1caf926f8')
     files1 = gr.files()
-    assert 3 == len(files1)
+    assert len(files1) == 3
     gr.reset()
 
     gr.checkout('f0dd1308bd904a9b108a6a40865166ee962af3d4')
     files2 = gr.files()
-    assert 2 == len(files2)
+    assert len(files2) == 2
     gr.reset()
 
     gr.checkout('9e71dd5726d775fb4a5f08506a539216e878adbb')
     files3 = gr.files()
-    assert 3 == len(files3)
+    assert len(files3) == 3
     gr.reset()
 
 
@@ -135,7 +136,7 @@ def test_checkout_consecutive_commits():
     gr.checkout('f0dd1308bd904a9b108a6a40865166ee962af3d4')
     gr.checkout('9e71dd5726d775fb4a5f08506a539216e878adbb')
     files3 = gr.files()
-    assert 3 == len(files3)
+    assert len(files3) == 3
     gr.reset()
 
 
@@ -143,14 +144,14 @@ def test_checkout_with_commit_not_fully_merged_to_master():
     gr = GitRepository('test-repos/git-9/')
     gr.checkout('developing')
     files1 = gr.files()
-    assert 2 == len(files1)
+    assert len(files1) == 2
     gr.reset()
-    assert len(gr.repo.branches) == 4, "temp branch should be cleared."
+    assert 4, "temp branch should be cleared." == len(gr.repo.branches)
     files2 = gr.files()
-    assert 1 == len(files2)
+    assert len(files2) == 1
     gr.checkout('developing')
     files1 = gr.files()
-    assert 2 == len(files1)
+    assert len(files1) == 2
     gr.reset()
 
 
@@ -158,20 +159,20 @@ def test_get_all_commits():
     gr = GitRepository('test-repos/git-1/')
     change_sets = list(gr.get_list_commits())
 
-    assert 13 == len(change_sets)
-    assert '866e997a9e44cb4ddd9e00efe49361420aff2559' == change_sets[0].hash
-    assert 'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2' == change_sets[12].hash
+    assert len(change_sets) == 13
+    assert change_sets[0].hash == '866e997a9e44cb4ddd9e00efe49361420aff2559'
+    assert change_sets[12].hash == 'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
 
 
 def test_branches_from_commit():
     gr = GitRepository('test-repos/git-1/')
     commit = gr.get_commit('a997e9d400f742003dea601bb05a9315d14d1124')
 
-    assert 1 == len(commit.branches)
+    assert len(commit.branches) == 1
     assert 'b2' in commit.branches
 
     commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
-    assert 2 == len(commit.branches)
+    assert len(commit.branches) == 2
     assert 'master' in commit.branches
     assert 'b2' in commit.branches
 
@@ -195,120 +196,120 @@ def test_other_branches_with_merge():
 
 def test_commit_in_master_branch():
     gr = GitRepository('test-repos/git-2/')
-    assert '29e929fbc5dc6a2e9c620069b24e2a143af4285f' == gr.get_head().hash
+    assert gr.get_head().hash == '29e929fbc5dc6a2e9c620069b24e2a143af4285f'
 
     gr.checkout('8986af2a679759e5a15794f6d56e6d46c3f302f1')
 
     git_to_change_head = GitRepository('test-repos/git-2/')
     commit = git_to_change_head.get_commit('8169f76a3d7add54b4fc7bca7160d1f1eede6eda')
-    assert False == commit.in_main_branch
+    assert commit.in_main_branch is False
 
     commit = git_to_change_head.get_commit('168b3aab057ed61a769acf336a4ef5e64f76c9fd')
-    assert True == commit.in_main_branch
+    assert commit.in_main_branch is True
 
     gr.reset()
-    assert '29e929fbc5dc6a2e9c620069b24e2a143af4285f' == gr.get_head().hash
+    assert gr.get_head().hash == '29e929fbc5dc6a2e9c620069b24e2a143af4285f'
 
 
 def test_should_detail_a_commit():
     gr = GitRepository('test-repos/git-1/')
     commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
 
-    assert "Maurício Aniche" == commit.author.name
-    assert "mauricioaniche@gmail.com" == commit.author.email
+    assert commit.author.name == "Maurício Aniche"
+    assert commit.author.email == "mauricioaniche@gmail.com"
 
-    assert "Matricula adicionada" == commit.msg
-    assert 1 == len(commit.modifications)
+    assert commit.msg == "Matricula adicionada"
+    assert len(commit.modifications) == 1
 
-    assert "Matricula.java" == commit.modifications[0].new_path
-    assert True == commit.modifications[0].diff.startswith("@@ -0,0 +1,62 @@\n+package model;")
-    assert True == commit.modifications[0].source_code.startswith("package model;")
+    assert commit.modifications[0].new_path == "Matricula.java"
+    assert commit.modifications[0].diff.startswith("@@ -0,0 +1,62 @@\n+package model;") is True
+    assert commit.modifications[0].source_code.startswith("package model;") is True
 
 
 def test_merge_commits():
     gr = GitRepository('test-repos/git-2/')
     commit = gr.get_commit("168b3aab057ed61a769acf336a4ef5e64f76c9fd")
-    assert False == commit.merge
+    assert commit.merge is False
 
     commit = gr.get_commit("8169f76a3d7add54b4fc7bca7160d1f1eede6eda")
-    assert False == commit.merge
+    assert commit.merge is False
 
     commit = gr.get_commit("29e929fbc5dc6a2e9c620069b24e2a143af4285f")
-    assert True == commit.merge
+    assert commit.merge is True
 
 
 def test_number_of_modifications():
     gr = GitRepository('test-repos/git-1/')
     commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
-    assert 62 == commit.modifications[0].added
-    assert 0 == commit.modifications[0].removed
+    assert commit.modifications[0].added == 62
+    assert commit.modifications[0].removed == 0
 
     commit = gr.get_commit('d11dd6734ff4e60cac3a7b58d9267f138c9e05c7')
-    assert 1 == commit.modifications[0].added
-    assert 1 == commit.modifications[0].removed
+    assert commit.modifications[0].added == 1
+    assert commit.modifications[0].removed == 1
 
 
 def test_modification_status():
     gr = GitRepository('test-repos/git-1/')
     commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
-    assert ModificationType.ADD == commit.modifications[0].change_type
-    assert None == commit.modifications[0].old_path
+    assert commit.modifications[0].change_type == ModificationType.ADD
+    assert commit.modifications[0].old_path is None
 
     commit = gr.get_commit('57dbd017d1a744b949e7ca0b1c1a3b3dd4c1cbc1')
-    assert ModificationType.MODIFY == commit.modifications[0].change_type
-    assert commit.modifications[0].old_path == commit.modifications[0].new_path
+    assert commit.modifications[0].change_type == ModificationType.MODIFY
+    assert commit.modifications[0].new_path == commit.modifications[0].old_path
 
     commit = gr.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71')
-    assert ModificationType.DELETE == commit.modifications[0].change_type
-    assert None == commit.modifications[0].new_path
+    assert commit.modifications[0].change_type == ModificationType.DELETE
+    assert commit.modifications[0].new_path is None
 
 
 def test_diffs():
     gr = GitRepository('test-repos/test4/')
     commit = gr.get_commit('93b4b18673ca6fb5d563bbf930c45cd1198e979b')
 
-    assert 2 == len(commit.modifications)
+    assert len(commit.modifications) == 2
 
     for mod in commit.modifications:
         if mod.filename == 'file4.java':
-            assert 8 == mod.removed
-            assert 0 == mod.added
+            assert mod.removed == 8
+            assert mod.added == 0
 
         if mod.filename == 'file2.java':
-            assert 12 == mod.removed
-            assert 0 == mod.added
+            assert mod.removed == 12
+            assert mod.added == 0
 
 
 def test_detail_rename():
     gr = GitRepository('test-repos/git-1/')
     commit = gr.get_commit('f0dd1308bd904a9b108a6a40865166ee962af3d4')
 
-    assert "Maurício Aniche" == commit.author.name
-    assert "mauricioaniche@gmail.com", commit.author.email
+    assert commit.author.name == "Maurício Aniche"
+    assert commit.author.email == "mauricioaniche@gmail.com"
 
-    assert "Matricula.javax" == commit.modifications[0].new_path
-    assert "Matricula.java" == commit.modifications[0].old_path
+    assert commit.modifications[0].new_path == "Matricula.javax"
+    assert commit.modifications[0].old_path == "Matricula.java"
 
 
 def test_parent_commits():
     gr = GitRepository('test-repos/git-5/')
     merge_commit = gr.get_commit('5d9d79607d7e82b6f236aa29be4ba89a28fb4f15')
-    assert 2 == len(merge_commit.parents)
+    assert len(merge_commit.parents) == 2
     assert 'fa8217c324e7fb46c80e1ddf907f4e141449637e' in merge_commit.parents
     assert 'ff663cf1931a67d5e47b75fc77dcea432c728052' in merge_commit.parents
 
     normal_commit = gr.get_commit('ff663cf1931a67d5e47b75fc77dcea432c728052')
-    assert 1 == len(normal_commit.parents)
+    assert len(normal_commit.parents) == 1
     assert '4a17f31c0d1285477a3a467d0bc3cb38e775097d' in normal_commit.parents
 
 
 def test_tags():
     gr = GitRepository('test-repos/git-8/')
     commit = gr.get_commit_from_tag('tag1')
-    assert '6bb9e2c6a8080e6b5b34e6e316c894b2ddbf7fcd' == commit.hash
+    assert commit.hash == '6bb9e2c6a8080e6b5b34e6e316c894b2ddbf7fcd'
 
     commit = gr.get_commit_from_tag('tag2')
-    assert '4638730126d40716e230c2040751a13153fb1556' == commit.hash
+    assert commit.hash == '4638730126d40716e230c2040751a13153fb1556'
 
     with pytest.raises(IndexError):
         gr.get_commit_from_tag('tag4')

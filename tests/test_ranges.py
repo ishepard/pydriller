@@ -83,7 +83,7 @@ def repository_mining_tt(path, from_tag, to_tag):
     (dt1, 3),
 ])
 def test_to_filter(repository_mining_st, expected_commits):
-    assert expected_commits == len(repository_mining_st)
+    assert len(repository_mining_st) == expected_commits
 
 
 @pytest.mark.parametrize('since,expected_commits', [
@@ -91,14 +91,14 @@ def test_to_filter(repository_mining_st, expected_commits):
     (dt, 4),
 ])
 def test_since_filter(repository_mining_st, expected_commits):
-    assert expected_commits == len(repository_mining_st)
+    assert len(repository_mining_st) == expected_commits
 
 
 @pytest.mark.parametrize('since,to,expected_commits', [
     (dt2, dt3, 3),
 ])
 def test_since_and_to_filters(repository_mining_st, expected_commits):
-    assert expected_commits == len(repository_mining_st)
+    assert len(repository_mining_st) == expected_commits
 
 
 # FROM AND TO COMMIT
@@ -106,21 +106,21 @@ def test_since_and_to_filters(repository_mining_st, expected_commits):
     ('09f6182cef737db02a085e1d018963c7a29bde5a', 3),
 ])
 def test_to_commit_filter_new(repository_mining_cc, expected_commits):
-    assert expected_commits == len(repository_mining_cc)
+    assert len(repository_mining_cc) == expected_commits
 
 
 @pytest.mark.parametrize('from_commit,expected_commits', [
     ('6411e3096dd2070438a17b225f44475136e54e3a', 4),
 ])
 def test_from_commit_filter(repository_mining_cc, expected_commits):
-    assert expected_commits == len(repository_mining_cc)
+    assert len(repository_mining_cc) == expected_commits
 
 
 @pytest.mark.parametrize('from_commit,to_commit,expected_commits', [
     ('6411e3096dd2070438a17b225f44475136e54e3a', '09f6182cef737db02a085e1d018963c7a29bde5a', 2),
 ])
 def test_from_and_to_commit(repository_mining_cc, expected_commits):
-    assert expected_commits == len(repository_mining_cc)
+    assert len(repository_mining_cc) == expected_commits
 
 
 # FROM AND TO TAG
@@ -128,21 +128,21 @@ def test_from_and_to_commit(repository_mining_cc, expected_commits):
     ('v1.4', 3),
 ])
 def test_to_tag_filter_new(repository_mining_tt, expected_commits):
-    assert expected_commits == len(repository_mining_tt)
+    assert len(repository_mining_tt) == expected_commits
 
 
 @pytest.mark.parametrize('from_tag,expected_commits', [
     ('v1.4', 3),
 ])
 def test_from_tag_filter(repository_mining_tt, expected_commits):
-    assert expected_commits == len(repository_mining_tt)
+    assert len(repository_mining_tt) == expected_commits
 
 
 @pytest.mark.parametrize('from_tag,to_tag,expected_commits', [
     ('v1.4', 'v1.4', 1),
 ])
 def test_from_and_to_tag(repository_mining_tt, expected_commits):
-    assert expected_commits == len(repository_mining_tt)
+    assert len(repository_mining_tt) == expected_commits
 
 
 def test_multiple_filters_exceptions():

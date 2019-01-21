@@ -124,7 +124,7 @@ def test_tabs():
     deleted = parsed_lines['deleted']
 
     assert (3, 'c') in deleted
-    assert 1 == len(deleted)
+    assert len(deleted) == 1
 
     assert (3, '\td') in added
     assert (4, 'cc') in added
@@ -140,7 +140,7 @@ def test_tabs():
     assert (14, '\tg') in added
     assert (15, '') in added
     assert (16, 'j') in added
-    assert 14 == len(added)
+    assert len(added) == 14
 
 
 def test_real_example():
@@ -179,12 +179,12 @@ def test_real_example():
 
     assert (75, '       public GitRepository(String path) {') in deleted
     assert (158, '       public ChangeSet getHead() {') in deleted
-    assert 2 == len(deleted)
+    assert len(deleted) == 2
 
     assert (75, '       public GitRepository2(String path) {') in added
     assert (158, '       public ChangeSet getHead2() {') in added
     assert (323, '       newline') in added
-    assert 3 == len(added)
+    assert len(added) == 3
 
 
 def test_diff_no_newline():
@@ -201,6 +201,6 @@ def test_diff_no_newline():
     added = parsed_lines['added']
     deleted = parsed_lines['deleted']
 
-    assert (1, 'test1') in deleted # is considered as deleted as a 'newline' command is added
-    assert (1, 'test1') in added   # now with added 'newline'
+    assert (1, 'test1') in deleted  # is considered as deleted as a 'newline' command is added
+    assert (1, 'test1') in added  # now with added 'newline'
     assert (2, 'test2') in added

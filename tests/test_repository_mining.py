@@ -69,12 +69,21 @@ def test_badly_formatted_url():
         list(RepositoryMining(path_to_repo='test').traverse_commits())
 
 
-def test_filepath():
+def test_filepath_with_to():
     dt = datetime(2018, 6, 6)
     assert 4 == len(list(RepositoryMining(
         path_to_repo='test-repos/test5',
         filepath='A.java',
         to=dt).traverse_commits()))
+
+
+def test_filepath_with_since():
+    since = datetime(2018, 6, 6)
+    assert 7 == len(list(RepositoryMining(
+        path_to_repo='test-repos/test5',
+        filepath='A.java',
+        since=since).traverse_commits()))
+
 
 def test_filepath_with_rename():
     dt = datetime(2018, 6, 6)

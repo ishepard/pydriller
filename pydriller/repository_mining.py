@@ -184,10 +184,9 @@ class RepositoryMining:
         if self._only_commits is not None and commit.hash not in self._only_commits:
             logger.debug("Commit filtered because it is not one of the specified commits")
             return True
-        if self._filepath is not None:
-            if self._filepath_commits is not None:
-                if commit.hash not in self._filepath_commits:
-                    return True
+        if self._filepath_commits is not None and commit.hash not in self._filepath_commits:
+            logger.debug("Commit filtered because it did not modify the specified file")
+            return True
 
         return False
 

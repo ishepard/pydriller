@@ -88,6 +88,7 @@ PyDriller comes with a set of common commit filters that you can apply:
 * **only\_no\_merge** *(bool)*: only analyses commits that are not merge commits.
 * **only\_authors** *(List[str])*: only analyses commits that are made by these authors. The check is made on the username, NOT the email.
 * **only\_commits** *(List[str])*: only these commits will be analyzed.
+* **filepath** *(str)*: only commits that modified this file will be analyzed.
 * **only\_modifications\_with\_file\_types** *(List[str])*: only analyses commits in which at least one modification was done in that file type, e.g., if you pass ".java", then, the it will visit only commits in which at least one Java file was modified; clearly, it will skip other commits.
 
 Examples::
@@ -104,6 +105,11 @@ Examples::
     # Only these 3 commits
     RepositoryMining('path/to/the/repo', only_commits=['hash1', 'hash2', 'hash3']).traverse_commits()
 
+    # Only commit that modified "Matricula.javax" 
+    RepositoryMining('path/to/the/repo', filepath='Matricula.javax').traverse_commits()
+
     # Only commits that modified a java file
     RepositoryMining('path/to/the/repo', only_modifications_with_file_types=['.java']).traverse_commits()
+
+
 

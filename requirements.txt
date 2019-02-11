@@ -1,4 +1,4 @@
 gitpython
 typing
 pytz
-lizard
+lizard==1.15.7

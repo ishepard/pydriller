@@ -87,11 +87,11 @@ def test_metrics_cpp():
     m1 = Modification('test-repos/test6/FileCPP.cpp', "test-repos/test6/FileCPP.cpp",
                       ModificationType.MODIFY, diff_and_sc)
 
-    assert m1.nloc == 332
-    assert m1.token_count == 2511
-    assert m1.complexity == 83
+    assert m1.nloc == 793
+    assert m1.token_count == 5564
+    assert m1.complexity == 199
 
-    assert len(m1.methods) == 23
+    assert len(m1.methods) == 16
 
 
 def test_metrics_java():

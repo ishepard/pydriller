@@ -18,7 +18,7 @@ import tempfile
 from datetime import datetime
 from typing import List, Generator, Union
 
-import pytz as pytz
+import pytz
 from git import Repo
 
 from pydriller.domain.commit import Commit

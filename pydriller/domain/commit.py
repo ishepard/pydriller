@@ -78,6 +78,7 @@ class Modification:
         self._complexity = None
         self._token_count = None
         self._function_list = []
+        self._changed_functions_list = []
 
     @property
     def added(self) -> int:
@@ -185,9 +186,23 @@ class Modification:
         self._calculate_metrics()
         return self._function_list
 
+    @property
+    def changed_methods(self) -> List[Method]:
+        """
+        Returns the list of methods changed in this modification.
+        Every method contains various information like complexicy,
+        loc, name, etc. You can find more information in the lizard
+        documentation: https://github.com/terryyin/lizard
+
+        :return: list of methods
+        """
+        self._filter_methods()
+        return self._changed_functions_list
+
     def _calculate_metrics(self):
         if self.source_code and self._nloc is None:
-            l = lizard.analyze_file.analyze_source_code(self.filename, self.source_code)
+            l = lizard.analyze_file.analyze_source_code(
+                self.filename, self.source_code)
 
             self._nloc = l.nloc
             self._complexity = l.CCN
@@ -195,6 +210,23 @@ class Modification:
 
             for func in l.function_list:
                 self._function_list.append(Method(func))
+
+    def _filter_methods(self) -> List[Method]:
+        def check_range(string, change):
+            num = string.split(",")
+            start = int(num[0].replace("-", "").replace("+", ""))
+            end = start + int(num[1])
+
+            if (start < change.start_line < end) or (start < change.end_line < end):
+                return True
+            return False
+
+        line_numbers = self.diff.split("\n")[0]
+        token = line_numbers.split(" ")
+
+        for m in self.methods:
+            if check_range(token[1], m) or check_range(token[2], m):
+                self._changed_functions_list.append(m)
 
     def __eq__(self, other):
         if not isinstance(other, Modification):
@@ -206,12 +238,12 @@ class Modification:
 
     def __str__(self):
         return (
-                'MODIFICATION\n' +
-                'Old Path: {}\n'.format(self.old_path) +
-                'New Path: {}\n'.format(self.new_path) +
-                'Type: {}\n'.format(self.change_type.name) +
-                'Diff: {}\n'.format(self.diff) +
-                'Source code: {}\n'.format(self.source_code)
+            'MODIFICATION\n' +
+            'Old Path: {}\n'.format(self.old_path) +
+            'New Path: {}\n'.format(self.new_path) +
+            'Type: {}\n'.format(self.change_type.name) +
+            'Diff: {}\n'.format(self.diff) +
+            'Source code: {}\n'.format(self.source_code)
         )
 
 
@@ -220,9 +252,9 @@ class Commit:
         """
         Create a commit object.
 
-        :param commit: GitPython Commit object
-        :param project_path: path to the project (temporary folder in case of a remote repository)
-        :param main_branch: main branch of the repo
+        : param commit: GitPython Commit object
+        : param project_path: path to the project(temporary folder in case of a remote repository)
+        : param main_branch: main branch of the repo
         """
         self._c_object = commit
         self._main_branch = main_branch
@@ -236,7 +268,7 @@ class Commit:
         """
         Return the SHA of the commit.
 
-        :return: str hash
+        : return: str hash
         """
         return self._c_object.hexsha
 
@@ -245,7 +277,7 @@ class Commit:
         """
         Return the author of the commit as a Developer object.
 
-        :return: author
+        : return: author
         """
         return Developer(self._c_object.author.name, self._c_object.author.email)
 
@@ -254,7 +286,7 @@ class Commit:
         """
         Return the committer of the commit as a Developer object.
 
-        :return: committer
+        : return: committer
         """
         return Developer(self._c_object.committer.name, self._c_object.committer.email)
 
@@ -263,7 +295,7 @@ class Commit:
         """
         Return the project name.
 
-        :return: project name
+        : return: project name
         """
         return self.project_path.name
 
@@ -272,7 +304,7 @@ class Commit:
         """
         Return the authored datetime.
 
-        :return: datetime author_datetime
+        : return: datetime author_datetime
         """
         return self._c_object.authored_datetime
 
@@ -281,7 +313,7 @@ class Commit:
         """
         Return the committed datetime.
 
-        :return: datetime committer_datetime
+        : return: datetime committer_datetime
         """
         return self._c_object.committed_datetime
 
@@ -290,7 +322,7 @@ class Commit:
         """
         Author timezone expressed in seconds from epoch.
 
-        :return: int timezone
+        : return: int timezone
         """
         return self._c_object.author_tz_offset
 
@@ -299,7 +331,7 @@ class Commit:
         """
         Author timezone expressed in seconds from epoch.
 
-        :return: int timezone
+        : return: int timezone
         """
         return self._c_object.committer_tz_offset
 
@@ -308,7 +340,7 @@ class Commit:
         """
         Return commit message.
 
-        :return: str commit_message
+        : return: str commit_message
         """
         return self._c_object.message.strip()
 
@@ -317,7 +349,7 @@ class Commit:
         """
         Return the list of parents SHAs.
 
-        :return: List[str] parents
+        : return: List[str] parents
         """
         parents = []
         for p in self._c_object.parents:
@@ -329,7 +361,7 @@ class Commit:
         """
         Return True if the commit is a merge, False otherwise.
 
-        :return: bool merge
+        : return: bool merge
         """
         return len(self._c_object.parents) > 1
 
@@ -338,7 +370,7 @@ class Commit:
         """
         Return a list of modified files.
 
-        :return: List[Modification] modifications
+        : return: List[Modification] modifications
         """
         if self._modifications is None:
             self._modifications = self._get_modifications()
@@ -351,7 +383,8 @@ class Commit:
 
         if len(self.parents) > 0:
             # the commit has a parent
-            diff_index = self._c_object.parents[0].diff(commit, create_patch=True)
+            diff_index = self._c_object.parents[0].diff(
+                commit, create_patch=True)
         else:
             # this is the first commit of the repo. Comparing it with git NULL TREE
             parent = repo.tree(NULL_TREE)
@@ -373,12 +406,14 @@ class Commit:
 
             try:
                 diff_and_sc['diff'] = d.diff.decode('utf-8')
-                diff_and_sc['source_code'] = d.b_blob.data_stream.read().decode('utf-8')
+                diff_and_sc['source_code'] = d.b_blob.data_stream.read().decode(
+                    'utf-8')
             except (UnicodeDecodeError, AttributeError, ValueError):
                 logger.debug(
                     'Could not load source code or the diff of a file in commit {}'.format(self._c_object.hexsha))
 
-            modifications_list.append(Modification(old_path, new_path, change_type, diff_and_sc))
+            modifications_list.append(Modification(
+                old_path, new_path, change_type, diff_and_sc))
 
         return modifications_list
 
@@ -387,7 +422,7 @@ class Commit:
         """
         Return True if the commit is in the main branch, False otherwise.
 
-        :return: bool in_main_branch
+        : return: bool in_main_branch
         """
         return self._main_branch in self.branches
 
@@ -396,7 +431,7 @@ class Commit:
         """
         Return the set of branches that contain the commit.
 
-        :return: set(str) branches
+        : return: set(str) branches
         """
         if self._branches is None:
             self._branches = self._get_branches()

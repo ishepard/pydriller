@@ -252,9 +252,9 @@ class Commit:
         """
         Create a commit object.
 
-        : param commit: GitPython Commit object
-        : param project_path: path to the project(temporary folder in case of a remote repository)
-        : param main_branch: main branch of the repo
+        :param commit: GitPython Commit object
+        :param project_path: path to the project(temporary folder in case of a remote repository)
+        :param main_branch: main branch of the repo
         """
         self._c_object = commit
         self._main_branch = main_branch
@@ -268,7 +268,7 @@ class Commit:
         """
         Return the SHA of the commit.
 
-        : return: str hash
+        :return: str hash
         """
         return self._c_object.hexsha
 
@@ -277,7 +277,7 @@ class Commit:
         """
         Return the author of the commit as a Developer object.
 
-        : return: author
+        :return: author
         """
         return Developer(self._c_object.author.name, self._c_object.author.email)
 
@@ -286,7 +286,7 @@ class Commit:
         """
         Return the committer of the commit as a Developer object.
 
-        : return: committer
+        :return: committer
         """
         return Developer(self._c_object.committer.name, self._c_object.committer.email)
 
@@ -295,7 +295,7 @@ class Commit:
         """
         Return the project name.
 
-        : return: project name
+        :return: project name
         """
         return self.project_path.name
 
@@ -304,7 +304,7 @@ class Commit:
         """
         Return the authored datetime.
 
-        : return: datetime author_datetime
+        :return: datetime author_datetime
         """
         return self._c_object.authored_datetime
 
@@ -313,7 +313,7 @@ class Commit:
         """
         Return the committed datetime.
 
-        : return: datetime committer_datetime
+        :return: datetime committer_datetime
         """
         return self._c_object.committed_datetime
 
@@ -322,7 +322,7 @@ class Commit:
         """
         Author timezone expressed in seconds from epoch.
 
-        : return: int timezone
+        :return: int timezone
         """
         return self._c_object.author_tz_offset
 
@@ -331,7 +331,7 @@ class Commit:
         """
         Author timezone expressed in seconds from epoch.
 
-        : return: int timezone
+        :return: int timezone
         """
         return self._c_object.committer_tz_offset
 
@@ -340,7 +340,7 @@ class Commit:
         """
         Return commit message.
 
-        : return: str commit_message
+        :return: str commit_message
         """
         return self._c_object.message.strip()
 
@@ -349,7 +349,7 @@ class Commit:
         """
         Return the list of parents SHAs.
 
-        : return: List[str] parents
+        :return: List[str] parents
         """
         parents = []
         for p in self._c_object.parents:
@@ -361,7 +361,7 @@ class Commit:
         """
         Return True if the commit is a merge, False otherwise.
 
-        : return: bool merge
+        :return: bool merge
         """
         return len(self._c_object.parents) > 1
 
@@ -370,7 +370,7 @@ class Commit:
         """
         Return a list of modified files.
 
-        : return: List[Modification] modifications
+        :return: List[Modification] modifications
         """
         if self._modifications is None:
             self._modifications = self._get_modifications()
@@ -422,7 +422,7 @@ class Commit:
         """
         Return True if the commit is in the main branch, False otherwise.
 
-        : return: bool in_main_branch
+        :return: bool in_main_branch
         """
         return self._main_branch in self.branches
 
@@ -431,7 +431,7 @@ class Commit:
         """
         Return the set of branches that contain the commit.
 
-        : return: set(str) branches
+        :return: set(str) branches
         """
         if self._branches is None:
             self._branches = self._get_branches()

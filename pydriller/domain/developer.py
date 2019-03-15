@@ -26,7 +26,7 @@ class Developer:
     def __eq__(self, other):
         if not isinstance(other, Developer):
             return NotImplemented
-        elif self is other:
+        if self is other:
             return True
-        else:
-            return self.__dict__ == other.__dict__
+
+        return self.__dict__ == other.__dict__

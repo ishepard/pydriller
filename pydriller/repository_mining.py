@@ -41,26 +41,32 @@ class RepositoryMining:
                  only_commits: List[str] = None,
                  filepath: str = None):
         """
-        Init a repository mining. The only required parameter is "path_to_repo": to analyze a single repo, pass the absolute
-        path to the repo; if you need to analyze more repos, pass a list of absolute paths.
+        Init a repository mining. The only required parameter is "path_to_repo": to analyze a
+        single repo, pass the absolute path to the repo; if you need to analyze more
+        repos, pass a list of absolute paths.
 
-        Furthermore, PyDriller supports local and remote repositories: if you pass a path to a repo, PyDriller will run the study
-        on that repo; if you pass an URL, PyDriller will clone the repo in a temporary folder, run the study, and
-        delete the temporary folder.
+        Furthermore, PyDriller supports local and remote repositories: if you pass a path to a
+        repo, PyDriller will run the study on that repo; if you pass an URL, PyDriller will clone
+        the repo in a temporary folder, run the study, and delete the temporary folder.
 
-        :param Union[str,List[str]] path_to_repo: absolute path (or list of absolute paths) to the repository(ies) to analyze
+        :param Union[str,List[str]] path_to_repo: absolute path (or list of absolute paths) to
+        the repository(ies) to analyze
         :param str single: hash of a single commit to analyze
         :param datetime since: starting date
         :param datetime to: ending date
         :param str from_commit: starting commit (only if `since` is None)
         :param str to_commit: ending commit (only if `to` is None)
-        :param str from_tag: starting the analysis from specified tag (only if `since` and `from_commit` are None)
-        :param str to_tag: ending the analysis from specified tag (only if `to` and `to_commit` are None)
+        :param str from_tag: starting the analysis from specified tag (only if `since` and
+        `from_commit` are None)
+        :param str to_tag: ending the analysis from specified tag (only if `to` and `to_commit`
+        are None)
         :param bool reversed_order: whether the commits should be analyzed in reversed order
         :param str only_in_branch: only commits in this branch will be analyzed
-        :param List[str] only_modifications_with_file_types: only modifications with that file types will be analyzed
+        :param List[str] only_modifications_with_file_types: only modifications with that file
+        types will be analyzed
         :param bool only_no_merge: if True, merges will not be analyzed
-        :param List[str] only_authors: only commits of these authors will be analyzed (the check is done on the username, NOT the email)
+        :param List[str] only_authors: only commits of these authors will be analyzed (the check
+        is done on the username, NOT the email)
         :param List[str] only_commits: only these commits will be analyzed
         :param str filepath: only commits that modified this file will be analyzed
         """
@@ -92,7 +98,8 @@ class RepositoryMining:
         # If single is defined, not other filters should be
         if self._single is not None:
             if self._since is not None or self._to is not None or self._from_commit is not None or \
-                    self._to_commit is not None or self._from_tag is not None or self._to_tag is not None:
+                    self._to_commit is not None or self._from_tag is not None or self._to_tag is \
+                    not None:
                 raise Exception('You can not specify a single commit with other filters')
 
         # If from_commit is defined, since should not be
@@ -110,7 +117,8 @@ class RepositoryMining:
         # If from_tag is defined, since and from_commit should not be
         if self._from_tag is not None:
             if self._since is not None or self._from_commit is not None:
-                raise Exception('You can not specify <since date> or <from commit> when using <from tag>')
+                raise Exception(
+                    'You can not specify <since date> or <from commit> when using <from tag>')
             self._since = git_repo.get_commit_from_tag(self._from_tag).committer_date
 
         # If to_tag is defined, to and to_commit should not be
@@ -125,7 +133,7 @@ class RepositoryMining:
     def _clone_remote_repos(self, tmp_folder: str, repo: str) -> str:
 
         repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
-        logger.info("Cloning {} in temporary folder {}".format(repo, repo_folder))
+        logger.info("Cloning %s in temporary folder %s", repo, repo_folder)
         Repo.clone_from(url=repo, to_path=repo_folder)
 
         return repo_folder
@@ -150,16 +158,17 @@ class RepositoryMining:
             self._sanity_check_filters(git_repo)
             self._check_timezones()
 
-            logger.info('Analyzing git repository in {}'.format(git_repo.path))
+            logger.info('Analyzing git repository in %s', git_repo.path)
 
             if self._filepath is not None:
                 self._filepath_commits = git_repo.get_commits_modified_file(self._filepath)
 
             for commit in git_repo.get_list_commits(self._only_in_branch, not self._reversed_order):
-                logger.info('Commit #{} in {} from {}'.format(commit.hash, commit.committer_date, commit.author.name))
+                logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date,
+                            commit.author.name)
 
                 if self._is_commit_filtered(commit):
-                    logger.info('Commit #{} filtered'.format(commit.hash))
+                    logger.info('Commit #%s filtered', commit.hash)
                     continue
 
                 yield commit

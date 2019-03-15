@@ -78,7 +78,8 @@ class GitRepository:
         head_commit = self.repo.head.commit
         return Commit(head_commit, self.path, self.main_branch)
 
-    def get_list_commits(self, branch: str = None, reverse_order: bool = True) -> Generator[Commit, None, None]:
+    def get_list_commits(self, branch: str = None, reverse_order: bool = True) \
+            -> Generator[Commit, None, None]:
         """
         Return a generator of commits of all the commits in the repo.
 
@@ -135,7 +136,7 @@ class GitRepository:
         :return: List[str], the list of the files
         """
         _all = []
-        for path, subdirs, files in os.walk(str(self.path)):
+        for path, _, files in os.walk(str(self.path)):
             if '.git' in path:
                 continue
             for name in files:
@@ -171,7 +172,7 @@ class GitRepository:
             selected_tag = self.repo.tags[tag]
             return self.get_commit(selected_tag.commit.hexsha)
         except (IndexError, AttributeError):
-            logger.debug('Tag {} not found'.format(tag))
+            logger.debug('Tag %s not found', tag)
             raise
 
     def parse_diff(self, diff: str) -> Dict[str, List[Tuple[int, str]]]:
@@ -221,7 +222,8 @@ class GitRepository:
         additions_line_number = int(numbers_new_file.split(",")[0]) - 1
         return delete_line_number, additions_line_number
 
-    def get_commits_last_modified_lines(self, commit: Commit, modification: Modification = None) -> Set[str]:
+    def get_commits_last_modified_lines(self, commit: Commit, modification: Modification = None) \
+            -> Set[str]:
         """
         Given the Commit object, returns the set of commits that last "touched" the lines
         that are modified in the files included in the commit. It applies SZZ.
@@ -249,7 +251,8 @@ class GitRepository:
 
         for mod in modifications:
             path = mod.new_path
-            if mod.change_type == ModificationType.RENAME or mod.change_type == ModificationType.DELETE:
+            if mod.change_type == ModificationType.RENAME or mod.change_type == \
+                    ModificationType.DELETE:
                 path = mod.old_path
 
             deleted_lines = self.parse_diff(mod.diff)['deleted']
@@ -260,17 +263,24 @@ class GitRepository:
                         buggy_commit = blame[num_line - 1].split(' ')[0].replace('^', '')
                         buggy_commits.add(self.get_commit(buggy_commit).hash)
             except GitCommandError:
-                logger.debug("Could not found file %s in commit %s. Probably a double rename!", mod.filename,
+                logger.debug("Could not found file %s in commit %s. Probably a double rename!",
+                             mod.filename,
                              commit.hash)
 
         return buggy_commits
 
     def _useless_line(self, line: str):
         # this covers comments in Java and Python, as well as empty lines. More have to be added!
-        return not line or line.startswith('//') or line.startswith('#') or line.startswith("/*") or \
-               line.startswith("'''") or line.startswith('"""') or line.startswith("*")
+        return not line or line.startswith('//') or line.startswith('#') or line.startswith("/*")\
+               or line.startswith("'''") or line.startswith('"""') or line.startswith("*")
 
     def get_commits_modified_file(self, filepath: str) -> List[str]:
+        """
+        Given a filepath, returns all the commits that modified this file (following renames)
+
+        :param str filepath: path to the file
+        :return: the list of commits' hash
+        """
         path = str(Path(filepath))
 
         commits = []

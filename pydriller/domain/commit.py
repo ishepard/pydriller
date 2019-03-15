@@ -16,22 +16,22 @@ from _datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import List, Set, Dict
-
 import lizard
 from git import Repo, Diff, Git, Commit as GitCommit
+from pydriller.domain.developer import Developer
+
 
 logger = logging.getLogger(__name__)
-from pydriller.domain.developer import Developer
 
 NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
 class ModificationType(Enum):
-    ADD = 1,
-    COPY = 2,
-    RENAME = 3,
-    DELETE = 4,
-    MODIFY = 5,
+    ADD = 1
+    COPY = 2
+    RENAME = 3
+    DELETE = 4
+    MODIFY = 5
     UNKNOWN = 6
 
 
@@ -199,19 +199,18 @@ class Modification:
     def __eq__(self, other):
         if not isinstance(other, Modification):
             return NotImplemented
-        elif self is other:
+        if self is other:
             return True
-        else:
-            return self.__dict__ == other.__dict__
+        return self.__dict__ == other.__dict__
 
     def __str__(self):
         return (
-                'MODIFICATION\n' +
-                'Old Path: {}\n'.format(self.old_path) +
-                'New Path: {}\n'.format(self.new_path) +
-                'Type: {}\n'.format(self.change_type.name) +
-                'Diff: {}\n'.format(self.diff) +
-                'Source code: {}\n'.format(self.source_code)
+            'MODIFICATION\n' +
+            'Old Path: {}\n'.format(self.old_path) +
+            'New Path: {}\n'.format(self.new_path) +
+            'Type: {}\n'.format(self.change_type.name) +
+            'Diff: {}\n'.format(self.diff) +
+            'Source code: {}\n'.format(self.source_code)
         )
 
 
@@ -349,7 +348,7 @@ class Commit:
         repo = Repo(str(self.project_path))
         commit = self._c_object
 
-        if len(self.parents) > 0:
+        if self.parents:
             # the commit has a parent
             diff_index = self._c_object.parents[0].diff(commit, create_patch=True)
         else:
@@ -361,10 +360,10 @@ class Commit:
 
     def _parse_diff(self, diff_index) -> List[Modification]:
         modifications_list = []
-        for d in diff_index:
-            old_path = d.a_path
-            new_path = d.b_path
-            change_type = self._from_change_to_modification_type(d)
+        for diff in diff_index:
+            old_path = diff.a_path
+            new_path = diff.b_path
+            change_type = self._from_change_to_modification_type(diff)
 
             diff_and_sc = {
                 'diff': '',
@@ -372,11 +371,12 @@ class Commit:
             }
 
             try:
-                diff_and_sc['diff'] = d.diff.decode('utf-8')
-                diff_and_sc['source_code'] = d.b_blob.data_stream.read().decode('utf-8')
+                diff_and_sc['diff'] = diff.diff.decode('utf-8')
+                diff_and_sc['source_code'] = diff.b_blob.data_stream.read().decode('utf-8')
             except (UnicodeDecodeError, AttributeError, ValueError):
                 logger.debug(
-                    'Could not load source code or the diff of a file in commit {}'.format(self._c_object.hexsha))
+                    'Could not load source code or the diff of a file in commit %s',
+                    self._c_object.hexsha)
 
             modifications_list.append(Modification(old_path, new_path, change_type, diff_and_sc))
 
@@ -410,38 +410,39 @@ class Commit:
             branches.add(branch.strip().replace('* ', ''))
         return branches
 
-    def _from_change_to_modification_type(self, d: Diff):
-        if d.new_file:
+    def _from_change_to_modification_type(self, diff: Diff):
+        if diff.new_file:
             return ModificationType.ADD
-        elif d.deleted_file:
+        if diff.deleted_file:
             return ModificationType.DELETE
-        elif d.renamed_file:
+        if diff.renamed_file:
             return ModificationType.RENAME
-        elif d.a_blob and d.b_blob and d.a_blob != d.b_blob:
+        if diff.a_blob and diff.b_blob and diff.a_blob != diff.b_blob:
             return ModificationType.MODIFY
-        else:
-            return ModificationType.UNKNOWN
+
+        return ModificationType.UNKNOWN
 
     def __eq__(self, other):
         if not isinstance(other, Commit):
             return NotImplemented
-        elif self is other:
+        if self is other:
             return True
-        else:
-            return self.__dict__ == other.__dict__
+
+        return self.__dict__ == other.__dict__
 
     def __str__(self):
-        return ('Hash: {}\n'.format(self.hash) +
-                'Author: {}\n'.format(self.author.name) +
-                'Author email: {}\n'.format(self.author.email) +
-                'Committer: {}\n'.format(self.committer.name) +
-                'Committer email: {}\n'.format(self.committer.email) +
-                'Author date: {}\n'.format(self.author_date.strftime("%Y-%m-%d %H:%M:%S")) +
-                'Committer date: {}\n'.format(self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) +
-                'Message: {}\n'.format(self.msg) +
-                'Parent: {}\n'.format("\n".join(map(str, self.parents))) +
-                'Merge: {}\n'.format(self.merge) +
-                'Modifications: \n{}'.format("\n".join(map(str, self.modifications))) +
-                'Branches: \n{}'.format("\n".join(map(str, self.branches))) +
-                'In main branch: {}\n'.format(self.in_main_branch)
-                )
+        return (
+            'Hash: {}\n'.format(self.hash) +
+            'Author: {}\n'.format(self.author.name) +
+            'Author email: {}\n'.format(self.author.email) +
+            'Committer: {}\n'.format(self.committer.name) +
+            'Committer email: {}\n'.format(self.committer.email) +
+            'Author date: {}\n'.format(self.author_date.strftime("%Y-%m-%d %H:%M:%S")) +
+            'Committer date: {}\n'.format(self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) +
+            'Message: {}\n'.format(self.msg) +
+            'Parent: {}\n'.format("\n".join(map(str, self.parents))) +
+            'Merge: {}\n'.format(self.merge) +
+            'Modifications: \n{}'.format("\n".join(map(str, self.modifications))) +
+            'Branches: \n{}'.format("\n".join(map(str, self.branches))) +
+            'In main branch: {}\n'.format(self.in_main_branch)
+        )

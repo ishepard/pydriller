@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+This module includes 1 class, RepositoryMining, main class of PyDriller.
+"""
+
 import logging
 import os
 import tempfile
@@ -28,6 +32,10 @@ logger = logging.getLogger(__name__)
 
 
 class RepositoryMining:
+    """
+    This is the main class of PyDriller, responsible for running the study.
+    """
+    # pylint: disable=R0902,R0913,R0914
     def __init__(self, path_to_repo: Union[str, List[str]],
                  single: str = None,
                  since: datetime = None, to: datetime = None,
@@ -97,6 +105,7 @@ class RepositoryMining:
     def _sanity_check_filters(self, git_repo: GitRepository):
         # If single is defined, not other filters should be
         if self._single is not None:
+            # pylint: disable=R0916
             if self._since is not None or self._to is not None or self._from_commit is not None or \
                     self._to_commit is not None or self._from_tag is not None or self._to_tag is \
                     not None:
@@ -173,7 +182,7 @@ class RepositoryMining:
 
                 yield commit
 
-    def _is_commit_filtered(self, commit: Commit):
+    def _is_commit_filtered(self, commit: Commit): # pylint: disable=R0911
         if self._single is not None:
             if commit.hash != self._single:
                 logger.debug('Commit filtered because is not the defined in single')

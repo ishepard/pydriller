@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+This module includes 1 class, GitRepository, representing a repository in Git.
+"""
+
 import logging
 import os
 from pathlib import Path
@@ -28,6 +32,10 @@ NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
 class GitRepository:
+    """
+    Class representing a repository in Git. It contains most of the logic of PyDriller: obtaining
+    the list of commits, checkout, reset, etc.
+    """
     def __init__(self, path: str):
         """
         Init the Git Repository.

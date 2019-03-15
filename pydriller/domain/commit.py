@@ -11,6 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+"""
+This module contains all the classes regarding a specific commit, such as Commit, Modification,
+ModificationType and Method.
+"""
+
 import logging
 from _datetime import datetime
 from enum import Enum
@@ -27,6 +33,10 @@ NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
 class ModificationType(Enum):
+    """
+    Type of Modification. Can be ADD, COPY, RENAME, DELETE, MODIFY or UNKNOWN.
+    """
+
     ADD = 1
     COPY = 2
     RENAME = 3
@@ -35,7 +45,12 @@ class ModificationType(Enum):
     UNKNOWN = 6
 
 
-class Method:
+class Method: # pylint: disable=R0902
+    """
+    This class represents a method in a class. Contains various information extracted through
+    Lizard.
+    """
+
     def __init__(self, func):
         """
         Initialize a method object. This is calculated using Lizard: it parses
@@ -60,7 +75,11 @@ class Method:
         self.top_nesting_level = func.top_nesting_level
 
 
-class Modification:
+class Modification: # pylint: disable=R0902
+    """
+    This class contains information regarding a modified file in a commit.
+    """
+
     def __init__(self, old_path: str, new_path: str,
                  change_type: ModificationType,
                  diff_and_sc: Dict[str, str]):
@@ -215,6 +234,11 @@ class Modification:
 
 
 class Commit:
+    """
+    Class representing a Commit. Contains all the important information such as hash, author, dates,
+    and modified files.
+    """
+
     def __init__(self, commit: GitCommit, project_path: Path, main_branch: str) -> None:
         """
         Create a commit object.
@@ -410,7 +434,7 @@ class Commit:
             branches.add(branch.strip().replace('* ', ''))
         return branches
 
-    def _from_change_to_modification_type(self, diff: Diff):
+    def _from_change_to_modification_type(self, diff: Diff): # pylint disable=R0902
         if diff.new_file:
             return ModificationType.ADD
         if diff.deleted_file:

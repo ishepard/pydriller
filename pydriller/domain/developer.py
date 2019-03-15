@@ -11,8 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""
+This module includes only 1 class, Developer, representing a developer.
+"""
 
 class Developer:
+    """
+    This class represents a developer. We save the email and the name.
+    """
     def __init__(self, name: str, email: str):
         """
         Class to identify a developer.

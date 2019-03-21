@@ -50,18 +50,15 @@ class ModificationType(Enum):
 class Method:  # pylint: disable=R0902
     """
     This class represents a method in a class. Contains various information
-    extracted through
-    Lizard.
+    extracted through Lizard.
     """
 
     def __init__(self, func):
         """
         Initialize a method object. This is calculated using Lizard: it parses
         the source code of all the modifications in a commit, extracting
-        information
-        of the methods contained in the file (if the file is a source code
-        written
-        in one of the supported programming languages).
+        information of the methods contained in the file (if the file is a
+        source code written in one of the supported programming languages).
         """
 
         self.name = func.name
@@ -90,8 +87,8 @@ class Modification:  # pylint: disable=R0902
                  diff_and_sc: Dict[str, str]):
         """
         Initialize a modification. A modification carries on information
-        regarding
-        the changed file. Normally, you shouldn't initialize a new one.
+        regarding the changed file. Normally, you shouldn't initialize a new
+        one.
         """
         self._old_path = Path(old_path) if old_path is not None else None
         self._new_path = Path(new_path) if new_path is not None else None
@@ -243,8 +240,7 @@ class Modification:  # pylint: disable=R0902
 class Commit:
     """
     Class representing a Commit. Contains all the important information such
-    as hash, author, dates,
-    and modified files.
+    as hash, author, dates, and modified files.
     """
 
     def __init__(self, commit: GitCommit, project_path: Path,

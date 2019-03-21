@@ -34,8 +34,7 @@ NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 class GitRepository:
     """
     Class representing a repository in Git. It contains most of the logic of
-    PyDriller: obtaining
-    the list of commits, checkout, reset, etc.
+    PyDriller: obtaining the list of commits, checkout, reset, etc.
     """
 
     def __init__(self, path: str):
@@ -124,8 +123,7 @@ class GitRepository:
         """
         Checkout the repo at the speficied commit.
         BE CAREFUL: this will change the state of the repo, hence it should
-        *not*
-        be used with more than 1 thread.
+        *not* be used with more than 1 thread.
 
         :param _hash: commit hash to checkout
         """
@@ -195,8 +193,7 @@ class GitRepository:
         Given a diff, returns a dictionary with the added and deleted lines.
         The dictionary has 2 keys: "added" and "deleted", each containing the
         corresponding added or deleted lines. For both keys, the value is a
-        list
-        of Tuple (int, str), corresponding to (number of line in the file,
+        list of Tuple (int, str), corresponding to (number of line in the file,
         actual line).
 
 
@@ -235,8 +232,8 @@ class GitRepository:
         token = line.split(" ")
         numbers_old_file = token[1]
         numbers_new_file = token[2]
-        delete_line_number = int(
-            numbers_old_file.split(",")[0].replace("-", "")) - 1
+        delete_line_number = int(numbers_old_file.split(",")[0]
+                                 .replace("-", "")) - 1
         additions_line_number = int(numbers_new_file.split(",")[0]) - 1
         return delete_line_number, additions_line_number
 
@@ -245,8 +242,8 @@ class GitRepository:
             -> Set[str]:
         """
         Given the Commit object, returns the set of commits that last
-        "touched" the lines
-        that are modified in the files included in the commit. It applies SZZ.
+        "touched" the lines that are modified in the files included in the
+        commit. It applies SZZ.
         The algorithm works as follow: (for every file in the commit)
 
         1- obtain the diff
@@ -278,8 +275,8 @@ class GitRepository:
 
             deleted_lines = self.parse_diff(mod.diff)['deleted']
             try:
-                blame = self.git.blame(commit.hash + '^', '--', path).split(
-                    '\n')
+                blame = self.git.blame(commit.hash + '^',
+                                       '--', path).split('\n')
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):
                         buggy_commit = blame[num_line - 1].split(' ')[
@@ -288,23 +285,24 @@ class GitRepository:
             except GitCommandError:
                 logger.debug(
                     "Could not found file %s in commit %s. Probably a double "
-                    "rename!",
-                    mod.filename,
-                    commit.hash)
+                    "rename!", mod.filename, commit.hash)
         return buggy_commits
 
     def _useless_line(self, line: str):
         # this covers comments in Java and Python, as well as empty lines.
         # More have to be added!
-        return not line or line.startswith('//') or \
-               line.startswith('#') or line.startswith("/*") or \
-               line.startswith("'''") or line.startswith('"""') or \
+        return not line or \
+               line.startswith('//') or \
+               line.startswith('#') or \
+               line.startswith("/*") or \
+               line.startswith("'''") or \
+               line.startswith('"""') or \
                line.startswith("*")
 
     def get_commits_modified_file(self, filepath: str) -> List[str]:
         """
-        Given a filepath, returns all the commits that modified this file (
-        following renames)
+        Given a filepath, returns all the commits that modified this file
+        (following renames).
 
         :param str filepath: path to the file
         :return: the list of commits' hash

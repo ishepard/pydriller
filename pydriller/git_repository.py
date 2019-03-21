@@ -33,9 +33,11 @@ NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 class GitRepository:
     """
-    Class representing a repository in Git. It contains most of the logic of PyDriller: obtaining
+    Class representing a repository in Git. It contains most of the logic of
+    PyDriller: obtaining
     the list of commits, checkout, reset, etc.
     """
+
     def __init__(self, path: str):
         """
         Init the Git Repository.
@@ -86,12 +88,14 @@ class GitRepository:
         head_commit = self.repo.head.commit
         return Commit(head_commit, self.path, self.main_branch)
 
-    def get_list_commits(self, branch: str = None, reverse_order: bool = True) \
+    def get_list_commits(self, branch: str = None,
+                         reverse_order: bool = True) \
             -> Generator[Commit, None, None]:
         """
         Return a generator of commits of all the commits in the repo.
 
-        :return: Generator[Commit], the generator of all the commits in the repo
+        :return: Generator[Commit], the generator of all the commits in the
+        repo
         """
         for commit in self.repo.iter_commits(branch, reverse=reverse_order):
             yield self.get_commit_from_gitpython(commit)
@@ -119,7 +123,8 @@ class GitRepository:
     def checkout(self, _hash: str) -> None:
         """
         Checkout the repo at the speficied commit.
-        BE CAREFUL: this will change the state of the repo, hence it should *not*
+        BE CAREFUL: this will change the state of the repo, hence it should
+        *not*
         be used with more than 1 thread.
 
         :param _hash: commit hash to checkout
@@ -130,7 +135,8 @@ class GitRepository:
 
     def _delete_tmp_branch(self) -> None:
         try:
-            # we are already in _PD, so checkout the master branch before deleting it
+            # we are already in _PD, so checkout the master branch before
+            # deleting it
             if self.repo.active_branch.name == '_PD':
                 self.git.checkout('-f', self.main_branch)
             self.repo.delete_head('_PD', force=True)
@@ -153,7 +159,8 @@ class GitRepository:
 
     def reset(self) -> None:
         """
-        Reset the state of the repo, checking out the main branch and discarding
+        Reset the state of the repo, checking out the main branch and
+        discarding
         local changes (-f option).
 
         """
@@ -187,8 +194,10 @@ class GitRepository:
         """
         Given a diff, returns a dictionary with the added and deleted lines.
         The dictionary has 2 keys: "added" and "deleted", each containing the
-        corresponding added or deleted lines. For both keys, the value is a list
-        of Tuple (int, str), corresponding to (number of line in the file, actual line).
+        corresponding added or deleted lines. For both keys, the value is a
+        list
+        of Tuple (int, str), corresponding to (number of line in the file,
+        actual line).
 
 
         :param str diff: diff of the commit
@@ -226,14 +235,17 @@ class GitRepository:
         token = line.split(" ")
         numbers_old_file = token[1]
         numbers_new_file = token[2]
-        delete_line_number = int(numbers_old_file.split(",")[0].replace("-", "")) - 1
+        delete_line_number = int(
+            numbers_old_file.split(",")[0].replace("-", "")) - 1
         additions_line_number = int(numbers_new_file.split(",")[0]) - 1
         return delete_line_number, additions_line_number
 
-    def get_commits_last_modified_lines(self, commit: Commit, modification: Modification = None) \
+    def get_commits_last_modified_lines(self, commit: Commit,
+                                        modification: Modification = None) \
             -> Set[str]:
         """
-        Given the Commit object, returns the set of commits that last "touched" the lines
+        Given the Commit object, returns the set of commits that last
+        "touched" the lines
         that are modified in the files included in the commit. It applies SZZ.
         The algorithm works as follow: (for every file in the commit)
 
@@ -243,7 +255,8 @@ class GitRepository:
 
         3- blame the file and obtain the commits were those lines were added
 
-        Can also be passed as parameter a single Modification, in this case only this file
+        Can also be passed as parameter a single Modification, in this case
+        only this file
         will be analyzed.
 
         :param Commit commit: the commit to analyze
@@ -259,32 +272,39 @@ class GitRepository:
 
         for mod in modifications:
             path = mod.new_path
-            if mod.change_type == ModificationType.RENAME or mod.change_type == \
-                    ModificationType.DELETE:
+            if mod.change_type == ModificationType.RENAME or \
+                    mod.change_type == ModificationType.DELETE:
                 path = mod.old_path
 
             deleted_lines = self.parse_diff(mod.diff)['deleted']
             try:
-                blame = self.git.blame(commit.hash + '^', '--', path).split('\n')
+                blame = self.git.blame(commit.hash + '^', '--', path).split(
+                    '\n')
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):
-                        buggy_commit = blame[num_line - 1].split(' ')[0].replace('^', '')
+                        buggy_commit = blame[num_line - 1].split(' ')[
+                            0].replace('^', '')
                         buggy_commits.add(self.get_commit(buggy_commit).hash)
             except GitCommandError:
-                logger.debug("Could not found file %s in commit %s. Probably a double rename!",
-                             mod.filename,
-                             commit.hash)
-
+                logger.debug(
+                    "Could not found file %s in commit %s. Probably a double "
+                    "rename!",
+                    mod.filename,
+                    commit.hash)
         return buggy_commits
 
     def _useless_line(self, line: str):
-        # this covers comments in Java and Python, as well as empty lines. More have to be added!
-        return not line or line.startswith('//') or line.startswith('#') or line.startswith("/*")\
-               or line.startswith("'''") or line.startswith('"""') or line.startswith("*")
+        # this covers comments in Java and Python, as well as empty lines.
+        # More have to be added!
+        return not line or line.startswith('//') or \
+               line.startswith('#') or line.startswith("/*") or \
+               line.startswith("'''") or line.startswith('"""') or \
+               line.startswith("*")
 
     def get_commits_modified_file(self, filepath: str) -> List[str]:
         """
-        Given a filepath, returns all the commits that modified this file (following renames)
+        Given a filepath, returns all the commits that modified this file (
+        following renames)
 
         :param str filepath: path to the file
         :return: the list of commits' hash

@@ -13,7 +13,8 @@
 # limitations under the License.
 
 """
-This module contains all the classes regarding a specific commit, such as Commit, Modification,
+This module contains all the classes regarding a specific commit, such as
+Commit, Modification,
 ModificationType and Method.
 """
 
@@ -22,10 +23,11 @@ from _datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import List, Set, Dict
+
 import lizard
 from git import Repo, Diff, Git, Commit as GitCommit
-from pydriller.domain.developer import Developer
 
+from pydriller.domain.developer import Developer
 
 logger = logging.getLogger(__name__)
 
@@ -45,17 +47,20 @@ class ModificationType(Enum):
     UNKNOWN = 6
 
 
-class Method: # pylint: disable=R0902
+class Method:  # pylint: disable=R0902
     """
-    This class represents a method in a class. Contains various information extracted through
+    This class represents a method in a class. Contains various information
+    extracted through
     Lizard.
     """
 
     def __init__(self, func):
         """
         Initialize a method object. This is calculated using Lizard: it parses
-        the source code of all the modifications in a commit, extracting information
-        of the methods contained in the file (if the file is a source code written
+        the source code of all the modifications in a commit, extracting
+        information
+        of the methods contained in the file (if the file is a source code
+        written
         in one of the supported programming languages).
         """
 
@@ -75,7 +80,7 @@ class Method: # pylint: disable=R0902
         self.top_nesting_level = func.top_nesting_level
 
 
-class Modification: # pylint: disable=R0902
+class Modification:  # pylint: disable=R0902
     """
     This class contains information regarding a modified file in a commit.
     """
@@ -84,7 +89,8 @@ class Modification: # pylint: disable=R0902
                  change_type: ModificationType,
                  diff_and_sc: Dict[str, str]):
         """
-        Initialize a modification. A modification carries on information regarding
+        Initialize a modification. A modification carries on information
+        regarding
         the changed file. Normally, you shouldn't initialize a new one.
         """
         self._old_path = Path(old_path) if old_path is not None else None
@@ -206,7 +212,8 @@ class Modification: # pylint: disable=R0902
 
     def _calculate_metrics(self):
         if self.source_code and self._nloc is None:
-            l = lizard.analyze_file.analyze_source_code(self.filename, self.source_code)
+            l = lizard.analyze_file.analyze_source_code(self.filename,
+                                                        self.source_code)
 
             self._nloc = l.nloc
             self._complexity = l.CCN
@@ -235,16 +242,19 @@ class Modification: # pylint: disable=R0902
 
 class Commit:
     """
-    Class representing a Commit. Contains all the important information such as hash, author, dates,
+    Class representing a Commit. Contains all the important information such
+    as hash, author, dates,
     and modified files.
     """
 
-    def __init__(self, commit: GitCommit, project_path: Path, main_branch: str) -> None:
+    def __init__(self, commit: GitCommit, project_path: Path,
+                 main_branch: str) -> None:
         """
         Create a commit object.
 
         :param commit: GitPython Commit object
-        :param project_path: path to the project (temporary folder in case of a remote repository)
+        :param project_path: path to the project (temporary folder in case
+        of a remote repository)
         :param main_branch: main branch of the repo
         """
         self._c_object = commit
@@ -270,7 +280,8 @@ class Commit:
 
         :return: author
         """
-        return Developer(self._c_object.author.name, self._c_object.author.email)
+        return Developer(self._c_object.author.name,
+                         self._c_object.author.email)
 
     @property
     def committer(self) -> Developer:
@@ -279,7 +290,8 @@ class Commit:
 
         :return: committer
         """
-        return Developer(self._c_object.committer.name, self._c_object.committer.email)
+        return Developer(self._c_object.committer.name,
+                         self._c_object.committer.email)
 
     @property
     def project_name(self) -> str:
@@ -374,9 +386,11 @@ class Commit:
 
         if self.parents:
             # the commit has a parent
-            diff_index = self._c_object.parents[0].diff(commit, create_patch=True)
+            diff_index = self._c_object.parents[0].diff(commit,
+                                                        create_patch=True)
         else:
-            # this is the first commit of the repo. Comparing it with git NULL TREE
+            # this is the first commit of the repo. Comparing it with git
+            # NULL TREE
             parent = repo.tree(NULL_TREE)
             diff_index = parent.diff(commit.tree, create_patch=True)
 
@@ -396,13 +410,14 @@ class Commit:
 
             try:
                 diff_and_sc['diff'] = diff.diff.decode('utf-8')
-                diff_and_sc['source_code'] = diff.b_blob.data_stream.read().decode('utf-8')
+                diff_and_sc['source_code'] = diff.b_blob.data_stream.read()\
+                    .decode('utf-8')
             except (UnicodeDecodeError, AttributeError, ValueError):
-                logger.debug(
-                    'Could not load source code or the diff of a file in commit %s',
-                    self._c_object.hexsha)
+                logger.debug('Could not load source code or the diff of a '
+                             'file in commit %s', self._c_object.hexsha)
 
-            modifications_list.append(Modification(old_path, new_path, change_type, diff_and_sc))
+            modifications_list.append(Modification(old_path, new_path,
+                                                   change_type, diff_and_sc))
 
         return modifications_list
 
@@ -434,7 +449,8 @@ class Commit:
             branches.add(branch.strip().replace('* ', ''))
         return branches
 
-    def _from_change_to_modification_type(self, diff: Diff): # pylint disable=R0902
+    # pylint disable=R0902
+    def _from_change_to_modification_type(self, diff: Diff):
         if diff.new_file:
             return ModificationType.ADD
         if diff.deleted_file:
@@ -461,12 +477,15 @@ class Commit:
             'Author email: {}\n'.format(self.author.email) +
             'Committer: {}\n'.format(self.committer.name) +
             'Committer email: {}\n'.format(self.committer.email) +
-            'Author date: {}\n'.format(self.author_date.strftime("%Y-%m-%d %H:%M:%S")) +
-            'Committer date: {}\n'.format(self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) +
+            'Author date: {}\n'.format(
+                self.author_date.strftime("%Y-%m-%d %H:%M:%S")) +
+            'Committer date: {}\n'.format(
+                self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) +
             'Message: {}\n'.format(self.msg) +
             'Parent: {}\n'.format("\n".join(map(str, self.parents))) +
             'Merge: {}\n'.format(self.merge) +
-            'Modifications: \n{}'.format("\n".join(map(str, self.modifications))) +
+            'Modifications: \n{}'.format(
+                "\n".join(map(str, self.modifications))) +
             'Branches: \n{}'.format("\n".join(map(str, self.branches))) +
             'In main branch: {}\n'.format(self.in_main_branch)
         )

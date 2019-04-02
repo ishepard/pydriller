@@ -212,6 +212,9 @@ class Modification:
                 self._function_list.append(Method(func))
 
     def _filter_methods(self) -> List[Method]:
+        if len(self._changed_functions_list) > 0:
+            return
+
         def check_range(string, change):
             num = string.split(",")
             start = int(num[0].replace("-", "").replace("+", ""))
@@ -222,11 +225,11 @@ class Modification:
             return False
 
         line_numbers = self.diff.split("\n")[0]
-        token = line_numbers.split(" ")
-
-        for m in self.methods:
-            if check_range(token[1], m) or check_range(token[2], m):
-                self._changed_functions_list.append(m)
+        if line_numbers:
+            token = line_numbers.split(" ")
+            for m in self.methods:
+                if check_range(token[1], m) or check_range(token[2], m):
+                    self._changed_functions_list.append(m)
 
     def __eq__(self, other):
         if not isinstance(other, Modification):

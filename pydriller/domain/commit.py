@@ -100,6 +100,7 @@ class Modification:  # pylint: disable=R0902
         self._complexity = None
         self._token_count = None
         self._function_list = []
+        self._changed_functions_list = []
 
     @property
     def added(self) -> int:
@@ -207,10 +208,23 @@ class Modification:  # pylint: disable=R0902
         self._calculate_metrics()
         return self._function_list
 
+    @property
+    def changed_methods(self) -> List[Method]:
+        """
+        Returns the list of methods changed in this modification.
+        Every method contains various information like complexicy,
+        loc, name, etc. You can find more information in the lizard
+        documentation: https://github.com/terryyin/lizard
+
+        :return: list of methods
+        """
+        self._filter_methods()
+        return self._changed_functions_list
+
     def _calculate_metrics(self):
         if self.source_code and self._nloc is None:
-            l = lizard.analyze_file.analyze_source_code(self.filename,
-                                                        self.source_code)
+            l = lizard.analyze_file.analyze_source_code(
+                self.filename, self.source_code)
 
             self._nloc = l.nloc
             self._complexity = l.CCN
@@ -218,6 +232,26 @@ class Modification:  # pylint: disable=R0902
 
             for func in l.function_list:
                 self._function_list.append(Method(func))
+
+    def _filter_methods(self) -> List[Method]:
+        if len(self._changed_functions_list) > 0:
+            return
+
+        def check_range(string, change):
+            num = string.split(",")
+            start = int(num[0].replace("-", "").replace("+", ""))
+            end = start + int(num[1])
+
+            if (start < change.start_line < end) or (start < change.end_line < end):
+                return True
+            return False
+
+        line_numbers = self.diff.split("\n")[0]
+        if line_numbers:
+            token = line_numbers.split(" ")
+            for m in self.methods:
+                if check_range(token[1], m) or check_range(token[2], m):
+                    self._changed_functions_list.append(m)
 
     def __eq__(self, other):
         if not isinstance(other, Modification):
@@ -249,8 +283,7 @@ class Commit:
         Create a commit object.
 
         :param commit: GitPython Commit object
-        :param project_path: path to the project (temporary folder in case
-        of a remote repository)
+        :param project_path: path to the project(temporary folder in case of a remote repository)
         :param main_branch: main branch of the repo
         """
         self._c_object = commit

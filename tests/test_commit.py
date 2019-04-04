@@ -16,7 +16,8 @@ import logging
 
 from pydriller.domain.commit import Modification, ModificationType
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+logging.basicConfig(
+    format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 import pytest
 from pathlib import Path
@@ -54,6 +55,32 @@ def test_filename():
     assert m2.filename == 'myfile.py'
     assert m1 != m2
     assert m3 == m1
+
+
+def test_changed_methods_nomethod():
+    gr = GitRepository('test-repos/test1')
+    # select a change with no methods (adds an empty class)
+    commits = [c for c in gr.get_list_commits()]
+    ch = [ch for c in commits for ch in c.modifications]
+
+    assert len(ch[-2].changed_methods) == 0
+
+
+def test_changed_methods_multiple_methods():
+    gr = GitRepository('test-repos/test1')
+    commits = [c for c in gr.get_list_commits()]
+    # use only the first commit and the first
+    # change for testing because this contains new methods
+    ch = commits[0].modifications[0]
+
+    assert len(ch.changed_methods) == 7
+
+
+def test_changed_methods_different_repo():
+    gr = GitRepository('test-repos/test3')
+    commits = [c for c in gr.get_list_commits()]
+    ch = commits[0].modifications[0]
+    assert len(ch.changed_methods) == 19
 
 
 def test_metrics_python():

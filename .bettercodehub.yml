@@ -1,6 +1,6 @@
-component_depth: 2
+component_depth: 1
 languages:
 - python
 exclude:
 - /examples/.*
-- /docs/.*
+- /docs/conf.py

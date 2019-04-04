@@ -3,3 +3,4 @@ languages:
 - python
 exclude:
 - /examples/.*
+- /docs/.*

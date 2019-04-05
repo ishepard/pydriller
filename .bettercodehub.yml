@@ -3,4 +3,3 @@ languages:
 - python
 exclude:
 - /examples/.*
-- /docs/conf.py

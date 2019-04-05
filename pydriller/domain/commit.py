@@ -233,25 +233,25 @@ class Modification:  # pylint: disable=R0902
             for func in l.function_list:
                 self._function_list.append(Method(func))
 
-    def _filter_methods(self) -> List[Method]:
-        if len(self._changed_functions_list) > 0:
-            return
+    def _check_range(self, string, change):
+        num = string.split(",")
+        start = int(num[0].replace("-", "").replace("+", ""))
+        end = start + int(num[1])
 
-        def check_range(string, change):
-            num = string.split(",")
-            start = int(num[0].replace("-", "").replace("+", ""))
-            end = start + int(num[1])
+        if (start < change.start_line < end) or (
+                start < change.end_line < end):
+            return True
+        return False
 
-            if (start < change.start_line < end) or (start < change.end_line < end):
-                return True
-            return False
-
-        line_numbers = self.diff.split("\n")[0]
-        if line_numbers:
-            token = line_numbers.split(" ")
-            for m in self.methods:
-                if check_range(token[1], m) or check_range(token[2], m):
-                    self._changed_functions_list.append(m)
+    def _filter_methods(self):
+        if not self._changed_functions_list:
+            line_numbers = self.diff.split("\n")[0]
+            if line_numbers:
+                token = line_numbers.split(" ")
+                for method in self.methods:
+                    if self._check_range(token[1], method) or \
+                            self._check_range(token[2], method):
+                        self._changed_functions_list.append(method)
 
     def __eq__(self, other):
         if not isinstance(other, Modification):
@@ -283,7 +283,8 @@ class Commit:
         Create a commit object.
 
         :param commit: GitPython Commit object
-        :param project_path: path to the project(temporary folder in case of a remote repository)
+        :param project_path: path to the project (temporary folder in case
+        of a remote repository)
         :param main_branch: main branch of the repo
         """
         self._c_object = commit

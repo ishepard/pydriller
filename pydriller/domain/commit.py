@@ -100,7 +100,6 @@ class Modification:  # pylint: disable=R0902
         self._complexity = None
         self._token_count = None
         self._function_list = []
-        self._changed_functions_list = []
 
     @property
     def added(self) -> int:
@@ -208,23 +207,10 @@ class Modification:  # pylint: disable=R0902
         self._calculate_metrics()
         return self._function_list
 
-    @property
-    def changed_methods(self) -> List[Method]:
-        """
-        Returns the list of methods changed in this modification.
-        Every method contains various information like complexicy,
-        loc, name, etc. You can find more information in the lizard
-        documentation: https://github.com/terryyin/lizard
-
-        :return: list of methods
-        """
-        self._filter_methods()
-        return self._changed_functions_list
-
     def _calculate_metrics(self):
         if self.source_code and self._nloc is None:
-            l = lizard.analyze_file.analyze_source_code(
-                self.filename, self.source_code)
+            l = lizard.analyze_file.analyze_source_code(self.filename,
+                                                        self.source_code)
 
             self._nloc = l.nloc
             self._complexity = l.CCN
@@ -232,26 +218,6 @@ class Modification:  # pylint: disable=R0902
 
             for func in l.function_list:
                 self._function_list.append(Method(func))
-
-    def _check_range(self, string, change):
-        num = string.split(",")
-        start = int(num[0].replace("-", "").replace("+", ""))
-        end = start + int(num[1])
-
-        if (start < change.start_line < end) or (
-                start < change.end_line < end):
-            return True
-        return False
-
-    def _filter_methods(self):
-        if not self._changed_functions_list:
-            line_numbers = self.diff.split("\n")[0]
-            if line_numbers:
-                token = line_numbers.split(" ")
-                for method in self.methods:
-                    if self._check_range(token[1], method) or \
-                            self._check_range(token[2], method):
-                        self._changed_functions_list.append(method)
 
     def __eq__(self, other):
         if not isinstance(other, Modification):

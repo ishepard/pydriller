@@ -26,7 +26,7 @@ from typing import List, Set, Dict
 
 import lizard
 from git import Repo, Diff, Git, Commit as GitCommit
-
+import git
 from pydriller.domain.developer import Developer
 
 logger = logging.getLogger(__name__)
@@ -380,10 +380,12 @@ class Commit:
         repo = Repo(str(self.project_path))
         commit = self._c_object
 
-        if self.parents:
+        if len(self.parents) == 1:
             # the commit has a parent
             diff_index = self._c_object.parents[0].diff(commit,
                                                         create_patch=True)
+        elif len(self.parents) > 1:
+            diff_index = self._c_object.diff(git.NULL_TREE)
         else:
             # this is the first commit of the repo. Comparing it with git
             # NULL TREE

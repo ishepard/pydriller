@@ -250,7 +250,7 @@ class Commit:
 
         :param commit: GitPython Commit object
         :param project_path: path to the project (temporary folder in case
-        of a remote repository)
+            of a remote repository)
         :param main_branch: main branch of the repo
         """
         self._c_object = commit
@@ -439,9 +439,9 @@ class Commit:
         return self._branches
 
     def _get_branches(self):
-        git = Git(str(self.project_path))
+        c_git = Git(str(self.project_path))
         branches = set()
-        for branch in set(git.branch('--contains', self.hash).split('\n')):
+        for branch in set(c_git.branch('--contains', self.hash).split('\n')):
             branches.add(branch.strip().replace('* ', ''))
         return branches
 

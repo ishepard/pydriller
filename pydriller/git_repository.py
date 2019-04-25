@@ -94,7 +94,7 @@ class GitRepository:
         Return a generator of commits of all the commits in the repo.
 
         :return: Generator[Commit], the generator of all the commits in the
-        repo
+            repo
         """
         for commit in self.repo.iter_commits(branch, reverse=reverse_order):
             yield self.get_commit_from_gitpython(commit)

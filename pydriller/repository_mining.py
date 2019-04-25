@@ -64,32 +64,27 @@ class RepositoryMining:
         temporary folder.
 
         :param Union[str,List[str]] path_to_repo: absolute path (or list of
-        absolute paths) to
-        the repository(ies) to analyze
+            absolute paths) to the repository(ies) to analyze
         :param str single: hash of a single commit to analyze
         :param datetime since: starting date
         :param datetime to: ending date
         :param str from_commit: starting commit (only if `since` is None)
         :param str to_commit: ending commit (only if `to` is None)
         :param str from_tag: starting the analysis from specified tag (only
-        if `since` and
-        `from_commit` are None)
+            if `since` and `from_commit` are None)
         :param str to_tag: ending the analysis from specified tag (only if
-        `to` and `to_commit`
-        are None)
+            `to` and `to_commit` are None)
         :param bool reversed_order: whether the commits should be analyzed
-        in reversed order
+            in reversed order
         :param str only_in_branch: only commits in this branch will be analyzed
         :param List[str] only_modifications_with_file_types: only
-        modifications with that file
-        types will be analyzed
+            modifications with that file types will be analyzed
         :param bool only_no_merge: if True, merges will not be analyzed
         :param List[str] only_authors: only commits of these authors will be
-        analyzed (the check
-        is done on the username, NOT the email)
+            analyzed (the check is done on the username, NOT the email)
         :param List[str] only_commits: only these commits will be analyzed
         :param str filepath: only commits that modified this file will be
-        analyzed
+            analyzed
         """
 
         self._sanity_check_repos(path_to_repo)

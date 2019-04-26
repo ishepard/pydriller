@@ -48,6 +48,7 @@ class RepositoryMining:
                  only_no_merge: bool = False,
                  only_authors: List[str] = None,
                  only_commits: List[str] = None,
+                 only_releases: bool = False,
                  filepath: str = None):
         """
         Init a repository mining. The only required parameter is
@@ -104,8 +105,10 @@ class RepositoryMining:
         self._only_no_merge = only_no_merge
         self._only_authors = only_authors
         self._only_commits = only_commits
+        self._only_releases = only_releases
         self._filepath = filepath
         self._filepath_commits = None
+        self._tagged_commits = None
 
     def _sanity_check_repos(self, path_to_repo):
         if not isinstance(path_to_repo, str) and \
@@ -121,7 +124,8 @@ class RepositoryMining:
                                              self._from_commit,
                                              self._to_commit,
                                              self._from_tag,
-                                             self._to_tag]):
+                                             self._to_tag,
+                                             self._only_releases]):
                 raise Exception('You can not specify a single commit with '
                                 'other filters')
 
@@ -200,6 +204,9 @@ class RepositoryMining:
                 self._filepath_commits = git_repo.get_commits_modified_file(
                     self._filepath)
 
+            if self._only_releases:
+                self._tagged_commits = git_repo.get_tagged_commits()
+
             for commit in git_repo.get_list_commits(self._only_in_branch,
                                                     not self._reversed_order):
                 logger.info('Commit #%s in %s from %s', commit.hash,
@@ -240,6 +247,10 @@ class RepositoryMining:
                 self._filepath_commits:
             logger.debug("Commit filtered because it did not modify the "
                          "specified file")
+            return True
+        if self._tagged_commits is not None and commit.hash not in \
+                self._tagged_commits:
+            logger.debug("Commit filtered because it is not tagged")
             return True
 
         return False

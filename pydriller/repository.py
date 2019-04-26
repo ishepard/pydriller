@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-This module includes 1 class, RepositoryMining, main class of PyDriller.
+This module includes 1 class, Repository, main class of PyDriller.
 """
 
 import logging
@@ -31,7 +31,7 @@ from pydriller.git_repository import GitRepository
 logger = logging.getLogger(__name__)
 
 
-class RepositoryMining:
+class Repository:
     """
     This is the main class of PyDriller, responsible for running the study.
     """
@@ -116,43 +116,50 @@ class RepositoryMining:
     def _sanity_check_filters(self, git_repo: GitRepository):
         # If single is defined, no other filters should be
         if self._single is not None:
-            # pylint: disable=R0916
-            if self._since is not None or self._to is not None or \
-                    self._from_commit is not None or \
-                    self._to_commit is not None or self._from_tag is not \
-                    None or self._to_tag is not None:
+            if not self._check_filters_none([self._since,
+                                             self._to,
+                                             self._from_commit,
+                                             self._to_commit,
+                                             self._from_tag,
+                                             self._to_tag]):
                 raise Exception('You can not specify a single commit with '
                                 'other filters')
 
         # If from_commit is defined, since should not be
         if self._from_commit is not None:
-            if self._since is not None:
+            if not self._check_filters_none([self._since, self._from_tag]):
                 raise Exception('You can not specify both <since date> '
                                 'and <from commit>')
             self._since = git_repo.get_commit(self._from_commit).committer_date
 
-        # If to_commit is defined, to should not be
-        if self._to_commit is not None:
-            if self._to is not None:
-                raise Exception('You can not specify both <to date> '
-                                'and <to commit>')
-            self._to = git_repo.get_commit(self._to_commit).committer_date
-
         # If from_tag is defined, since and from_commit should not be
         if self._from_tag is not None:
-            if self._since is not None or self._from_commit is not None:
+            if not self._check_filters_none([self._since, self._from_commit]):
                 raise Exception('You can not specify <since date> or '
                                 '<from commit> when using <from tag>')
             self._since = git_repo.get_commit_from_tag(
                 self._from_tag).committer_date
 
+        # If to_commit is defined, to should not be
+        if self._to_commit is not None:
+            if not self._check_filters_none([self._to, self._to_tag]):
+                raise Exception('You can not specify both <to date> '
+                                'and <to commit>')
+            self._to = git_repo.get_commit(self._to_commit).committer_date
+
         # If to_tag is defined, to and to_commit should not be
         if self._to_tag is not None:
-            if self._to is not None or self._to_commit is not None:
+            if not self._check_filters_none([self._to, self._to_commit]):
                 raise Exception('You can not specify <to date> or <to commit> '
                                 'when using <to tag>')
             self._to = git_repo.get_commit_from_tag(
                 self._to_tag).committer_date
+
+    def _check_filters_none(self, filters: List):
+        for filter in filters:
+            if filter is not None:
+                return False
+        return True
 
     def _isremote(self, repo: str) -> bool:
         return repo.startswith("git@") or repo.startswith("https://")
@@ -206,11 +213,10 @@ class RepositoryMining:
                 yield commit
 
     def _is_commit_filtered(self, commit: Commit):  # pylint: disable=R0911
-        if self._single is not None:
-            if commit.hash != self._single:
-                logger.debug(
-                    'Commit filtered because is not the defined in single')
-                return True
+        if self._single is not None and commit.hash != self._single:
+            logger.debug(
+                'Commit filtered because is not the defined in single')
+            return True
         if (self._since is not None and commit.committer_date < self._since) \
                 or (self._to is not None and commit.committer_date > self._to):
             return True

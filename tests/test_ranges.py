@@ -17,7 +17,7 @@ import logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 import pytest
-from pydriller.repository_mining import RepositoryMining
+from pydriller.repository import Repository
 from datetime import datetime, timezone, timedelta
 
 to_zone = timezone(timedelta(hours=1))
@@ -65,17 +65,17 @@ def to_tag():
 
 @pytest.fixture
 def repository_mining_st(path, since, to):
-    return list(RepositoryMining(path, since=since, to=to).traverse_commits())
+    return list(Repository(path, since=since, to=to).traverse_commits())
 
 
 @pytest.fixture
 def repository_mining_cc(path, from_commit, to_commit):
-    return list(RepositoryMining(path, from_commit=from_commit, to_commit=to_commit).traverse_commits())
+    return list(Repository(path, from_commit=from_commit, to_commit=to_commit).traverse_commits())
 
 
 @pytest.fixture
 def repository_mining_tt(path, from_tag, to_tag):
-    return list(RepositoryMining(path, from_tag=from_tag, to_tag=to_tag).traverse_commits())
+    return list(Repository(path, from_tag=from_tag, to_tag=to_tag).traverse_commits())
 
 
 @pytest.mark.parametrize('to,expected_commits', [
@@ -150,27 +150,40 @@ def test_multiple_filters_exceptions():
     from_tag = 'v1.4'
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/', from_commit=from_commit,
-                                       from_tag=from_tag).traverse_commits():
+        for commit in Repository('test-repos/test1/',
+                                 since=dt2,
+                                 from_commit=from_commit
+                                 ).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/', since=dt2, from_commit=from_commit).traverse_commits():
+        for commit in Repository('test-repos/test1/',
+                                 since=dt2,
+                                 from_tag=from_tag).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/', since=dt2, from_tag=from_tag).traverse_commits():
+        for commit in Repository('test-repos/test1/',
+                                 from_commit=from_commit,
+                                 from_tag=from_tag).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/', to=dt2, to_tag=from_tag).traverse_commits():
+        for commit in Repository('test-repos/test1/',
+                                 to=dt2,
+                                 to_commit=from_commit
+                                 ).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/', single=from_commit, to=dt2,
-                                       to_tag=from_tag).traverse_commits():
+        for commit in Repository('test-repos/test1/',
+                                 to=dt2,
+                                 to_tag=from_tag).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/', to_commit=from_commit, to=dt2).traverse_commits():
+        for commit in Repository('test-repos/test1/',
+                                 single=from_commit,
+                                 to=dt2,
+                                 to_tag=from_tag).traverse_commits():
             print(commit.hash)

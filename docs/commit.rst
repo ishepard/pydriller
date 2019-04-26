@@ -8,7 +8,7 @@ A Commit contains a hash, a committer (name and email), an author (name, and ema
 
 For example::
 
-    for commit in RepositoryMining('path/to/the/repo').traverse_commits():
+    for commit in Repository('path/to/the/repo').traverse_commits():
         print(
             'Hash: {}\n'.format(commit.hash),
             'Author: {}'.format(commit.author.name),

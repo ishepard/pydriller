@@ -16,11 +16,11 @@ import logging
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-from pydriller.repository_mining import RepositoryMining
+from pydriller.repository import Repository
 
 
 def test_mod_with_file_types():
-    lc = list(RepositoryMining('test-repos/git-7/', only_modifications_with_file_types=['.java']).traverse_commits())
+    lc = list(Repository('test-repos/git-7/', only_modifications_with_file_types=['.java']).traverse_commits())
 
     assert len(lc) == 2
     assert lc[0].hash == '5adbb71167e79ab6b974827e74c9da4d81977655'

@@ -25,7 +25,7 @@ if 'TRAVIS' in os.environ:
     logging.basicConfig(level=logging.WARNING)
     webhook_url = os.environ['WEBHOOK_URL']
 
-from pydriller.repository import Repository
+from pydriller.repository_mining import RepositoryMining
 from datetime import datetime
 
 
@@ -109,9 +109,9 @@ def mine(_type):
     all_commits = []
 
     start = datetime.now()
-    for commit in Repository('test-repos/hadoop',
-                             since=dt1,
-                             to=dt2).traverse_commits():
+    for commit in RepositoryMining('test-repos/hadoop',
+                                   since=dt1,
+                                   to=dt2).traverse_commits():
         memory = p.memory_info()[0] / (2 ** 20)
         all_commits.append(memory)
 

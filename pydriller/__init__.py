@@ -1,3 +1,3 @@
 # pylint: disable=C0111
 from .domain.commit import Commit
-from .repository import Repository, GitRepository
+from .repository_mining import RepositoryMining, GitRepository

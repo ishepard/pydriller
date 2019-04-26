@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-This module includes 1 class, Repository, main class of PyDriller.
+This module includes 1 class, RepositoryMining, main class of PyDriller.
 """
 
 import logging
@@ -31,7 +31,7 @@ from pydriller.git_repository import GitRepository
 logger = logging.getLogger(__name__)
 
 
-class Repository:
+class RepositoryMining:
     """
     This is the main class of PyDriller, responsible for running the study.
     """

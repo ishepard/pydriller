@@ -21,7 +21,7 @@ You can get the list of modified files, as well as their diffs and current sourc
 
 For example::
 
-    for commit in Repository('path/to/the/repo').traverse_commits():
+    for commit in RepositoryMining('path/to/the/repo').traverse_commits():
         for m in commit.modifications:
             print(
                 "Author {}".format(commit.author.name),

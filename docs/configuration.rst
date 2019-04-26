@@ -8,11 +8,11 @@ One of the main advantage of using PyDriller to mine software repositories, is t
 
 Selecting projects to analyze
 =============================
-The only required parameter of `Repository` is **path_to_repo**, which specifies the repo(s) to analyze. It must be of type `str` or `List[str]`, meaning analyze only one repository or more than one.
+The only required parameter of `RepositoryMining` is **path_to_repo**, which specifies the repo(s) to analyze. It must be of type `str` or `List[str]`, meaning analyze only one repository or more than one.
 
 Furthermore, PyDriller supports both local and remote repositories: if you pass an URL, PyDriller will automatically create a temporary folder, clone the repository, run the study, and finally delete the temporary folder. 
 
-For example, the following are all possible inputs for `Repository`::
+For example, the following are all possible inputs for `RepositoryMining`::
     
     # analyze only 1 local repository
     url = "repos/pydriller/" 
@@ -31,7 +31,7 @@ To keep track of what project PyDriller is analyzing, the `Commit` object has a 
 Selecting the Commit Range
 ==========================
 
-By default, PyDriller analyzes all the commits in the repository. However, filters can be applied to `Repository` to visit *only specific* commits.
+By default, PyDriller analyzes all the commits in the repository. However, filters can be applied to `RepositoryMining` to visit *only specific* commits.
 
 * **single** *(str)*: single hash of the commit. The visitor will be called only on this commit
 
@@ -54,27 +54,27 @@ By default, PyDriller analyzes all the commits in the repository. However, filte
 Examples::
 
     # Analyze single commit
-    Repository('path/to/the/repo', single='6411e3096dd2070438a17b225f44475136e54e3a').traverse_commits()
+    RepositoryMining('path/to/the/repo', single='6411e3096dd2070438a17b225f44475136e54e3a').traverse_commits()
 
     # Since 8/10/2016
-    Repository('path/to/the/repo', since=datetime(2016, 10, 8, 17, 0, 0)).traverse_commits()
+    RepositoryMining('path/to/the/repo', since=datetime(2016, 10, 8, 17, 0, 0)).traverse_commits()
 
     # Between 2 dates
     dt1 = datetime(2016, 10, 8, 17, 0, 0)
     dt2 = datetime(2016, 10, 8, 17, 59, 0)
-    Repository('path/to/the/repo', since=dt1, to=dt2).traverse_commits()
+    RepositoryMining('path/to/the/repo', since=dt1, to=dt2).traverse_commits()
 
     # Between tags
     from_tag = 'tag1'
     to_tag = 'tag2'
-    Repository('path/to/the/repo', from_tag=from_tag, to_tag=to_tag).traverse_commits()
+    RepositoryMining('path/to/the/repo', from_tag=from_tag, to_tag=to_tag).traverse_commits()
 
     # Up to a date
     dt1 = datetime(2016, 10, 8, 17, 0, 0, tzinfo=to_zone)
-    Repository('path/to/the/repo', to=dt1).traverse_commits()
+    RepositoryMining('path/to/the/repo', to=dt1).traverse_commits()
 
     # !!!!! ERROR !!!!! THIS IS NOT POSSIBLE
-    Repository('path/to/the/repo', from_tag=from_tag, from_commit=from_commit).traverse_commits()
+    RepositoryMining('path/to/the/repo', from_tag=from_tag, from_commit=from_commit).traverse_commits()
 
 **IMPORTANT**: it is **not** possible to configure more than one filter of the same category (for example, more than one *from*). It is also **not** possible to have the *single* filter together with other filters!
 
@@ -94,22 +94,22 @@ PyDriller comes with a set of common commit filters that you can apply:
 Examples::
 
     # Only commits in branch1
-    Repository('path/to/the/repo', only_in_branch='branch1').traverse_commits()
+    RepositoryMining('path/to/the/repo', only_in_branch='branch1').traverse_commits()
 
     # Only commits in branch1 and no merges
-    Repository('path/to/the/repo', only_in_branch='branch1', only_no_merge=True).traverse_commits()
+    RepositoryMining('path/to/the/repo', only_in_branch='branch1', only_no_merge=True).traverse_commits()
 
     # Only commits of author "ishepard" (yeah, that's me)
-    Repository('path/to/the/repo', only_authors=['ishepard']).traverse_commits()
+    RepositoryMining('path/to/the/repo', only_authors=['ishepard']).traverse_commits()
 
     # Only these 3 commits
-    Repository('path/to/the/repo', only_commits=['hash1', 'hash2', 'hash3']).traverse_commits()
+    RepositoryMining('path/to/the/repo', only_commits=['hash1', 'hash2', 'hash3']).traverse_commits()
 
     # Only commit that modified "Matricula.javax" 
-    Repository('path/to/the/repo', filepath='Matricula.javax').traverse_commits()
+    RepositoryMining('path/to/the/repo', filepath='Matricula.javax').traverse_commits()
 
     # Only commits that modified a java file
-    Repository('path/to/the/repo', only_modifications_with_file_types=['.java']).traverse_commits()
+    RepositoryMining('path/to/the/repo', only_modifications_with_file_types=['.java']).traverse_commits()
 
 
 

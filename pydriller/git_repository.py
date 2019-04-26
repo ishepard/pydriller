@@ -39,7 +39,7 @@ class GitRepository:
 
     def __init__(self, path: str):
         """
-        Init the Git Repository.
+        Init the Git RepositoryMining.
 
         :param str path: path to the repository
         """

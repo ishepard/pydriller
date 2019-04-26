@@ -189,6 +189,11 @@ class GitRepository:
             raise
 
     def get_tagged_commits(self):
+        """
+        Obtain the hash of all the tagged commits.
+
+        :return: list of tagged commits (can be empty if there are no tags)
+        """
         tags = []
         for tag in self.repo.tags:
             if tag.commit:

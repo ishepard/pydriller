@@ -124,8 +124,7 @@ class RepositoryMining:
                                              self._from_commit,
                                              self._to_commit,
                                              self._from_tag,
-                                             self._to_tag,
-                                             self._only_releases]):
+                                             self._to_tag]):
                 raise Exception('You can not specify a single commit with '
                                 'other filters')
 

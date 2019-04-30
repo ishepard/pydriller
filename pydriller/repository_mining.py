@@ -52,17 +52,14 @@ class RepositoryMining:
                  filepath: str = None):
         """
         Init a repository mining. The only required parameter is
-        "path_to_repo": to analyze a
-        single repo, pass the absolute path to the repo; if you need to
-        analyze more
-        repos, pass a list of absolute paths.
+        "path_to_repo": to analyze a single repo, pass the absolute path to
+        the repo; if you need to analyze more repos, pass a list of absolute
+        paths.
 
         Furthermore, PyDriller supports local and remote repositories: if
-        you pass a path to a
-        repo, PyDriller will run the study on that repo; if you pass an URL,
-        PyDriller will clone
-        the repo in a temporary folder, run the study, and delete the
-        temporary folder.
+        you pass a path to a repo, PyDriller will run the study on that
+        repo; if you pass an URL, PyDriller will clone the repo in a
+        temporary folder, run the study, and delete the temporary folder.
 
         :param Union[str,List[str]] path_to_repo: absolute path (or list of
             absolute paths) to the repository(ies) to analyze
@@ -159,8 +156,8 @@ class RepositoryMining:
                 self._to_tag).committer_date
 
     def _check_filters_none(self, filters: List):
-        for filter in filters:
-            if filter is not None:
+        for filt in filters:
+            if filt is not None:
                 return False
         return True
 

@@ -43,8 +43,10 @@ def test_list_commits():
     assert gr is not None
     change_sets = list(gr.get_list_commits())
 
-    list_commits = ['a88c84ddf42066611e76e6cb690144e5357d132c', '6411e3096dd2070438a17b225f44475136e54e3a',
-                    '09f6182cef737db02a085e1d018963c7a29bde5a', '1f99848edadfffa903b8ba1286a935f1b92b2845',
+    list_commits = ['a88c84ddf42066611e76e6cb690144e5357d132c',
+                    '6411e3096dd2070438a17b225f44475136e54e3a',
+                    '09f6182cef737db02a085e1d018963c7a29bde5a',
+                    '1f99848edadfffa903b8ba1286a935f1b92b2845',
                     'da39b1326dbc2edfe518b90672734a08f3c13458']
 
     for commit in change_sets:
@@ -61,7 +63,8 @@ def test_get_commit():
     assert c.hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
     assert c.author.name == 'ishepard'
     assert c.committer.name == 'ishepard'
-    assert c.author_date.timestamp() == datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone).timestamp()
+    assert c.author_date.timestamp() == datetime(2018, 3, 22, 10, 42, 3,
+                                                 tzinfo=to_zone).timestamp()
     assert len(c.modifications) == 1
     assert c.msg == 'Ooops file2'
     assert c.in_main_branch is True
@@ -75,8 +78,10 @@ def test_get_first_commit():
     assert c.hash == 'a88c84ddf42066611e76e6cb690144e5357d132c'
     assert c.author.name == 'ishepard'
     assert c.committer.name == 'ishepard'
-    assert c.author_date.timestamp() == datetime(2018, 3, 22, 10, 41, 11, tzinfo=to_zone).timestamp()
-    assert c.committer_date.timestamp() == datetime(2018, 3, 22, 10, 41, 11, tzinfo=to_zone).timestamp()
+    assert c.author_date.timestamp() == datetime(2018, 3, 22, 10, 41, 11,
+                                                 tzinfo=to_zone).timestamp()
+    assert c.committer_date.timestamp() == datetime(2018, 3, 22, 10, 41, 11,
+                                                    tzinfo=to_zone).timestamp()
     assert len(c.modifications) == 2
     assert c.msg == 'First commit adding 2 files'
     assert c.in_main_branch is True
@@ -413,3 +418,22 @@ def test_get_commits_modified_file_missing_file():
     commits = gr.get_commits_modified_file('non-existing-file.java')
 
     assert len(commits) == 0
+
+
+def test_get_tagged_commits():
+    gr = GitRepository('test-repos/git-8/')
+
+    tagged_commits = gr.get_tagged_commits()
+
+    assert len(tagged_commits) == 3
+    assert '6bb9e2c6a8080e6b5b34e6e316c894b2ddbf7fcd' == tagged_commits[0]
+    assert '4638730126d40716e230c2040751a13153fb1556' == tagged_commits[1]
+    assert '627e1ad917a188a861c9fedf6e5858b79edbe439' == tagged_commits[2]
+
+
+def test_get_tagged_commits_wo_tags():
+    gr = GitRepository('test-repos/git-7/')
+
+    tagged_commits = gr.get_tagged_commits()
+
+    assert len(tagged_commits) == 0

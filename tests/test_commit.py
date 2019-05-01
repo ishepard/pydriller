@@ -22,7 +22,7 @@ logging.basicConfig(
 import pytest
 from pathlib import Path
 from pydriller.git_repository import GitRepository
-
+from datetime import timezone
 
 @pytest.yield_fixture(scope="module")
 def resource():
@@ -44,11 +44,14 @@ def test_filename():
         'diff': '',
         'source_code': ''
     }
-    m1 = Modification('dspadini/pydriller/myfile.py', 'dspadini/pydriller/mynewfile.py',
+    m1 = Modification('dspadini/pydriller/myfile.py',
+                      'dspadini/pydriller/mynewfile.py',
                       ModificationType.ADD, diff_and_sc)
-    m3 = Modification('dspadini/pydriller/myfile.py', 'dspadini/pydriller/mynewfile.py',
+    m3 = Modification('dspadini/pydriller/myfile.py',
+                      'dspadini/pydriller/mynewfile.py',
                       ModificationType.ADD, diff_and_sc)
-    m2 = Modification('dspadini/pydriller/myfile.py', None,
+    m2 = Modification('dspadini/pydriller/myfile.py',
+                      None,
                       ModificationType.ADD, diff_and_sc)
 
     assert m1.filename == 'mynewfile.py'
@@ -66,7 +69,8 @@ def test_metrics_python():
         'source_code': sc
     }
 
-    m1 = Modification('test-repos/test6/git_repository.py', "test-repos/test6/git_repository.py",
+    m1 = Modification('test-repos/test6/git_repository.py',
+                      "test-repos/test6/git_repository.py",
                       ModificationType.MODIFY, diff_and_sc)
 
     assert m1.nloc == 196
@@ -85,7 +89,8 @@ def test_metrics_cpp():
         'source_code': sc
     }
 
-    m1 = Modification('test-repos/test6/FileCPP.cpp', "test-repos/test6/FileCPP.cpp",
+    m1 = Modification('test-repos/test6/FileCPP.cpp',
+                      "test-repos/test6/FileCPP.cpp",
                       ModificationType.MODIFY, diff_and_sc)
 
     assert m1.nloc == 793
@@ -104,7 +109,8 @@ def test_metrics_java():
         'source_code': sc
     }
 
-    m1 = Modification('test-repos/test6/FileJava.java', "test-repos/test6/FileJava.java",
+    m1 = Modification('test-repos/test6/FileJava.java',
+                      "test-repos/test6/FileJava.java",
                       ModificationType.MODIFY, diff_and_sc)
 
     assert m1.nloc == 466
@@ -122,7 +128,8 @@ def test_metrics_not_supported_file():
         'source_code': sc
     }
 
-    m1 = Modification('test-repos/test6/NotSupported.pdf', "test-repos/test6/NotSupported.pdf",
+    m1 = Modification('test-repos/test6/NotSupported.pdf',
+                      "test-repos/test6/NotSupported.pdf",
                       ModificationType.MODIFY, diff_and_sc)
 
     assert m1.nloc == 2
@@ -154,3 +161,49 @@ def test_modification_type_unknown():
     mod0 = c.modifications[0]
 
     assert mod0.change_type.name == 'UNKNOWN'
+
+
+def test_eq_commit():
+    gr = GitRepository('test-repos/git-11')
+    c1 = gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
+    c2 = gr.get_commit('2c1327f957ba3b2a5e86eaed097b0a425236719e')
+    c3 = gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
+    m1 = gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc'
+                       '').modifications[0]
+    assert c1 == c3
+    assert c1 == c1
+    assert c1 != m1
+    assert c1 != c2
+
+
+def test_eq_modifications():
+    gr = GitRepository('test-repos/git-1')
+    m1 = gr.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
+                       '').modifications[0]
+    m2 = gr.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
+                       '').modifications[0]
+    m3 = gr.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58'
+                       '').modifications[0]
+    c1 = gr.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58')
+
+    assert m1 == m2
+    assert m1 == m1
+    assert m1 != m3
+    assert m1 != c1
+
+def test_tzoffset():
+    gr = GitRepository('test-repos/git-1')
+    tz1 = gr.get_commit(
+        'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2').author_timezone
+    tz2 = gr.get_commit(
+        'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2').committer_timezone
+    assert tz1 == 10800 # -3 hours
+    assert tz2 == 10800 # -3 hours
+
+    gr = GitRepository('test-repos/test1')
+    tz1 = gr.get_commit(
+        'da39b1326dbc2edfe518b90672734a08f3c13458').author_timezone
+    tz2 = gr.get_commit(
+        'da39b1326dbc2edfe518b90672734a08f3c13458').committer_timezone
+    assert tz1 == -7200 # +2 hours
+    assert tz2 == -7200 # +2 hours

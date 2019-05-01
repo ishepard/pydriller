@@ -188,6 +188,18 @@ class GitRepository:
             logger.debug('Tag %s not found', tag)
             raise
 
+    def get_tagged_commits(self):
+        """
+        Obtain the hash of all the tagged commits.
+
+        :return: list of tagged commits (can be empty if there are no tags)
+        """
+        tags = []
+        for tag in self.repo.tags:
+            if tag.commit:
+                tags.append(tag.commit.hexsha)
+        return tags
+
     def parse_diff(self, diff: str) -> Dict[str, List[Tuple[int, str]]]:
         """
         Given a diff, returns a dictionary with the added and deleted lines.

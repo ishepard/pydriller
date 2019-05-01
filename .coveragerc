@@ -11,3 +11,4 @@ ignore_errors = True
 include = */pydriller/*
 omit =
     tests/*
+    */__init__.py/*

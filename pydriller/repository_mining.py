@@ -48,20 +48,18 @@ class RepositoryMining:
                  only_no_merge: bool = False,
                  only_authors: List[str] = None,
                  only_commits: List[str] = None,
+                 only_releases: bool = False,
                  filepath: str = None):
         """
         Init a repository mining. The only required parameter is
-        "path_to_repo": to analyze a
-        single repo, pass the absolute path to the repo; if you need to
-        analyze more
-        repos, pass a list of absolute paths.
+        "path_to_repo": to analyze a single repo, pass the absolute path to
+        the repo; if you need to analyze more repos, pass a list of absolute
+        paths.
 
         Furthermore, PyDriller supports local and remote repositories: if
-        you pass a path to a
-        repo, PyDriller will run the study on that repo; if you pass an URL,
-        PyDriller will clone
-        the repo in a temporary folder, run the study, and delete the
-        temporary folder.
+        you pass a path to a repo, PyDriller will run the study on that
+        repo; if you pass an URL, PyDriller will clone the repo in a
+        temporary folder, run the study, and delete the temporary folder.
 
         :param Union[str,List[str]] path_to_repo: absolute path (or list of
             absolute paths) to the repository(ies) to analyze
@@ -104,8 +102,10 @@ class RepositoryMining:
         self._only_no_merge = only_no_merge
         self._only_authors = only_authors
         self._only_commits = only_commits
+        self._only_releases = only_releases
         self._filepath = filepath
         self._filepath_commits = None
+        self._tagged_commits = None
 
     def _sanity_check_repos(self, path_to_repo):
         if not isinstance(path_to_repo, str) and \
@@ -156,8 +156,8 @@ class RepositoryMining:
                 self._to_tag).committer_date
 
     def _check_filters_none(self, filters: List):
-        for filter in filters:
-            if filter is not None:
+        for filt in filters:
+            if filt is not None:
                 return False
         return True
 
@@ -200,6 +200,9 @@ class RepositoryMining:
                 self._filepath_commits = git_repo.get_commits_modified_file(
                     self._filepath)
 
+            if self._only_releases:
+                self._tagged_commits = git_repo.get_tagged_commits()
+
             for commit in git_repo.get_list_commits(self._only_in_branch,
                                                     not self._reversed_order):
                 logger.info('Commit #%s in %s from %s', commit.hash,
@@ -240,6 +243,10 @@ class RepositoryMining:
                 self._filepath_commits:
             logger.debug("Commit filtered because it did not modify the "
                          "specified file")
+            return True
+        if self._tagged_commits is not None and commit.hash not in \
+                self._tagged_commits:
+            logger.debug("Commit filtered because it is not tagged")
             return True
 
         return False

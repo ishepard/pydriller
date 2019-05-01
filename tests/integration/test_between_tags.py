@@ -23,7 +23,9 @@ def test_between_revisions():
     from_tag = 'tag1'
     to_tag = 'tag3'
 
-    lc = list(RepositoryMining('test-repos/git-8/', from_tag=from_tag, to_tag=to_tag).traverse_commits())
+    lc = list(RepositoryMining('test-repos/git-8/',
+                               from_tag=from_tag,
+                               to_tag=to_tag).traverse_commits())
 
     assert len(lc) == 5
     assert '6bb9e2c6a8080e6b5b34e6e316c894b2ddbf7fcd' == lc[0].hash

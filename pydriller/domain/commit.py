@@ -226,7 +226,7 @@ class Modification:  # pylint: disable=R0902
             return True
         return self.__dict__ == other.__dict__
 
-    def __str__(self):
+    def __str__(self): # pragma: no cover
         return (
             'MODIFICATION\n' +
             'Old Path: {}\n'.format(self.old_path) +
@@ -466,7 +466,7 @@ class Commit:
 
         return self.__dict__ == other.__dict__
 
-    def __str__(self):
+    def __str__(self): # pragma: no cover
         return (
             'Hash: {}\n'.format(self.hash) +
             'Author: {}\n'.format(self.author.name) +

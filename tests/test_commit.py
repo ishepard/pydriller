@@ -162,6 +162,15 @@ def test_modification_type_unknown():
 
     assert mod0.change_type.name == 'UNKNOWN'
 
+    
+def test_modification_with_more_parents():
+    gr = GitRepository('test-repos/test11')
+    c = gr.get_commit('ce6bcd987a6a53cc55da7cef9f8bb128adf68741')
+    assert len(c.modifications) == 0
+
+    c = gr.get_commit('1b03d13c816f576eb82a8c3e935fbcacff6c2e8d')
+    assert len(c.modifications) == 0
+
 
 def test_eq_commit():
     gr = GitRepository('test-repos/git-11')

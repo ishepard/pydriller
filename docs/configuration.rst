@@ -31,7 +31,7 @@ To keep track of what project PyDriller is analyzing, the `Commit` object has a 
 Selecting the Commit Range
 ==========================
 
-By default, PyDriller analyzes all the commits in the repository. However, filters can be applied to `RepositoryMining` to visit *only specific* commits. 
+By default, PyDriller analyzes all the commits in the repository. However, filters can be applied to `RepositoryMining` to visit *only specific* commits.
 
 * **single** *(str)*: single hash of the commit. The visitor will be called only on this commit
 

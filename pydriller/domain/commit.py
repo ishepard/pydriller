@@ -226,7 +226,7 @@ class Modification:  # pylint: disable=R0902
             return True
         return self.__dict__ == other.__dict__
 
-    def __str__(self):
+    def __str__(self): # pragma: no cover
         return (
             'MODIFICATION\n' +
             'Old Path: {}\n'.format(self.old_path) +
@@ -250,7 +250,7 @@ class Commit:
 
         :param commit: GitPython Commit object
         :param project_path: path to the project (temporary folder in case
-        of a remote repository)
+            of a remote repository)
         :param main_branch: main branch of the repo
         """
         self._c_object = commit
@@ -441,9 +441,9 @@ class Commit:
         return self._branches
 
     def _get_branches(self):
-        git = Git(str(self.project_path))
+        c_git = Git(str(self.project_path))
         branches = set()
-        for branch in set(git.branch('--contains', self.hash).split('\n')):
+        for branch in set(c_git.branch('--contains', self.hash).split('\n')):
             branches.add(branch.strip().replace('* ', ''))
         return branches
 
@@ -468,7 +468,7 @@ class Commit:
 
         return self.__dict__ == other.__dict__
 
-    def __str__(self):
+    def __str__(self): # pragma: no cover
         return (
             'Hash: {}\n'.format(self.hash) +
             'Author: {}\n'.format(self.author.name) +

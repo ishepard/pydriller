@@ -39,7 +39,7 @@ class GitRepository:
 
     def __init__(self, path: str):
         """
-        Init the Git Repository.
+        Init the Git RepositoryMining.
 
         :param str path: path to the repository
         """
@@ -94,7 +94,7 @@ class GitRepository:
         Return a generator of commits of all the commits in the repo.
 
         :return: Generator[Commit], the generator of all the commits in the
-        repo
+            repo
         """
         for commit in self.repo.iter_commits(branch, reverse=reverse_order):
             yield self.get_commit_from_gitpython(commit)
@@ -187,6 +187,18 @@ class GitRepository:
         except (IndexError, AttributeError):
             logger.debug('Tag %s not found', tag)
             raise
+
+    def get_tagged_commits(self):
+        """
+        Obtain the hash of all the tagged commits.
+
+        :return: list of tagged commits (can be empty if there are no tags)
+        """
+        tags = []
+        for tag in self.repo.tags:
+            if tag.commit:
+                tags.append(tag.commit.hexsha)
+        return tags
 
     def parse_diff(self, diff: str) -> Dict[str, List[Tuple[int, str]]]:
         """

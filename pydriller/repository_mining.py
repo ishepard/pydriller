@@ -48,48 +48,41 @@ class RepositoryMining:
                  only_no_merge: bool = False,
                  only_authors: List[str] = None,
                  only_commits: List[str] = None,
+                 only_releases: bool = False,
                  filepath: str = None):
         """
         Init a repository mining. The only required parameter is
-        "path_to_repo": to analyze a
-        single repo, pass the absolute path to the repo; if you need to
-        analyze more
-        repos, pass a list of absolute paths.
+        "path_to_repo": to analyze a single repo, pass the absolute path to
+        the repo; if you need to analyze more repos, pass a list of absolute
+        paths.
 
         Furthermore, PyDriller supports local and remote repositories: if
-        you pass a path to a
-        repo, PyDriller will run the study on that repo; if you pass an URL,
-        PyDriller will clone
-        the repo in a temporary folder, run the study, and delete the
-        temporary folder.
+        you pass a path to a repo, PyDriller will run the study on that
+        repo; if you pass an URL, PyDriller will clone the repo in a
+        temporary folder, run the study, and delete the temporary folder.
 
         :param Union[str,List[str]] path_to_repo: absolute path (or list of
-        absolute paths) to
-        the repository(ies) to analyze
+            absolute paths) to the repository(ies) to analyze
         :param str single: hash of a single commit to analyze
         :param datetime since: starting date
         :param datetime to: ending date
         :param str from_commit: starting commit (only if `since` is None)
         :param str to_commit: ending commit (only if `to` is None)
         :param str from_tag: starting the analysis from specified tag (only
-        if `since` and
-        `from_commit` are None)
+            if `since` and `from_commit` are None)
         :param str to_tag: ending the analysis from specified tag (only if
-        `to` and `to_commit`
-        are None)
+            `to` and `to_commit` are None)
         :param bool reversed_order: whether the commits should be analyzed
-        in reversed order
+            in reversed order
         :param str only_in_branch: only commits in this branch will be analyzed
         :param List[str] only_modifications_with_file_types: only
-        modifications with that file
-        types will be analyzed
+            modifications with that file types will be analyzed
         :param bool only_no_merge: if True, merges will not be analyzed
         :param List[str] only_authors: only commits of these authors will be
-        analyzed (the check
-        is done on the username, NOT the email)
+            analyzed (the check is done on the username, NOT the email)
         :param List[str] only_commits: only these commits will be analyzed
         :param str filepath: only commits that modified this file will be
-        analyzed
+            analyzed
         """
 
         self._sanity_check_repos(path_to_repo)
@@ -109,8 +102,10 @@ class RepositoryMining:
         self._only_no_merge = only_no_merge
         self._only_authors = only_authors
         self._only_commits = only_commits
+        self._only_releases = only_releases
         self._filepath = filepath
         self._filepath_commits = None
+        self._tagged_commits = None
 
     def _sanity_check_repos(self, path_to_repo):
         if not isinstance(path_to_repo, str) and \
@@ -121,43 +116,50 @@ class RepositoryMining:
     def _sanity_check_filters(self, git_repo: GitRepository):
         # If single is defined, no other filters should be
         if self._single is not None:
-            # pylint: disable=R0916
-            if self._since is not None or self._to is not None or \
-                    self._from_commit is not None or \
-                    self._to_commit is not None or self._from_tag is not \
-                    None or self._to_tag is not None:
+            if not self._check_filters_none([self._since,
+                                             self._to,
+                                             self._from_commit,
+                                             self._to_commit,
+                                             self._from_tag,
+                                             self._to_tag]):
                 raise Exception('You can not specify a single commit with '
                                 'other filters')
 
         # If from_commit is defined, since should not be
         if self._from_commit is not None:
-            if self._since is not None:
+            if not self._check_filters_none([self._since, self._from_tag]):
                 raise Exception('You can not specify both <since date> '
                                 'and <from commit>')
             self._since = git_repo.get_commit(self._from_commit).committer_date
 
-        # If to_commit is defined, to should not be
-        if self._to_commit is not None:
-            if self._to is not None:
-                raise Exception('You can not specify both <to date> '
-                                'and <to commit>')
-            self._to = git_repo.get_commit(self._to_commit).committer_date
-
         # If from_tag is defined, since and from_commit should not be
         if self._from_tag is not None:
-            if self._since is not None or self._from_commit is not None:
+            if not self._check_filters_none([self._since, self._from_commit]):
                 raise Exception('You can not specify <since date> or '
                                 '<from commit> when using <from tag>')
             self._since = git_repo.get_commit_from_tag(
                 self._from_tag).committer_date
 
+        # If to_commit is defined, to should not be
+        if self._to_commit is not None:
+            if not self._check_filters_none([self._to, self._to_tag]):
+                raise Exception('You can not specify both <to date> '
+                                'and <to commit>')
+            self._to = git_repo.get_commit(self._to_commit).committer_date
+
         # If to_tag is defined, to and to_commit should not be
         if self._to_tag is not None:
-            if self._to is not None or self._to_commit is not None:
+            if not self._check_filters_none([self._to, self._to_commit]):
                 raise Exception('You can not specify <to date> or <to commit> '
                                 'when using <to tag>')
             self._to = git_repo.get_commit_from_tag(
                 self._to_tag).committer_date
+
+    def _check_filters_none(self, filters: List):
+        for filt in filters:
+            if filt is not None:
+                return False
+        return True
 
     def _isremote(self, repo: str) -> bool:
         return repo.startswith("git@") or repo.startswith("https://")
@@ -198,6 +200,9 @@ class RepositoryMining:
                 self._filepath_commits = git_repo.get_commits_modified_file(
                     self._filepath)
 
+            if self._only_releases:
+                self._tagged_commits = git_repo.get_tagged_commits()
+
             for commit in git_repo.get_list_commits(self._only_in_branch,
                                                     not self._reversed_order):
                 logger.info('Commit #%s in %s from %s', commit.hash,
@@ -211,11 +216,10 @@ class RepositoryMining:
                 yield commit
 
     def _is_commit_filtered(self, commit: Commit):  # pylint: disable=R0911
-        if self._single is not None:
-            if commit.hash != self._single:
-                logger.debug(
-                    'Commit filtered because is not the defined in single')
-                return True
+        if self._single is not None and commit.hash != self._single:
+            logger.debug(
+                'Commit filtered because is not the defined in single')
+            return True
         if (self._since is not None and commit.committer_date < self._since) \
                 or (self._to is not None and commit.committer_date > self._to):
             return True
@@ -239,6 +243,10 @@ class RepositoryMining:
                 self._filepath_commits:
             logger.debug("Commit filtered because it did not modify the "
                          "specified file")
+            return True
+        if self._tagged_commits is not None and commit.hash not in \
+                self._tagged_commits:
+            logger.debug("Commit filtered because it is not tagged")
             return True
 
         return False

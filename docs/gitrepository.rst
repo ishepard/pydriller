@@ -1,7 +1,7 @@
 .. _gitrepository_toplevel:
 
 ==============
-Git RepositoryMining
+GitRepository
 ==============
 
 GitRepository is a wrapper for the most common utilities of Git. It receives in input

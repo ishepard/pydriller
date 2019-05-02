@@ -385,7 +385,14 @@ class Commit:
             diff_index = self._c_object.parents[0].diff(commit,
                                                         create_patch=True)
         elif len(self.parents) > 1:
-            diff_index = self._c_object.diff(git.NULL_TREE)
+            # if it's a merge commit, the modified files of the commit are the
+            # conflicts. This because if the file is not in conflict,
+            # pydriller will visit the modification in one of the previous
+            # commits. However, parsing the output of a combined diff (that
+            # returns the list of conflicts) is challenging: so, right now,
+            # I will return an empty array, in the meanwhile I will try to
+            # find a way to parse the output.
+            diff_index = []
         else:
             # this is the first commit of the repo. Comparing it with git
             # NULL TREE

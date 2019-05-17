@@ -414,9 +414,9 @@ class Commit:
             }
 
             try:
-                diff_and_sc['diff'] = diff.diff.decode('utf-8')
-                diff_and_sc['source_code'] = diff.b_blob.data_stream.read()\
-                    .decode('utf-8')
+                diff_and_sc['diff'] = diff.diff.decode('utf-8', 'ignore')
+                diff_and_sc['source_code'] = diff.b_blob.data_stream.read() \
+                    .decode('utf-8', 'ignore')
             except (UnicodeDecodeError, AttributeError, ValueError):
                 logger.debug('Could not load source code or the diff of a '
                              'file in commit %s', self._c_object.hexsha)

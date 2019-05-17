@@ -229,4 +229,34 @@ def test_source_code_before():
     m1 = gr.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71'
                        '').modifications[0]
 
-    print(m1)
+    assert m1.source_code == ''
+    assert m1.source_code_before != ''
+
+
+def test_source_code_before_complete():
+    gr = GitRepository('test-repos/test12')
+    m1 = gr.get_commit('ca1f75455f064410360bc56218d0418221cf9484'
+                       '').modifications[0]
+
+    with open('test-repos/test12/sc_A_ca1f75455f064410360bc56218d0418221cf9484.txt') as f:
+        sc = f.read()
+
+    assert m1.source_code == sc
+    assert m1.source_code_before == ''
+
+    old_sc = sc
+    with open('test-repos/test12/sc_A_022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0.txt') as f:
+        sc = f.read()
+
+    m1 = gr.get_commit('022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0'
+                       '').modifications[0]
+
+    assert m1.source_code == sc
+    assert m1.source_code_before == old_sc
+
+    old_sc = sc
+    m1 = gr.get_commit('ecd6780457835a2fc85c532338a29f2c98a6cfeb'
+                       '').modifications[0]
+
+    assert m1.source_code == ''
+    assert m1.source_code_before == old_sc

@@ -95,6 +95,7 @@ class Modification:  # pylint: disable=R0902
         self.change_type = change_type
         self.diff = diff_and_sc['diff']
         self.source_code = diff_and_sc['source_code']
+        self.source_code_before = diff_and_sc['source_code_before']
 
         self._nloc = None
         self._complexity = None
@@ -233,6 +234,7 @@ class Modification:  # pylint: disable=R0902
             'New Path: {}\n'.format(self.new_path) +
             'Type: {}\n'.format(self.change_type.name) +
             'Diff: {}\n'.format(self.diff) +
+            'Source code before: {}\n'.format(self.source_code_before) +
             'Source code: {}\n'.format(self.source_code)
         )
 
@@ -392,6 +394,9 @@ class Commit:
             # returns the list of conflicts) is challenging: so, right now,
             # I will return an empty array, in the meanwhile I will try to
             # find a way to parse the output.
+            # c_git = Git(str(self.project_path))
+            # d = c_git.diff_tree("--cc", commit.hexsha, '-r', '--abbrev=40',
+            #                     '--full-index', '-M', '-p', '--no-color')
             diff_index = []
         else:
             # this is the first commit of the repo. Comparing it with git
@@ -409,22 +414,33 @@ class Commit:
             change_type = self._from_change_to_modification_type(diff)
 
             diff_and_sc = {
-                'diff': '',
-                'source_code': ''
+                'diff': self._get_decoded_str(diff.diff),
+                'source_code_before': self._get_decoded_sc_str(
+                    diff.a_blob),
+                'source_code': self._get_decoded_sc_str(
+                    diff.b_blob)
             }
-
-            try:
-                diff_and_sc['diff'] = diff.diff.decode('utf-8', 'ignore')
-                diff_and_sc['source_code'] = diff.b_blob.data_stream.read() \
-                    .decode('utf-8', 'ignore')
-            except (UnicodeDecodeError, AttributeError, ValueError):
-                logger.debug('Could not load source code or the diff of a '
-                             'file in commit %s', self._c_object.hexsha)
 
             modifications_list.append(Modification(old_path, new_path,
                                                    change_type, diff_and_sc))
 
         return modifications_list
+
+    def _get_decoded_str(self, diff):
+        try:
+            return diff.decode('utf-8', 'ignore')
+        except (UnicodeDecodeError, AttributeError, ValueError):
+            logger.debug('Could not load the diff of a '
+                         'file in commit %s', self._c_object.hexsha)
+            return None
+
+    def _get_decoded_sc_str(self, diff):
+        try:
+            return diff.data_stream.read().decode('utf-8', 'ignore')
+        except (UnicodeDecodeError, AttributeError, ValueError):
+            logger.debug('Could not load source code of a '
+                         'file in commit %s', self._c_object.hexsha)
+            return None
 
     @property
     def in_main_branch(self) -> bool:

@@ -421,34 +421,26 @@ class Commit:
                     diff.b_blob)
             }
 
-            # try:
-            #     diff_and_sc['diff'] = diff.diff.decode('utf-8', 'ignore')
-            #     diff_and_sc['source_code_before'] = diff.a_blob.data_stream.read().decode('utf-8', 'ignore')
-            #     diff_and_sc['source_code'] = diff.b_blob.data_stream.read().decode('utf-8', 'ignore')
-            # except (UnicodeDecodeError, AttributeError, ValueError):
-            #     logger.debug('Could not load source code or the diff of a '
-            #                  'file in commit %s', self._c_object.hexsha)
-
             modifications_list.append(Modification(old_path, new_path,
                                                    change_type, diff_and_sc))
 
         return modifications_list
 
-    def _get_decoded_str(self, d):
+    def _get_decoded_str(self, diff):
         try:
-            return d.decode('utf-8', 'ignore')
+            return diff.decode('utf-8', 'ignore')
         except (UnicodeDecodeError, AttributeError, ValueError):
             logger.debug('Could not load the diff of a '
                          'file in commit %s', self._c_object.hexsha)
-            return ''
+            return None
 
-    def _get_decoded_sc_str(self, d):
+    def _get_decoded_sc_str(self, diff):
         try:
-            return d.data_stream.read().decode('utf-8', 'ignore')
+            return diff.data_stream.read().decode('utf-8', 'ignore')
         except (UnicodeDecodeError, AttributeError, ValueError):
             logger.debug('Could not load source code of a '
                          'file in commit %s', self._c_object.hexsha)
-            return ''
+            return None
 
     @property
     def in_main_branch(self) -> bool:

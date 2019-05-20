@@ -11,6 +11,7 @@ You can get the list of modified files, as well as their diffs and current sourc
 * **change_type**: type of the change: can be Added, Deleted, Modified, or Renamed.
 * **diff**: diff of the file as Git presents it (e.g., starting with @@ xx,xx @@).
 * **source_code**: source code of the file (can be _None_ if the file is deleted)
+* **source_code_before**: source code of the file before the change (can be _None_ if the file is added)
 * **added**: number of lines added
 * **removed**: number of lines removed
 * **nloc**: Lines Of Code (LOC) of the file

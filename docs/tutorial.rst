@@ -38,4 +38,4 @@ Furthermore, PyDriller can calculate structural metrics of every file changed in
     for commit in RepositoryMining('path/to/the/repo').traverse_commits():
         for mod in commit.modifications:
             print('{} has complexity of {}, and it contains {} methods'.format(
-                  mod.filename, mod.complexity, len(mod.methods))
+                  mod.filename, mod.complexity, len(mod.methods)))

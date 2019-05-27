@@ -4,19 +4,34 @@
 Commit Object
 =============
 
-A Commit contains a hash, a committer (name and email), an author (name, and email), a message, the authored date, committed date, a list of its parent hashes (if it's a merge commit, the commit has two parents), and the list of modification. Furthermore, the commit also contains the project name and path.
+A Commit object has all the information of a Git commit, and much more. More specifically:
 
-For example::
+* **hash** *(str)*: hash of the commit
+* **msg** *(str)*: commit message
+* **author** *(Developer)*: commit author (name, email)
+* **author_date** *(datetime)*: authored date
+* **author_timezone** *(int)*: author timezone (expressed in seconds from epoch)
+* **committer** *(Developer)*: commit committer (name, email) 
+* **committer_date** *(datetime)*: commit date
+* **committer_timezone** *(int)*: commit timezone (expressed in seconds from epoch)
+* **branches** *(List[str])*: List of branches that contain this commit
+* **in_main_branch** *(Bool)*: True if the commit is in the main branch
+* **merge** *(Bool)*: True if the commit is a merge commit
+* **modifications** *(List[Modifications])*: list of modified files in the commit (see :ref:`modifications_toplevel`)
+* **parents** *(Set[str])*: list of the commit parents
+* **project_name** *(str)*: project name 
+* **project_path** *(str)*: project path 
+
+
+Example::
 
     for commit in RepositoryMining('path/to/the/repo').traverse_commits():
         print(
-            'Hash: {}\n'.format(commit.hash),
-            'Author: {}'.format(commit.author.name),
-            'Committer: {}'.format(commit.committer.name),
-            'In project named: {}'.format(commit.project_name),
-            'In path: {}'.format(commit.project_path),
-            'Author date: {}'.format(commit.author_date.strftime("%Y-%m-%d %H:%M:%S")),
-            'Message: {}'.format(commit.msg),
-            'Merge: {}'.format(commit.merge),
-            'In main branch: {}'.format(commit.in_main_branch)
-    )
+            'The commit {} has been modified by {}, '
+            'committed by {} in date {}'.format(
+                commit.hash,
+                commit.author.name,
+                commit.committer.name,
+                commit.committer_date
+            )
+        )

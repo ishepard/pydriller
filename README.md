@@ -21,13 +21,20 @@ PyDriller is a Python framework that helps developers in analyzing Git repositor
 ## How to cite PyDriller
 
 ```
-@inbook{PyDriller,
-	title = "PyDriller: Python Framework for Mining Software Repositories",
-	author = "Spadini, Davide and Aniche, Maur\'{i}cio and Bacchelli, Alberto",
-	year = "2018",
-	doi = "10.1145/3236024.3264598",
-	booktitle = "The 26th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE)",
+@inproceedings{Spadini2018,
+	address = {New York, New York, USA},
+	author = {Spadini, Davide and Aniche, Maur\'{i}cio and Bacchelli, Alberto},
+	booktitle = {Proceedings of the 2018 26th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering - ESEC/FSE 2018},
+	doi = {10.1145/3236024.3264598},
+	isbn = {9781450355735},
+	keywords = {2018,acm reference format,and alberto bacchelli,davide spadini,git,gitpython,maur\'{i}cio aniche,mining software repositories,pydriller,python},
+	pages = {908--911},
+	publisher = {ACM Press},
+	title = {{PyDriller: Python framework for mining software repositories}},
+	url = {http://dl.acm.org/citation.cfm?doid=3236024.3264598},
+	year = {2018}
 }
+
 ```
 
 ## REQUIREMENTS

@@ -11,13 +11,24 @@ PyDriller is a Python framework that helps developers in analyzing Git repositor
 ![Alt Text](https://ishepard.github.io/images/mygif.gif)
 
 ## Table of contents
+* **[How to cite PyDriller](#how-to-cite-pydriller)**
 * **[Requirements](#requirements)**
 * **[Install](#install)**
 * **[Source code](#source-code)**
 * **[Tutorial](#tutorial)**
 * **[How to contribute](#how-to-contribute)**
-* **[How to cite PyDriller](#how-to-cite-pydriller)**
 
+## How to cite PyDriller
+
+```
+@inbook{PyDriller,
+	title = "PyDriller: Python Framework for Mining Software Repositories",
+	author = "Spadini, Davide and Aniche, Maur\'{i}cio and Bacchelli, Alberto",
+	year = "2018",
+	doi = "10.1145/3236024.3264598",
+	booktitle = "The 26th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE)",
+}
+```
 
 ## REQUIREMENTS
 Very few! Just:
@@ -87,21 +98,8 @@ Fork the project and follow the instructions on how to get started with [source 
 - inside you will find many "small repositories" that I manually created to test PyDriller. Choose the one you prefer the most, and test your feature (check the tests I have already written, you'll find inspiration there)
 - if you do not find a repository that is suitable to test your feature, create a new one. **Be careful**: if you create a new one, do not forget to upload a new zip file `test-repos.zip` that includes your new repository, otherwise the tests will fail.
 
-## How to cite PyDriller
-
-```
-@inbook{PyDriller,
-	title = "PyDriller: Python Framework for Mining Software Repositories",
-	abstract = "Software repositories contain historical and valuable information about the overall development of software systems. Mining software repositories (MSR) is nowadays considered one of the most interesting growing fields within software engineering. MSR focuses on extracting and analyzing data available in software repositories to uncover interesting, useful, and actionable information about the system. Even though MSR plays an important role in software engineering research, few tools have been created and made public to support developers in extracting information from Git repository. In this paper, we present PyDriller, a Python Framework that eases the process of mining Git. We compare our tool against the state-of-the-art Python Framework GitPython, demonstrating that PyDriller can achieve the same results with, on average, 50% less LOC and significantly lower complexity.URL: https://github.com/ishepard/pydrillerMaterials: https://doi.org/10.5281/zenodo.1327363Pre-print: https://doi.org/10.5281/zenodo.1327411",
-	author = "Spadini, Davide and Aniche, Maurício and Bacchelli, Alberto",
-	year = "2018",
-	doi = "10.1145/3236024.3264598",
-	booktitle = "The 26th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE)",
-}
-```
-
-This project has received funding from the European Unions’ Horizon 2020 research and innovation programme under the Marie Sklodowska-Curie grant agreement No. 642954.
-
 ## License
 
 This software is licensed under the Apache 2.0 License.
+
+This project has received funding from the European Unions’ Horizon 2020 research and innovation programme under the Marie Sklodowska-Curie grant agreement No. 642954.

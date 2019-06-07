@@ -46,4 +46,4 @@ install:
 build: false
 
 test_script:
-  - pytest -s -v
+  - pytest -s -v tests/

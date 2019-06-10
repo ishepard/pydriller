@@ -11,10 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import os
+import platform
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import pytest
+from git import Repo
 
 from pydriller.domain.commit import ModificationType
 from pydriller.git_repository import GitRepository
@@ -437,3 +440,45 @@ def test_get_tagged_commits_wo_tags():
     tagged_commits = gr.get_tagged_commits()
 
     assert len(tagged_commits) == 0
+
+
+@pytest.fixture(scope="session")
+def depot_tools(tmpdir_factory):
+    gr = GitRepository('test-repos/test5/')
+    if not gr.hyper_blame_available:
+        tmpdir = tmpdir_factory.mktemp("depot_tools")
+        Repo.clone_from(url="https://chromium.googlesource.com/chromium/tools/depot_tools.git", to_path=tmpdir)
+
+        with open(os.path.join(str(tmpdir), 'git_hyper_blame.py'), 'r') as f:
+            git_hyper_blame_script = f.read()
+
+        with open(os.path.join(str(tmpdir), 'git_hyper_blame.py'), 'w') as f:
+            f.write(git_hyper_blame_script.replace('#!/usr/bin/env python', '#!/usr/bin/env python2'))
+
+        if platform.system() == "Windows":
+            os.environ["PATH"] = str(tmpdir) + os.pathsep + os.environ["PATH"]
+        else:
+            os.environ["PATH"] += os.pathsep + str(tmpdir)
+
+
+@pytest.mark.skipif(platform.system() == "Windows", reason="depot_tools is not easy to install on Windows CI")
+def test_get_commits_last_modified_lines_hyper_blame(depot_tools):
+    gr = GitRepository('test-repos/test5/')
+
+    buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('e6d3b38a9ef683e8184eac10a0471075c2808bbd'))
+
+    assert len(buggy_commits) == 1
+    assert '540c7f31c18664a38190fafb6721b5174ff4a166' in buggy_commits
+
+
+@pytest.mark.skipif(platform.system() == "Windows", reason="depot_tools is not easy to install on Windows CI")
+def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(depot_tools, tmpdir):
+    with open(os.path.join(str(tmpdir), "ignore"), "w") as f:
+        f.write("540c7f31c18664a38190fafb6721b5174ff4a166")
+
+    gr = GitRepository('test-repos/test5/')
+
+    buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('e6d3b38a9ef683e8184eac10a0471075c2808bbd'), hashes_to_ignore_path=tmpdir / "ignore")
+
+    assert len(buggy_commits) == 1
+    assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits

@@ -48,6 +48,19 @@ class GitRepository:
         self.main_branch = None
         self.lock = Lock()
 
+        # Try running 'git hyper-blame' on a file in the repo to check if the command is available.
+        try:
+            for f in os.listdir(path):
+                if f == '.git':
+                    continue
+
+                break
+
+            self.git.execute(["git", "hyper-blame", f])
+            self.hyper_blame_available = True
+        except GitCommandError as e:
+            self.hyper_blame_available = False
+
     @property
     def git(self):
         """
@@ -250,7 +263,8 @@ class GitRepository:
         return delete_line_number, additions_line_number
 
     def get_commits_last_modified_lines(self, commit: Commit,
-                                        modification: Modification = None) \
+                                        modification: Modification = None,
+                                        hashes_to_ignore_path: str = None) \
             -> Set[str]:
         """
         Given the Commit object, returns the set of commits that last
@@ -270,8 +284,13 @@ class GitRepository:
 
         :param Commit commit: the commit to analyze
         :param Modification modification: single modification to analyze
+        :param str hashes_to_ignore_path: path to a file containing hashes of
+               commits to ignore
         :return: the set containing all the bug inducing commits
         """
+        if hashes_to_ignore_path is not None:
+            assert self.hyper_blame_available, "Can't ignore hashes if hyper-blame is not available. Install it by cloning depot_tools and adding it to your PATH."
+
         buggy_commits = set()
 
         if modification is not None:
@@ -287,8 +306,14 @@ class GitRepository:
 
             deleted_lines = self.parse_diff(mod.diff)['deleted']
             try:
-                blame = self.git.blame('-w', commit.hash + '^',
-                                       '--', path).split('\n')
+                if not self.hyper_blame_available:
+                    blame = self.git.blame('-w', commit.hash + '^',
+                                           '--', path).split('\n')
+                else:
+                    cmd = ["git", "hyper-blame", commit.hash + '^', path]
+                    if hashes_to_ignore_path is not None:
+                        cmd.append("--ignore-file={}".format(hashes_to_ignore_path))
+                    blame = self.git.execute(cmd).split('\n')
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):
                         buggy_commit = blame[num_line - 1].split(' ')[

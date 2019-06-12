@@ -11,10 +11,10 @@ matrix:
       dist: xenial
       sudo: required
 before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y python
   - unzip test-repos.zip
-  - cd test-repos
-  - git clone https://github.com/apache/hadoop.git
-  - cd ..
+  - git clone https://github.com/apache/hadoop.git test-repos/hadoop
 install:
   - pip install -r test-requirements.txt
   - pip install codecov pytest-cov

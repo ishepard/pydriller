@@ -329,7 +329,8 @@ def test_get_commits_last_modified_lines_simple():
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('e6d3b38a9ef683e8184eac10a0471075c2808bbd'))
 
     assert len(buggy_commits) == 1
-    assert '540c7f31c18664a38190fafb6721b5174ff4a166' in buggy_commits
+    assert '540c7f31c18664a38190fafb6721b5174ff4a166' in buggy_commits[
+        'B.java']
 
 
 def test_get_commits_last_modified_lines_multiple():
@@ -337,10 +338,13 @@ def test_get_commits_last_modified_lines_multiple():
 
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('9942ee9dcdd1103e5808d544a84e6bc8cade0e54'))
 
-    assert len(buggy_commits) == 3
-    assert '2eb905e5e7be414fd184d6b4f1571b142621f4de' in buggy_commits
-    assert '20a40688521c1802569e60f9d55342c3bfdd772c' in buggy_commits
-    assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits
+    assert len(buggy_commits) == 1
+    assert '2eb905e5e7be414fd184d6b4f1571b142621f4de' in buggy_commits[
+        'A.java']
+    assert '20a40688521c1802569e60f9d55342c3bfdd772c' in buggy_commits[
+        'A.java']
+    assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
+        'A.java']
 
 
 def test_get_commits_last_modified_lines_rename_simple():
@@ -349,7 +353,8 @@ def test_get_commits_last_modified_lines_rename_simple():
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('45ba0a61ccc448625bce0fea0301cf0c1ab32696'))
 
     assert len(buggy_commits) == 1
-    assert 'e358878a00e78aca8366264d61a7319d00dd8186' in buggy_commits
+    assert 'e358878a00e78aca8366264d61a7319d00dd8186' in buggy_commits[
+        'C.java']
 
 
 def test_get_commits_last_modified_lines_multiple_rename():
@@ -363,9 +368,14 @@ def test_get_commits_last_modified_lines_multiple_rename():
 def test_get_commits_last_modified_lines_rename_simple_more_commits():
     gr = GitRepository('test-repos/test5/')
 
-    buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('4e287ab8e6dba110219404fb8a43993f3dda674c'))
-    assert len(buggy_commits) == 1
-    assert '06b9ff31cd3475d9fd9ef668cc0844ab169da726' in buggy_commits
+    buggy_commits = gr.get_commits_last_modified_lines(
+        gr.get_commit('04fadd3e68c58281db6cf15119f9769880ac1cbc'))
+
+    assert len(buggy_commits) == 2
+    assert '9b373199c270f9b24c37fee70f9e2b3ee9b816e3' in buggy_commits[
+        'A.java']
+    assert '9b373199c270f9b24c37fee70f9e2b3ee9b816e3' in buggy_commits[
+        'B.java']
 
 
 def test_get_commits_last_modified_lines_useless_lines():
@@ -373,7 +383,8 @@ def test_get_commits_last_modified_lines_useless_lines():
 
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('3bc7295c16b7dfc15d5f82eb6962a2774e1b8420'))
     assert len(buggy_commits) == 1
-    assert 'c7fc2e870ce03b0b8dc29ed0eeb26d14e235ea3b' in buggy_commits
+    assert 'c7fc2e870ce03b0b8dc29ed0eeb26d14e235ea3b' in buggy_commits[
+        'H.java']
 
 
 def test_get_commits_last_modified_lines_useless_lines2():
@@ -393,7 +404,8 @@ def test_get_commits_last_modified_lines_for_single_file():
             buggy_commits = gr.get_commits_last_modified_lines(commit, mod)
 
     assert len(buggy_commits) == 1
-    assert 'e2ed043eb96c05ebde653a44ae733ded9ef90750' in buggy_commits
+    assert 'e2ed043eb96c05ebde653a44ae733ded9ef90750' in buggy_commits['A.java']
+    assert 1 == len(buggy_commits['A.java'])
 
 
 def test_get_commits_last_modified_lines_with_more_modification():
@@ -401,7 +413,8 @@ def test_get_commits_last_modified_lines_with_more_modification():
 
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('c7002fb321a8ba32a28fac200538f7c2ba76f175'))
     assert len(buggy_commits) == 1
-    assert '5cb9e9ae44a0949ec91d06a955975289be766f34' in buggy_commits
+    assert '5cb9e9ae44a0949ec91d06a955975289be766f34' in buggy_commits[
+        'A.java']
 
 
 def test_get_commits_modified_file():
@@ -453,12 +466,10 @@ def depot_tools(tmpdir_factory):
             git_hyper_blame_script = f.read()
 
         with open(os.path.join(str(tmpdir), 'git_hyper_blame.py'), 'w') as f:
-            f.write(git_hyper_blame_script.replace('#!/usr/bin/env python', '#!/usr/bin/env python2'))
+            f.write(git_hyper_blame_script.replace('#!/usr/bin/env python',
+                                                   '#!/usr/bin/env python2'))
 
-        if platform.system() == "Windows":
-            os.environ["PATH"] = str(tmpdir) + os.pathsep + os.environ["PATH"]
-        else:
-            os.environ["PATH"] += os.pathsep + str(tmpdir)
+        os.environ["PATH"] += os.pathsep + str(tmpdir)
 
 
 @pytest.mark.skipif(platform.system() == "Windows", reason="depot_tools is not easy to install on Windows CI")
@@ -468,7 +479,8 @@ def test_get_commits_last_modified_lines_hyper_blame(depot_tools):
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('e6d3b38a9ef683e8184eac10a0471075c2808bbd'))
 
     assert len(buggy_commits) == 1
-    assert '540c7f31c18664a38190fafb6721b5174ff4a166' in buggy_commits
+    assert '540c7f31c18664a38190fafb6721b5174ff4a166' in buggy_commits[
+        'B.java']
 
 
 @pytest.mark.skipif(platform.system() == "Windows", reason="depot_tools is not easy to install on Windows CI")
@@ -481,4 +493,5 @@ def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(depot_tools, tm
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('e6d3b38a9ef683e8184eac10a0471075c2808bbd'), hashes_to_ignore_path=tmpdir / "ignore")
 
     assert len(buggy_commits) == 1
-    assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits
+    assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
+        'B.java']

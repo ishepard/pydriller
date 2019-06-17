@@ -125,13 +125,31 @@ class RepositoryMining:
                 raise Exception('You can not specify a single commit with '
                                 'other filters')
 
+        self._check_starting_commit(git_repo)
+        self._check_ending_commit(git_repo)
+
+    def _check_ending_commit(self, git_repo):
+        # If to_commit is defined, to should not be
+        if self._to_commit is not None:
+            if not self._check_filters_none([self._to, self._to_tag]):
+                raise Exception('You can not specify both <to date> '
+                                'and <to commit>')
+            self._to = git_repo.get_commit(self._to_commit).committer_date
+        # If to_tag is defined, to and to_commit should not be
+        if self._to_tag is not None:
+            if not self._check_filters_none([self._to, self._to_commit]):
+                raise Exception('You can not specify <to date> or <to commit> '
+                                'when using <to tag>')
+            self._to = git_repo.get_commit_from_tag(
+                self._to_tag).committer_date
+
+    def _check_starting_commit(self, git_repo):
         # If from_commit is defined, since should not be
         if self._from_commit is not None:
             if not self._check_filters_none([self._since, self._from_tag]):
                 raise Exception('You can not specify both <since date> '
                                 'and <from commit>')
             self._since = git_repo.get_commit(self._from_commit).committer_date
-
         # If from_tag is defined, since and from_commit should not be
         if self._from_tag is not None:
             if not self._check_filters_none([self._since, self._from_commit]):
@@ -140,20 +158,10 @@ class RepositoryMining:
             self._since = git_repo.get_commit_from_tag(
                 self._from_tag).committer_date
 
-        # If to_commit is defined, to should not be
-        if self._to_commit is not None:
-            if not self._check_filters_none([self._to, self._to_tag]):
-                raise Exception('You can not specify both <to date> '
-                                'and <to commit>')
-            self._to = git_repo.get_commit(self._to_commit).committer_date
-
-        # If to_tag is defined, to and to_commit should not be
-        if self._to_tag is not None:
-            if not self._check_filters_none([self._to, self._to_commit]):
-                raise Exception('You can not specify <to date> or <to commit> '
-                                'when using <to tag>')
-            self._to = git_repo.get_commit_from_tag(
-                self._to_tag).committer_date
+    # TODO: check this function!!!!!
+    # def single_true(iterable):
+    #     i = iter(iterable)
+    #     return any(i) and not any(i)
 
     def _check_filters_none(self, filters: List):
         for filt in filters:

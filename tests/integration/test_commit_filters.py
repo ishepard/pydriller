@@ -189,7 +189,7 @@ def test_filepath_with_to():
     dt = datetime(2018, 6, 6)
     assert len(list(RepositoryMining(
         path_to_repo='test-repos/test5',
-        filepath='A.java',
+        filepath='myfolder/A.java',
         to=dt).traverse_commits())) == 4
 
 
@@ -197,8 +197,8 @@ def test_filepath_with_since():
     since = datetime(2018, 6, 6)
     assert len(list(RepositoryMining(
         path_to_repo='test-repos/test5',
-        filepath='A.java',
-        since=since).traverse_commits())) == 7
+        filepath='myfolder/A.java',
+        since=since).traverse_commits())) == 10
 
 
 def test_filepath_with_rename():

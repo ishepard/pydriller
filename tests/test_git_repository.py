@@ -495,3 +495,17 @@ def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(depot_tools, tm
     assert len(buggy_commits) == 1
     assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
         'B.java']
+
+
+@pytest.mark.skipif(platform.system() == "Windows", reason="depot_tools is not easy to install on Windows CI")
+def test_get_commits_last_modified_lines_hyper_blame_with_renaming(
+        depot_tools, tmpdir):
+    gr = GitRepository('test-repos/test5/')
+
+    buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('be0772cbaa2eba32bf97aae885199d1a357ddc93'))
+
+    assert len(buggy_commits) == 2
+    assert '9568d20856728304ab0b4d2d02fb9e81d0e5156d' in buggy_commits[
+        'A.java']
+    assert '9568d20856728304ab0b4d2d02fb9e81d0e5156d' in buggy_commits[
+        'H.java']

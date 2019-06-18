@@ -1,9 +1,11 @@
 [![Build Status](https://travis-ci.org/ishepard/pydriller.svg?branch=master)](https://travis-ci.org/ishepard/pydriller)
-[![BCH compliance](https://bettercodehub.com/edge/badge/ishepard/pydriller?branch=master&token=fdd54de940e65d248cd892ac8791a1445f38c88f)](https://bettercodehub.com/)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/ishepard/pydriller.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ishepard/pydriller/context:python)
-[![codecov](https://codecov.io/gh/ishepard/pydriller/branch/master/graph/badge.svg)](https://codecov.io/gh/ishepard/pydriller)
 [![Build status](https://ci.appveyor.com/api/projects/status/s7uni50v4wd54q43/branch/master?svg=true&retina=true&passingText=Windows%20passing&failingText=Windows%20failing)](https://ci.appveyor.com/project/ishepard/pydriller/branch/master)
+[![Documentation Status](https://readthedocs.org/projects/pydriller/badge/?version=latest)](https://pydriller.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/ishepard/pydriller/branch/master/graph/badge.svg)](https://codecov.io/gh/ishepard/pydriller)
+[![BCH compliance](https://bettercodehub.com/edge/badge/ishepard/pydriller?branch=master&token=fdd54de940e65d248cd892ac8791a1445f38c88f)](https://bettercodehub.com/)
 
+[![Downloads](https://pepy.tech/badge/pydriller/month)](https://pepy.tech/project/pydriller/month)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/ishepard/pydriller.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ishepard/pydriller/context:python)
 
 # PyDriller
 

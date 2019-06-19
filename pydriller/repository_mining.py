@@ -86,7 +86,10 @@ class RepositoryMining:
         """
 
         self._sanity_check_repos(path_to_repo)
-        self._path_to_repo = path_to_repo
+        if isinstance(path_to_repo, str):
+            self._path_to_repo = [path_to_repo]
+        else:
+            self._path_to_repo = path_to_repo
 
         self._from_commit = from_commit
         self._to_commit = to_commit
@@ -186,10 +189,6 @@ class RepositoryMining:
         Analyze all the specified commits (all of them by default), returning
         a generator of commits.
         """
-
-        if isinstance(self._path_to_repo, str):
-            self._path_to_repo = [self._path_to_repo]
-
         for path_repo in self._path_to_repo:
             # if it is a remote repo, clone it first in a temporary folder!
             if self._isremote(path_repo):

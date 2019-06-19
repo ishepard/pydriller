@@ -26,7 +26,7 @@ from typing import List, Set, Dict
 
 import lizard
 from git import Repo, Diff, Git, Commit as GitCommit
-import git
+
 from pydriller.domain.developer import Developer
 
 logger = logging.getLogger(__name__)

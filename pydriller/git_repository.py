@@ -320,12 +320,10 @@ class GitRepository:
             if mod.change_type == ModificationType.RENAME or \
                     mod.change_type == ModificationType.DELETE:
                 path = mod.old_path
-            print(path)
             deleted_lines = self.parse_diff(mod.diff)['deleted']
             try:
                 blame = self._get_blame(commit.hash, path,
                                         hashes_to_ignore_path)
-                print(blame)
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):
                         buggy_commit = blame[num_line - 1].split(' ')[
@@ -349,11 +347,9 @@ class GitRepository:
         If "git hyper-blame" is available, use it. Otherwise use normal blame.
         """
         if not self.hyper_blame_available:
-            print("Using normal blame")
             return self.git.blame('-w', hash + '^',
                                   '--', path).split('\n')
         else:
-            print("Using hyper-blame")
             cmd = ["git", "hyper-blame", hash + '^', path]
             if hashes_to_ignore_path is not None:
                 cmd.append("--ignore-file={}"

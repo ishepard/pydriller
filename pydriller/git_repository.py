@@ -299,6 +299,8 @@ class GitRepository:
                                                "available. Install it by " \
                                                "cloning depot_tools and " \
                                                "adding it to your PATH."
+            hashes_to_ignore_path = os.path.realpath(hashes_to_ignore_path)
+            assert os.path.exists(hashes_to_ignore_path), "The file with the commit hashes to ignore does not exist"
 
         if modification is not None:
             modifications = [modification]

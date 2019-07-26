@@ -490,7 +490,29 @@ def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(depot_tools, tm
 
     gr = GitRepository('test-repos/test5/')
 
-    buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('e6d3b38a9ef683e8184eac10a0471075c2808bbd'), hashes_to_ignore_path=tmpdir / "ignore")
+    buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('e6d3b38a9ef683e8184eac10a0471075c2808bbd'), hashes_to_ignore_path=os.path.join(str(tmpdir), "ignore"))
+
+    assert len(buggy_commits) == 1
+    assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
+        'B.java']
+
+
+@pytest.fixture
+def tmpcwd(tmpdir):
+    cwd = os.getcwd()
+    os.chdir(str(tmpdir))
+    yield cwd
+    os.chdir(cwd)
+
+
+@pytest.mark.skipif(platform.system() == "Windows", reason="depot_tools is not easy to install on Windows CI")
+def test_get_commits_last_modified_lines_hyper_blame_ignore_hash_relative(depot_tools, tmpcwd):
+    with open("ignore", "w") as f:
+        f.write("540c7f31c18664a38190fafb6721b5174ff4a166")
+
+    gr = GitRepository(os.path.join(tmpcwd, 'test-repos/test5/'))
+
+    buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('e6d3b38a9ef683e8184eac10a0471075c2808bbd'), hashes_to_ignore_path="ignore")
 
     assert len(buggy_commits) == 1
     assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
@@ -499,7 +521,7 @@ def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(depot_tools, tm
 
 @pytest.mark.skipif(platform.system() == "Windows", reason="depot_tools is not easy to install on Windows CI")
 def test_get_commits_last_modified_lines_hyper_blame_with_renaming(
-        depot_tools, tmpdir):
+        depot_tools):
     gr = GitRepository('test-repos/test5/')
 
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('be0772cbaa2eba32bf97aae885199d1a357ddc93'))

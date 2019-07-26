@@ -490,7 +490,7 @@ def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(depot_tools, tm
 
     gr = GitRepository('test-repos/test5/')
 
-    buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('e6d3b38a9ef683e8184eac10a0471075c2808bbd'), hashes_to_ignore_path=tmpdir / "ignore")
+    buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('e6d3b38a9ef683e8184eac10a0471075c2808bbd'), hashes_to_ignore_path=os.path.join(str(tmpdir), "ignore"))
 
     assert len(buggy_commits) == 1
     assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[

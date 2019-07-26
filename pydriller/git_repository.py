@@ -47,6 +47,7 @@ class GitRepository:
         self.project_name = self.path.name
         self.main_branch = None
         self.lock = Lock()
+        self._hyper_blame_available = None
 
     @property
     def git(self):
@@ -70,12 +71,14 @@ class GitRepository:
     def hyper_blame_available(self):
         # Try running 'git hyper-blame' on a file in the repo to check if
         # the command is available.
-        try:
-            self.git.execute(["git", "hyper-blame", "-h"])
-            return True
-        except GitCommandError as e:
-            logger.debug("Hyper-blame not available. Using normal blame.")
-            return False
+        if self._hyper_blame_available is None:
+            try:
+                self.git.execute(["git", "hyper-blame", "-h"])
+                self._hyper_blame_available = True
+            except GitCommandError as e:
+                logger.debug("Hyper-blame not available. Using normal blame.")
+                self._hyper_blame_available = False
+        return self._hyper_blame_available
 
     def _open_git(self) -> Git:
         return Git(str(self.path))

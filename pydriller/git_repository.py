@@ -351,7 +351,7 @@ class GitRepository:
         """
         If "git hyper-blame" is available, use it. Otherwise use normal blame.
         """
-        if not self.hyper_blame_available:
+        if not self.hyper_blame_available or hashes_to_ignore_path is None:
             return self.git.blame('-w', hash + '^',
                                   '--', path).split('\n')
         else:

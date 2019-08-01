@@ -48,6 +48,8 @@ class GitRepository:
         self.main_branch = None
         self.lock = Lock()
         self._hyper_blame_available = None
+        self._git = None
+        self._repo = None
 
     @property
     def git(self):
@@ -56,7 +58,9 @@ class GitRepository:
 
         :return: Git
         """
-        return self._open_git()
+        if self._git is None:
+            self._open_git()
+        return self._git
 
     @property
     def repo(self):
@@ -65,7 +69,9 @@ class GitRepository:
 
         :return: Repo
         """
-        return self._open_repository()
+        if self._repo is None:
+            self._open_repository()
+        return self._repo
 
     @property
     def hyper_blame_available(self):
@@ -80,14 +86,13 @@ class GitRepository:
                 self._hyper_blame_available = False
         return self._hyper_blame_available
 
-    def _open_git(self) -> Git:
-        return Git(str(self.path))
+    def _open_git(self):
+        self._git = Git(str(self.path))
 
-    def _open_repository(self) -> Repo:
-        repo = Repo(str(self.path))
+    def _open_repository(self):
+        self._repo = Repo(str(self.path))
         if self.main_branch is None:
-            self._discover_main_branch(repo)
-        return repo
+            self._discover_main_branch(self._repo)
 
     def _discover_main_branch(self, repo):
         self.main_branch = repo.active_branch.name

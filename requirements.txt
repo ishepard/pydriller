@@ -1,4 +1,4 @@
 gitpython
-typing
+typing; python_version < '3.5'
 pytz
 lizard

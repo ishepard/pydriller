@@ -2,10 +2,6 @@ language: python
 notifications:
     slack: pydriller:GY8wzJPkOMy22cPAH7umESp9
 
-os:
-  - linux
-  - osx
-
 python:
   - "3.4"
   - "3.5"

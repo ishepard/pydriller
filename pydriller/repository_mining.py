@@ -19,6 +19,7 @@ This module includes 1 class, RepositoryMining, main class of PyDriller.
 import logging
 import os
 import tempfile
+import pygit2
 from datetime import datetime
 from typing import List, Generator, Union
 

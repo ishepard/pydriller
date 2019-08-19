@@ -1,24 +1,29 @@
 language: python
 notifications:
     slack: pydriller:GY8wzJPkOMy22cPAH7umESp9
+
+os:
+  - linux
+  - osx
+
 python:
   - "3.4"
   - "3.5"
   - "3.6"
-matrix:
-  include:
-    - python: "3.7"
-      dist: xenial
-      sudo: required
+  - "3.7"
+
 before_install:
   - sudo apt-get update
   - sudo apt-get install -y python
   - unzip test-repos.zip
   - git clone https://github.com/apache/hadoop.git test-repos/hadoop
+
 install:
   - pip install -r test-requirements.txt
   - pip install codecov pytest-cov
+
 script:
   - pytest tests/ --cov=pydriller/
+
 after_success:
   - codecov

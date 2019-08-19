@@ -12,9 +12,29 @@ python:
   - "3.6"
   - "3.7"
 
+matrix:
+    include:
+        # Use the built in venv for linux builds
+        - os: linux
+          python: 3.4
+        - os: linux
+          python: 3.5
+        - os: linux
+          python: 3.6
+        - os: linux
+          python: 3.7
+        # Use generic language for osx
+        - os: osx
+          language: generic
+
+
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install -y python
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew list python &>/dev/null || brew install python; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew list python3 &>/dev/null || brew install python3; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install pyenv-virtualenv; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install -y python; fi
   - unzip test-repos.zip
   - git clone https://github.com/apache/hadoop.git test-repos/hadoop
 

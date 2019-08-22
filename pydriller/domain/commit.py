@@ -22,6 +22,8 @@ import logging
 from _datetime import datetime
 from enum import Enum
 from pathlib import Path
+from pygit2 import Commit as PyCommit, Repository as PyRepo, Diff, \
+    DiffDelta, DiffFile
 from typing import List, Set, Dict
 
 import lizard
@@ -245,7 +247,7 @@ class Commit:
     as hash, author, dates, and modified files.
     """
 
-    def __init__(self, commit: GitCommit, project_path: Path,
+    def __init__(self, commit: PyCommit, project_path: Path,
                  main_branch: str) -> None:
         """
         Create a commit object.
@@ -269,7 +271,16 @@ class Commit:
 
         :return: str hash
         """
-        return self._c_object.hexsha
+        return self._c_object.hex
+
+    @property
+    def project_name(self) -> str:
+        """
+        Return the project name.
+
+        :return: project name
+        """
+        return self.project_path.name
 
     @property
     def author(self) -> Developer:
@@ -282,6 +293,25 @@ class Commit:
                          self._c_object.author.email)
 
     @property
+    def author_date(self) -> datetime:
+        """
+        Return the authored datetime.
+
+        :return: datetime author_datetime
+        """
+        return datetime.fromtimestamp(self._c_object.author.time)
+
+    @property
+    def author_timezone(self) -> int:
+        """
+        Author timezone expressed in seconds from epoch.
+
+        :return: int timezone
+        """
+        return self._c_object.author.offset
+
+
+    @property
     def committer(self) -> Developer:
         """
         Return the committer of the commit as a Developer object.
@@ -292,40 +322,13 @@ class Commit:
                          self._c_object.committer.email)
 
     @property
-    def project_name(self) -> str:
-        """
-        Return the project name.
-
-        :return: project name
-        """
-        return self.project_path.name
-
-    @property
-    def author_date(self) -> datetime:
-        """
-        Return the authored datetime.
-
-        :return: datetime author_datetime
-        """
-        return self._c_object.authored_datetime
-
-    @property
     def committer_date(self) -> datetime:
         """
         Return the committed datetime.
 
         :return: datetime committer_datetime
         """
-        return self._c_object.committed_datetime
-
-    @property
-    def author_timezone(self) -> int:
-        """
-        Author timezone expressed in seconds from epoch.
-
-        :return: int timezone
-        """
-        return self._c_object.author_tz_offset
+        return datetime.fromtimestamp(self._c_object.commit_time)
 
     @property
     def committer_timezone(self) -> int:
@@ -334,7 +337,7 @@ class Commit:
 
         :return: int timezone
         """
-        return self._c_object.committer_tz_offset
+        return self._c_object.commit_time_offset
 
     @property
     def msg(self) -> str:
@@ -352,10 +355,7 @@ class Commit:
 
         :return: List[str] parents
         """
-        parents = []
-        for p in self._c_object.parents:
-            parents.append(p.hexsha)
-        return parents
+        return self._c_object.parent_ids
 
     @property
     def merge(self) -> bool:
@@ -379,13 +379,13 @@ class Commit:
         return self._modifications
 
     def _get_modifications(self):
-        repo = Repo(str(self.project_path))
-        commit = self._c_object
+        repo = PyRepo(str(self.project_path))
 
         if len(self.parents) == 1:
             # the commit has a parent
-            diff_index = self._c_object.parents[0].diff(commit,
-                                                        create_patch=True)
+            diff = repo.diff(str(self._c_object.parents[0].id),
+                             str(self._c_object.id))
+            diff.find_similar()
         elif len(self.parents) > 1:
             # if it's a merge commit, the modified files of the commit are the
             # conflicts. This because if the file is not in conflict,
@@ -397,28 +397,35 @@ class Commit:
             # c_git = Git(str(self.project_path))
             # d = c_git.diff_tree("--cc", commit.hexsha, '-r', '--abbrev=40',
             #                     '--full-index', '-M', '-p', '--no-color')
-            diff_index = []
+            diff = []
         else:
             # this is the first commit of the repo. Comparing it with git
             # NULL TREE
-            parent = repo.tree(NULL_TREE)
-            diff_index = parent.diff(commit.tree, create_patch=True)
+            diff = self._c_object.tree.diff_to_tree(swap=True)
 
-        return self._parse_diff(diff_index)
+        return self._parse_diff(diff, repo)
 
-    def _parse_diff(self, diff_index) -> List[Modification]:
+    def _parse_diff(self, diff, repo) -> List[Modification]:
         modifications_list = []
-        for diff in diff_index:
-            old_path = diff.a_path
-            new_path = diff.b_path
-            change_type = self._from_change_to_modification_type(diff)
+        for p in diff:
+            delta: DiffDelta = p.delta
+            old_path = delta.old_file.path
+            new_path = delta.new_file.path
+            # change_type = self._from_change_to_modification_type(diff)
+
+            change_type = delta.status_char()
+
+            if change_type == 'D':
+                new_path = None
+            elif change_type == 'A':
+                old_path = None
 
             diff_and_sc = {
-                'diff': self._get_decoded_str(diff.diff),
-                'source_code_before': self._get_decoded_sc_str(
-                    diff.a_blob),
-                'source_code': self._get_decoded_sc_str(
-                    diff.b_blob)
+                'diff': self._get_decoded_diff(p.data),
+                'source_code': self._get_decoded_sc_str(repo,
+                                                        delta.new_file.path),
+                'source_code_before': self._get_decoded_sc_str(repo,
+                                                               delta.old_file.path)
             }
 
             modifications_list.append(Modification(old_path, new_path,
@@ -426,20 +433,21 @@ class Commit:
 
         return modifications_list
 
-    def _get_decoded_str(self, diff):
+    def _get_decoded_sc_str(self, repo, filepath):
         try:
-            return diff.decode('utf-8', 'ignore')
+            return repo[self._c_object.tree[filepath].id].data.decode('utf-8',
+                                                                      'ignore')
         except (UnicodeDecodeError, AttributeError, ValueError):
             logger.debug('Could not load the diff of a '
-                         'file in commit %s', self._c_object.hexsha)
+                         'file in commit %s', self._c_object.hex)
             return None
 
-    def _get_decoded_sc_str(self, diff):
+    def _get_decoded_diff(self, data):
         try:
-            return diff.data_stream.read().decode('utf-8', 'ignore')
+            return data.decode('utf-8', 'ignore')
         except (UnicodeDecodeError, AttributeError, ValueError):
             logger.debug('Could not load source code of a '
-                         'file in commit %s', self._c_object.hexsha)
+                         'file in commit %s', self._c_object.hex)
             return None
 
     @property

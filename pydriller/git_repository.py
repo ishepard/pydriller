@@ -95,7 +95,12 @@ class GitRepository:
             self._discover_main_branch(self._repo)
 
     def _discover_main_branch(self, repo):
-        self.main_branch = repo.active_branch.name
+        try:
+            self.main_branch = repo.active_branch.name
+        except TypeError:
+            logger.info("HEAD is a detached symbolic reference, setting "
+                        "main branch to empty string")
+            self.main_branch = ''
 
     def get_head(self) -> Commit:
         """

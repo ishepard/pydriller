@@ -34,7 +34,7 @@ def test_equal(resource):
     c2 = resource.get_commit(c1.parents[0])
     c3 = resource.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58')
 
-    assert c1.parents[0] == 'a4ece0762e797d2e2dcbd471115108dd6e05ff58'
+    assert str(c1.parents[0]) == 'a4ece0762e797d2e2dcbd471115108dd6e05ff58'
     assert c3 == c2
     assert c1 != c3
 
@@ -141,7 +141,7 @@ def test_metrics_not_supported_file():
     assert len(m1.methods) == 0
 
 
-def test_filepahs():
+def test_filepaths():
     gr = GitRepository('test-repos/test7')
     c = gr.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
@@ -157,15 +157,6 @@ def test_projectname():
     c = gr.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
     assert c.project_name == 'test7'
-
-
-def test_modification_type_unknown():
-    gr = GitRepository('test-repos/git-11')
-    c = gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
-
-    mod0 = c.modifications[0]
-
-    assert mod0.change_type.name == 'UNKNOWN'
 
     
 def test_modification_with_more_parents():
@@ -212,16 +203,16 @@ def test_tzoffset():
         'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2').author_timezone
     tz2 = gr.get_commit(
         'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2').committer_timezone
-    assert tz1 == 10800 # -3 hours
-    assert tz2 == 10800 # -3 hours
+    assert tz1 == -180 # -3 hours
+    assert tz2 == -180 # -3 hours
 
     gr = GitRepository('test-repos/test1')
     tz1 = gr.get_commit(
         'da39b1326dbc2edfe518b90672734a08f3c13458').author_timezone
     tz2 = gr.get_commit(
         'da39b1326dbc2edfe518b90672734a08f3c13458').committer_timezone
-    assert tz1 == -7200 # +2 hours
-    assert tz2 == -7200 # +2 hours
+    assert tz1 == 120 # +2 hours
+    assert tz2 == 120 # +2 hours
 
 
 def test_source_code_before():

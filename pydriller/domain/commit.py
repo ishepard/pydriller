@@ -411,44 +411,43 @@ class Commit:
             delta: DiffDelta = p.delta
             old_path = delta.old_file.path
             new_path = delta.new_file.path
-            # change_type = self._from_change_to_modification_type(diff)
+            change_type = self._from_change_to_modification_type(
+                delta.status_char())
 
-            change_type = delta.status_char()
-
-            if change_type == 'D':
+            if change_type == ModificationType.DELETE:
                 new_path = None
-            elif change_type == 'A':
+            elif change_type == ModificationType.ADD:
                 old_path = None
 
-            diff_and_sc = {
-                'diff': self._get_decoded_diff(p.data),
-                'source_code': self._get_decoded_sc_str(repo,
-                                                        delta.new_file.path),
-                'source_code_before': self._get_decoded_sc_str(repo,
-                                                               delta.old_file.path)
-            }
+            diff_and_sc = self._get_diff_and_sc(repo, p)
 
             modifications_list.append(Modification(old_path, new_path,
                                                    change_type, diff_and_sc))
 
         return modifications_list
 
-    def _get_decoded_sc_str(self, repo, filepath):
-        try:
-            return repo[self._c_object.tree[filepath].id].data.decode('utf-8',
-                                                                      'ignore')
-        except (UnicodeDecodeError, AttributeError, ValueError):
-            logger.debug('Could not load the diff of a '
-                         'file in commit %s', self._c_object.hex)
-            return None
+    def _get_diff_and_sc(self, repo, patch):
+        delta: DiffDelta = patch.delta
+        if not delta.status_char() == 'D':
+            source_code = repo[self._c_object.tree[delta.new_file.path].id].\
+                data.decode('utf-8', 'ignore')
+        else:
+            source_code = None
 
-    def _get_decoded_diff(self, data):
-        try:
-            return data.decode('utf-8', 'ignore')
-        except (UnicodeDecodeError, AttributeError, ValueError):
-            logger.debug('Could not load source code of a '
-                         'file in commit %s', self._c_object.hex)
-            return None
+        if not delta.status_char() == 'A':
+            source_code_before = repo[self._c_object.parents[0].tree[
+                delta.new_file.path].id].\
+                data.decode('utf-8', 'ignore')
+        else:
+            source_code_before = None
+
+        diff_and_sc = {
+            'diff': patch.data.decode('utf-8', 'ignore'),
+            'source_code': source_code,
+            'source_code_before': source_code_before
+        }
+
+        return diff_and_sc
 
     @property
     def in_main_branch(self) -> bool:
@@ -479,14 +478,14 @@ class Commit:
         return branches
 
     # pylint disable=R0902
-    def _from_change_to_modification_type(self, diff: Diff):
-        if diff.new_file:
+    def _from_change_to_modification_type(self, diff_char: str):
+        if diff_char == 'A':
             return ModificationType.ADD
-        if diff.deleted_file:
+        if diff_char == 'D':
             return ModificationType.DELETE
-        if diff.renamed_file:
+        if diff_char == 'R':
             return ModificationType.RENAME
-        if diff.a_blob and diff.b_blob and diff.a_blob != diff.b_blob:
+        if diff_char == 'M':
             return ModificationType.MODIFY
 
         return ModificationType.UNKNOWN

@@ -22,7 +22,9 @@ from pathlib import Path
 from threading import Lock
 from typing import List, Dict, Tuple, Set, Generator
 
-from git import Git, Repo, GitCommandError, Commit as GitCommit
+# from git import Git, Repo, GitCommandError, Commit as GitCommit
+from pygit2 import Commit as PyCommit, Repository as PyRepo
+from pygit2 import GIT_SORT_REVERSE
 
 from pydriller.domain.commit import Commit, ModificationType, Modification
 
@@ -48,19 +50,7 @@ class GitRepository:
         self.main_branch = None
         self.lock = Lock()
         self._hyper_blame_available = None
-        self._git = None
         self._repo = None
-
-    @property
-    def git(self):
-        """
-        GitPython object Git.
-
-        :return: Git
-        """
-        if self._git is None:
-            self._open_git()
-        return self._git
 
     @property
     def repo(self):
@@ -77,29 +67,24 @@ class GitRepository:
     def hyper_blame_available(self):
         # Try running 'git hyper-blame' on a file in the repo to check if
         # the command is available.
-        if self._hyper_blame_available is None:
-            try:
-                self.git.execute(["git", "hyper-blame", "-h"])
-                self._hyper_blame_available = True
-            except GitCommandError as e:
-                logger.debug("Hyper-blame not available. Using normal blame.")
-                self._hyper_blame_available = False
+        # if self._hyper_blame_available is None:
+        #     try:
+        #         self.git.execute(["git", "hyper-blame", "-h"])
+        #         self._hyper_blame_available = True
+        #     except GitCommandError as e:
+        #         logger.debug("Hyper-blame not available. Using normal blame.")
+        self._hyper_blame_available = False
         return self._hyper_blame_available
 
-    def _open_git(self):
-        self._git = Git(str(self.path))
-
     def _open_repository(self):
-        self._repo = Repo(str(self.path))
+        self._repo = PyRepo(str(self.path))
         if self.main_branch is None:
             self._discover_main_branch(self._repo)
 
     def _discover_main_branch(self, repo):
-        try:
-            self.main_branch = repo.active_branch.name
-        except TypeError:
-            logger.info("HEAD is a detached symbolic reference, setting "
-                        "main branch to empty string")
+        if not repo.head_is_detached:
+            self.main_branch = repo.head.shorthand
+        else:
             self.main_branch = ''
 
     def get_head(self) -> Commit:
@@ -108,7 +93,7 @@ class GitRepository:
 
         :return: Commit of the head commit
         """
-        head_commit = self.repo.head.commit
+        head_commit = self.repo[self.repo.head.target]
         return Commit(head_commit, self.path, self.main_branch)
 
     def get_list_commits(self, branch: str = None,
@@ -120,8 +105,8 @@ class GitRepository:
         :return: Generator[Commit], the generator of all the commits in the
             repo
         """
-        for commit in self.repo.iter_commits(branch, reverse=reverse_order):
-            yield self.get_commit_from_gitpython(commit)
+        for commit in self.repo.walk(self.repo.head.target, GIT_SORT_REVERSE):
+            yield self.get_commit_from_pygit2(commit)
 
     def get_commit(self, commit_id: str) -> Commit:
         """
@@ -130,9 +115,9 @@ class GitRepository:
         :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
-        return Commit(self.repo.commit(commit_id), self.path, self.main_branch)
+        return Commit(self.repo[commit_id], self.path, self.main_branch)
 
-    def get_commit_from_gitpython(self, commit: GitCommit) -> Commit:
+    def get_commit_from_pygit2(self, commit: PyCommit) -> Commit:
         """
         Build a PyDriller commit object from a GitPython commit object.
         This is internal of PyDriller, I don't think users generally will need

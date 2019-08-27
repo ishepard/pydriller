@@ -19,7 +19,7 @@ ModificationType and Method.
 """
 
 import logging
-from _datetime import datetime
+from datetime import datetime, timezone, timedelta
 from enum import Enum
 from pathlib import Path
 from pygit2 import Commit as PyCommit, Repository as PyRepo, Diff, \
@@ -328,7 +328,9 @@ class Commit:
 
         :return: datetime committer_datetime
         """
-        return datetime.fromtimestamp(self._c_object.commit_time)
+        return datetime.fromtimestamp(self._c_object.commit_time).replace(
+            tzinfo=timezone(timedelta(
+                seconds=self._c_object.commit_time_offset * 60)))
 
     @property
     def committer_timezone(self) -> int:

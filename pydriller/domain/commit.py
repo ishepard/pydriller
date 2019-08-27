@@ -386,8 +386,8 @@ class Commit:
     def _get_modifications(self):
         if len(self.parents) == 1:
             # the commit has a parent
-            diff = self._repo.diff(str(self._c_object.parents[0].id),
-                             str(self._c_object.id))
+            diff = self._repo.diff(self._c_object.parents[0].hex,
+                                   self._c_object.hex)
             diff.find_similar()
         elif len(self.parents) > 1:
             # if it's a merge commit, the modified files of the commit are the

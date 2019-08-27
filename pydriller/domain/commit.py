@@ -229,15 +229,15 @@ class Modification:  # pylint: disable=R0902
             return True
         return self.__dict__ == other.__dict__
 
-    def __str__(self): # pragma: no cover
+    def __str__(self):  # pragma: no cover
         return (
-            'MODIFICATION\n' +
-            'Old Path: {}\n'.format(self.old_path) +
-            'New Path: {}\n'.format(self.new_path) +
-            'Type: {}\n'.format(self.change_type.name) +
-            'Diff: {}\n'.format(self.diff) +
-            'Source code before: {}\n'.format(self.source_code_before) +
-            'Source code: {}\n'.format(self.source_code)
+                'MODIFICATION\n' +
+                'Old Path: {}\n'.format(self.old_path) +
+                'New Path: {}\n'.format(self.new_path) +
+                'Type: {}\n'.format(self.change_type.name) +
+                'Diff: {}\n'.format(self.diff) +
+                'Source code before: {}\n'.format(self.source_code_before) +
+                'Source code: {}\n'.format(self.source_code)
         )
 
 
@@ -299,7 +299,10 @@ class Commit:
 
         :return: datetime author_datetime
         """
-        return datetime.fromtimestamp(self._c_object.author.time)
+        offset = self._c_object.author.offset * 60
+        dt = datetime.utcfromtimestamp(self._c_object.author.time) + \
+             timedelta(seconds=offset)
+        return dt.replace(tzinfo=timezone(timedelta(seconds=offset)))
 
     @property
     def author_timezone(self) -> int:
@@ -309,7 +312,6 @@ class Commit:
         :return: int timezone
         """
         return self._c_object.author.offset
-
 
     @property
     def committer(self) -> Developer:
@@ -328,9 +330,10 @@ class Commit:
 
         :return: datetime committer_datetime
         """
-        return datetime.fromtimestamp(self._c_object.commit_time).replace(
-            tzinfo=timezone(timedelta(
-                seconds=self._c_object.commit_time_offset * 60)))
+        offset = self._c_object.commit_time_offset * 60
+        dt = datetime.utcfromtimestamp(self._c_object.commit_time) + \
+             timedelta(seconds=offset)
+        return dt.replace(tzinfo=timezone(timedelta(seconds=offset)))
 
     @property
     def committer_timezone(self) -> int:
@@ -432,14 +435,14 @@ class Commit:
     def _get_diff_and_sc(self, repo, patch):
         delta: DiffDelta = patch.delta
         if not delta.status_char() == 'D':
-            source_code = repo[self._c_object.tree[delta.new_file.path].id].\
+            source_code = repo[self._c_object.tree[delta.new_file.path].id]. \
                 data.decode('utf-8', 'ignore')
         else:
             source_code = None
 
         if not delta.status_char() == 'A':
             source_code_before = repo[self._c_object.parents[0].tree[
-                delta.old_file.path].id].\
+                delta.old_file.path].id]. \
                 data.decode('utf-8', 'ignore')
         else:
             source_code_before = None
@@ -501,22 +504,22 @@ class Commit:
 
         return self.__dict__ == other.__dict__
 
-    def __str__(self): # pragma: no cover
+    def __str__(self):  # pragma: no cover
         return (
-            'Hash: {}\n'.format(self.hash) +
-            'Author: {}\n'.format(self.author.name) +
-            'Author email: {}\n'.format(self.author.email) +
-            'Committer: {}\n'.format(self.committer.name) +
-            'Committer email: {}\n'.format(self.committer.email) +
-            'Author date: {}\n'.format(
-                self.author_date.strftime("%Y-%m-%d %H:%M:%S")) +
-            'Committer date: {}\n'.format(
-                self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) +
-            'Message: {}\n'.format(self.msg) +
-            'Parent: {}\n'.format("\n".join(map(str, self.parents))) +
-            'Merge: {}\n'.format(self.merge) +
-            'Modifications: \n{}'.format(
-                "\n".join(map(str, self.modifications))) +
-            'Branches: \n{}'.format("\n".join(map(str, self.branches))) +
-            'In main branch: {}\n'.format(self.in_main_branch)
+                'Hash: {}\n'.format(self.hash) +
+                'Author: {}\n'.format(self.author.name) +
+                'Author email: {}\n'.format(self.author.email) +
+                'Committer: {}\n'.format(self.committer.name) +
+                'Committer email: {}\n'.format(self.committer.email) +
+                'Author date: {}\n'.format(
+                    self.author_date.strftime("%Y-%m-%d %H:%M:%S")) +
+                'Committer date: {}\n'.format(
+                    self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) +
+                'Message: {}\n'.format(self.msg) +
+                'Parent: {}\n'.format("\n".join(map(str, self.parents))) +
+                'Merge: {}\n'.format(self.merge) +
+                'Modifications: \n{}'.format(
+                    "\n".join(map(str, self.modifications))) +
+                'Branches: \n{}'.format("\n".join(map(str, self.branches))) +
+                'In main branch: {}\n'.format(self.in_main_branch)
         )

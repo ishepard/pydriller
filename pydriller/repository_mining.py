@@ -217,6 +217,7 @@ class RepositoryMining:
                             commit.committer_date,
                             commit.author.name)
 
+                print(commit.committer_date)
                 if self._is_commit_filtered(commit):
                     logger.info('Commit #%s filtered', commit.hash)
                     continue

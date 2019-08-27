@@ -19,18 +19,25 @@ This module includes 1 class, GitRepository, representing a repository in Git.
 import logging
 import os
 from pathlib import Path
-from threading import Lock
 from typing import List, Dict, Tuple, Set, Generator
 
 # from git import Git, Repo, GitCommandError, Commit as GitCommit
-from pygit2 import Commit as PyCommit, Repository as PyRepo
+import pygit2
+from pygit2 import Commit as PyCommit, Repository as PyRepo, \
+    GIT_CHECKOUT_FORCE, GIT_SORT_NONE, GIT_CHECKOUT_RECREATE_MISSING
 from pygit2 import GIT_SORT_REVERSE
+
+import subprocess
 
 from pydriller.domain.commit import Commit, ModificationType, Modification
 
 logger = logging.getLogger(__name__)
 
 NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
+
+
+class GitRepositoryException(Exception):
+    pass
 
 
 class GitRepository:
@@ -48,12 +55,11 @@ class GitRepository:
         self.path = Path(path)
         self.project_name = self.path.name
         self.main_branch = None
-        self.lock = Lock()
         self._hyper_blame_available = None
         self._repo = None
 
     @property
-    def repo(self):
+    def repo(self) -> PyRepo:
         """
         GitPython object Repo.
 
@@ -67,13 +73,13 @@ class GitRepository:
     def hyper_blame_available(self):
         # Try running 'git hyper-blame' on a file in the repo to check if
         # the command is available.
-        # if self._hyper_blame_available is None:
-        #     try:
-        #         self.git.execute(["git", "hyper-blame", "-h"])
-        #         self._hyper_blame_available = True
-        #     except GitCommandError as e:
-        #         logger.debug("Hyper-blame not available. Using normal blame.")
-        self._hyper_blame_available = False
+        if self._hyper_blame_available is None:
+            try:
+                self.execute(["git", "hyper-blame", "-h"])
+                self._hyper_blame_available = True
+            except GitRepositoryException:
+                logger.debug("Hyper-blame not available. Using normal blame.")
+                self._hyper_blame_available = False
         return self._hyper_blame_available
 
     def _open_repository(self):
@@ -105,7 +111,16 @@ class GitRepository:
         :return: Generator[Commit], the generator of all the commits in the
             repo
         """
-        for commit in self.repo.walk(self.repo.head.target, GIT_SORT_REVERSE):
+        sort = GIT_SORT_REVERSE
+        if reverse_order:
+            sort = GIT_SORT_NONE
+
+        if branch:
+            target = self.repo.branches[branch].target
+        else:
+            target = self.repo.head.target
+
+        for commit in self.repo.walk(target, sort):
             yield self.get_commit_from_pygit2(commit)
 
     def get_commit(self, commit_id: str) -> Commit:
@@ -128,27 +143,22 @@ class GitRepository:
         """
         return Commit(commit, self.path, self.main_branch)
 
-    def checkout(self, _hash: str) -> None:
+    def checkout(self, ref: str) -> None:
         """
         Checkout the repo at the speficied commit.
         BE CAREFUL: this will change the state of the repo, hence it should
         *not* be used with more than 1 thread.
 
-        :param _hash: commit hash to checkout
+        :param commit_hash: commit hash to checkout
         """
-        with self.lock:
-            self._delete_tmp_branch()
-            self.git.checkout('-f', _hash, b='_PD')
-
-    def _delete_tmp_branch(self) -> None:
-        try:
-            # we are already in _PD, so checkout the master branch before
-            # deleting it
-            if self.repo.active_branch.name == '_PD':
-                self.git.checkout('-f', self.main_branch)
-            self.repo.delete_head('_PD', force=True)
-        except GitCommandError:
-            logger.debug("Branch _PD not found")
+        if pygit2.reference_is_valid_name('refs/head/' + ref):
+            self.repo.checkout(ref, strategy=GIT_CHECKOUT_FORCE |
+                               GIT_CHECKOUT_RECREATE_MISSING)
+        else:
+            self.repo.checkout_tree(self.repo[ref],
+                                    strategy=GIT_CHECKOUT_FORCE |
+                                    GIT_CHECKOUT_RECREATE_MISSING)
+            self.repo.set_head(self.repo[ref].oid)
 
     def files(self) -> List[str]:
         """
@@ -163,17 +173,6 @@ class GitRepository:
             for name in files:
                 _all.append(os.path.join(path, name))
         return _all
-
-    def reset(self) -> None:
-        """
-        Reset the state of the repo, checking out the main branch and
-        discarding
-        local changes (-f option).
-
-        """
-        with self.lock:
-            self.git.checkout('-f', self.main_branch)
-            self._delete_tmp_branch()
 
     def total_commits(self) -> int:
         """
@@ -191,9 +190,10 @@ class GitRepository:
         :return: Commit commit: the commit the tag referred to
         """
         try:
-            selected_tag = self.repo.tags[tag]
-            return self.get_commit(selected_tag.commit.hexsha)
-        except (IndexError, AttributeError):
+            return Commit(self.repo.lookup_reference("refs/tags/" + tag).peel(),
+                          self.path,
+                          self.main_branch)
+        except KeyError:
             logger.debug('Tag %s not found', tag)
             raise
 
@@ -248,6 +248,17 @@ class GitRepository:
                 count_additions -= 1
 
         return modified_lines
+
+    def execute(self, command: List[str], cwd: str = None) -> str:
+        if not cwd:
+            cwd = str(self.path)
+        try:
+            return subprocess.check_output(command, cwd=cwd,
+                                           stderr=subprocess.STDOUT,
+                                           universal_newlines=True)
+        except subprocess.CalledProcessError as e:
+            raise GitRepositoryException('GitReposiory.execute() failed. '
+                                         'Check the message above!') from e
 
     def _get_line_numbers(self, line):
         token = line.split(" ")
@@ -334,7 +345,7 @@ class GitRepository:
 
                         buggy_commits.setdefault(path, set()).add(
                             self.get_commit(buggy_commit).hash)
-            except GitCommandError:
+            except GitRepositoryException:
                 logger.debug(
                     "Could not found file %s in commit %s. Probably a double "
                     "rename!", mod.filename, commit.hash)
@@ -347,14 +358,14 @@ class GitRepository:
         If "git hyper-blame" is available, use it. Otherwise use normal blame.
         """
         if not self.hyper_blame_available or hashes_to_ignore_path is None:
-            return self.git.blame('-w', hash + '^',
-                                  '--', path).split('\n')
+            cmd = ["git", "blame", "-w", hash + '^', "--", path]
+            return self.execute(cmd).split('\n')
         else:
             cmd = ["git", "hyper-blame", hash + '^', path]
             if hashes_to_ignore_path is not None:
                 cmd.append("--ignore-file={}"
                            .format(hashes_to_ignore_path))
-            return self.git.execute(cmd).split('\n')
+            return self.execute(cmd).split('\n')
 
     def _useless_line(self, line: str):
         # this covers comments in Java and Python, as well as empty lines.
@@ -377,10 +388,5 @@ class GitRepository:
         """
         path = str(Path(filepath))
 
-        commits = []
-        try:
-            commits = self.git.log("--follow", "--format=%H", path).split('\n')
-        except GitCommandError:
-            logger.debug("Could not find information of file %s", path)
-
-        return commits
+        cmd = ["git", "log", "--follow", "--format=%H", path]
+        return self.execute(cmd).split('\n')

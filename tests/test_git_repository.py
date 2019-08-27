@@ -116,7 +116,7 @@ def test_get_commit_from_tag():
     commit = gr.get_commit_from_tag('v1.4')
 
     assert commit.hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
-    with pytest.raises(IndexError):
+    with pytest.raises(KeyError):
         gr.get_commit_from_tag('v1.5')
 
 
@@ -125,17 +125,14 @@ def test_list_files_in_commit():
     gr.checkout('a7053a4dcd627f5f4f213dc9aa002eb1caf926f8')
     files1 = gr.files()
     assert len(files1) == 3
-    gr.reset()
 
     gr.checkout('f0dd1308bd904a9b108a6a40865166ee962af3d4')
     files2 = gr.files()
     assert len(files2) == 2
-    gr.reset()
 
     gr.checkout('9e71dd5726d775fb4a5f08506a539216e878adbb')
     files3 = gr.files()
     assert len(files3) == 3
-    gr.reset()
 
 
 def test_checkout_consecutive_commits():
@@ -145,7 +142,6 @@ def test_checkout_consecutive_commits():
     gr.checkout('9e71dd5726d775fb4a5f08506a539216e878adbb')
     files3 = gr.files()
     assert len(files3) == 3
-    gr.reset()
 
 
 def test_checkout_with_commit_not_fully_merged_to_master():
@@ -153,14 +149,13 @@ def test_checkout_with_commit_not_fully_merged_to_master():
     gr.checkout('developing')
     files1 = gr.files()
     assert len(files1) == 2
-    gr.reset()
+
     assert 4, "temp branch should be cleared." == len(gr.repo.branches)
     files2 = gr.files()
     assert len(files2) == 1
     gr.checkout('developing')
     files1 = gr.files()
     assert len(files1) == 2
-    gr.reset()
 
 
 def test_get_all_commits():
@@ -215,7 +210,6 @@ def test_commit_in_master_branch():
     commit = git_to_change_head.get_commit('168b3aab057ed61a769acf336a4ef5e64f76c9fd')
     assert commit.in_main_branch is True
 
-    gr.reset()
     assert gr.get_head().hash == '29e929fbc5dc6a2e9c620069b24e2a143af4285f'
 
 

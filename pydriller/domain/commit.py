@@ -247,7 +247,7 @@ class Commit:
     as hash, author, dates, and modified files.
     """
 
-    def __init__(self, commit: PyCommit, project_path: Path,
+    def __init__(self, commit: PyCommit, repo: PyRepo, project_path: Path,
                  main_branch: str) -> None:
         """
         Create a commit object.
@@ -260,7 +260,7 @@ class Commit:
         self._c_object = commit
         self._main_branch = main_branch
         self.project_path = project_path
-
+        self._repo = repo
         self._modifications = None
         self._branches = None
 
@@ -384,11 +384,9 @@ class Commit:
         return self._modifications
 
     def _get_modifications(self):
-        repo = PyRepo(str(self.project_path))
-
         if len(self.parents) == 1:
             # the commit has a parent
-            diff = repo.diff(str(self._c_object.parents[0].id),
+            diff = self._repo.diff(str(self._c_object.parents[0].id),
                              str(self._c_object.id))
             diff.find_similar()
         elif len(self.parents) > 1:
@@ -409,12 +407,12 @@ class Commit:
             diff = self._c_object.tree.diff_to_tree(swap=True)
             diff.find_similar()
 
-        return self._parse_diff(diff, repo)
+        return self._parse_diff(diff)
 
-    def _parse_diff(self, diff, repo) -> List[Modification]:
+    def _parse_diff(self, diff) -> List[Modification]:
         modifications_list = []
         for p in diff:
-            delta: DiffDelta = p.delta
+            delta = p.delta
             old_path = delta.old_file.path
             new_path = delta.new_file.path
             change_type = self._from_change_to_modification_type(
@@ -425,23 +423,22 @@ class Commit:
             elif change_type == ModificationType.ADD:
                 old_path = None
 
-            diff_and_sc = self._get_diff_and_sc(repo, p)
+            diff_and_sc = self._get_diff_and_sc(p, delta)
 
             modifications_list.append(Modification(old_path, new_path,
                                                    change_type, diff_and_sc))
 
         return modifications_list
 
-    def _get_diff_and_sc(self, repo, patch):
-        delta: DiffDelta = patch.delta
+    def _get_diff_and_sc(self, patch, delta):
         if not delta.status_char() == 'D':
-            source_code = repo[self._c_object.tree[delta.new_file.path].id]. \
+            source_code = self._repo[self._c_object.tree[delta.new_file.path].id]. \
                 data.decode('utf-8', 'ignore')
         else:
             source_code = None
 
         if not delta.status_char() == 'A':
-            source_code_before = repo[self._c_object.parents[0].tree[
+            source_code_before = self._repo[self._c_object.parents[0].tree[
                 delta.old_file.path].id]. \
                 data.decode('utf-8', 'ignore')
         else:

@@ -22,11 +22,9 @@ import re
 from pathlib import Path
 from typing import List, Dict, Tuple, Set, Generator
 
-# from git import Git, Repo, GitCommandError, Commit as GitCommit
-import pygit2
 from pygit2 import Commit as PyCommit, Repository as PyRepo, \
-    GIT_CHECKOUT_FORCE, GIT_SORT_NONE, GIT_CHECKOUT_RECREATE_MISSING
-from pygit2 import GIT_SORT_REVERSE
+    GIT_CHECKOUT_FORCE, GIT_SORT_NONE, GIT_CHECKOUT_RECREATE_MISSING, \
+    GIT_SORT_REVERSE
 
 import subprocess
 
@@ -90,10 +88,8 @@ class GitRepository:
 
     def _discover_main_branch(self, repo):
         if not repo.head_is_detached:
-            print("main branch is " + repo.head.shorthand)
             self.main_branch = repo.head.shorthand
         else:
-            print("No main branch since the head is detached")
             self.main_branch = ''
 
     def get_head(self) -> Commit:
@@ -103,7 +99,7 @@ class GitRepository:
         :return: Commit of the head commit
         """
         head_commit = self.repo[self.repo.head.target]
-        return Commit(head_commit, self.path, self.main_branch)
+        return Commit(head_commit, self.repo, self.path, self.main_branch)
 
     def get_list_commits(self, branch: str = None,
                          reverse_order: bool = True) \
@@ -133,7 +129,7 @@ class GitRepository:
         :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
-        return Commit(self.repo[commit_id], self.path, self.main_branch)
+        return Commit(self.repo[commit_id], self.repo, self.path, self.main_branch)
 
     def get_commit_from_pygit2(self, commit: PyCommit) -> Commit:
         """
@@ -144,7 +140,7 @@ class GitRepository:
         :param GitCommit commit: GitPython commit
         :return: Commit commit: PyDriller commit
         """
-        return Commit(commit, self.path, self.main_branch)
+        return Commit(commit, self.repo, self.path, self.main_branch)
 
     def checkout(self, ref: str) -> None:
         """
@@ -202,6 +198,7 @@ class GitRepository:
         """
         try:
             return Commit(self.repo.lookup_reference("refs/tags/" + tag).peel(),
+                          self.repo,
                           self.path,
                           self.main_branch)
         except KeyError:
@@ -348,7 +345,6 @@ class GitRepository:
                 blame = self._get_blame(commit.hash, path,
                                         hashes_to_ignore_path)
                 for num_line, line in deleted_lines:
-                    print(line.strip())
                     if not self._useless_line(line.strip()):
                         buggy_commit = blame[num_line - 1].split(' ')[
                             0].replace('^', '')

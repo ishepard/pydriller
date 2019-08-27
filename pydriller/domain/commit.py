@@ -355,7 +355,7 @@ class Commit:
 
         :return: List[str] parents
         """
-        return self._c_object.parent_ids
+        return [str(p) for p in self._c_object.parent_ids]
 
     @property
     def merge(self) -> bool:
@@ -402,6 +402,7 @@ class Commit:
             # this is the first commit of the repo. Comparing it with git
             # NULL TREE
             diff = self._c_object.tree.diff_to_tree(swap=True)
+            diff.find_similar()
 
         return self._parse_diff(diff, repo)
 
@@ -436,7 +437,7 @@ class Commit:
 
         if not delta.status_char() == 'A':
             source_code_before = repo[self._c_object.parents[0].tree[
-                delta.new_file.path].id].\
+                delta.old_file.path].id].\
                 data.decode('utf-8', 'ignore')
         else:
             source_code_before = None

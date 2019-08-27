@@ -13,6 +13,7 @@
 # limitations under the License.
 import os
 import platform
+from pprint import pprint
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -20,7 +21,7 @@ import pytest
 from git import Repo
 
 from pydriller.domain.commit import ModificationType
-from pydriller.git_repository import GitRepository
+from pydriller.git_repository import GitRepository, GitRepositoryException
 
 
 def test_projectname():
@@ -133,6 +134,7 @@ def test_list_files_in_commit():
     gr.checkout('9e71dd5726d775fb4a5f08506a539216e878adbb')
     files3 = gr.files()
     assert len(files3) == 3
+    gr.checkout('master')
 
 
 def test_checkout_consecutive_commits():
@@ -142,6 +144,7 @@ def test_checkout_consecutive_commits():
     gr.checkout('9e71dd5726d775fb4a5f08506a539216e878adbb')
     files3 = gr.files()
     assert len(files3) == 3
+    gr.checkout('master')
 
 
 def test_checkout_with_commit_not_fully_merged_to_master():
@@ -150,12 +153,14 @@ def test_checkout_with_commit_not_fully_merged_to_master():
     files1 = gr.files()
     assert len(files1) == 2
 
+    gr.checkout('master')
     assert 4, "temp branch should be cleared." == len(gr.repo.branches)
     files2 = gr.files()
     assert len(files2) == 1
     gr.checkout('developing')
     files1 = gr.files()
     assert len(files1) == 2
+    gr.checkout('master')
 
 
 def test_get_all_commits():
@@ -204,13 +209,15 @@ def test_commit_in_master_branch():
     gr.checkout('8986af2a679759e5a15794f6d56e6d46c3f302f1')
 
     git_to_change_head = GitRepository('test-repos/git-2/')
+    # now head is detached, so main branch is an Empty string
     commit = git_to_change_head.get_commit('8169f76a3d7add54b4fc7bca7160d1f1eede6eda')
     assert commit.in_main_branch is False
 
     commit = git_to_change_head.get_commit('168b3aab057ed61a769acf336a4ef5e64f76c9fd')
-    assert commit.in_main_branch is True
+    assert commit.in_main_branch is False
 
-    assert gr.get_head().hash == '29e929fbc5dc6a2e9c620069b24e2a143af4285f'
+    assert gr.get_head().hash == '8986af2a679759e5a15794f6d56e6d46c3f302f1'
+    gr.checkout('master')
 
 
 def test_should_detail_a_commit():
@@ -222,9 +229,12 @@ def test_should_detail_a_commit():
 
     assert commit.msg == "Matricula adicionada"
     assert len(commit.modifications) == 1
+    diff = "diff --git a/Matricula.java b/Matricula.java\nnew file mode " \
+           "100644\nindex 0000000..b77b760\n--- /dev/null\n+++ " \
+           "b/Matricula.java\n@@ -0,0 +1,62 @@\n"
 
     assert commit.modifications[0].new_path == "Matricula.java"
-    assert commit.modifications[0].diff.startswith("@@ -0,0 +1,62 @@\n+package model;") is True
+    assert commit.modifications[0].diff.startswith(diff) is True
     assert commit.modifications[0].source_code.startswith("package model;") is True
 
 
@@ -313,7 +323,7 @@ def test_tags():
     commit = gr.get_commit_from_tag('tag2')
     assert commit.hash == '4638730126d40716e230c2040751a13153fb1556'
 
-    with pytest.raises(IndexError):
+    with pytest.raises(KeyError):
         gr.get_commit_from_tag('tag4')
 
 
@@ -415,7 +425,7 @@ def test_get_commits_modified_file():
     gr = GitRepository('test-repos/test1/')
 
     commits = gr.get_commits_modified_file('file2.java')
-
+    print(commits)
     assert len(commits) == 3
     assert '09f6182cef737db02a085e1d018963c7a29bde5a' in commits
     assert '6411e3096dd2070438a17b225f44475136e54e3a' in commits
@@ -425,9 +435,8 @@ def test_get_commits_modified_file():
 def test_get_commits_modified_file_missing_file():
     gr = GitRepository('test-repos/test1/')
 
-    commits = gr.get_commits_modified_file('non-existing-file.java')
-
-    assert len(commits) == 0
+    with pytest.raises(GitRepositoryException):
+        gr.get_commits_modified_file('non-existing-file.java')
 
 
 def test_get_tagged_commits():

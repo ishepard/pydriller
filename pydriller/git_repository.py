@@ -18,6 +18,7 @@ This module includes 1 class, GitRepository, representing a repository in Git.
 
 import logging
 import os
+import re
 from pathlib import Path
 from typing import List, Dict, Tuple, Set, Generator
 
@@ -89,8 +90,10 @@ class GitRepository:
 
     def _discover_main_branch(self, repo):
         if not repo.head_is_detached:
+            print("main branch is " + repo.head.shorthand)
             self.main_branch = repo.head.shorthand
         else:
+            print("No main branch since the head is detached")
             self.main_branch = ''
 
     def get_head(self) -> Commit:
@@ -112,7 +115,7 @@ class GitRepository:
             repo
         """
         sort = GIT_SORT_REVERSE
-        if reverse_order:
+        if not reverse_order:
             sort = GIT_SORT_NONE
 
         if branch:
@@ -149,10 +152,18 @@ class GitRepository:
         BE CAREFUL: this will change the state of the repo, hence it should
         *not* be used with more than 1 thread.
 
-        :param commit_hash: commit hash to checkout
+        :param ref: commit hash or branch name to checkout
         """
-        if pygit2.reference_is_valid_name('refs/head/' + ref):
-            self.repo.checkout(ref, strategy=GIT_CHECKOUT_FORCE |
+        try:
+            # first check if it's a branch
+            self.repo.lookup_reference('refs/heads/' + ref)
+            branch = True
+        except KeyError:
+            # ref is a commit
+            branch = False
+        if branch:
+            self.repo.checkout('refs/heads/' + ref,
+                               strategy=GIT_CHECKOUT_FORCE |
                                GIT_CHECKOUT_RECREATE_MISSING)
         else:
             self.repo.checkout_tree(self.repo[ref],
@@ -204,9 +215,10 @@ class GitRepository:
         :return: list of tagged commits (can be empty if there are no tags)
         """
         tags = []
-        for tag in self.repo.tags:
-            if tag.commit:
-                tags.append(tag.commit.hexsha)
+        regex = re.compile('^refs/tags')
+        for tag in filter(lambda r: regex.match(r), self.repo.references):
+            tag_ref = self.repo.lookup_reference(tag)
+            tags.append(tag_ref.peel().hex)
         return tags
 
     def parse_diff(self, diff: str) -> Dict[str, List[Tuple[int, str]]]:
@@ -235,11 +247,11 @@ class GitRepository:
             if line.startswith('@@'):
                 count_deletions, count_additions = self._get_line_numbers(line)
 
-            if line.startswith('-'):
+            if line.startswith('-') and not line.startswith('---'):
                 modified_lines['deleted'].append((count_deletions, line[1:]))
                 count_additions -= 1
 
-            if line.startswith('+'):
+            if line.startswith('+') and not line.startswith('+++'):
                 modified_lines['added'].append((count_additions, line[1:]))
                 count_deletions -= 1
 
@@ -255,7 +267,7 @@ class GitRepository:
         try:
             return subprocess.check_output(command, cwd=cwd,
                                            stderr=subprocess.STDOUT,
-                                           universal_newlines=True)
+                                           universal_newlines=True).strip()
         except subprocess.CalledProcessError as e:
             raise GitRepositoryException('GitReposiory.execute() failed. '
                                          'Check the message above!') from e
@@ -336,6 +348,7 @@ class GitRepository:
                 blame = self._get_blame(commit.hash, path,
                                         hashes_to_ignore_path)
                 for num_line, line in deleted_lines:
+                    print(line.strip())
                     if not self._useless_line(line.strip()):
                         buggy_commit = blame[num_line - 1].split(' ')[
                             0].replace('^', '')

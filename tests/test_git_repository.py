@@ -233,7 +233,7 @@ def test_should_detail_a_commit():
            "100644\nindex 0000000..b77b760\n--- /dev/null\n+++ " \
            "b/Matricula.java\n@@ -0,0 +1,62 @@\n"
 
-    assert commit.modifications[0].new_path == "Matricula.java"
+    assert commit.modifications[0].new_path == Path("Matricula.java")
     assert commit.modifications[0].diff.startswith(diff) is True
     assert commit.modifications[0].source_code.startswith("package model;") is True
 
@@ -299,8 +299,8 @@ def test_detail_rename():
     assert commit.author.name == "Maurício Aniche"
     assert commit.author.email == "mauricioaniche@gmail.com"
 
-    assert commit.modifications[0].new_path == "Matricula.javax"
-    assert commit.modifications[0].old_path == "Matricula.java"
+    assert commit.modifications[0].new_path == Path("Matricula.javax")
+    assert commit.modifications[0].old_path == Path("Matricula.java")
 
 
 def test_parent_commits():
@@ -334,7 +334,7 @@ def test_get_commits_last_modified_lines_simple():
 
     assert len(buggy_commits) == 1
     assert '540c7f31c18664a38190fafb6721b5174ff4a166' in buggy_commits[
-        'B.java']
+        Path('B.java')]
 
 
 def test_get_commits_last_modified_lines_multiple():
@@ -344,11 +344,11 @@ def test_get_commits_last_modified_lines_multiple():
 
     assert len(buggy_commits) == 1
     assert '2eb905e5e7be414fd184d6b4f1571b142621f4de' in buggy_commits[
-        'A.java']
+        Path('A.java')]
     assert '20a40688521c1802569e60f9d55342c3bfdd772c' in buggy_commits[
-        'A.java']
+        Path('A.java')]
     assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
-        'A.java']
+        Path('A.java')]
 
 
 def test_get_commits_last_modified_lines_rename_simple():
@@ -358,7 +358,7 @@ def test_get_commits_last_modified_lines_rename_simple():
 
     assert len(buggy_commits) == 1
     assert 'e358878a00e78aca8366264d61a7319d00dd8186' in buggy_commits[
-        'C.java']
+        Path('C.java')]
 
 
 def test_get_commits_last_modified_lines_multiple_rename():
@@ -377,9 +377,9 @@ def test_get_commits_last_modified_lines_rename_simple_more_commits():
 
     assert len(buggy_commits) == 2
     assert '9b373199c270f9b24c37fee70f9e2b3ee9b816e3' in buggy_commits[
-        'A.java']
+        Path('A.java')]
     assert '9b373199c270f9b24c37fee70f9e2b3ee9b816e3' in buggy_commits[
-        'B.java']
+        Path('B.java')]
 
 
 def test_get_commits_last_modified_lines_useless_lines():
@@ -388,7 +388,7 @@ def test_get_commits_last_modified_lines_useless_lines():
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('3bc7295c16b7dfc15d5f82eb6962a2774e1b8420'))
     assert len(buggy_commits) == 1
     assert 'c7fc2e870ce03b0b8dc29ed0eeb26d14e235ea3b' in buggy_commits[
-        'H.java']
+        Path('H.java')]
 
 
 def test_get_commits_last_modified_lines_useless_lines2():
@@ -408,8 +408,9 @@ def test_get_commits_last_modified_lines_for_single_file():
             buggy_commits = gr.get_commits_last_modified_lines(commit, mod)
 
     assert len(buggy_commits) == 1
-    assert 'e2ed043eb96c05ebde653a44ae733ded9ef90750' in buggy_commits['A.java']
-    assert 1 == len(buggy_commits['A.java'])
+    assert 'e2ed043eb96c05ebde653a44ae733ded9ef90750' in buggy_commits[
+        Path('A.java')]
+    assert 1 == len(buggy_commits[Path('A.java')])
 
 
 def test_get_commits_last_modified_lines_with_more_modification():
@@ -418,7 +419,7 @@ def test_get_commits_last_modified_lines_with_more_modification():
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('c7002fb321a8ba32a28fac200538f7c2ba76f175'))
     assert len(buggy_commits) == 1
     assert '5cb9e9ae44a0949ec91d06a955975289be766f34' in buggy_commits[
-        'A.java']
+        Path('A.java')]
 
 
 def test_get_commits_modified_file():
@@ -483,7 +484,7 @@ def test_get_commits_last_modified_lines_hyper_blame(depot_tools):
 
     assert len(buggy_commits) == 1
     assert '540c7f31c18664a38190fafb6721b5174ff4a166' in buggy_commits[
-        'B.java']
+        Path('B.java')]
 
 
 @pytest.mark.skipif(platform.system() == "Windows", reason="depot_tools is not easy to install on Windows CI")
@@ -497,7 +498,7 @@ def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(depot_tools, tm
 
     assert len(buggy_commits) == 1
     assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
-        'B.java']
+        Path('B.java')]
 
 
 @pytest.fixture
@@ -519,7 +520,7 @@ def test_get_commits_last_modified_lines_hyper_blame_ignore_hash_relative(depot_
 
     assert len(buggy_commits) == 1
     assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
-        'B.java']
+        Path('B.java')]
 
 
 @pytest.mark.skipif(platform.system() == "Windows", reason="depot_tools is not easy to install on Windows CI")
@@ -531,6 +532,6 @@ def test_get_commits_last_modified_lines_hyper_blame_with_renaming(
 
     assert len(buggy_commits) == 2
     assert '9568d20856728304ab0b4d2d02fb9e81d0e5156d' in buggy_commits[
-        'A.java']
+        Path('A.java')]
     assert '9568d20856728304ab0b4d2d02fb9e81d0e5156d' in buggy_commits[
-        'H.java']
+        Path('H.java')]

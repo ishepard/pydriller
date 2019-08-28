@@ -84,21 +84,29 @@ class Modification:  # pylint: disable=R0902
     This class contains information regarding a modified file in a commit.
     """
 
-    def __init__(self, old_path: str, new_path: str,
-                 change_type: ModificationType,
-                 diff_and_sc: Dict[str, str]):
+    def __init__(self, patch, repo: PyRepo, commit: PyCommit):
         """
         Initialize a modification. A modification carries on information
         regarding the changed file. Normally, you shouldn't initialize a new
         one.
         """
-        self._old_path = Path(old_path) if old_path is not None else None
-        self._new_path = Path(new_path) if new_path is not None else None
-        self.change_type = change_type
-        self.diff = diff_and_sc['diff']
-        self.source_code = diff_and_sc['source_code']
-        self.source_code_before = diff_and_sc['source_code_before']
+        self._old_path = None
+        self._new_path = None
+        self._change_type = None
+        self._patch = patch
+        self._delta = patch.delta
 
+        # to get the source code we need the repo and commit object
+        self._repo = repo
+        self._commit = commit
+
+        # expensive to calculate, so I calculate them only once and then I
+        # save them in a temporary field
+        self._diff = None
+        self._source_code = None
+        self._source_code_before = None
+
+        # fields we get back from Lizard
         self._nloc = None
         self._complexity = None
         self._token_count = None
@@ -131,26 +139,33 @@ class Modification:  # pylint: disable=R0902
         return removed
 
     @property
-    def old_path(self):
+    def old_path(self) -> Path:
         """
         Old path of the file. Can be None if the file is added.
 
         :return: str old_path
         """
-        if self._old_path:
-            return str(self._old_path)
+        if self._old_path is None and self.change_type != ModificationType.ADD:
+            self._old_path = Path(self._delta.old_file.path)
         return self._old_path
 
     @property
-    def new_path(self):
+    def new_path(self) -> Path:
         """
         New path of the file. Can be None if the file is deleted.
 
         :return: str new_path
         """
-        if self._new_path:
-            return str(self._new_path)
+        if self._new_path is None and self.change_type != ModificationType.DELETE:
+            self._new_path = Path(self._delta.new_file.path)
         return self._new_path
+
+    @property
+    def change_type(self) -> ModificationType:
+        if self._change_type is None:
+            self._change_type = self._from_change_to_modification_type(
+                self._delta.status_char())
+        return self._change_type
 
     @property
     def filename(self) -> str:
@@ -161,12 +176,48 @@ class Modification:  # pylint: disable=R0902
 
         :return: str filename
         """
-        if self._new_path is not None and str(self._new_path) != "/dev/null":
-            path = self._new_path
+        if self.new_path is not None and str(self.new_path) != "/dev/null":
+            path = self.new_path
         else:
-            path = self._old_path
+            path = self.old_path
 
         return path.name
+
+    @property
+    def diff(self) -> str:
+        if self._diff is None:
+            self._diff = self._patch.data.decode('utf-8', 'ignore')
+        return self._diff
+
+    @property
+    def source_code(self) -> str:
+        if self._source_code is None and self.change_type != \
+                ModificationType.DELETE:
+            self._source_code = self._repo[self._commit.tree[
+                str(self.new_path)].id].data.decode('utf-8', 'ignore')
+        return self._source_code
+
+    @property
+    def source_code_before(self) -> str:
+        if self._source_code_before is None and self.change_type != \
+                ModificationType.ADD:
+            self._source_code_before = self._repo[self._commit.parents[0].tree[
+                str(self.old_path)].id].data.decode('utf-8', 'ignore')
+        return self._source_code_before
+
+    # pylint disable=R0902
+    def _from_change_to_modification_type(self, diff_char: str) -> \
+            ModificationType:
+        if diff_char == 'A':
+            return ModificationType.ADD
+        if diff_char == 'D':
+            return ModificationType.DELETE
+        if diff_char == 'R':
+            return ModificationType.RENAME
+        if diff_char == 'M':
+            return ModificationType.MODIFY
+
+        return ModificationType.UNKNOWN
 
     @property
     def nloc(self) -> int:
@@ -225,7 +276,8 @@ class Modification:  # pylint: disable=R0902
     def __eq__(self, other):
         if not isinstance(other, Modification):
             return NotImplemented
-        if self is other:
+        if self._commit.hex == other._commit.hex and self._repo.path == \
+                other._repo.path:
             return True
         return self.__dict__ == other.__dict__
 
@@ -411,46 +463,11 @@ class Commit:
 
     def _parse_diff(self, diff) -> List[Modification]:
         modifications_list = []
-        for p in diff:
-            delta = p.delta
-            old_path = delta.old_file.path
-            new_path = delta.new_file.path
-            change_type = self._from_change_to_modification_type(
-                delta.status_char())
-
-            if change_type == ModificationType.DELETE:
-                new_path = None
-            elif change_type == ModificationType.ADD:
-                old_path = None
-
-            diff_and_sc = self._get_diff_and_sc(p, delta)
-
-            modifications_list.append(Modification(old_path, new_path,
-                                                   change_type, diff_and_sc))
+        for patch in diff:
+            modifications_list.append(Modification(patch, self._repo,
+                                                   self._c_object))
 
         return modifications_list
-
-    def _get_diff_and_sc(self, patch, delta):
-        if not delta.status_char() == 'D':
-            source_code = self._repo[self._c_object.tree[delta.new_file.path].id]. \
-                data.decode('utf-8', 'ignore')
-        else:
-            source_code = None
-
-        if not delta.status_char() == 'A':
-            source_code_before = self._repo[self._c_object.parents[0].tree[
-                delta.old_file.path].id]. \
-                data.decode('utf-8', 'ignore')
-        else:
-            source_code_before = None
-
-        diff_and_sc = {
-            'diff': patch.data.decode('utf-8', 'ignore'),
-            'source_code': source_code,
-            'source_code_before': source_code_before
-        }
-
-        return diff_and_sc
 
     @property
     def in_main_branch(self) -> bool:
@@ -479,19 +496,6 @@ class Commit:
         for branch in set(c_git.branch('--contains', self.hash).split('\n')):
             branches.add(branch.strip().replace('* ', ''))
         return branches
-
-    # pylint disable=R0902
-    def _from_change_to_modification_type(self, diff_char: str):
-        if diff_char == 'A':
-            return ModificationType.ADD
-        if diff_char == 'D':
-            return ModificationType.DELETE
-        if diff_char == 'R':
-            return ModificationType.RENAME
-        if diff_char == 'M':
-            return ModificationType.MODIFY
-
-        return ModificationType.UNKNOWN
 
     def __eq__(self, other):
         if not isinstance(other, Commit):

@@ -342,7 +342,7 @@ class GitRepository:
                 path = mod.old_path
             deleted_lines = self.parse_diff(mod.diff)['deleted']
             try:
-                blame = self._get_blame(commit.hash, path,
+                blame = self._get_blame(commit.hash, str(path),
                                         hashes_to_ignore_path)
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):

@@ -56,7 +56,7 @@ def test_memory(caplog):
         diff_with_metrics.seconds // 3600, (diff_with_metrics.seconds % 3600) // 60, diff_with_metrics.seconds % 60
     ))
 
-    if any(val > 350 for val in max_values) or \
+    if any(val > 300 for val in max_values) or \
             minutes_with_everything >= 1 or \
             minutes_with_metrics >= 5:
         # if to analyze 1000 commits requires more than 250MB of RAM, more than 1 minute without metrics or

@@ -69,7 +69,7 @@ def test_get_commit():
     assert c.committer.name == 'ishepard'
     assert c.author_date.timestamp() == datetime(2018, 3, 22, 10, 42, 3,
                                                  tzinfo=to_zone).timestamp()
-    assert len(c.modifications) == 1
+    assert len(list(c.modifications)) == 1
     assert c.msg == 'Ooops file2'
     assert c.in_main_branch is True
 
@@ -86,7 +86,7 @@ def test_get_first_commit():
                                                  tzinfo=to_zone).timestamp()
     assert c.committer_date.timestamp() == datetime(2018, 3, 22, 10, 41, 11,
                                                     tzinfo=to_zone).timestamp()
-    assert len(c.modifications) == 2
+    assert len(list(c.modifications)) == 2
     assert c.msg == 'First commit adding 2 files'
     assert c.in_main_branch is True
 
@@ -228,14 +228,15 @@ def test_should_detail_a_commit():
     assert commit.author.email == "mauricioaniche@gmail.com"
 
     assert commit.msg == "Matricula adicionada"
-    assert len(commit.modifications) == 1
+    mods = list(commit.modifications)
+    assert len(mods) == 1
     diff = "diff --git a/Matricula.java b/Matricula.java\nnew file mode " \
            "100644\nindex 0000000..b77b760\n--- /dev/null\n+++ " \
            "b/Matricula.java\n@@ -0,0 +1,62 @@\n"
 
-    assert commit.modifications[0].new_path == Path("Matricula.java")
-    assert commit.modifications[0].diff.startswith(diff) is True
-    assert commit.modifications[0].source_code.startswith("package model;") is True
+    assert mods[0].new_path == "Matricula.java"
+    assert mods[0].diff.startswith(diff) is True
+    assert mods[0].source_code.startswith("package model;") is True
 
 
 def test_merge_commits():
@@ -253,34 +254,39 @@ def test_merge_commits():
 def test_number_of_modifications():
     gr = GitRepository('test-repos/git-1/')
     commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
-    assert commit.modifications[0].added == 62
-    assert commit.modifications[0].removed == 0
+    mods = list(commit.modifications)
+    assert mods[0].added == 62
+    assert mods[0].removed == 0
 
     commit = gr.get_commit('d11dd6734ff4e60cac3a7b58d9267f138c9e05c7')
-    assert commit.modifications[0].added == 1
-    assert commit.modifications[0].removed == 1
+    mods = list(commit.modifications)
+    assert mods[0].added == 1
+    assert mods[0].removed == 1
 
 
 def test_modification_status():
     gr = GitRepository('test-repos/git-1/')
     commit = gr.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
-    assert commit.modifications[0].change_type == ModificationType.ADD
-    assert commit.modifications[0].old_path is None
+    mods = list(commit.modifications)
+    assert mods[0].change_type == ModificationType.ADD
+    assert mods[0].old_path is None
 
     commit = gr.get_commit('57dbd017d1a744b949e7ca0b1c1a3b3dd4c1cbc1')
-    assert commit.modifications[0].change_type == ModificationType.MODIFY
-    assert commit.modifications[0].new_path == commit.modifications[0].old_path
+    mods = list(commit.modifications)
+    assert mods[0].change_type == ModificationType.MODIFY
+    assert mods[0].new_path == mods[0].old_path
 
     commit = gr.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71')
-    assert commit.modifications[0].change_type == ModificationType.DELETE
-    assert commit.modifications[0].new_path is None
+    mods = list(commit.modifications)
+    assert mods[0].change_type == ModificationType.DELETE
+    assert mods[0].new_path is None
 
 
 def test_diffs():
     gr = GitRepository('test-repos/test4/')
     commit = gr.get_commit('93b4b18673ca6fb5d563bbf930c45cd1198e979b')
 
-    assert len(commit.modifications) == 2
+    assert len(list(commit.modifications)) == 2
 
     for mod in commit.modifications:
         if mod.filename == 'file4.java':
@@ -299,20 +305,26 @@ def test_detail_rename():
     assert commit.author.name == "Maurício Aniche"
     assert commit.author.email == "mauricioaniche@gmail.com"
 
-    assert commit.modifications[0].new_path == Path("Matricula.javax")
-    assert commit.modifications[0].old_path == Path("Matricula.java")
+    assert list(commit.modifications)[0].new_path == "Matricula.javax"
+    assert list(commit.modifications)[0].old_path == "Matricula.java"
 
 
 def test_parent_commits():
     gr = GitRepository('test-repos/git-5/')
     merge_commit = gr.get_commit('5d9d79607d7e82b6f236aa29be4ba89a28fb4f15')
-    assert len(merge_commit.parents) == 2
-    assert 'fa8217c324e7fb46c80e1ddf907f4e141449637e' in merge_commit.parents
-    assert 'ff663cf1931a67d5e47b75fc77dcea432c728052' in merge_commit.parents
+    parents_ids = []
+    for mc in merge_commit.parents:
+        parents_ids.append(mc.hash)
+    assert len(parents_ids) == 2
+    assert 'fa8217c324e7fb46c80e1ddf907f4e141449637e' in parents_ids
+    assert 'ff663cf1931a67d5e47b75fc77dcea432c728052' in parents_ids
 
     normal_commit = gr.get_commit('ff663cf1931a67d5e47b75fc77dcea432c728052')
-    assert len(normal_commit.parents) == 1
-    assert '4a17f31c0d1285477a3a467d0bc3cb38e775097d' in normal_commit.parents
+    parents_ids = []
+    for mc in normal_commit.parents:
+        parents_ids.append(mc.hash)
+    assert len(parents_ids) == 1
+    assert '4a17f31c0d1285477a3a467d0bc3cb38e775097d' in parents_ids
 
 
 def test_tags():
@@ -334,7 +346,7 @@ def test_get_commits_last_modified_lines_simple():
 
     assert len(buggy_commits) == 1
     assert '540c7f31c18664a38190fafb6721b5174ff4a166' in buggy_commits[
-        Path('B.java')]
+        'B.java']
 
 
 def test_get_commits_last_modified_lines_multiple():
@@ -344,11 +356,11 @@ def test_get_commits_last_modified_lines_multiple():
 
     assert len(buggy_commits) == 1
     assert '2eb905e5e7be414fd184d6b4f1571b142621f4de' in buggy_commits[
-        Path('A.java')]
+        'A.java']
     assert '20a40688521c1802569e60f9d55342c3bfdd772c' in buggy_commits[
-        Path('A.java')]
+        'A.java']
     assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
-        Path('A.java')]
+        'A.java']
 
 
 def test_get_commits_last_modified_lines_rename_simple():
@@ -358,7 +370,7 @@ def test_get_commits_last_modified_lines_rename_simple():
 
     assert len(buggy_commits) == 1
     assert 'e358878a00e78aca8366264d61a7319d00dd8186' in buggy_commits[
-        Path('C.java')]
+        'C.java']
 
 
 def test_get_commits_last_modified_lines_multiple_rename():
@@ -377,9 +389,9 @@ def test_get_commits_last_modified_lines_rename_simple_more_commits():
 
     assert len(buggy_commits) == 2
     assert '9b373199c270f9b24c37fee70f9e2b3ee9b816e3' in buggy_commits[
-        Path('A.java')]
+        'A.java']
     assert '9b373199c270f9b24c37fee70f9e2b3ee9b816e3' in buggy_commits[
-        Path('B.java')]
+        'B.java']
 
 
 def test_get_commits_last_modified_lines_useless_lines():
@@ -388,7 +400,7 @@ def test_get_commits_last_modified_lines_useless_lines():
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('3bc7295c16b7dfc15d5f82eb6962a2774e1b8420'))
     assert len(buggy_commits) == 1
     assert 'c7fc2e870ce03b0b8dc29ed0eeb26d14e235ea3b' in buggy_commits[
-        Path('H.java')]
+        'H.java']
 
 
 def test_get_commits_last_modified_lines_useless_lines2():
@@ -409,8 +421,8 @@ def test_get_commits_last_modified_lines_for_single_file():
 
     assert len(buggy_commits) == 1
     assert 'e2ed043eb96c05ebde653a44ae733ded9ef90750' in buggy_commits[
-        Path('A.java')]
-    assert 1 == len(buggy_commits[Path('A.java')])
+        'A.java']
+    assert 1 == len(buggy_commits['A.java'])
 
 
 def test_get_commits_last_modified_lines_with_more_modification():
@@ -419,7 +431,7 @@ def test_get_commits_last_modified_lines_with_more_modification():
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit('c7002fb321a8ba32a28fac200538f7c2ba76f175'))
     assert len(buggy_commits) == 1
     assert '5cb9e9ae44a0949ec91d06a955975289be766f34' in buggy_commits[
-        Path('A.java')]
+        'A.java']
 
 
 def test_get_commits_modified_file():
@@ -484,7 +496,7 @@ def test_get_commits_last_modified_lines_hyper_blame(depot_tools):
 
     assert len(buggy_commits) == 1
     assert '540c7f31c18664a38190fafb6721b5174ff4a166' in buggy_commits[
-        Path('B.java')]
+        'B.java']
 
 
 @pytest.mark.skipif(platform.system() == "Windows", reason="depot_tools is not easy to install on Windows CI")
@@ -498,7 +510,7 @@ def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(depot_tools, tm
 
     assert len(buggy_commits) == 1
     assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
-        Path('B.java')]
+        'B.java']
 
 
 @pytest.fixture
@@ -520,7 +532,7 @@ def test_get_commits_last_modified_lines_hyper_blame_ignore_hash_relative(depot_
 
     assert len(buggy_commits) == 1
     assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
-        Path('B.java')]
+        'B.java']
 
 
 @pytest.mark.skipif(platform.system() == "Windows", reason="depot_tools is not easy to install on Windows CI")
@@ -532,6 +544,6 @@ def test_get_commits_last_modified_lines_hyper_blame_with_renaming(
 
     assert len(buggy_commits) == 2
     assert '9568d20856728304ab0b4d2d02fb9e81d0e5156d' in buggy_commits[
-        Path('A.java')]
+        'A.java']
     assert '9568d20856728304ab0b4d2d02fb9e81d0e5156d' in buggy_commits[
-        Path('H.java')]
+        'H.java']

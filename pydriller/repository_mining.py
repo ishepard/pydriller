@@ -212,7 +212,8 @@ class RepositoryMining:
 
             for commit in git_repo.get_list_commits(self._only_in_branch,
                                                     not self._reversed_order):
-                logger.info('Commit #%s in %s from %s', commit.hash,
+                logger.info('Commit #%s in %s from %s',
+                            commit.hash,
                             commit.committer_date,
                             commit.author.name)
 

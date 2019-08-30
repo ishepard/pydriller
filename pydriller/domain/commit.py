@@ -23,7 +23,7 @@ from datetime import datetime, timezone, timedelta
 from enum import Enum
 from pathlib import Path
 from pygit2 import Commit as PyCommit, Repository as PyRepo
-from typing import List, Set
+from typing import List, Generator, Union
 # from pympler import asizeof
 import lizard
 
@@ -88,21 +88,10 @@ class Modification:  # pylint: disable=R0902
         regarding the changed file. Normally, you shouldn't initialize a new
         one.
         """
-        self._old_path = None
-        self._new_path = None
-        self._change_type = None
         self._patch = patch
-        self._delta = patch.delta
-
-        # to get the source code we need the repo and commit object
         self._repo = repo
         self._commit = commit
-
-        # expensive to calculate, so I calculate them only once and then I
-        # save them in a temporary field
-        self._diff = None
-        self._source_code = None
-        self._source_code_before = None
+        self._delta = patch.delta
 
         # fields we get back from Lizard
         self._nloc = None
@@ -137,33 +126,31 @@ class Modification:  # pylint: disable=R0902
         return removed
 
     @property
-    def old_path(self) -> Path:
+    def old_path(self) -> Union[str, None]:
         """
         Old path of the file. Can be None if the file is added.
 
         :return: str old_path
         """
-        if self._old_path is None and self.change_type != ModificationType.ADD:
-            self._old_path = Path(self._delta.old_file.path)
-        return self._old_path
+        if self.change_type != ModificationType.ADD:
+            return self._delta.old_file.path
+        return None
 
     @property
-    def new_path(self) -> Path:
+    def new_path(self) -> Union[str, None]:
         """
         New path of the file. Can be None if the file is deleted.
 
         :return: str new_path
         """
-        if self._new_path is None and self.change_type != ModificationType.DELETE:
-            self._new_path = Path(self._delta.new_file.path)
-        return self._new_path
+        if self.change_type != ModificationType.DELETE:
+            return self._delta.new_file.path
+        return None
 
     @property
     def change_type(self) -> ModificationType:
-        if self._change_type is None:
-            self._change_type = self._from_change_to_modification_type(
-                self._delta.status_char())
-        return self._change_type
+        return self._from_change_to_modification_type(
+            self._delta.status_char())
 
     @property
     def filename(self) -> str:
@@ -175,34 +162,29 @@ class Modification:  # pylint: disable=R0902
         :return: str filename
         """
         if self.new_path is not None and str(self.new_path) != "/dev/null":
-            path = self.new_path
+            path = Path(self.new_path)
         else:
-            path = self.old_path
+            path = Path(self.old_path)
 
         return path.name
 
     @property
     def diff(self) -> str:
-        if self._diff is None:
-            self._diff = self._patch.data.decode('utf-8', 'ignore')
-        return self._diff
+        return self._patch.data.decode('utf-8', 'ignore')
 
     @property
-    def source_code(self) -> str:
-        if self._source_code is None and self.change_type != \
-                ModificationType.DELETE:
-            self._source_code = self._repo[self._commit.tree[
-                str(self.new_path)].id].data.decode('utf-8', 'ignore')
-        # print(f'Commit after mod size is {asizeof.asizeof(self)}')
-        return self._source_code
+    def source_code(self) -> Union[str, None]:
+        if self.change_type != ModificationType.DELETE:
+            return self._repo[self._commit.tree[
+                self.new_path].id].data.decode('utf-8', 'ignore')
+        return None
 
     @property
-    def source_code_before(self) -> str:
-        if self._source_code_before is None and self.change_type != \
-                ModificationType.ADD:
-            self._source_code_before = self._repo[self._commit.parents[0].tree[
-                str(self.old_path)].id].data.decode('utf-8', 'ignore')
-        return self._source_code_before
+    def source_code_before(self) -> Union[str, None]:
+        if self.change_type != ModificationType.ADD:
+            return self._repo[self._commit.parents[0].tree[
+                self.old_path].id].data.decode('utf-8', 'ignore')
+        return None
 
     # pylint disable=R0902
     def _from_change_to_modification_type(self, diff_char: str) -> \
@@ -298,10 +280,9 @@ class Commit:
         :param main_branch: main branch of the repo
         """
         self._c_object = commit
+        self._repo = repo
         self._main_branch = main_branch
         self.project_path = project_path
-        self._repo = repo
-        self._modifications = None
         self._branches = None
 
     @property
@@ -394,13 +375,15 @@ class Commit:
         return self._c_object.message.strip()
 
     @property
-    def parents(self) -> List[str]:
+    def parents(self):
         """
-        Return the list of parents SHAs.
+        Return a generator with the parents' commits.
 
         :return: List[str] parents
         """
-        return [str(p) for p in self._c_object.parent_ids]
+        for parent in self._c_object.parents:
+            yield Commit(parent, self._repo, self.project_path,
+                         self._main_branch)
 
     @property
     def merge(self) -> bool:
@@ -418,17 +401,13 @@ class Commit:
 
         :return: List[Modification] modifications
         """
-        if self._modifications is None:
-            self._modifications = self._get_modifications()
-        return self._modifications
-
-    def _get_modifications(self):
-        if len(self.parents) == 1:
+        num_parents = len(list(self.parents))
+        if num_parents == 1:
             # the commit has a parent
             diff = self._repo.diff(self._c_object.parents[0].hex,
                                    self._c_object.hex)
             diff.find_similar()
-        elif len(self.parents) > 1:
+        elif num_parents > 1:
             # if it's a merge commit, the modified files of the commit are the
             # conflicts. This because if the file is not in conflict,
             # pydriller will visit the modification in one of the previous
@@ -446,15 +425,8 @@ class Commit:
             diff = self._c_object.tree.diff_to_tree(swap=True)
             diff.find_similar()
 
-        return self._parse_diff(diff)
-
-    def _parse_diff(self, diff) -> List[Modification]:
-        modifications_list = []
         for patch in diff:
-            modifications_list.append(Modification(patch, self._repo,
-                                                   self._c_object))
-
-        return modifications_list
+            yield Modification(patch, self._repo, self._c_object)
 
     @property
     def in_main_branch(self) -> bool:

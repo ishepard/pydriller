@@ -32,19 +32,20 @@ def resource():
 
 def test_equal(resource):
     c1 = resource.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2')
-    c2 = resource.get_commit(c1.parents[0])
+    c2 = list(c1.parents)[0]
     c3 = resource.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58')
 
-    assert str(c1.parents[0]) == 'a4ece0762e797d2e2dcbd471115108dd6e05ff58'
+    assert list(c1.parents)[0].hash == \
+           'a4ece0762e797d2e2dcbd471115108dd6e05ff58'
     assert c3 == c2
     assert c1 != c3
 
 
 def test_filename(resource):
-    m1 = resource.get_commit(
-        'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2').modifications[0]
-    m2 = resource.get_commit(
-        '9e71dd5726d775fb4a5f08506a539216e878adbb').modifications[0]
+    m1 = list(resource.get_commit(
+        'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2').modifications)[0]
+    m2 = list(resource.get_commit(
+        '9e71dd5726d775fb4a5f08506a539216e878adbb').modifications)[0]
 
     assert m1.filename == 'Arquivo.java'
     assert m2.filename == 'Capitulo.java'
@@ -93,11 +94,11 @@ def test_filepaths():
     gr = GitRepository('test-repos/test7')
     c = gr.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
-    mod0 = c.modifications[0]
+    mod0 = list(c.modifications)[0]
 
     assert mod0.filename == 'a.java'
-    assert mod0.new_path == Path('dir2/a.java')
-    assert mod0.old_path == Path('dir2/a.java')
+    assert mod0.new_path == 'dir2/a.java'
+    assert mod0.old_path == 'dir2/a.java'
 
 
 def test_projectname():
@@ -110,10 +111,10 @@ def test_projectname():
 def test_modification_with_more_parents():
     gr = GitRepository('test-repos/test11')
     c = gr.get_commit('ce6bcd987a6a53cc55da7cef9f8bb128adf68741')
-    assert len(c.modifications) == 0
+    assert len(list(c.modifications)) == 0
 
     c = gr.get_commit('1b03d13c816f576eb82a8c3e935fbcacff6c2e8d')
-    assert len(c.modifications) == 0
+    assert len(list(c.modifications)) == 0
 
 
 def test_eq_commit():
@@ -121,8 +122,8 @@ def test_eq_commit():
     c1 = gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
     c2 = gr.get_commit('2c1327f957ba3b2a5e86eaed097b0a425236719e')
     c3 = gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
-    m1 = gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc'
-                       '').modifications[0]
+    m1 = list(gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc').modifications)[0]
+
     assert c1 == c3
     assert c1 == c1
     assert c1 != m1
@@ -131,12 +132,12 @@ def test_eq_commit():
 
 def test_eq_modifications():
     gr = GitRepository('test-repos/git-1')
-    m1 = gr.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
-                       '').modifications[0]
-    m2 = gr.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
-                       '').modifications[0]
-    m3 = gr.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58'
-                       '').modifications[0]
+    m1 = list(gr.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
+                       '').modifications)[0]
+    m2 = list(gr.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
+                       '').modifications)[0]
+    m3 = list(gr.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58'
+                       '').modifications)[0]
     c1 = gr.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58')
 
     assert m1 == m2
@@ -165,8 +166,8 @@ def test_tzoffset():
 
 def test_source_code_before():
     gr = GitRepository('test-repos/git-1')
-    m1 = gr.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71'
-                       '').modifications[0]
+    m1 = list(gr.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71'
+                       '').modifications)[0]
 
     assert m1.source_code is None
     assert m1.source_code_before is not None
@@ -174,8 +175,8 @@ def test_source_code_before():
 
 def test_source_code_before_complete():
     gr = GitRepository('test-repos/test12')
-    m1 = gr.get_commit('ca1f75455f064410360bc56218d0418221cf9484'
-                       '').modifications[0]
+    m1 = list(gr.get_commit('ca1f75455f064410360bc56218d0418221cf9484'
+                       '').modifications)[0]
 
     with open('test-repos/test12/sc_A_ca1f75455f064410360bc56218d0418221cf9484'
               '.txt') as f:
@@ -190,15 +191,15 @@ def test_source_code_before_complete():
             '.txt') as f:
         sc = f.read()
 
-    m1 = gr.get_commit('022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0'
-                       '').modifications[0]
+    m1 =list(gr.get_commit('022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0'
+                       '').modifications)[0]
 
     assert m1.source_code == sc
     assert m1.source_code_before == old_sc
 
     old_sc = sc
-    m1 = gr.get_commit('ecd6780457835a2fc85c532338a29f2c98a6cfeb'
-                       '').modifications[0]
+    m1 = list(gr.get_commit('ecd6780457835a2fc85c532338a29f2c98a6cfeb'
+                       '').modifications)[0]
 
     assert m1.source_code is None
     assert m1.source_code_before == old_sc

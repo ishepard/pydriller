@@ -133,11 +133,11 @@ class GitRepository:
 
     def get_commit_from_pygit2(self, commit: PyCommit) -> Commit:
         """
-        Build a PyDriller commit object from a GitPython commit object.
+        Build a PyDriller commit object from a pygit2 commit object.
         This is internal of PyDriller, I don't think users generally will need
         it.
 
-        :param GitCommit commit: GitPython commit
+        :param pygit2 commit: pygit2 commit
         :return: Commit commit: PyDriller commit
         """
         return Commit(commit, self.repo, self.path, self.main_branch)
@@ -342,7 +342,7 @@ class GitRepository:
                 path = mod.old_path
             deleted_lines = self.parse_diff(mod.diff)['deleted']
             try:
-                blame = self._get_blame(commit.hash, str(path),
+                blame = self._get_blame(commit.hash, path,
                                         hashes_to_ignore_path)
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):

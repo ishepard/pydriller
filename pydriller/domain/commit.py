@@ -22,12 +22,10 @@ import logging
 from datetime import datetime, timezone, timedelta
 from enum import Enum
 from pathlib import Path
-from pygit2 import Commit as PyCommit, Repository as PyRepo, Diff, \
-    DiffDelta, DiffFile
-from typing import List, Set, Dict
-
+from pygit2 import Commit as PyCommit, Repository as PyRepo
+from typing import List, Set
+# from pympler import asizeof
 import lizard
-from git import Repo, Diff, Git, Commit as GitCommit
 
 from pydriller.domain.developer import Developer
 
@@ -195,6 +193,7 @@ class Modification:  # pylint: disable=R0902
                 ModificationType.DELETE:
             self._source_code = self._repo[self._commit.tree[
                 str(self.new_path)].id].data.decode('utf-8', 'ignore')
+        # print(f'Commit after mod size is {asizeof.asizeof(self)}')
         return self._source_code
 
     @property
@@ -280,17 +279,6 @@ class Modification:  # pylint: disable=R0902
                 other._repo.path:
             return True
         return self.__dict__ == other.__dict__
-
-    def __str__(self):  # pragma: no cover
-        return (
-                'MODIFICATION\n' +
-                'Old Path: {}\n'.format(self.old_path) +
-                'New Path: {}\n'.format(self.new_path) +
-                'Type: {}\n'.format(self.change_type.name) +
-                'Diff: {}\n'.format(self.diff) +
-                'Source code before: {}\n'.format(self.source_code_before) +
-                'Source code: {}\n'.format(self.source_code)
-        )
 
 
 class Commit:
@@ -432,7 +420,6 @@ class Commit:
         """
         if self._modifications is None:
             self._modifications = self._get_modifications()
-
         return self._modifications
 
     def _get_modifications(self):
@@ -479,7 +466,7 @@ class Commit:
         return self._main_branch in self.branches
 
     @property
-    def branches(self) -> Set[str]:
+    def branches(self) -> List[str]:
         """
         Return the set of branches that contain the commit.
 
@@ -491,11 +478,7 @@ class Commit:
         return self._branches
 
     def _get_branches(self):
-        c_git = Git(str(self.project_path))
-        branches = set()
-        for branch in set(c_git.branch('--contains', self.hash).split('\n')):
-            branches.add(branch.strip().replace('* ', ''))
-        return branches
+        return list(self._repo.branches.with_commit(self.hash))
 
     def __eq__(self, other):
         if not isinstance(other, Commit):
@@ -504,23 +487,3 @@ class Commit:
             return True
 
         return self.__dict__ == other.__dict__
-
-    def __str__(self):  # pragma: no cover
-        return (
-                'Hash: {}\n'.format(self.hash) +
-                'Author: {}\n'.format(self.author.name) +
-                'Author email: {}\n'.format(self.author.email) +
-                'Committer: {}\n'.format(self.committer.name) +
-                'Committer email: {}\n'.format(self.committer.email) +
-                'Author date: {}\n'.format(
-                    self.author_date.strftime("%Y-%m-%d %H:%M:%S")) +
-                'Committer date: {}\n'.format(
-                    self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) +
-                'Message: {}\n'.format(self.msg) +
-                'Parent: {}\n'.format("\n".join(map(str, self.parents))) +
-                'Merge: {}\n'.format(self.merge) +
-                'Modifications: \n{}'.format(
-                    "\n".join(map(str, self.modifications))) +
-                'Branches: \n{}'.format("\n".join(map(str, self.branches))) +
-                'In main branch: {}\n'.format(self.in_main_branch)
-        )

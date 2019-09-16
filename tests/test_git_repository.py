@@ -476,7 +476,12 @@ def depot_tools(tmpdir_factory):
     gr = GitRepository('test-repos/test5/')
     if not gr.hyper_blame_available:
         tmpdir = tmpdir_factory.mktemp("depot_tools")
-        pygit2.clone_repository(url="https://chromium.googlesource.com/chromium/tools/depot_tools.git", path=tmpdir)
+        print("cloning.....")
+        pygit2.clone_repository(
+            url="https://chromium.googlesource.com/chromium/tools"
+                "/depot_tools.git",
+            path=str(tmpdir))
+        print("end cloning.....")
 
         with open(os.path.join(str(tmpdir), 'git_hyper_blame.py'), 'r') as f:
             git_hyper_blame_script = f.read()

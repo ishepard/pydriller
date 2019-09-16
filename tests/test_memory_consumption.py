@@ -150,7 +150,7 @@ def test_performances_diff():
                 mod.source_code_before
                 mod.diff
     dt2 = datetime.now()
-    logging.warning(f'pydriller: it took {dt2 - dt1}')
+    logging.warning('pydriller: it took {}'.format(dt2 - dt1))
 
     dt1 = datetime.now()
     for commit in gitpythonrepo.iter_commits():
@@ -178,4 +178,4 @@ def test_performances_diff():
                 except (UnicodeDecodeError, AttributeError, ValueError):
                     pass
     dt2 = datetime.now()
-    logging.warning(f'gitpython: it took {dt2 - dt1}')
+    logging.warning('gitpython: it took {}'.format(dt2 - dt1))

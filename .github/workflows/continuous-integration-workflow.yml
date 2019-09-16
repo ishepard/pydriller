@@ -25,7 +25,8 @@ jobs:
           pip install codecov pytest-cov
           unzip test-repos
           git clone https://github.com/apache/hadoop.git test-repos/hadoop
-      
+          git config --system core.longpaths true
+
       - name: Run pytest
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}

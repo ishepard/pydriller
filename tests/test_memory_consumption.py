@@ -20,15 +20,18 @@ import psutil
 
 import requests
 import logging
+
+if 'MEM_CONS_TEST' in os.environ:
+    logging.basicConfig(level=logging.WARNING)
+    webhook_url = os.environ['WEBHOOK_URL']
+
 from git import Repo
 from pydriller.repository_mining import RepositoryMining
 from datetime import datetime, timezone
 
-logging.basicConfig(level=logging.WARNING)
-webhook_url = os.environ['WEBHOOK_URL']
-
-
 def test_memory(caplog):
+    if not 'MEM_CONS_TEST' in os.environ:
+        return
     caplog.set_level(logging.WARNING)
 
     logging.warning("Starting with nothing...")
@@ -134,6 +137,8 @@ def mine(_type):
 
 
 def test_performances_diff():
+    if not 'MEM_CONS_TEST' in os.environ:
+        return
     gitpythonrepo = Repo('test-repos/hadoop')
     start = datetime(2017, 1, 1, tzinfo=timezone.utc)
     end = datetime(2018, 1, 1, tzinfo=timezone.utc)

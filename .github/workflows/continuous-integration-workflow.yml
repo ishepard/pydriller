@@ -24,14 +24,19 @@ jobs:
           pip install -r test-requirements.txt
           pip install codecov pytest-cov
           unzip test-repos
-          git clone https://github.com/apache/hadoop.git test-repos/hadoop
-          git config --system core.longpaths true
 
       - name: Run pytest
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          MEM_CONS_TEST: 'TO_RUN'
         run: |
+           git clone https://github.com/apache/hadoop.git test-repos/hadoop
            pytest tests/ --cov=pydriller/
+
+      - name: Run tests on windows
+        if: matrix.os == 'windows-latest'
+        run: pytest tests/ --cov=pydriller/
 
       - name: Publish to codecov
         if: matrix.os == 'ubuntu-latest'

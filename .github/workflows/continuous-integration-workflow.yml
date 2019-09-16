@@ -1,0 +1,44 @@
+name: Pydriller workflow
+on: push
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        python: [ '3.5.x', '3.6.x', '3.7.x' ]
+    name: Python ${{ matrix.python }} sample on ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@master
+      - name: Install python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install libgit2 on Macos
+        if: matrix.os == 'macOS-latest'
+        run: brew install libgit2
+      - name: Install dependencies and unzip test-repos
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r test-requirements.txt
+          pip install codecov pytest-cov
+          unzip test-repos
+
+      - name: Run pytest
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          MEM_CONS_TEST: 'TO_RUN'
+        run: |
+           git clone https://github.com/apache/hadoop.git test-repos/hadoop
+           pytest tests/ --cov=pydriller/
+
+      - name: Run tests on windows
+        if: matrix.os == 'windows-latest'
+        run: pytest tests/ --cov=pydriller/
+
+      - name: Publish to codecov
+        if: matrix.os == 'ubuntu-latest'
+        run: codecov
+        

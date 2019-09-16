@@ -20,18 +20,15 @@ import psutil
 
 import requests
 import logging
-
-if 'MEM_CONS_TEST' in os.environ:
-    logging.basicConfig(level=logging.WARNING)
-    webhook_url = os.environ['WEBHOOK_URL']
-
 from git import Repo
 from pydriller.repository_mining import RepositoryMining
 from datetime import datetime, timezone
 
+logging.basicConfig(level=logging.WARNING)
+webhook_url = os.environ['WEBHOOK_URL']
+
+
 def test_memory(caplog):
-    if not 'MEM_CONS_TEST' in os.environ:
-        return
     caplog.set_level(logging.WARNING)
 
     logging.warning("Starting with nothing...")

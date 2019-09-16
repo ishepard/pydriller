@@ -285,6 +285,7 @@ class Commit:
         self.project_path = project_path
         self._branches = None
 
+
     @property
     def hash(self) -> str:
         """
@@ -381,9 +382,12 @@ class Commit:
 
         :return: List[str] parents
         """
+        parents = []
         for parent in self._c_object.parents:
-            yield Commit(parent, self._repo, self.project_path,
-                         self._main_branch)
+            parents.append(Commit(parent, self._repo, self.project_path,
+                         self._main_branch))
+
+        return parents
 
     @property
     def merge(self) -> bool:
@@ -395,13 +399,13 @@ class Commit:
         return len(self._c_object.parents) > 1
 
     @property
-    def modifications(self) -> List[Modification]:
+    def modifications(self) -> Generator[Modification, None, None]:
         """
-        Return a list of modified files.
+        Return a generator of modified files.
 
-        :return: List[Modification] modifications
+        :return: Generator[Modification, None, None] modifications
         """
-        num_parents = len(list(self.parents))
+        num_parents = len(self.parents)
         if num_parents == 1:
             # the commit has a parent
             diff = self._repo.diff(self._c_object.parents[0].hex,

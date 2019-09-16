@@ -1,4 +1,4 @@
-gitpython
+pygit2==0.28.2
 typing; python_version < '3.5'
 pytz
 lizard

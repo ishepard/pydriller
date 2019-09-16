@@ -25,9 +25,9 @@ if 'MEM_CONS_TEST' in os.environ:
     logging.basicConfig(level=logging.WARNING)
     webhook_url = os.environ['WEBHOOK_URL']
 
+from git import Repo
 from pydriller.repository_mining import RepositoryMining
-from datetime import datetime
-
+from datetime import datetime, timezone
 
 def test_memory(caplog):
     if not 'MEM_CONS_TEST' in os.environ:
@@ -134,3 +134,48 @@ def mine(_type):
     diff = end - start
 
     return diff, all_commits
+
+
+def test_performances_diff():
+    gitpythonrepo = Repo('test-repos/hadoop')
+    start = datetime(2017, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2018, 1, 1, tzinfo=timezone.utc)
+
+    dt1 = datetime.now()
+    for commit in RepositoryMining('test-repos-mercurial/hadoop',
+                                   since=start, to=end).traverse_commits():
+        if len(commit.parents) == 1:
+            for mod in commit.modifications:
+                mod.source_code
+                mod.source_code_before
+                mod.diff
+    dt2 = datetime.now()
+    logging.warning(f'pydriller: it took {dt2 - dt1}')
+
+    dt1 = datetime.now()
+    for commit in gitpythonrepo.iter_commits():
+        if commit.committed_datetime < start or commit.committed_datetime > \
+                end:
+            continue
+        if len(commit.parents) == 1:
+            diff_index = commit.parents[0].diff(commit, create_patch=True)
+            for diff in diff_index:
+                diff.a_path
+                diff.b_path
+                diff.diff.decode('utf-8', 'ignore')
+                try:
+                    if diff.deleted_file:
+                        diff.a_blob.data_stream.read().decode('utf-8',
+                                                              'ignore')
+                    elif diff.new_file:
+                        diff.b_blob.data_stream.read().decode('utf-8',
+                                                              'ignore')
+                    else:
+                        diff.a_blob.data_stream.read().decode('utf-8',
+                                                              'ignore')
+                        diff.b_blob.data_stream.read().decode('utf-8',
+                                                              'ignore')
+                except (UnicodeDecodeError, AttributeError, ValueError):
+                    pass
+    dt2 = datetime.now()
+    logging.warning(f'gitpython: it took {dt2 - dt1}')

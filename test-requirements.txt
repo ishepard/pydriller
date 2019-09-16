@@ -3,4 +3,3 @@
 pytest>=3.5.0
 psutil
 requests
-pygit2==0.28.2

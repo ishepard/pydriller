@@ -22,8 +22,8 @@ import tempfile
 from datetime import datetime
 from typing import List, Generator, Union
 
+import pygit2
 import pytz
-from git import Repo
 
 from pydriller.domain.commit import Commit
 from pydriller.git_repository import GitRepository
@@ -180,7 +180,7 @@ class RepositoryMining:
         repo_folder = os.path.join(tmp_folder,
                                    self._get_repo_name_from_url(repo))
         logger.info("Cloning %s in temporary folder %s", repo, repo_folder)
-        Repo.clone_from(url=repo, to_path=repo_folder)
+        pygit2.clone_repository(url=repo, path=repo_folder)
 
         return repo_folder
 

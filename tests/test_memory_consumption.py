@@ -139,7 +139,7 @@ def test_performances_diff():
     end = datetime(2018, 1, 1, tzinfo=timezone.utc)
 
     dt1 = datetime.now()
-    for commit in RepositoryMining('test-repos-mercurial/hadoop',
+    for commit in RepositoryMining('test-repos/hadoop',
                                    since=start, to=end).traverse_commits():
         if len(commit.parents) == 1:
             for mod in commit.modifications:

@@ -18,7 +18,7 @@ import sys
 
 import psutil
 
-if 'TRAVIS' in os.environ:
+if 'MEM_CONS_TEST' in os.environ:
     import requests
     import logging
 
@@ -30,7 +30,7 @@ from datetime import datetime
 
 
 def test_memory(caplog):
-    if 'TRAVIS' not in os.environ:
+    if 'MEM_CONS_TEST' not in os.environ:
         return
     caplog.set_level(logging.WARNING)
 

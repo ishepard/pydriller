@@ -64,7 +64,7 @@ def test_performances_diff(caplog):
     gitpython_time = dt2 - dt1
     logging.warning('gitpython: it took {}'.format(gitpython_time))
 
-    logging.warning('Pydriller is faster than GitPython of {}'.format(
+    logging.warning('Pydriller is {:.1f} faster than GitPython'.format(
         ((gitpython_time - pydriller_time) / gitpython_time) * 100
     ))
 

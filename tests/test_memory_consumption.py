@@ -35,46 +35,45 @@ def test_performances_diff(caplog):
     caplog.set_level(logging.WARNING)
     gitpythonrepo = Repo('test-repos/hadoop')
     start = datetime(2017, 1, 1, tzinfo=timezone.utc)
-    end = datetime(2018, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2017, 7, 1, tzinfo=timezone.utc)
 
     dt1 = datetime.now()
     for commit in RepositoryMining('test-repos/hadoop',
                                    since=start, to=end).traverse_commits():
-        if len(commit.parents) == 1:
-            for mod in commit.modifications:
-                mod.source_code
-                mod.source_code_before
-                mod.diff
+        for mod in commit.modifications:
+            mod.source_code
+            mod.source_code_before
+            mod.diff
     dt2 = datetime.now()
-    logging.warning('pydriller: it took {}'.format(dt2 - dt1))
+    pydriller_time = dt2 - dt1
+    logging.warning('pydriller: it took {}'.format(pydriller_time))
 
     dt1 = datetime.now()
     for commit in gitpythonrepo.iter_commits():
         if commit.committed_datetime < start or commit.committed_datetime > \
                 end:
             continue
-        if len(commit.parents) == 1:
-            diff_index = commit.parents[0].diff(commit, create_patch=True)
-            for diff in diff_index:
-                diff.a_path
-                diff.b_path
-                diff.diff.decode('utf-8', 'ignore')
-                try:
-                    if diff.deleted_file:
-                        diff.a_blob.data_stream.read().decode('utf-8',
-                                                              'ignore')
-                    elif diff.new_file:
-                        diff.b_blob.data_stream.read().decode('utf-8',
-                                                              'ignore')
-                    else:
-                        diff.a_blob.data_stream.read().decode('utf-8',
-                                                              'ignore')
-                        diff.b_blob.data_stream.read().decode('utf-8',
-                                                              'ignore')
-                except (UnicodeDecodeError, AttributeError, ValueError):
-                    pass
+        diff_index = commit.parents[0].diff(commit, create_patch=True)
+        for diff in diff_index:
+            diff.a_path
+            diff.b_path
+            diff.diff.decode('utf-8', 'ignore')
+            get_decoded_sc_str(diff.a_blob)
+            get_decoded_sc_str(diff.b_blob)
     dt2 = datetime.now()
-    logging.warning('gitpython: it took {}'.format(dt2 - dt1))
+    gitpython_time = dt2 - dt1
+    logging.warning('gitpython: it took {}'.format(gitpython_time))
+
+    logging.warning('Pydriller is faster than GitPython of {}'.format(
+        ((gitpython_time - pydriller_time) / gitpython_time) * 100
+    ))
+
+
+def get_decoded_sc_str(diff):
+    try:
+        return diff.data_stream.read().decode('utf-8', 'ignore')
+    except (AttributeError, ValueError):
+        return None
 
 
 def test_memory(caplog):

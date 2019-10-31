@@ -467,7 +467,7 @@ def test_get_commits_last_modified_lines_hyper_blame():
 
 
 def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(tmpdir):
-    p = Path(tmpdir) / "ignore.txt"
+    p = Path(str(tmpdir)) / "ignore.txt"
     p.write_text("540c7f31c18664a38190fafb6721b5174ff4a166")
 
     gr = GitRepository('test-repos/test5/')
@@ -482,7 +482,7 @@ def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(tmpdir):
 
 
 def test_get_commits_last_modified_lines_hyper_blame_ignore_hash_relative(tmpdir):
-    p = Path(tmpdir) / "ignore.txt"
+    p = Path(str(tmpdir)) / "ignore.txt"
     p.write_text("540c7f31c18664a38190fafb6721b5174ff4a166")
 
     gr = GitRepository('test-repos/test5/')

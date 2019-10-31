@@ -179,6 +179,7 @@ class GitRepository:
                 _all.append(os.path.join(path, name))
         return _all
 
+
     def reset(self) -> None:
         """
         Reset the state of the repo, checking out the main branch and

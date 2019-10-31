@@ -278,10 +278,13 @@ class GitHyperBlame:
                 line.commit.author_time)) + timedelta(hours=hours,
                                                       minutes=minutes)
             author_time = author_time.replace(tzinfo=tz)
+            row = ''
             row = [line.commit.commithash[:8],
                    '(' + line.commit.author,
                    author_time.strftime('%Y-%m-%d %H:%M:%S %z'),
                    str(line.lineno_now) + ('*' if line.modified else '') + ')',
                    line.context]
+            row.insert(1, line.commit.filename)
+            row = ' '.join(row)
             table.append(row)
         return table

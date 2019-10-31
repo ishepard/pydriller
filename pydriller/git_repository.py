@@ -25,6 +25,7 @@ from typing import List, Dict, Tuple, Set, Generator
 from git import Git, Repo, GitCommandError, Commit as GitCommit
 
 from pydriller.domain.commit import Commit, ModificationType, Modification
+from pydriller.utils.hyperblame import GitHyperBlame
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +45,7 @@ class GitRepository:
         :param str path: path to the repository
         """
         self.path = Path(path)
+        self.hyperblame = GitHyperBlame(path)
         self.project_name = self.path.name
         self.main_branch = None
         self.lock = Lock()
@@ -73,18 +75,18 @@ class GitRepository:
             self._open_repository()
         return self._repo
 
-    @property
-    def hyper_blame_available(self):
-        # Try running 'git hyper-blame' on a file in the repo to check if
-        # the command is available.
-        if self._hyper_blame_available is None:
-            try:
-                self.git.execute(["git", "hyper-blame", "-h"])
-                self._hyper_blame_available = True
-            except GitCommandError as e:
-                logger.debug("Hyper-blame not available. Using normal blame.")
-                self._hyper_blame_available = False
-        return self._hyper_blame_available
+    # @property
+    # def hyper_blame_available(self):
+    #     # Try running 'git hyper-blame' on a file in the repo to check if
+    #     # the command is available.
+    #     if self._hyper_blame_available is None:
+    #         try:
+    #             self.git.execute(["git", "hyper-blame", "-h"])
+    #             self._hyper_blame_available = True
+    #         except GitCommandError as e:
+    #             logger.debug("Hyper-blame not available. Using normal blame.")
+    #             self._hyper_blame_available = False
+    #     return self._hyper_blame_available
 
     def _open_git(self):
         self._git = Git(str(self.path))
@@ -276,6 +278,7 @@ class GitRepository:
 
     def get_commits_last_modified_lines(self, commit: Commit,
                                         modification: Modification = None,
+                                        use_hyperblame: bool = False,
                                         hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
         """
@@ -307,14 +310,11 @@ class GitRepository:
                commits to ignore. Requires "git hyper-blame".
         :return: the set containing all the bug inducing commits
         """
-        if hashes_to_ignore_path is not None:
-            assert self.hyper_blame_available, "Can't ignore hashes if " \
-                                               "hyper-blame is not " \
-                                               "available. Install it by " \
-                                               "cloning depot_tools and " \
-                                               "adding it to your PATH."
-            hashes_to_ignore_path = os.path.realpath(hashes_to_ignore_path)
-            assert os.path.exists(hashes_to_ignore_path), "The file with the commit hashes to ignore does not exist"
+        hashes_to_ignore = []
+        if hashes_to_ignore_path is not None and use_hyperblame:
+            assert os.path.exists(hashes_to_ignore_path), \
+                "The file with the commit hashes to ignore does not exist"
+            hashes_to_ignore = open(hashes_to_ignore_path).readlines()
 
         if modification is not None:
             modifications = [modification]
@@ -322,11 +322,13 @@ class GitRepository:
             modifications = commit.modifications
 
         return self._calculate_last_commits(commit, modifications,
-                                            hashes_to_ignore_path)
+                                            use_hyperblame,
+                                            hashes_to_ignore)
 
     def _calculate_last_commits(self, commit: Commit,
                                 modifications: List[Modification],
-                                hashes_to_ignore_path: str = None) \
+                                use_hyperblame: bool = False,
+                                hashes_to_ignore: List[str] = None) \
             -> Dict[str, Set[str]]:
 
         buggy_commits = {}
@@ -338,8 +340,8 @@ class GitRepository:
                 path = mod.old_path
             deleted_lines = self.parse_diff(mod.diff)['deleted']
             try:
-                blame = self._get_blame(commit.hash, path,
-                                        hashes_to_ignore_path)
+                blame = self._get_blame(commit.hash, path, use_hyperblame,
+                                        hashes_to_ignore)
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):
                         buggy_commit = blame[num_line - 1].split(' ')[
@@ -358,19 +360,17 @@ class GitRepository:
         return buggy_commits
 
     def _get_blame(self, hash: str, path: str,
-                   hashes_to_ignore_path: str = None):
+                   use_hyperblame: bool = False,
+                   hashes_to_ignore: List[str] = None):
         """
         If "git hyper-blame" is available, use it. Otherwise use normal blame.
         """
-        if not self.hyper_blame_available or hashes_to_ignore_path is None:
+        if not use_hyperblame or hashes_to_ignore is None:
             return self.git.blame('-w', hash + '^',
                                   '--', path).split('\n')
         else:
-            cmd = ["git", "hyper-blame", hash + '^', path]
-            if hashes_to_ignore_path is not None:
-                cmd.append("--ignore-file={}"
-                           .format(hashes_to_ignore_path))
-            return self.git.execute(cmd).split('\n')
+            return self.hyperblame.hyper_blame(hashes_to_ignore, path,
+                                               hash + '^')
 
     def _useless_line(self, line: str):
         # this covers comments in Java and Python, as well as empty lines.

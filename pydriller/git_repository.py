@@ -76,10 +76,10 @@ class GitRepository:
         return self._repo
 
     def _open_git(self):
-        self._git = Git(self.path)
+        self._git = Git(str(self.path))
 
     def _open_repository(self):
-        self._repo = Repo(self.path)
+        self._repo = Repo(str(self.path))
         if self.main_branch is None:
             self._discover_main_branch(self._repo)
 
@@ -161,7 +161,7 @@ class GitRepository:
         :return: List[str], the list of the files
         """
         _all = []
-        for path, _, files in os.walk(self.path):
+        for path, _, files in os.walk(str(self.path)):
             if '.git' in path:
                 continue
             for name in files:

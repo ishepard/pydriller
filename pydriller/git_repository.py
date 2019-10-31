@@ -75,24 +75,11 @@ class GitRepository:
             self._open_repository()
         return self._repo
 
-    # @property
-    # def hyper_blame_available(self):
-    #     # Try running 'git hyper-blame' on a file in the repo to check if
-    #     # the command is available.
-    #     if self._hyper_blame_available is None:
-    #         try:
-    #             self.git.execute(["git", "hyper-blame", "-h"])
-    #             self._hyper_blame_available = True
-    #         except GitCommandError as e:
-    #             logger.debug("Hyper-blame not available. Using normal blame.")
-    #             self._hyper_blame_available = False
-    #     return self._hyper_blame_available
-
     def _open_git(self):
-        self._git = Git(str(self.path))
+        self._git = Git(self.path)
 
     def _open_repository(self):
-        self._repo = Repo(str(self.path))
+        self._repo = Repo(self.path)
         if self.main_branch is None:
             self._discover_main_branch(self._repo)
 
@@ -174,7 +161,7 @@ class GitRepository:
         :return: List[str], the list of the files
         """
         _all = []
-        for path, _, files in os.walk(str(self.path)):
+        for path, _, files in os.walk(self.path):
             if '.git' in path:
                 continue
             for name in files:

@@ -38,3 +38,16 @@ jobs:
       - name: Publish to codecov
         if: matrix.os == 'ubuntu-latest'
         run: codecov
+
+      - name: Slack Notification
+        uses: homoluctus/slatify@master
+        if: always()
+        with:
+          type: ${{ job.status }}
+          job_name: '*Slack Notification*'
+          mention: 'here'
+          mention_if: 'failure'
+          channel: '#general'
+          url: ${{ secrets.WEBHOOK_URL }}
+          commit: true
+          token: ${{ secrets.SLACK_TOKEN }}

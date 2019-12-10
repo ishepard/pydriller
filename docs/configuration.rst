@@ -90,7 +90,7 @@ PyDriller comes with a set of common commit filters that you can apply:
 * **only\_commits** *(List[str])*: only these commits will be analyzed.
 * **only_releases** *(bool)*: only commits that are tagged ("release" is a term of GitHub, does not actually exist in Git)
 * **filepath** *(str)*: only commits that modified this file will be analyzed.
-* **only\_modifications\_with\_file\_types** *(List[str])*: only analyses commits in which at least one modification was done in that file type, e.g., if you pass ".java", then, the it will visit only commits in which at least one Java file was modified; clearly, it will skip other commits.
+* **only\_modifications\_with\_file\_types** *(List[str])*: only analyses commits in which **at least** one modification was done in that file type, e.g., if you pass ".java", it will visit only commits in which at least one Java file was modified; clearly, it will skip other commits (e.g., commits that did not modify Java files).
 
 Examples::
 

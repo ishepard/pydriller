@@ -265,7 +265,7 @@ class GitRepository:
 
     def get_commits_last_modified_lines(self, commit: Commit,
                                         modification: Modification = None,
-                                        use_hyperblame: bool = False,
+                                        hyper_blame: bool = False,
                                         hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
         """
@@ -293,12 +293,14 @@ class GitRepository:
 
         :param Commit commit: the commit to analyze
         :param Modification modification: single modification to analyze
+        :param bool hyper_blame: whether to use git hyper blame or the
+            normal blame (by default it uses the normal blame).
         :param str hashes_to_ignore_path: path to a file containing hashes of
-               commits to ignore. Requires "git hyper-blame".
+               commits to ignore. (only works with git hyper blame)
         :return: the set containing all the bug inducing commits
         """
         hashes_to_ignore = []
-        if hashes_to_ignore_path is not None and use_hyperblame:
+        if hashes_to_ignore_path is not None:
             assert os.path.exists(hashes_to_ignore_path), \
                 "The file with the commit hashes to ignore does not exist"
             hashes_to_ignore = open(hashes_to_ignore_path).readlines()
@@ -309,12 +311,12 @@ class GitRepository:
             modifications = commit.modifications
 
         return self._calculate_last_commits(commit, modifications,
-                                            use_hyperblame,
+                                            hyper_blame,
                                             hashes_to_ignore)
 
     def _calculate_last_commits(self, commit: Commit,
                                 modifications: List[Modification],
-                                use_hyperblame: bool = False,
+                                hyper_blame: bool = False,
                                 hashes_to_ignore: List[str] = None) \
             -> Dict[str, Set[str]]:
 
@@ -327,7 +329,7 @@ class GitRepository:
                 path = mod.old_path
             deleted_lines = self.parse_diff(mod.diff)['deleted']
             try:
-                blame = self._get_blame(commit.hash, path, use_hyperblame,
+                blame = self._get_blame(commit.hash, path, hyper_blame,
                                         hashes_to_ignore)
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):
@@ -347,12 +349,12 @@ class GitRepository:
         return buggy_commits
 
     def _get_blame(self, hash: str, path: str,
-                   use_hyperblame: bool = False,
+                   hyper_blame: bool = False,
                    hashes_to_ignore: List[str] = None):
         """
         If "git hyper-blame" is available, use it. Otherwise use normal blame.
         """
-        if not use_hyperblame or hashes_to_ignore is None:
+        if not hyper_blame or hashes_to_ignore is None:
             return self.git.blame('-w', hash + '^',
                                   '--', path).split('\n')
         else:

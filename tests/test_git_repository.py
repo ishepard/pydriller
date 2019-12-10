@@ -459,7 +459,7 @@ def test_get_commits_last_modified_lines_hyper_blame():
     gr = GitRepository('test-repos/test5/')
 
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit(
-        'e6d3b38a9ef683e8184eac10a0471075c2808bbd'), use_hyperblame=True)
+        'e6d3b38a9ef683e8184eac10a0471075c2808bbd'), hyper_blame=True)
 
     assert len(buggy_commits) == 1
     assert '540c7f31c18664a38190fafb6721b5174ff4a166' in buggy_commits[
@@ -473,22 +473,7 @@ def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(tmp_path):
     gr = GitRepository('test-repos/test5/')
 
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit(
-        'e6d3b38a9ef683e8184eac10a0471075c2808bbd'), use_hyperblame=True,
-        hashes_to_ignore_path=str(p))
-
-    assert len(buggy_commits) == 1
-    assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
-        'B.java']
-
-
-def test_get_commits_last_modified_lines_hyper_blame_ignore_hash_relative(tmp_path):
-    p = tmp_path / "ignore.txt"
-    p.write_text("540c7f31c18664a38190fafb6721b5174ff4a166")
-
-    gr = GitRepository('test-repos/test5/')
-
-    buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit(
-        'e6d3b38a9ef683e8184eac10a0471075c2808bbd'), use_hyperblame=True,
+        'e6d3b38a9ef683e8184eac10a0471075c2808bbd'), hyper_blame=True,
         hashes_to_ignore_path=str(p))
 
     assert len(buggy_commits) == 1
@@ -500,7 +485,7 @@ def test_get_commits_last_modified_lines_hyper_blame_with_renaming():
     gr = GitRepository('test-repos/test5/')
 
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit(
-        'be0772cbaa2eba32bf97aae885199d1a357ddc93'), use_hyperblame=True)
+        'be0772cbaa2eba32bf97aae885199d1a357ddc93'), hyper_blame=True)
 
     assert len(buggy_commits) == 2
     assert '9568d20856728304ab0b4d2d02fb9e81d0e5156d' in buggy_commits[

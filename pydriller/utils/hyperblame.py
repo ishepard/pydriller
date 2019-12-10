@@ -9,26 +9,34 @@ BlameLine = collections.namedtuple(
     'BlameLine',
     'commit context lineno_then lineno_now modified')
 
+# Copyright 2016 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# This is a slightly modified verion of the "git hyper-blame" found in Google
+# depot_tools.
+# See https://github.com/GiantPay/depot_tools/blob/master/git_hyper_blame.py
+# for more information.
 
 class HyperBlameCommit(object):
-  """Info about a commit."""
-  def __init__(self, commithash):
-    self.commithash = commithash
-    self.author = None
-    self.author_mail = None
-    self.author_time = None
-    self.author_tz = None
-    self.committer = None
-    self.committer_mail = None
-    self.committer_time = None
-    self.committer_tz = None
-    self.summary = None
-    self.boundary = None
-    self.previous = None
-    self.filename = None
+    """Info about a commit."""
+    def __init__(self, commithash):
+        self.commithash = commithash
+        self.author = None
+        self.author_mail = None
+        self.author_time = None
+        self.author_tz = None
+        self.committer = None
+        self.committer_mail = None
+        self.committer_time = None
+        self.committer_tz = None
+        self.summary = None
+        self.boundary = None
+        self.previous = None
+        self.filename = None
 
-  def __repr__(self):  # pragma: no cover
-    return '<Commit %s>' % self.commithash
+    def __repr__(self):  # pragma: no cover
+        return '<Commit %s>' % self.commithash
 
 
 class GitHyperBlame:
@@ -77,16 +85,8 @@ class GitHyperBlame:
 
             yield BlameLine(commit, context, lineno_then, lineno_now, False)
 
-    def blame(self, filename, revision=None, porcelain=False, abbrev=None):
-        command = ['blame']
-        if porcelain:
-            command.append('-p')
-        if revision is not None:
-            command.append(revision)
-        return self.g.blame('-p', revision, '--', filename)
-
     def get_parsed_blame(self, filename, revision='HEAD'):
-        blame = self.blame(filename, revision=revision, porcelain=True)
+        blame = self.g.blame('-p', revision, '--', filename)
         return list(self.parse_blame(blame))
 
     def hyper_blame(self, ignored, filename, revision='HEAD'):
@@ -104,8 +104,6 @@ class GitHyperBlame:
         parsed = cache_blame_from(filename, revision)
 
         new_parsed = []
-
-        # We don't show filenames in blame output unless we have to.
         show_filenames = False
         for line in parsed:
             # If a line references an ignored commit, blame that commit's
@@ -122,15 +120,13 @@ class GitHyperBlame:
 
                 if len(parent_blame) == 0:
                     # The previous version of this file was empty,
-                    # therefore, you can't
-                    # ignore this commit.
+                    # therefore, you can't ignore this commit.
                     break
 
                 # line.lineno_then is the line number in question at
                 # line.commit. We need
                 # to translate that line number so that it refers to the
-                # position of the
-                # same line on previouscommit.
+                # position of the same line on previouscommit.
                 lineno_previous = self.approx_lineno_across_revs(
                     line.commit.filename, previousfilename,
                     line.commit.commithash,
@@ -149,7 +145,7 @@ class GitHyperBlame:
                 line = BlameLine(newline.commit, line.context,
                                  newline.lineno_then,
                                  line.lineno_now, True)
-                logger.debug('    replacing with %r', line)
+                logger.debug('replacing with %r', line)
 
             # If any line has a different filename to the file's current
             # name, turn on

@@ -15,7 +15,7 @@
 import logging
 
 import pytest
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -49,6 +49,20 @@ def test_mod_with_file_types_no_extension():
     assert len(lc) == 0
 
 
+def test_mod_with_file_types_and_date():
+    to_zone = timezone(timedelta(hours=2))
+    dt1 = datetime(2016, 10, 8, 23, 57, 49, tzinfo=to_zone)
+    print(dt1)
+    lc = list(RepositoryMining('test-repos/git-4/',
+                               only_modifications_with_file_types=['.java'],
+                               since=dt1)
+              .traverse_commits())
+
+    print(lc)
+    assert len(lc) == 1
+    assert lc[0].hash == 'b8c2be250786975f1c6f47e96922096f1bb25e39'
+
+
 def test_only_in_main_branch():
     lc = list(RepositoryMining('test-repos/git-5/').traverse_commits())
 
@@ -60,7 +74,7 @@ def test_only_in_main_branch():
     assert lc[4].hash == '377e0f474d70f6205784d0150ee0069a050c29ed'
 
 
-def test_multiple_filters():
+def test_only_no_merge():
     lc = list(RepositoryMining('test-repos/git-5/',
                                only_no_merge=True).traverse_commits())
 

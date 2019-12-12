@@ -1,5 +1,7 @@
-component_depth: 1
+component_depth: 2
 languages:
 - python
 exclude:
 - /examples/.*
+- /docs/.*
+- /setup.py

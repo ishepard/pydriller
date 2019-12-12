@@ -321,7 +321,7 @@ class GitRepository:
                                 hashes_to_ignore: List[str] = None) \
             -> Dict[str, Set[str]]:
 
-        buggy_commits = {}
+        commits = {}
 
         for mod in modifications:
             path = mod.new_path
@@ -340,14 +340,14 @@ class GitRepository:
                         if mod.change_type == ModificationType.RENAME:
                             path = mod.new_path
 
-                        buggy_commits.setdefault(path, set()).add(
+                        commits.setdefault(path, set()).add(
                             self.get_commit(buggy_commit).hash)
             except GitCommandError:
                 logger.debug(
                     "Could not found file %s in commit %s. Probably a double "
                     "rename!", mod.filename, commit.hash)
 
-        return buggy_commits
+        return commits
 
     def _get_blame(self, commit_hash: str, path: str,
                    hyper_blame: bool = False,

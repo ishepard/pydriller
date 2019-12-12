@@ -32,15 +32,12 @@ class ProcessMetrics():
                                        to_commit=to_commit,
                                        reversed_order=True).traverse_commits():
             for modified_file in commit.modifications:
-                if modified_file.new_path == filepath or \
-                        modified_file.old_path == filepath:
+                if filepath in (modified_file.new_path,
+                                modified_file.old_path):
                     count += 1
 
                     if modified_file.change_type == ModificationType.RENAME:
                         filepath = str(Path(modified_file.old_path))
-
-                    if modified_file.change_type == ModificationType.ADD:
-                        return count
 
                     break
         return count
@@ -64,15 +61,11 @@ class ProcessMetrics():
                                        reversed_order=True).traverse_commits():
             
             for modified_file in commit.modifications:
-
                 if modified_file.new_path == filepath or modified_file.old_path == filepath:
                     developers.add(commit.author.email.strip())
-                    
+
                     if modified_file.change_type == ModificationType.RENAME:
                         filepath = str(Path(modified_file.old_path))
-                        
-                    if modified_file.change_type == ModificationType.ADD:
-                        return len(developers)
 
                     break
 

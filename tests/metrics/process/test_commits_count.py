@@ -29,12 +29,6 @@ def test_commits_count_with_renaming():
     assert count == 3
 
 def test_commits_count_til_creation_file():
-    for commit in RepositoryMining('test-repos/git-1', reversed_order=True).traverse_commits():
-        for m in commit.modifications:
-            print(m.filename)
-            print(m.change_type)
-            print(m.old_path)
-
     count = ProcessMetrics().commits_count(path_to_repo='test-repos/git-1', filepath='Secao.java')
     assert count == 3
 
@@ -42,4 +36,8 @@ def test_commits_count_til_creation_file():
     assert count == 3
 
     count = ProcessMetrics().commits_count(path_to_repo='test-repos/git-1', filepath='Secao.java', commit_hash='71535a31f0b598a5d5fcebda7146ebc01def783a')
+    assert count == 2
+
+def test_from_latest_remote():
+    count = ProcessMetrics().commits_count(path_to_repo='https://github.com/ishepard/pydriller', filepath='domain/developer.py', commit_hash='fdf671856b260aca058e6595a96a7a0fba05454b')
     assert count == 2

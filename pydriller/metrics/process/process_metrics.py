@@ -31,7 +31,7 @@ class ProcessMetrics():
                 continue
             
             for modified_file in commit.modifications:
-                if modified_file.filename == filepath or modified_file.old_path == filepath:
+                if modified_file.new_path == filepath or modified_file.old_path == filepath:
                     count += 1
 
                     if modified_file.change_type == ModificationType.RENAME:

@@ -1,5 +1,6 @@
 from pydriller.domain.commit import ModificationType
 from pydriller.repository_mining import RepositoryMining
+from pathlib import Path
 
 class ProcessMetrics():
     """
@@ -19,6 +20,8 @@ class ProcessMetrics():
         
         :return: int number of commits made to the file
         """
+
+        filepath = str(Path(filepath))
         count = 0
         start_counting = commit_hash is None
 
@@ -36,7 +39,7 @@ class ProcessMetrics():
                     count += 1
 
                     if modified_file.change_type == ModificationType.RENAME:
-                        filepath = modified_file.old_path 
+                        filepath = str(Path(modified_file.old_path))
                     
                     if modified_file.change_type == ModificationType.ADD:
                         return count
@@ -55,6 +58,7 @@ class ProcessMetrics():
         
         :return: int number of distinct developers contributing to the file
         """
+        filepath = str(Path(filepath))
         developers = set()
         start_counting = commit_hash is None
 
@@ -73,8 +77,8 @@ class ProcessMetrics():
                     developers.add(commit.author.email.strip())
                     
                     if modified_file.change_type == ModificationType.RENAME:
-                        filepath = modified_file.old_path
-                    
+                        filepath = str(Path(modified_file.old_path))
+                        
                     if modified_file.change_type == ModificationType.ADD:
                         return len(developers)
 

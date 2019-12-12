@@ -1,3 +1,4 @@
+from pydriller.domain.commit import ModificationType
 from pydriller.repository_mining import RepositoryMining
 
 class ProcessMetrics():
@@ -30,16 +31,14 @@ class ProcessMetrics():
                 continue
             
             for modified_file in commit.modifications:
-                if modified_file.filename == filepath:
+                if modified_file.filename == filepath or modified_file.old_path == filepath:
                     count += 1
 
-                    # Stop counting if the file has been created at the current commit
-                    if not modified_file.old_path:
+                    if modified_file.change_type == ModificationType.RENAME:
+                        filepath = modified_file.old_path  # Rename filepath with the older one
+                    
+                    if modified_file.change_type == ModificationType.ADD:
                         return count
 
-                    # Else rename filepath with the older one (which can be the same)
-                    filepath = modified_file.old_path
-
                     break
-
         return count

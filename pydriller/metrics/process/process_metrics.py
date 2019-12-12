@@ -11,10 +11,8 @@ class ProcessMetrics():
         developers that contributed to a file
     """
 
-    def commits_count(self, path_to_repo: str,
-                      filepath: str,
-                      from_commit: str = None,
-                      to_commit: str = None):
+    def commits_count(self, path_to_repo: str, filepath: str,
+                      from_commit: str = None, to_commit: str = None):
         """
         Return the number of commits made to a file from the first commit to
         the one identified by commit_hash.
@@ -46,7 +44,8 @@ class ProcessMetrics():
                     break
         return count
 
-    def distinct_dev_count(self, path_to_repo: str, filepath: str, commit_hash: str = None):
+    def distinct_dev_count(self, path_to_repo: str, filepath: str,
+                      from_commit: str = None, to_commit: str = None):
         """
         Return the cumulative number of distinct developers contributed to the file up to the indicated commit.
         
@@ -58,16 +57,10 @@ class ProcessMetrics():
         """
         filepath = str(Path(filepath))
         developers = set()
-        start_counting = commit_hash is None
 
-        for commit in RepositoryMining(path_to_repo, reversed_order=True).traverse_commits():            
-            
-            if not start_counting and commit_hash == commit.hash:
-                start_counting = True
-
-            # Skip commit if not counting
-            if not start_counting:
-                continue
+        for commit in RepositoryMining(path_to_repo, from_commit=from_commit,
+                                       to_commit=to_commit,
+                                       reversed_order=True).traverse_commits():
             
             for modified_file in commit.modifications:
 

@@ -43,7 +43,8 @@ the result is::
 Another very useful API (especially for researchers ;) ) is the one that, given a commit, allows you to retrieve
 all the commits that last "touched" the modified lines of the file (if you pass a bug fixing commit, it will retrieve the bug inducing). 
 
-PS: Since PyDriller 1.9, this function uses (if available) "git hyper-blame" (check `this <https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up>`_ for more info).
+PS: Since PyDriller 1.9, this function can be customized to use "git hyper-blame" (check `this <https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up>`_ for more info).
+Git hyper blame can be instructed to skip specific commits (like commits that refactor the code).
 
 Let's see an example::
 

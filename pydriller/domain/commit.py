@@ -135,9 +135,9 @@ class Modification:  # pylint: disable=R0902
 
         :return: str old_path
         """
-        if self._old_path:
+        if self._old_path is not None:
             return str(self._old_path)
-        return self._old_path
+        return None
 
     @property
     def new_path(self):
@@ -146,9 +146,9 @@ class Modification:  # pylint: disable=R0902
 
         :return: str new_path
         """
-        if self._new_path:
+        if self._new_path is not None:
             return str(self._new_path)
-        return self._new_path
+        return None
 
     @property
     def filename(self) -> str:

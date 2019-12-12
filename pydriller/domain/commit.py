@@ -227,17 +227,6 @@ class Modification:  # pylint: disable=R0902
             return True
         return self.__dict__ == other.__dict__
 
-    def __str__(self): # pragma: no cover
-        return (
-            'MODIFICATION\n' +
-            'Old Path: {}\n'.format(self.old_path) +
-            'New Path: {}\n'.format(self.new_path) +
-            'Type: {}\n'.format(self.change_type.name) +
-            'Diff: {}\n'.format(self.diff) +
-            'Source code before: {}\n'.format(self.source_code_before) +
-            'Source code: {}\n'.format(self.source_code)
-        )
-
 
 class Commit:
     """
@@ -490,23 +479,3 @@ class Commit:
             return True
 
         return self.__dict__ == other.__dict__
-
-    def __str__(self): # pragma: no cover
-        return (
-            'Hash: {}\n'.format(self.hash) +
-            'Author: {}\n'.format(self.author.name) +
-            'Author email: {}\n'.format(self.author.email) +
-            'Committer: {}\n'.format(self.committer.name) +
-            'Committer email: {}\n'.format(self.committer.email) +
-            'Author date: {}\n'.format(
-                self.author_date.strftime("%Y-%m-%d %H:%M:%S")) +
-            'Committer date: {}\n'.format(
-                self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) +
-            'Message: {}\n'.format(self.msg) +
-            'Parent: {}\n'.format("\n".join(map(str, self.parents))) +
-            'Merge: {}\n'.format(self.merge) +
-            'Modifications: \n{}'.format(
-                "\n".join(map(str, self.modifications))) +
-            'Branches: \n{}'.format("\n".join(map(str, self.branches))) +
-            'In main branch: {}\n'.format(self.in_main_branch)
-        )

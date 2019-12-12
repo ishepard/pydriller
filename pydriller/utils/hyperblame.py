@@ -18,7 +18,8 @@ BlameLine = collections.namedtuple(
 # See https://github.com/GiantPay/depot_tools/blob/master/git_hyper_blame.py
 # for more information.
 
-class HyperBlameCommit(object):
+
+class HyperBlameCommit():
     """Info about a commit."""
     def __init__(self, commithash):
         self.commithash = commithash
@@ -131,9 +132,9 @@ class GitHyperBlame:
                     line.commit.commithash,
                     previouscommit, line.lineno_then)
                 logger.debug('ignore commit %s on line p%d/t%d/n%d',
-                              line.commit.commithash, lineno_previous,
-                              line.lineno_then,
-                              line.lineno_now)
+                             line.commit.commithash, lineno_previous,
+                             line.lineno_then,
+                             line.lineno_now)
 
                 # Get the line at lineno_previous in the parent commit.
                 assert 1 <= lineno_previous <= len(parent_blame)

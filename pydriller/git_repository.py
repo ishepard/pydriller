@@ -38,6 +38,7 @@ class GitRepository:
     PyDriller: obtaining the list of commits, checkout, reset, etc.
     """
 
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, path: str):
         """
         Init the Git RepositoryMining.
@@ -348,18 +349,17 @@ class GitRepository:
 
         return buggy_commits
 
-    def _get_blame(self, hash: str, path: str,
+    def _get_blame(self, commit_hash: str, path: str,
                    hyper_blame: bool = False,
                    hashes_to_ignore: List[str] = None):
         """
         If "git hyper-blame" is available, use it. Otherwise use normal blame.
         """
         if not hyper_blame or hashes_to_ignore is None:
-            return self.git.blame('-w', hash + '^',
+            return self.git.blame('-w', commit_hash + '^',
                                   '--', path).split('\n')
-        else:
-            return self.hyperblame.hyper_blame(hashes_to_ignore, path,
-                                               hash + '^')
+        return self.hyperblame.hyper_blame(hashes_to_ignore, path,
+                                           commit_hash + '^')
 
     def _useless_line(self, line: str):
         # this covers comments in Java and Python, as well as empty lines.

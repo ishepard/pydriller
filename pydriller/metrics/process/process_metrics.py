@@ -16,12 +16,12 @@ class ProcessMetrics():
         """
         Return the number of commits made to a file from the first commit to
         the one identified by commit_hash.
-        
+
         :path_to_repo: path to a single repo
         :commit_hash: the SHA of the commit to stop counting. If None, the
             analysis starts from the latest commit
         :filepath: the path to the file to count for. E.g. 'doc/README.md'
-        
+
         :return: int number of commits made to the file
         """
 
@@ -32,12 +32,13 @@ class ProcessMetrics():
                                        to_commit=to_commit,
                                        reversed_order=True).traverse_commits():
             for modified_file in commit.modifications:
-                if modified_file.new_path == filepath or modified_file.old_path == filepath:
+                if modified_file.new_path == filepath or \
+                        modified_file.old_path == filepath:
                     count += 1
 
                     if modified_file.change_type == ModificationType.RENAME:
                         filepath = str(Path(modified_file.old_path))
-                    
+
                     if modified_file.change_type == ModificationType.ADD:
                         return count
 
@@ -45,7 +46,7 @@ class ProcessMetrics():
         return count
 
     def distinct_dev_count(self, path_to_repo: str, filepath: str,
-                      from_commit: str = None, to_commit: str = None):
+                           from_commit: str = None, to_commit: str = None):
         """
         Return the cumulative number of distinct developers contributed to the file up to the indicated commit.
         

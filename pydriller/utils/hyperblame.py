@@ -104,7 +104,6 @@ class GitHyperBlame:
         parsed = cache_blame_from(filename, revision)
 
         new_parsed = []
-        show_filenames = False
         for line in parsed:
             # If a line references an ignored commit, blame that commit's
             # parent repeatedly until we find a non-ignored commit.
@@ -146,12 +145,6 @@ class GitHyperBlame:
                                  newline.lineno_then,
                                  line.lineno_now, True)
                 logger.debug('replacing with %r', line)
-
-            # If any line has a different filename to the file's current
-            # name, turn on
-            # filename display for the entire blame output.
-            if line.commit.filename != filename:
-                show_filenames = True
 
             new_parsed.append(line)
 

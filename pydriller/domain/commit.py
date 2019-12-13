@@ -17,7 +17,7 @@ This module contains all the classes regarding a specific commit, such as
 Commit, Modification,
 ModificationType and Method.
 """
-
+import git
 import logging
 from _datetime import datetime
 from enum import Enum
@@ -234,8 +234,7 @@ class Commit:
     as hash, author, dates, and modified files.
     """
 
-    def __init__(self, commit: GitCommit, project_path: Path,
-                 main_branch: str) -> None:
+    def __init__(self, commit: GitCommit, **kwargs) -> None:
         """
         Create a commit object.
 
@@ -245,8 +244,8 @@ class Commit:
         :param main_branch: main branch of the repo
         """
         self._c_object = commit
-        self._main_branch = main_branch
-        self.project_path = project_path
+        self._main_branch = kwargs["main_branch"]
+        self.project_path = kwargs["path"]
 
         self._modifications = None
         self._branches = None
@@ -368,7 +367,6 @@ class Commit:
         return self._modifications
 
     def _get_modifications(self):
-        repo = Repo(str(self.project_path))
         commit = self._c_object
 
         if len(self.parents) == 1:
@@ -390,8 +388,7 @@ class Commit:
         else:
             # this is the first commit of the repo. Comparing it with git
             # NULL TREE
-            parent = repo.tree(NULL_TREE)
-            diff_index = parent.diff(commit.tree, create_patch=True)
+            diff_index = commit.diff(git.NULL_TREE, create_patch=True)
 
         return self._parse_diff(diff_index)
 

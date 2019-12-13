@@ -1,3 +1,14 @@
+"""
+Copyright 2016 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+
+This is a slightly modified verion of the "git hyper-blame" found in Google
+depot_tools.
+See https://github.com/GiantPay/depot_tools/blob/master/git_hyper_blame.py
+for more information.
+"""
+
 import collections
 from datetime import datetime, timedelta, timezone
 import logging
@@ -8,15 +19,6 @@ logger = logging.getLogger(__name__)
 BlameLine = collections.namedtuple(
     'BlameLine',
     'commit context lineno_then lineno_now modified')
-
-# Copyright 2016 The Chromium Authors. All rights reserved.
-# Use of this source code is governed by a BSD-style license that can be
-# found in the LICENSE file.
-
-# This is a slightly modified verion of the "git hyper-blame" found in Google
-# depot_tools.
-# See https://github.com/GiantPay/depot_tools/blob/master/git_hyper_blame.py
-# for more information.
 
 
 class HyperBlameCommit():

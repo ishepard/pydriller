@@ -39,7 +39,7 @@ class GitRepository:
     """
 
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, path: str):
+    def __init__(self, path: str, **kwargs):
         """
         Init the Git RepositoryMining.
 
@@ -99,7 +99,9 @@ class GitRepository:
         :return: Commit of the head commit
         """
         head_commit = self.repo.head.commit
-        return Commit(head_commit, self.path, self.main_branch)
+        options = {"path": self.path,
+                   "main_branch": self.main_branch}
+        return Commit(head_commit, **options)
 
     def get_list_commits(self, branch: str = None,
                          reverse_order: bool = True) \
@@ -110,8 +112,10 @@ class GitRepository:
         :return: Generator[Commit], the generator of all the commits in the
             repo
         """
+        options = {"path": self.path,
+                   "main_branch": self.main_branch}
         for commit in self.repo.iter_commits(branch, reverse=reverse_order):
-            yield self.get_commit_from_gitpython(commit)
+            yield self.get_commit_from_gitpython(commit, **options)
 
     def get_commit(self, commit_id: str) -> Commit:
         """
@@ -120,9 +124,12 @@ class GitRepository:
         :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
-        return Commit(self.repo.commit(commit_id), self.path, self.main_branch)
+        gp_commit = self.repo.commit(commit_id)
+        options = {"path": self.path,
+                   "main_branch": self.main_branch}
+        return Commit(gp_commit, **options)
 
-    def get_commit_from_gitpython(self, commit: GitCommit) -> Commit:
+    def get_commit_from_gitpython(self, commit: GitCommit, **kwargs) -> Commit:
         """
         Build a PyDriller commit object from a GitPython commit object.
         This is internal of PyDriller, I don't think users generally will need
@@ -131,7 +138,7 @@ class GitRepository:
         :param GitCommit commit: GitPython commit
         :return: Commit commit: PyDriller commit
         """
-        return Commit(commit, self.path, self.main_branch)
+        return Commit(commit, **kwargs)
 
     def checkout(self, _hash: str) -> None:
         """
@@ -168,7 +175,6 @@ class GitRepository:
             for name in files:
                 _all.append(os.path.join(path, name))
         return _all
-
 
     def reset(self) -> None:
         """

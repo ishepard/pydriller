@@ -13,11 +13,9 @@
 # limitations under the License.
 import os
 import platform
+import pytest
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
-
-import pytest
-from git import Repo
 
 from pydriller.domain.commit import ModificationType
 from pydriller.git_repository import GitRepository
@@ -88,6 +86,9 @@ def test_get_first_commit():
     assert len(c.modifications) == 2
     assert c.msg == 'First commit adding 2 files'
     assert c.in_main_branch is True
+
+    assert c.modifications[0].change_type == ModificationType.ADD
+    assert c.modifications[1].change_type == ModificationType.ADD
 
 
 def test_files():

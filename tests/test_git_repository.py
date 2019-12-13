@@ -493,3 +493,7 @@ def test_get_commits_last_modified_lines_hyper_blame_with_renaming():
         'A.java']
     assert '9568d20856728304ab0b4d2d02fb9e81d0e5156d' in buggy_commits[
         'H.java']
+
+
+def test_diff_histogram():
+    pass # TODO: create a test here!!

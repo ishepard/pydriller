@@ -249,6 +249,10 @@ class Commit:
 
         self._modifications = None
         self._branches = None
+        self.diff_options = {}
+
+        if "histogram" in kwargs:
+            self.diff_options["histogram"] = True
 
     @property
     def hash(self) -> str:
@@ -367,12 +371,11 @@ class Commit:
         return self._modifications
 
     def _get_modifications(self):
-        commit = self._c_object
-
         if len(self.parents) == 1:
             # the commit has a parent
-            diff_index = self._c_object.parents[0].diff(commit,
-                                                        create_patch=True)
+            diff_index = self._c_object.parents[0].diff(self._c_object,
+                                                        create_patch=True,
+                                                        **self.diff_options)
         elif len(self.parents) > 1:
             # if it's a merge commit, the modified files of the commit are the
             # conflicts. This because if the file is not in conflict,
@@ -388,7 +391,9 @@ class Commit:
         else:
             # this is the first commit of the repo. Comparing it with git
             # NULL TREE
-            diff_index = commit.diff(git.NULL_TREE, create_patch=True)
+            diff_index = self._c_object.diff(git.NULL_TREE,
+                                             create_patch=True,
+                                             **self.diff_options)
 
         return self._parse_diff(diff_index)
 

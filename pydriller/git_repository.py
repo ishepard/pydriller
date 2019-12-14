@@ -37,7 +37,7 @@ class GitRepository:
     """
 
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, path: str):
+    def __init__(self, path: str, **kwargs):
         """
         Init the Git RepositoryMining.
 
@@ -46,11 +46,17 @@ class GitRepository:
         self.path = Path(path)
         self.hyperblame = GitHyperBlame(path)
         self.project_name = self.path.name
-        self.main_branch = None
         self.lock = Lock()
         self._hyper_blame_available = None
         self._git = None
         self._repo = None
+        self._commit_options = {
+            "path": self.path,
+            "main_branch": None
+        }
+
+        if 'histogram' in kwargs:
+            self._commit_options['histogram'] = True
 
     @property
     def git(self):
@@ -79,16 +85,16 @@ class GitRepository:
 
     def _open_repository(self):
         self._repo = Repo(str(self.path))
-        if self.main_branch is None:
+        if self._commit_options["main_branch"] is None:
             self._discover_main_branch(self._repo)
 
     def _discover_main_branch(self, repo):
         try:
-            self.main_branch = repo.active_branch.name
+            self._commit_options["main_branch"] = repo.active_branch.name
         except TypeError:
             logger.info("HEAD is a detached symbolic reference, setting "
                         "main branch to empty string")
-            self.main_branch = ''
+            self._commit_options["main_branch"] = ''
 
     def get_head(self) -> Commit:
         """
@@ -97,9 +103,7 @@ class GitRepository:
         :return: Commit of the head commit
         """
         head_commit = self.repo.head.commit
-        options = {"path": self.path,
-                   "main_branch": self.main_branch}
-        return Commit(head_commit, **options)
+        return Commit(head_commit, **self._commit_options)
 
     def get_list_commits(self, branch: str = None,
                          reverse_order: bool = True) \
@@ -110,10 +114,8 @@ class GitRepository:
         :return: Generator[Commit], the generator of all the commits in the
             repo
         """
-        options = {"path": self.path,
-                   "main_branch": self.main_branch}
         for commit in self.repo.iter_commits(branch, reverse=reverse_order):
-            yield self.get_commit_from_gitpython(commit, **options)
+            yield self.get_commit_from_gitpython(commit)
 
     def get_commit(self, commit_id: str) -> Commit:
         """
@@ -123,12 +125,9 @@ class GitRepository:
         :return: Commit
         """
         gp_commit = self.repo.commit(commit_id)
-        options = {"path": self.path,
-                   "main_branch": self.main_branch}
-        return Commit(gp_commit, **options)
+        return Commit(gp_commit, **self._commit_options)
 
-    @staticmethod
-    def get_commit_from_gitpython(commit: GitCommit, **kwargs) -> Commit:
+    def get_commit_from_gitpython(self, commit: GitCommit) -> Commit:
         """
         Build a PyDriller commit object from a GitPython commit object.
         This is internal of PyDriller, I don't think users generally will need
@@ -137,7 +136,7 @@ class GitRepository:
         :param GitCommit commit: GitPython commit
         :return: Commit commit: PyDriller commit
         """
-        return Commit(commit, **kwargs)
+        return Commit(commit, **self._commit_options)
 
     def checkout(self, _hash: str) -> None:
         """
@@ -156,7 +155,7 @@ class GitRepository:
             # we are already in _PD, so checkout the master branch before
             # deleting it
             if self.repo.active_branch.name == '_PD':
-                self.git.checkout('-f', self.main_branch)
+                self.git.checkout('-f', self._commit_options["main_branch"])
             self.repo.delete_head('_PD', force=True)
         except GitCommandError:
             logger.debug("Branch _PD not found")
@@ -183,7 +182,7 @@ class GitRepository:
 
         """
         with self.lock:
-            self.git.checkout('-f', self.main_branch)
+            self.git.checkout('-f', self._commit_options["main_branch"])
             self._delete_tmp_branch()
 
     def total_commits(self) -> int:

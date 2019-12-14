@@ -110,21 +110,21 @@ class RepositoryMining:
         self._filepath_commits = None
         self._tagged_commits = None
 
-    def _sanity_check_repos(self, path_to_repo):
+    @staticmethod
+    def _sanity_check_repos(path_to_repo):
         if not isinstance(path_to_repo, str) and \
                 not isinstance(path_to_repo, list):
             raise Exception("The path to the repo has to be of type "
                             "'string' or 'list of strings'!")
 
     def _sanity_check_filters(self, git_repo: GitRepository):
-        # If single is defined, no other filters should be
         if self._single is not None:
-            if not self._check_filters_none([self._since,
-                                             self._to,
-                                             self._from_commit,
-                                             self._to_commit,
-                                             self._from_tag,
-                                             self._to_tag]):
+            if any([self._since,
+                    self._to,
+                    self._from_commit,
+                    self._to_commit,
+                    self._from_tag,
+                    self._to_tag]):
                 raise Exception('You can not specify a single commit with '
                                 'other filters')
 
@@ -132,47 +132,33 @@ class RepositoryMining:
         self._check_ending_commit(git_repo)
 
     def _check_ending_commit(self, git_repo):
-        # If to_commit is defined, to should not be
+        if not self.only_one_filter([self._to, self._to_commit,
+                                     self._to_tag]):
+            raise Exception('You can only specify one between since, '
+                            'from_tag and from_commit')
         if self._to_commit is not None:
-            if not self._check_filters_none([self._to, self._to_tag]):
-                raise Exception('You can not specify both <to date> '
-                                'and <to commit>')
             self._to = git_repo.get_commit(self._to_commit).committer_date
-        # If to_tag is defined, to and to_commit should not be
         if self._to_tag is not None:
-            if not self._check_filters_none([self._to, self._to_commit]):
-                raise Exception('You can not specify <to date> or <to commit> '
-                                'when using <to tag>')
             self._to = git_repo.get_commit_from_tag(
                 self._to_tag).committer_date
 
     def _check_starting_commit(self, git_repo):
-        # If from_commit is defined, since should not be
+        if not self.only_one_filter([self._since, self._from_tag,
+                                     self._from_commit]):
+            raise Exception('You can only specify one between since, '
+                            'from_tag and from_commit')
         if self._from_commit is not None:
-            if not self._check_filters_none([self._since, self._from_tag]):
-                raise Exception('You can not specify both <since date> '
-                                'and <from commit>')
             self._since = git_repo.get_commit(self._from_commit).committer_date
-        # If from_tag is defined, since and from_commit should not be
         if self._from_tag is not None:
-            if not self._check_filters_none([self._since, self._from_commit]):
-                raise Exception('You can not specify <since date> or '
-                                '<from commit> when using <from tag>')
             self._since = git_repo.get_commit_from_tag(
                 self._from_tag).committer_date
 
-    # TODO: check this function!!!!!
-    # def single_true(iterable):
-    #     i = iter(iterable)
-    #     return any(i) and not any(i)
+    @staticmethod
+    def only_one_filter(arr):
+        return len([x for x in arr if x is not None]) <= 1
 
-    def _check_filters_none(self, filters: List):
-        for filt in filters:
-            if filt is not None:
-                return False
-        return True
-
-    def _isremote(self, repo: str) -> bool:
+    @staticmethod
+    def _is_remote(repo: str) -> bool:
         return repo.startswith("git@") or repo.startswith("https://")
 
     def _clone_remote_repos(self, tmp_folder: str, repo: str) -> str:
@@ -191,7 +177,7 @@ class RepositoryMining:
         """
         for path_repo in self._path_to_repo:
             # if it is a remote repo, clone it first in a temporary folder!
-            if self._isremote(path_repo):
+            if self._is_remote(path_repo):
                 tmp_folder = tempfile.TemporaryDirectory()
                 path_repo = self._clone_remote_repos(tmp_folder.name,
                                                      path_repo)
@@ -271,12 +257,14 @@ class RepositoryMining:
         if self._to is not None:
             self._to = self._replace_timezone(self._to)
 
-    def _replace_timezone(self, dt: datetime):
+    @staticmethod
+    def _replace_timezone(dt: datetime):
         if dt.tzinfo is None or dt.tzinfo.utcoffset(dt) is None:
             dt = dt.replace(tzinfo=pytz.utc)
         return dt
 
-    def _get_repo_name_from_url(self, url: str) -> str:
+    @staticmethod
+    def _get_repo_name_from_url(url: str) -> str:
         last_slash_index = url.rfind("/")
         last_suffix_index = url.rfind(".git")
         if last_suffix_index < 0:

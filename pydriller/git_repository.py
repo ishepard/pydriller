@@ -29,8 +29,6 @@ from pydriller.utils.hyperblame import GitHyperBlame
 
 logger = logging.getLogger(__name__)
 
-NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
-
 
 class GitRepository:
     """
@@ -39,7 +37,7 @@ class GitRepository:
     """
 
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, path: str, **kwargs):
+    def __init__(self, path: str):
         """
         Init the Git RepositoryMining.
 
@@ -129,7 +127,8 @@ class GitRepository:
                    "main_branch": self.main_branch}
         return Commit(gp_commit, **options)
 
-    def get_commit_from_gitpython(self, commit: GitCommit, **kwargs) -> Commit:
+    @staticmethod
+    def get_commit_from_gitpython(commit: GitCommit, **kwargs) -> Commit:
         """
         Build a PyDriller commit object from a GitPython commit object.
         This is internal of PyDriller, I don't think users generally will need
@@ -261,7 +260,8 @@ class GitRepository:
 
         return modified_lines
 
-    def _get_line_numbers(self, line):
+    @staticmethod
+    def _get_line_numbers(line):
         token = line.split(" ")
         numbers_old_file = token[1]
         numbers_new_file = token[2]
@@ -367,7 +367,8 @@ class GitRepository:
         return self.hyperblame.hyper_blame(hashes_to_ignore, path,
                                            commit_hash + '^')
 
-    def _useless_line(self, line: str):
+    @staticmethod
+    def _useless_line(line: str):
         # this covers comments in Java and Python, as well as empty lines.
         # More have to be added!
         return not line or \

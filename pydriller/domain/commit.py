@@ -17,7 +17,6 @@ This module contains all the classes regarding a specific commit, such as
 Commit, Modification,
 ModificationType and Method.
 """
-import git
 import logging
 from _datetime import datetime
 from enum import Enum
@@ -25,13 +24,11 @@ from pathlib import Path
 from typing import List, Set, Dict
 
 import lizard
-from git import Repo, Diff, Git, Commit as GitCommit
+from git import Diff, Git, Commit as GitCommit, NULL_TREE
 
 from pydriller.domain.developer import Developer
 
 logger = logging.getLogger(__name__)
-
-NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
 class ModificationType(Enum):
@@ -391,7 +388,7 @@ class Commit:
         else:
             # this is the first commit of the repo. Comparing it with git
             # NULL TREE
-            diff_index = self._c_object.diff(git.NULL_TREE,
+            diff_index = self._c_object.diff(NULL_TREE,
                                              create_patch=True,
                                              **self.diff_options)
 

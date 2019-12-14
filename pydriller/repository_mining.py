@@ -49,7 +49,8 @@ class RepositoryMining:
                  only_authors: List[str] = None,
                  only_commits: List[str] = None,
                  only_releases: bool = False,
-                 filepath: str = None):
+                 filepath: str = None,
+                 histogram_diff: bool = False):
         """
         Init a repository mining. The only required parameter is
         "path_to_repo": to analyze a single repo, pass the absolute path to
@@ -109,6 +110,7 @@ class RepositoryMining:
         self._filepath = filepath
         self._filepath_commits = None
         self._tagged_commits = None
+        self._histogram = histogram_diff
 
     def _sanity_check_repos(self, path_to_repo):
         if not isinstance(path_to_repo, str) and \
@@ -195,8 +197,11 @@ class RepositoryMining:
                 tmp_folder = tempfile.TemporaryDirectory()
                 path_repo = self._clone_remote_repos(tmp_folder.name,
                                                      path_repo)
+            options = {}
+            if self._histogram:
+                options['histogram'] = True
 
-            git_repo = GitRepository(path_repo)
+            git_repo = GitRepository(path_repo, **options)
 
             self._sanity_check_filters(git_repo)
             self._check_timezones()

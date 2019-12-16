@@ -1,0 +1,137 @@
+import logging
+from datetime import datetime
+from typing import Dict
+
+import pytz
+
+from pydriller.domain.commit import Commit
+
+logger = logging.getLogger(__name__)
+
+
+class Conf:
+    def __init__(self, options: Dict[str, object]):
+        self._options = {}
+        for k, v in options.items():
+            self._options[k] = v
+
+        self.sanity_check_repos(self._options['path_to_repo'])
+        if isinstance(self._options['path_to_repo'], str):
+            self._options['path_to_repos'] = [self._options['path_to_repo']]
+        else:
+            self._options['path_to_repos'] = self._options['path_to_repo']
+
+    def put(self, key, value):
+        self._options[key] = value
+
+    def get(self, key):
+        return self._options.get(key, None)
+
+    @staticmethod
+    def sanity_check_repos(path_to_repo):
+        if not isinstance(path_to_repo, str) and \
+                not isinstance(path_to_repo, list):
+            raise Exception("The path to the repo has to be of type "
+                            "'string' or 'list of strings'!")
+
+    def sanity_check_filters(self, git_repo):
+        if self.get('single') is not None:
+            if any([self.get('since'),
+                    self.get('to'),
+                    self.get('from_commit'),
+                    self.get('to_commit'),
+                    self.get('from_tag'),
+                    self.get('to_tag')]):
+                raise Exception('You can not specify a single commit with '
+                                'other filters')
+
+        self.check_starting_commit(git_repo)
+        self.check_ending_commit(git_repo)
+
+    def check_ending_commit(self, git_repo):
+        if not self.only_one_filter([self.get('to'),
+                                     self.get('to_commit'),
+                                     self.get('to_tag')]):
+            raise Exception('You can only specify one between since, '
+                            'from_tag and from_commit')
+        if self.get('to_commit') is not None:
+            self.put('to', git_repo.get_commit(self.get(
+                'to_commit')).committer_date)
+        if self.get('to_tag') is not None:
+            self.put('to', git_repo.get_commit_from_tag(
+                self.get('to_tag')).committer_date)
+
+    def check_starting_commit(self, git_repo):
+        if not self.only_one_filter([self.get('since'),
+                                     self.get('from_commit'),
+                                     self.get('from_tag')]):
+            raise Exception('You can only specify one between since, '
+                            'from_tag and from_commit')
+        if self.get('from_commit') is not None:
+            self.put('since', git_repo.get_commit(
+                self.get('from_commit')).committer_date)
+        if self.get('from_tag') is not None:
+            self.put('since', git_repo.get_commit_from_tag(
+                self.get('from_tag')).committer_date)
+
+    @staticmethod
+    def only_one_filter(arr):
+        return len([x for x in arr if x is not None]) <= 1
+
+    def is_commit_filtered(self, commit: Commit):  # pylint: disable=R0911
+        if self.get('single') is not None and \
+                commit.hash != self.get('single'):
+            logger.debug(
+                'Commit filtered because is not the defined in single')
+            return True
+        if (self.get('since') is not None and
+            commit.committer_date < self.get('since')) or \
+                (self.get('to') is not None and
+                 commit.committer_date > self.get('to')):
+            return True
+        if self.get('only_modifications_with_file_types') is not None:
+            if not self._has_modification_with_file_type(commit):
+                logger.debug('Commit filtered for modification types')
+                return True
+        if self.get('only_no_merge') is True and commit.merge is True:
+            logger.debug('Commit filtered for no merge')
+            return True
+        if self.get('only_authors') is not None and \
+                commit.author.name not in self.get('only_authors'):
+            logger.debug("Commit filtered for author")
+            return True
+        if self.get('only_commits') is not None and \
+                commit.hash not in self.get('only_commits'):
+            logger.debug("Commit filtered because it is not one of the "
+                         "specified commits")
+            return True
+        if self.get('filepath_commits') is not None and \
+                commit.hash not in self.get('filepath_commits'):
+            logger.debug("Commit filtered because it did not modify the "
+                         "specified file")
+            return True
+        if self.get('tagged_commits') is not None and \
+                commit.hash not in self.get('tagged_commits'):
+            logger.debug("Commit filtered because it is not tagged")
+            return True
+
+        return False
+
+    def _has_modification_with_file_type(self, commit):
+        for mod in commit.modifications:
+            if mod.filename.endswith(
+                    tuple(self.get('only_modifications_with_file_types'))):
+                return True
+        return False
+
+    def check_timezones(self):
+        if self.get('since') is not None:
+            self.put('since', self._replace_timezone(self.get('since')))
+        if self.get('to') is not None:
+            self.put('to', self._replace_timezone(self.get('to')))
+
+    @staticmethod
+    def _replace_timezone(dt: datetime):
+        if dt.tzinfo is None or dt.tzinfo.utcoffset(dt) is None:
+            dt = dt.replace(tzinfo=pytz.utc)
+        return dt

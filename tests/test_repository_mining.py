@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pytest
 
-from pydriller import RepositoryMining
+from pydriller import RepositoryMining, GitRepository
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -79,3 +79,58 @@ def test_badly_formatted_url():
 
     with pytest.raises(Exception):
         list(RepositoryMining(path_to_repo='test').traverse_commits())
+
+
+def test_diff_histogram():
+    # without histogram
+    commit = list(RepositoryMining('test-repos/test13',
+                                   single="93df8676e6fab70d9677e94fd0f6b17db095e890").traverse_commits())[0]
+    mod = commit.modifications[0]
+    gr = GitRepository('test-repos/test13')
+    diff = gr.parse_diff(mod.diff)
+    assert len(diff['added']) == 11
+    assert (3, '    if (path == null)') in diff['added']
+    assert (5, '        log.error("Icon path is null");') in diff['added']
+    assert (6, '        return null;') in diff['added']
+    assert (8, '') in diff['added']
+    assert (9, '    java.net.URL imgURL = GuiImporter.class.getResource(path);') in diff['added']
+    assert (10, '') in diff['added']
+    assert (11, '    if (imgURL == null)') in diff['added']
+    assert (12, '    {') in diff['added']
+    assert (14, '        return null;') in diff['added']
+    assert (16, '    else') in diff['added']
+    assert (17, '        return new ImageIcon(imgURL);') in diff['added']
+
+    assert len(diff['deleted']) == 7
+    assert (3, '    java.net.URL imgURL = GuiImporter.class.getResource(path);') in diff['deleted']
+    assert (4, '') in diff['deleted']
+    assert (5, '    if (imgURL != null)') in diff['deleted']
+    assert (7, '        return new ImageIcon(imgURL);') in diff['deleted']
+    assert (9, '    else') in diff['deleted']
+    assert (10, '    {') in diff['deleted']
+    assert (13, '    return null;') in diff['deleted']
+
+    # with histogram
+    commit = list(RepositoryMining('test-repos/test13',
+                                   single="93df8676e6fab70d9677e94fd0f6b17db095e890",
+                                   histogram_diff=True).traverse_commits())[0]
+    mod = commit.modifications[0]
+    gr = GitRepository('test-repos/test13')
+    diff = gr.parse_diff(mod.diff)
+    assert (4, '    {') in diff["added"]
+    assert (5, '        log.error("Icon path is null");') in diff["added"]
+    assert (6, '        return null;') in diff["added"]
+    assert (7, '    }') in diff["added"]
+    assert (8, '') in diff["added"]
+    assert (11, '    if (imgURL == null)') in diff["added"]
+    assert (12, '    {') in diff["added"]
+    assert (13, '        log.error("Couldn\'t find icon: " + imgURL);') in diff["added"]
+    assert (14, '        return null;') in diff["added"]
+    assert (17, '        return new ImageIcon(imgURL);') in diff["added"]
+
+    assert (6, '    {') in diff["deleted"]
+    assert (7, '        return new ImageIcon(imgURL);') in diff["deleted"]
+    assert (10, '    {') in diff["deleted"]
+    assert (11, '        log.error("Couldn\'t find icon: " + imgURL);') in diff["deleted"]
+    assert (12, '    }') in diff["deleted"]
+    assert (13, '    return null;') in diff["deleted"]

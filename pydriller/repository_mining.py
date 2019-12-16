@@ -22,7 +22,6 @@ import tempfile
 from datetime import datetime
 from typing import List, Generator, Union
 
-import pytz
 from git import Repo
 
 from pydriller.domain.commit import Commit
@@ -138,7 +137,6 @@ class RepositoryMining:
             git_repo = GitRepository(path_repo, self._conf)
 
             self._conf.sanity_check_filters(git_repo)
-            self._conf.check_timezones()
 
             logger.info('Analyzing git repository in %s', git_repo.path)
 

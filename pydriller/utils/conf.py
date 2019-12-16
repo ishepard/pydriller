@@ -1,3 +1,7 @@
+"""
+Configuration module.
+"""
+
 import logging
 from datetime import datetime
 from typing import Dict
@@ -10,31 +14,60 @@ logger = logging.getLogger(__name__)
 
 
 class Conf:
+    """
+    Configuration class. This class holds all the possible configurations of
+    the mining process (i.e., starting and ending dates, branches, etc.)
+    It's also responsible for checking whether the filters are correct (i.e.,
+    the user did not specify 2 starting commits).
+    """
     def __init__(self, options: Dict[str, object]):
         self._options = {}
-        for k, v in options.items():
-            self._options[k] = v
+        for key, val in options.items():
+            self._options[key] = val
 
-        self.sanity_check_repos(self._options['path_to_repo'])
-        if isinstance(self._options['path_to_repo'], str):
-            self._options['path_to_repos'] = [self._options['path_to_repo']]
+        self._sanity_check_repos(self.get('path_to_repo'))
+        if isinstance(self.get('path_to_repo'), str):
+            self.put('path_to_repos', [self.get('path_to_repo')])
         else:
-            self._options['path_to_repos'] = self._options['path_to_repo']
+            self.put('path_to_repos', self.get('path_to_repo'))
 
     def put(self, key, value):
+        """
+        Save the value of a configuration.
+
+        :param key: configuration (i.e., start date)
+        :param value: value
+        """
         self._options[key] = value
 
     def get(self, key):
+        """
+        Return the value of the configuration.
+
+        :param key: configuration name
+        :return: value of the configuration, None if not present
+        """
         return self._options.get(key, None)
 
     @staticmethod
-    def sanity_check_repos(path_to_repo):
+    def _sanity_check_repos(path_to_repo):
+        """
+        Checks if repo is of type str or list.
+
+        @param path_to_repo: path to the repo as provided by the user.
+        @return:
+        """
         if not isinstance(path_to_repo, str) and \
                 not isinstance(path_to_repo, list):
             raise Exception("The path to the repo has to be of type "
                             "'string' or 'list of strings'!")
 
     def sanity_check_filters(self, git_repo):
+        """
+        Check if the values passed by the user are correct.
+
+        :param GitRepository git_repo: GitRepository Object
+        """
         if self.get('single') is not None:
             if any([self.get('since'),
                     self.get('to'),
@@ -47,8 +80,14 @@ class Conf:
 
         self.check_starting_commit(git_repo)
         self.check_ending_commit(git_repo)
+        self._check_timezones()
 
     def check_ending_commit(self, git_repo):
+        """
+        Get the ending commit from the 'to', 'to_commit' or 'to_tag' filter.
+
+        :param GitRepository git_repo: GitRepository Object
+        """
         if not self.only_one_filter([self.get('to'),
                                      self.get('to_commit'),
                                      self.get('to_tag')]):
@@ -62,6 +101,12 @@ class Conf:
                 self.get('to_tag')).committer_date)
 
     def check_starting_commit(self, git_repo):
+        """
+        Get the starting commit from the 'since', 'from_commit' or 'from_tag'
+        filter.
+
+        :param GitRepository git_repo: GitRepository Object
+        """
         if not self.only_one_filter([self.get('since'),
                                      self.get('from_commit'),
                                      self.get('from_tag')]):
@@ -76,16 +121,29 @@ class Conf:
 
     @staticmethod
     def only_one_filter(arr):
+        """
+        Return true if in 'arr' there is at most 1 filter to True.
+
+        :param arr: iterable object
+        :return:
+        """
         return len([x for x in arr if x is not None]) <= 1
 
     def is_commit_filtered(self, commit: Commit):  # pylint: disable=R0911
+        """
+        Check if commit has to be filtered according to the filters provided
+        by the user.
+
+        :param Commit commit: Commit to check
+        :return:
+        """
         if self.get('single') is not None and \
                 commit.hash != self.get('single'):
             logger.debug(
                 'Commit filtered because is not the defined in single')
             return True
         if (self.get('since') is not None and
-            commit.committer_date < self.get('since')) or \
+                commit.committer_date < self.get('since')) or \
                 (self.get('to') is not None and
                  commit.committer_date > self.get('to')):
             return True
@@ -124,7 +182,7 @@ class Conf:
                 return True
         return False
 
-    def check_timezones(self):
+    def _check_timezones(self):
         if self.get('since') is not None:
             self.put('since', self._replace_timezone(self.get('since')))
         if self.get('to') is not None:

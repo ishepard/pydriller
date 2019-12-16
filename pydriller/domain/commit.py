@@ -208,7 +208,8 @@ class Modification:  # pylint: disable=R0902
     def _calculate_metrics(self):
         if self.source_code and self._nloc is None:
             analysis = lizard.analyze_file.analyze_source_code(self.filename,
-                                                               self.source_code)
+                                                               self.source_code
+                                                               )
 
             self._nloc = analysis.nloc
             self._complexity = analysis.CCN

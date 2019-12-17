@@ -366,6 +366,9 @@ class Commit:
         if self._conf.get('histogram'):
             options['histogram'] = True
 
+        if self._conf.get('skip_whitespaces'):
+            options['w'] = True
+
         if len(self.parents) == 1:
             # the commit has a parent
             diff_index = self._c_object.parents[0].diff(self._c_object,

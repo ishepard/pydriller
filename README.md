@@ -101,18 +101,6 @@ For information on how to use PyDriller, refer to the official documentation:
 
 or have a look at our [example](https://github.com/ishepard/pydriller/tree/master/examples) folder.
 
-## Overview of Diff Algorithms
-Git offers four different algorithms in `git diff`:
-* Myers (default)
-* Minimal (improved Myers)
-* Patience (try to give contextual diff)
-* Histogram (kind of enhanced patience)
-
-[Differences between four diff algorithms](https://git-scm.com/docs/git-diff#Documentation/git-diff.txt---diff-algorithmpatienceminimalhistogrammyers).
-
-Based on the comparison between Myers and Histogram in a study by [Nugroho, et al (2019)](https://doi.org/10.1007/s10664-019-09772-z), various `diff` algorithms in the `git diff` command produced unequal `diff` outputs. From the result of patches analysis, they found that Histogram is better than Myers to show the changes of code that can be expected to recover the changing operations. 
-Thus, in this tool, we implement histogram `diff` algorithm to consider differences in source code.
-
 ## How to contribute
 Fork the project and follow the instructions on how to get started with [source code](#source-code). I tend to not accept a Pull Request without tests, so:
 

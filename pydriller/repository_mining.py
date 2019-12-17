@@ -50,7 +50,8 @@ class RepositoryMining:
                  only_commits: List[str] = None,
                  only_releases: bool = False,
                  filepath: str = None,
-                 histogram_diff: bool = False):
+                 histogram_diff: bool = False,
+                 skip_whitespaces: bool = False):
         """
         Init a repository mining. The only required parameter is
         "path_to_repo": to analyze a single repo, pass the absolute path to
@@ -103,6 +104,7 @@ class RepositoryMining:
             "only_authors": only_authors,
             "only_commits": only_commits,
             "only_releases": only_releases,
+            "skip_whitespaces": skip_whitespaces,
             "filepath": filepath,
             "filepath_commits": None,
             "tagged_commits": None,

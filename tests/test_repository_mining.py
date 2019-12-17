@@ -134,3 +134,51 @@ def test_diff_histogram():
     assert (11, '        log.error("Couldn\'t find icon: " + imgURL);') in diff["deleted"]
     assert (12, '    }') in diff["deleted"]
     assert (13, '    return null;') in diff["deleted"]
+
+
+def test_ignore_add_whitespaces():
+    commit = list(RepositoryMining('test-repos/test14',
+                                   single="338a74ceae164784e216555d930210371279ba8e").traverse_commits())[0]
+    assert len(commit.modifications) == 1
+    commit = list(RepositoryMining('test-repos/test14',
+                                   skip_whitespaces=True,
+                                   single="338a74ceae164784e216555d930210371279ba8e").traverse_commits())[0]
+    assert len(commit.modifications) == 0
+
+
+def test_ignore_add_whitespaces_and_modified_normal_line():
+    gr = GitRepository('test-repos/test14')
+    commit = list(RepositoryMining('test-repos/test14',
+                                   single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
+    assert len(commit.modifications) == 1
+    parsed_normal_diff = gr.parse_diff(commit.modifications[0].diff)
+    commit = list(RepositoryMining('test-repos/test14',
+                                   skip_whitespaces=True,
+                                   single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
+    assert len(commit.modifications) == 1
+    parsed_wo_whitespaces_diff = gr.parse_diff(commit.modifications[0].diff)
+    assert len(parsed_normal_diff['added']) == 2
+    assert len(parsed_wo_whitespaces_diff['added']) == 1
+
+    assert len(parsed_normal_diff['deleted']) == 1
+    assert len(parsed_wo_whitespaces_diff['deleted']) == 0
+
+
+def test_ignore_deleted_whitespaces():
+    commit = list(RepositoryMining('test-repos/test14',
+                                   single="e6e429f6b485e18fb856019d9953370fd5420b20").traverse_commits())[0]
+    assert len(commit.modifications) == 1
+    commit = list(RepositoryMining('test-repos/test14',
+                                   skip_whitespaces=True,
+                                   single="e6e429f6b485e18fb856019d9953370fd5420b20").traverse_commits())[0]
+    assert len(commit.modifications) == 0
+
+
+def test_ignore_add_whitespaces_and_changed_file():
+    commit = list(RepositoryMining('test-repos/test14',
+                                   single="532068e9d64b8a86e07eea93de3a57bf9e5b4ae0").traverse_commits())[0]
+    assert len(commit.modifications) == 2
+    commit = list(RepositoryMining('test-repos/test14',
+                                   skip_whitespaces=True,
+                                   single="532068e9d64b8a86e07eea93de3a57bf9e5b4ae0").traverse_commits())[0]
+    assert len(commit.modifications) == 1

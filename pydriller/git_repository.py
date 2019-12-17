@@ -52,11 +52,13 @@ class GitRepository:
         self._git = None
         self._repo = None
 
+        # if no configuration is passed, then creates a new "emtpy" one
+        # with just "path_to_repo" inside.
         if conf is None:
             conf = Conf({"path_to_repo": str(self.path)})
 
         self._conf = conf
-        self._conf.put("main_branch", None)
+        self._conf.put("main_branch", None)  # init main_branch to None
 
     @property
     def git(self):

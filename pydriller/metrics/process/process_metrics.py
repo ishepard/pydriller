@@ -12,9 +12,9 @@ class ProcessMetrics:
     """
     This class is responsible to implement the following process metrics:
 
-    - Commit Count - measures the number of commits made to a file
-    - Distinct Developers Count - measures the cumulative number of distinct
-        developers that contributed to a file
+    * Commit Count: measures the number of commits made to a file
+    * Distinct Developers Count: measures the cumulative number of distinct \
+    developers that contributed to a file
     """
 
     def commits_count(self, path_to_repo: str, filepath: str,

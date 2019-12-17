@@ -207,14 +207,15 @@ class Modification:  # pylint: disable=R0902
 
     def _calculate_metrics(self):
         if self.source_code and self._nloc is None:
-            l = lizard.analyze_file.analyze_source_code(self.filename,
-                                                        self.source_code)
+            analysis = lizard.analyze_file.analyze_source_code(self.filename,
+                                                               self.source_code
+                                                               )
 
-            self._nloc = l.nloc
-            self._complexity = l.CCN
-            self._token_count = l.token_count
+            self._nloc = analysis.nloc
+            self._complexity = analysis.CCN
+            self._token_count = analysis.token_count
 
-            for func in l.function_list:
+            for func in analysis.function_list:
                 self._function_list.append(Method(func))
 
     def __eq__(self, other):
@@ -231,25 +232,18 @@ class Commit:
     as hash, author, dates, and modified files.
     """
 
-    def __init__(self, commit: GitCommit, **kwargs) -> None:
+    def __init__(self, commit: GitCommit, conf) -> None:
         """
         Create a commit object.
 
         :param commit: GitPython Commit object
-        :param project_path: path to the project (temporary folder in case
-            of a remote repository)
-        :param main_branch: main branch of the repo
+        :param conf: Configuration class
         """
         self._c_object = commit
-        self._main_branch = kwargs["main_branch"]
-        self.project_path = kwargs["path"]
 
         self._modifications = None
         self._branches = None
-        self.diff_options = {}
-
-        if "histogram" in kwargs:
-            self.diff_options["histogram"] = True
+        self._conf = conf
 
     @property
     def hash(self) -> str:
@@ -287,7 +281,7 @@ class Commit:
 
         :return: project name
         """
-        return self.project_path.name
+        return Path(self._conf.get('path_to_repo')).name
 
     @property
     def author_date(self) -> datetime:
@@ -368,11 +362,15 @@ class Commit:
         return self._modifications
 
     def _get_modifications(self):
+        options = {}
+        if self._conf.get('histogram'):
+            options['histogram'] = True
+
         if len(self.parents) == 1:
             # the commit has a parent
             diff_index = self._c_object.parents[0].diff(self._c_object,
                                                         create_patch=True,
-                                                        **self.diff_options)
+                                                        **options)
         elif len(self.parents) > 1:
             # if it's a merge commit, the modified files of the commit are the
             # conflicts. This because if the file is not in conflict,
@@ -390,7 +388,7 @@ class Commit:
             # NULL TREE
             diff_index = self._c_object.diff(NULL_TREE,
                                              create_patch=True,
-                                             **self.diff_options)
+                                             **options)
 
         return self._parse_diff(diff_index)
 
@@ -437,7 +435,7 @@ class Commit:
 
         :return: bool in_main_branch
         """
-        return self._main_branch in self.branches
+        return self._conf.get('main_branch') in self.branches
 
     @property
     def branches(self) -> Set[str]:
@@ -452,14 +450,15 @@ class Commit:
         return self._branches
 
     def _get_branches(self):
-        c_git = Git(str(self.project_path))
+        c_git = Git(str(self._conf.get('path_to_repo')))
         branches = set()
         for branch in set(c_git.branch('--contains', self.hash).split('\n')):
             branches.add(branch.strip().replace('* ', ''))
         return branches
 
     # pylint disable=R0902
-    def _from_change_to_modification_type(self, diff: Diff):
+    @staticmethod
+    def _from_change_to_modification_type(diff: Diff):
         if diff.new_file:
             return ModificationType.ADD
         if diff.deleted_file:

@@ -25,6 +25,7 @@ from typing import List, Dict, Tuple, Set, Generator
 from git import Git, Repo, GitCommandError, Commit as GitCommit
 
 from pydriller.domain.commit import Commit, ModificationType, Modification
+from pydriller.utils.conf import Conf
 from pydriller.utils.hyperblame import GitHyperBlame
 
 logger = logging.getLogger(__name__)
@@ -37,7 +38,7 @@ class GitRepository:
     """
 
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, path: str, **kwargs):
+    def __init__(self, path: str, conf=None):
         """
         Init the Git RepositoryMining.
 
@@ -50,13 +51,17 @@ class GitRepository:
         self._hyper_blame_available = None
         self._git = None
         self._repo = None
-        self._commit_options = {
-            "path": self.path,
-            "main_branch": None
-        }
 
-        if 'histogram' in kwargs:
-            self._commit_options['histogram'] = True
+        # if no configuration is passed, then creates a new "emtpy" one
+        # with just "path_to_repo" inside.
+        if conf is None:
+            conf = Conf({
+                "path_to_repo": str(self.path),
+                "git_repo": self
+            })
+
+        self._conf = conf
+        self._conf.put("main_branch", None)  # init main_branch to None
 
     @property
     def git(self):
@@ -85,16 +90,16 @@ class GitRepository:
 
     def _open_repository(self):
         self._repo = Repo(str(self.path))
-        if self._commit_options["main_branch"] is None:
+        if self._conf.get("main_branch") is None:
             self._discover_main_branch(self._repo)
 
     def _discover_main_branch(self, repo):
         try:
-            self._commit_options["main_branch"] = repo.active_branch.name
+            self._conf.put("main_branch", repo.active_branch.name)
         except TypeError:
             logger.info("HEAD is a detached symbolic reference, setting "
                         "main branch to empty string")
-            self._commit_options["main_branch"] = ''
+            self._conf.put("main_branch", '')
 
     def get_head(self) -> Commit:
         """
@@ -103,7 +108,7 @@ class GitRepository:
         :return: Commit of the head commit
         """
         head_commit = self.repo.head.commit
-        return Commit(head_commit, **self._commit_options)
+        return Commit(head_commit, self._conf)
 
     def get_list_commits(self, branch: str = None,
                          reverse_order: bool = True) \
@@ -125,7 +130,7 @@ class GitRepository:
         :return: Commit
         """
         gp_commit = self.repo.commit(commit_id)
-        return Commit(gp_commit, **self._commit_options)
+        return Commit(gp_commit, self._conf)
 
     def get_commit_from_gitpython(self, commit: GitCommit) -> Commit:
         """
@@ -136,7 +141,7 @@ class GitRepository:
         :param GitCommit commit: GitPython commit
         :return: Commit commit: PyDriller commit
         """
-        return Commit(commit, **self._commit_options)
+        return Commit(commit, self._conf)
 
     def checkout(self, _hash: str) -> None:
         """
@@ -155,7 +160,7 @@ class GitRepository:
             # we are already in _PD, so checkout the master branch before
             # deleting it
             if self.repo.active_branch.name == '_PD':
-                self.git.checkout('-f', self._commit_options["main_branch"])
+                self.git.checkout('-f', self._conf.get("main_branch"))
             self.repo.delete_head('_PD', force=True)
         except GitCommandError:
             logger.debug("Branch _PD not found")
@@ -182,7 +187,7 @@ class GitRepository:
 
         """
         with self.lock:
-            self.git.checkout('-f', self._commit_options["main_branch"])
+            self.git.checkout('-f', self._conf.get("main_branch"))
             self._delete_tmp_branch()
 
     def total_commits(self) -> int:

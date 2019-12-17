@@ -4,7 +4,6 @@ Configuration module.
 
 import logging
 from datetime import datetime
-from typing import Dict
 
 import pytz
 
@@ -20,7 +19,8 @@ class Conf:
     It's also responsible for checking whether the filters are correct (i.e.,
     the user did not specify 2 starting commits).
     """
-    def __init__(self, options: Dict[str, object]):
+    def __init__(self, options):
+        # insert all the configurations in a local dictionary
         self._options = {}
         for key, val in options.items():
             self._options[key] = val
@@ -62,11 +62,10 @@ class Conf:
             raise Exception("The path to the repo has to be of type "
                             "'string' or 'list of strings'!")
 
-    def sanity_check_filters(self, git_repo):
+    def sanity_check_filters(self):
         """
         Check if the values passed by the user are correct.
 
-        :param GitRepository git_repo: GitRepository Object
         """
         if self.get('single') is not None:
             if any([self.get('since'),
@@ -78,21 +77,20 @@ class Conf:
                 raise Exception('You can not specify a single commit with '
                                 'other filters')
 
-        self.check_starting_commit(git_repo)
-        self.check_ending_commit(git_repo)
+        self.check_starting_commit()
+        self.check_ending_commit()
         self._check_timezones()
 
-    def check_ending_commit(self, git_repo):
+    def check_ending_commit(self):
         """
         Get the ending commit from the 'to', 'to_commit' or 'to_tag' filter.
-
-        :param GitRepository git_repo: GitRepository Object
         """
         if not self.only_one_filter([self.get('to'),
                                      self.get('to_commit'),
                                      self.get('to_tag')]):
             raise Exception('You can only specify one between since, '
                             'from_tag and from_commit')
+        git_repo = self.get("git_repo")
         if self.get('to_commit') is not None:
             self.put('to', git_repo.get_commit(self.get(
                 'to_commit')).committer_date)
@@ -100,18 +98,17 @@ class Conf:
             self.put('to', git_repo.get_commit_from_tag(
                 self.get('to_tag')).committer_date)
 
-    def check_starting_commit(self, git_repo):
+    def check_starting_commit(self):
         """
         Get the starting commit from the 'since', 'from_commit' or 'from_tag'
         filter.
-
-        :param GitRepository git_repo: GitRepository Object
         """
         if not self.only_one_filter([self.get('since'),
                                      self.get('from_commit'),
                                      self.get('from_tag')]):
             raise Exception('You can only specify one between since, '
                             'from_tag and from_commit')
+        git_repo = self.get("git_repo")
         if self.get('from_commit') is not None:
             self.put('since', git_repo.get_commit(
                 self.get('from_commit')).committer_date)

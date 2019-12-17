@@ -86,6 +86,7 @@ class RepositoryMining:
             analyzed
         """
         options = {
+            "git_repo": None,
             "path_to_repo": path_to_repo,
             "from_commit": from_commit,
             "to_commit": to_commit,
@@ -135,8 +136,8 @@ class RepositoryMining:
                                                      path_repo)
 
             git_repo = GitRepository(path_repo, self._conf)
-
-            self._conf.sanity_check_filters(git_repo)
+            self._conf.put("git_repo", git_repo)
+            self._conf.sanity_check_filters()
 
             logger.info('Analyzing git repository in %s', git_repo.path)
 
@@ -154,7 +155,6 @@ class RepositoryMining:
                             commit.committer_date,
                             commit.author.name)
 
-                print(self._conf.get('since'))
                 if self._conf.is_commit_filtered(commit):
                     logger.info('Commit #%s filtered', commit.hash)
                     continue

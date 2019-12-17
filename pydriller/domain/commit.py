@@ -364,7 +364,6 @@ class Commit:
     def _get_modifications(self):
         options = {}
         if self._conf.get('histogram'):
-            print(self._conf.get('histogram'))
             options['histogram'] = True
 
         if len(self.parents) == 1:

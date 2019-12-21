@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 import tempfile
 import os
+import shutil
 
 import pytest
 
@@ -186,12 +187,14 @@ def test_ignore_add_whitespaces_and_changed_file():
     assert len(commit.modifications) == 1
 
 def test_clone_repo_to():
-    tmp_folder = tempfile.TemporaryDirectory()
+    tmp_folder = 'temp_dir'
+    os.mkdir(tmp_folder)
     dt2 = datetime(2018, 10, 20)
     url = "https://github.com/ishepard/pydriller.git"
     assert len(list(RepositoryMining(
         path_to_repo=url,
         to=dt2,
-        clone_repo_to=tmp_folder.name).traverse_commits())) == 159
-    assert len(list(RepositoryMining(path_to_repo=os.path.join(tmp_folder.name, 'pydriller'),
+        clone_repo_to=tmp_folder).traverse_commits())) == 159
+    assert len(list(RepositoryMining(path_to_repo=os.path.join(tmp_folder, 'pydriller'),
         to=dt2).traverse_commits())) == 159
+    shutil.rmtree(tmp_folder)

@@ -51,7 +51,8 @@ class RepositoryMining:
                  only_releases: bool = False,
                  filepath: str = None,
                  histogram_diff: bool = False,
-                 skip_whitespaces: bool = False):
+                 skip_whitespaces: bool = False,
+                 clone_repo_to: str = None):
         """
         Init a repository mining. The only required parameter is
         "path_to_repo": to analyze a single repo, pass the absolute path to
@@ -108,7 +109,8 @@ class RepositoryMining:
             "filepath": filepath,
             "filepath_commits": None,
             "tagged_commits": None,
-            "histogram": histogram_diff
+            "histogram": histogram_diff,
+            "clone_repo_to": clone_repo_to
         }
         self._conf = Conf(options)
 
@@ -133,9 +135,17 @@ class RepositoryMining:
         for path_repo in self._conf.get('path_to_repos'):
             # if it is a remote repo, clone it first in a temporary folder!
             if self._is_remote(path_repo):
-                tmp_folder = tempfile.TemporaryDirectory()
-                path_repo = self._clone_remote_repos(tmp_folder.name,
-                                                     path_repo)
+                if self._conf.get('clone_repo_to'):
+                    clone_folder = self._conf.get('clone_repo_to')
+                    if not os.path.isdir(clone_folder):
+                        raise Exception("Not a directory: "\
+                                "{0}".format(clone_folder))
+                    path_repo = self._clone_remote_repos(clone_folder,
+                                                         path_repo)
+                else:
+                    tmp_folder = tempfile.TemporaryDirectory()
+                    path_repo = self._clone_remote_repos(tmp_folder.name,
+                                                         path_repo)
 
             git_repo = GitRepository(path_repo, self._conf)
             self._conf.put("git_repo", git_repo)

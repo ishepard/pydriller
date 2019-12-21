@@ -193,6 +193,5 @@ def test_clone_repo_to():
         path_to_repo=url,
         to=dt2,
         clone_repo_to=tmp_folder.name).traverse_commits())) == 159
-    assert len(list(RepositoryMining(path_to_repo=os.path.join(tmp_folder.name,
-        RepositoryMining._get_repo_name_from_url(url)),
+    assert len(list(RepositoryMining(path_to_repo=os.path.join(tmp_folder.name, 'pydriller'),
         to=dt2).traverse_commits())) == 159

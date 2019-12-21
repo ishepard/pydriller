@@ -21,6 +21,7 @@ import os
 import tempfile
 from datetime import datetime
 from typing import List, Generator, Union
+from pathlib import Path
 
 from git import Repo
 
@@ -136,7 +137,7 @@ class RepositoryMining:
             # if it is a remote repo, clone it first in a temporary folder!
             if self._is_remote(path_repo):
                 if self._conf.get('clone_repo_to'):
-                    clone_folder = self._conf.get('clone_repo_to')
+                    clone_folder = str(Path(self._conf.get('clone_repo_to')))
                     if not os.path.isdir(clone_folder):
                         raise Exception("Not a directory: "\
                                 "{0}".format(clone_folder))

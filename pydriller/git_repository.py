@@ -26,7 +26,6 @@ from git import Git, Repo, GitCommandError, Commit as GitCommit
 
 from pydriller.domain.commit import Commit, ModificationType, Modification
 from pydriller.utils.conf import Conf
-from pydriller.utils.hyperblame import GitHyperBlame
 
 logger = logging.getLogger(__name__)
 
@@ -45,10 +44,8 @@ class GitRepository:
         :param str path: path to the repository
         """
         self.path = Path(path)
-        self.hyperblame = GitHyperBlame(path)
         self.project_name = self.path.name
         self.lock = Lock()
-        self._hyper_blame_available = None
         self._git = None
         self._repo = None
 
@@ -90,6 +87,7 @@ class GitRepository:
 
     def _open_repository(self):
         self._repo = Repo(str(self.path))
+        self._repo.config_writer().set_value("blame", "markUnblamableLines", "true").release()
         if self._conf.get("main_branch") is None:
             self._discover_main_branch(self._repo)
 
@@ -276,20 +274,12 @@ class GitRepository:
 
     def get_commits_last_modified_lines(self, commit: Commit,
                                         modification: Modification = None,
-                                        hyper_blame: bool = False,
                                         hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
         """
         Given the Commit object, returns the set of commits that last
         "touched" the lines that are modified in the files included in the
         commit. It applies SZZ.
-
-        IMPORTANT: for better results, we suggest to install Google
-        depot_tools first (see
-        https://dev.chromium.org/developers/how-tos/install-depot-tools).
-        This allows PyDriller to use "git hyper-blame" instead of the normal
-        blame. If depot_tools are not installed, PyDriller will automatically
-        switch to the normal blame.
 
         The algorithm works as follow: (for every file in the commit)
 
@@ -304,31 +294,21 @@ class GitRepository:
 
         :param Commit commit: the commit to analyze
         :param Modification modification: single modification to analyze
-        :param bool hyper_blame: whether to use git hyper blame or the
-            normal blame (by default it uses the normal blame).
         :param str hashes_to_ignore_path: path to a file containing hashes of
-               commits to ignore. (only works with git hyper blame)
+               commits to ignore.
         :return: the set containing all the bug inducing commits
         """
-        hashes_to_ignore = []
-        if hashes_to_ignore_path is not None:
-            assert os.path.exists(hashes_to_ignore_path), \
-                "The file with the commit hashes to ignore does not exist"
-            hashes_to_ignore = open(hashes_to_ignore_path).readlines()
-
         if modification is not None:
             modifications = [modification]
         else:
             modifications = commit.modifications
 
         return self._calculate_last_commits(commit, modifications,
-                                            hyper_blame,
-                                            hashes_to_ignore)
+                                            hashes_to_ignore_path)
 
     def _calculate_last_commits(self, commit: Commit,
                                 modifications: List[Modification],
-                                hyper_blame: bool = False,
-                                hashes_to_ignore: List[str] = None) \
+                                hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
 
         commits = {}
@@ -340,12 +320,16 @@ class GitRepository:
                 path = mod.old_path
             deleted_lines = self.parse_diff(mod.diff)['deleted']
             try:
-                blame = self._get_blame(commit.hash, path, hyper_blame,
-                                        hashes_to_ignore)
+                blame = self._get_blame(commit.hash, path,
+                                        hashes_to_ignore_path)
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):
                         buggy_commit = blame[num_line - 1].split(' ')[
                             0].replace('^', '')
+
+                        # Skip unblamable lines.
+                        if buggy_commit.startswith("*"):
+                            continue
 
                         if mod.change_type == ModificationType.RENAME:
                             path = mod.new_path
@@ -360,16 +344,11 @@ class GitRepository:
         return commits
 
     def _get_blame(self, commit_hash: str, path: str,
-                   hyper_blame: bool = False,
-                   hashes_to_ignore: List[str] = None):
-        """
-        If "git hyper-blame" is available, use it. Otherwise use normal blame.
-        """
-        if not hyper_blame or hashes_to_ignore is None:
-            return self.git.blame('-w', commit_hash + '^',
-                                  '--', path).split('\n')
-        return self.hyperblame.hyper_blame(hashes_to_ignore, path,
-                                           commit_hash + '^')
+                   hashes_to_ignore_path: List[str] = None):
+        args = ['-w', commit_hash + '^',]
+        if hashes_to_ignore_path is not None:
+            args += ["--ignore-revs-file", hashes_to_ignore_path]
+        return self.git.blame(*args, '--', path).split('\n')
 
     @staticmethod
     def _useless_line(line: str):

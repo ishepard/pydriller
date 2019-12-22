@@ -3,6 +3,7 @@ from datetime import datetime
 import tempfile
 import os
 import shutil
+import platform
 
 import pytest
 
@@ -186,6 +187,8 @@ def test_ignore_add_whitespaces_and_changed_file():
                                    single="532068e9d64b8a86e07eea93de3a57bf9e5b4ae0").traverse_commits())[0]
     assert len(commit.modifications) == 1
 
+
+@pytest.mark.skipif(platform.system() == "Windows", reason="Sometimes Windows give an error 'Handle is not valid' in this test, though it works anyway outside the test.")
 def test_clone_repo_to():
     tmp_folder = tempfile.TemporaryDirectory()
     dt2 = datetime(2018, 10, 20)

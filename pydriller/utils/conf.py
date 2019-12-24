@@ -27,11 +27,11 @@ class Conf:
 
         self._sanity_check_repos(self.get('path_to_repo'))
         if isinstance(self.get('path_to_repo'), str):
-            self.put('path_to_repos', [self.get('path_to_repo')])
+            self.set_value('path_to_repos', [self.get('path_to_repo')])
         else:
-            self.put('path_to_repos', self.get('path_to_repo'))
+            self.set_value('path_to_repos', self.get('path_to_repo'))
 
-    def put(self, key, value):
+    def set_value(self, key, value):
         """
         Save the value of a configuration.
 
@@ -92,10 +92,10 @@ class Conf:
                             'from_tag and from_commit')
         git_repo = self.get("git_repo")
         if self.get('to_commit') is not None:
-            self.put('to', git_repo.get_commit(self.get(
+            self.set_value('to', git_repo.get_commit(self.get(
                 'to_commit')).committer_date)
         if self.get('to_tag') is not None:
-            self.put('to', git_repo.get_commit_from_tag(
+            self.set_value('to', git_repo.get_commit_from_tag(
                 self.get('to_tag')).committer_date)
 
     def check_starting_commit(self):
@@ -110,10 +110,10 @@ class Conf:
                             'from_tag and from_commit')
         git_repo = self.get("git_repo")
         if self.get('from_commit') is not None:
-            self.put('since', git_repo.get_commit(
+            self.set_value('since', git_repo.get_commit(
                 self.get('from_commit')).committer_date)
         if self.get('from_tag') is not None:
-            self.put('since', git_repo.get_commit_from_tag(
+            self.set_value('since', git_repo.get_commit_from_tag(
                 self.get('from_tag')).committer_date)
 
     @staticmethod
@@ -181,9 +181,9 @@ class Conf:
 
     def _check_timezones(self):
         if self.get('since') is not None:
-            self.put('since', self._replace_timezone(self.get('since')))
+            self.set_value('since', self._replace_timezone(self.get('since')))
         if self.get('to') is not None:
-            self.put('to', self._replace_timezone(self.get('to')))
+            self.set_value('to', self._replace_timezone(self.get('to')))
 
     @staticmethod
     def _replace_timezone(dt: datetime):

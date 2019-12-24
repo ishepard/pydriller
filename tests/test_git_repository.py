@@ -17,6 +17,8 @@ import pytest
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
+from git import Git
+
 from pydriller.domain.commit import ModificationType
 from pydriller.git_repository import GitRepository
 
@@ -467,6 +469,8 @@ def test_get_commits_last_modified_lines_hyper_blame():
         'B.java']
 
 
+@pytest.mark.skipif(Git().version_info < (2, 23),
+                    reason="requires python3.6 or higher")
 def test_get_commits_last_modified_lines_hyper_blame_unblamable(tmp_path):
     p = tmp_path / "ignore.txt"
     p.write_text("540c7f31c18664a38190fafb6721b5174ff4a166")
@@ -480,6 +484,8 @@ def test_get_commits_last_modified_lines_hyper_blame_unblamable(tmp_path):
     assert len(buggy_commits) == 0
 
 
+@pytest.mark.skipif(Git().version_info < (2, 23),
+                    reason="requires python3.6 or higher")
 def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(tmp_path):
     p = tmp_path / "ignore.txt"
     p.write_text("5cb9e9ae44a0949ec91d06a955975289be766f34")

@@ -149,18 +149,19 @@ class RepositoryMining:
                                                          path_repo)
 
             git_repo = GitRepository(path_repo, self._conf)
-            self._conf.put("git_repo", git_repo)
+            self._conf.set_value("git_repo", git_repo)
             self._conf.sanity_check_filters()
 
             logger.info('Analyzing git repository in %s', git_repo.path)
 
             if self._conf.get('filepath') is not None:
-                self._conf.put('filepath_commits',
-                               git_repo.get_commits_modified_file(
-                                   self._conf.get('filepath')))
+                self._conf.set_value('filepath_commits',
+                                     git_repo.get_commits_modified_file(
+                                         self._conf.get('filepath')))
 
             if self._conf.get('only_releases'):
-                self._conf.put('tagged_commits', git_repo.get_tagged_commits())
+                self._conf.set_value('tagged_commits',
+                                     git_repo.get_tagged_commits())
 
             for commit in git_repo.get_list_commits(self._conf.get(
                     'only_in_branch'), not self._conf.get('reversed_order')):

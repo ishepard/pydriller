@@ -58,7 +58,7 @@ class GitRepository:
             })
 
         self._conf = conf
-        self._conf.put("main_branch", None)  # init main_branch to None
+        self._conf.set_value("main_branch", None)  # init main_branch to None
 
     @property
     def git(self):
@@ -93,11 +93,11 @@ class GitRepository:
 
     def _discover_main_branch(self, repo):
         try:
-            self._conf.put("main_branch", repo.active_branch.name)
+            self._conf.set_value("main_branch", repo.active_branch.name)
         except TypeError:
             logger.info("HEAD is a detached symbolic reference, setting "
                         "main branch to empty string")
-            self._conf.put("main_branch", '')
+            self._conf.set_value("main_branch", '')
 
     def get_head(self) -> Commit:
         """
@@ -345,9 +345,13 @@ class GitRepository:
 
     def _get_blame(self, commit_hash: str, path: str,
                    hashes_to_ignore_path: List[str] = None):
-        args = ['-w', commit_hash + '^',]
+        args = ['-w', commit_hash + '^']
         if hashes_to_ignore_path is not None:
-            args += ["--ignore-revs-file", hashes_to_ignore_path]
+            if self.git.version_info >= (2, 23):
+                args += ["--ignore-revs-file", hashes_to_ignore_path]
+            else:
+                logger.info("'--ignore-revs-file' is only available from "
+                            "git v2.23")
         return self.git.blame(*args, '--', path).split('\n')
 
     @staticmethod

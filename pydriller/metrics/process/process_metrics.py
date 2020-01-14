@@ -146,3 +146,69 @@ class ProcessMetrics():
 
         return len(developers)
         
+
+    def new_dev_count_prior_release(self, path_to_repo: str, filepath: str, from_commit: str = None, to_commit: str = None):
+        """
+        Return the number of new developers who modified the file during the prior release.
+        
+        :path_to_repo: path to a single repo
+        :from_commit: the SHA of the commit to start counting. If None, the SHA is the first commit SHA
+        :to_commit: the SHA of the commit to stop counting. If None, the SHA is the latest commit SHA
+        :filepath: the path to the file to count for. E.g. 'doc/README.md'
+        
+        :return: int number of distinct developers contributing to the file
+        """
+        developers = set()
+        duplicates = set()
+        filepath = str(Path(filepath))
+        
+        # Get the sha of all releases in the repo
+        releases = set()
+        for commit in RepositoryMining(path_to_repo, from_commit=from_commit, to_commit=to_commit, reversed_order=True, only_releases=True).traverse_commits():
+            releases.add(commit.hash)
+        
+        in_prior_release = False
+        in_older_release = False
+
+        for commit in RepositoryMining(path_to_repo, from_commit=from_commit, to_commit=to_commit, reversed_order=True).traverse_commits():
+            
+            sha = commit.hash
+            if sha in releases:
+                if not in_prior_release:
+                    in_prior_release = True
+                    continue # Start count from next iteration
+                else:
+                    in_older_release = True # Reached a release older than the prior
+
+            if not in_prior_release:
+                continue
+
+            for modified_file in commit.modifications:
+
+                stop_count = False
+
+                if modified_file.new_path == filepath or modified_file.old_path == filepath:
+                    
+                    author = commit.author.email.strip()
+
+                    if in_older_release and author in developers:
+                        duplicates.add(author)
+                    else:
+                        developers.add(author)
+                    
+                    if modified_file.change_type == ModificationType.RENAME:
+                        filepath = str(Path(modified_file.old_path))
+                
+                    elif modified_file.change_type == ModificationType.RENAME:
+                        filepath = str(Path(modified_file.old_path))
+                        
+                    elif modified_file.change_type == ModificationType.ADD:
+                        stop_count = True
+                    
+                    break
+                
+                if stop_count:
+                    break
+        
+        new_devs = developers - duplicates
+        return len(new_devs)

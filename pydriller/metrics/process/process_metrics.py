@@ -14,9 +14,13 @@ class ProcessMetrics:
 
     * Commit Count: measures the number of commits made to a file
     * Distinct Developers Count: measures the cumulative number of distinct \
-    developers that contributed to a file
-    * Developers Count Prior Release: counts the number of developer who modified the file during the prior release
-    * New Developers Count Prior Release: counts the number of new developer who modified the file during the prior release
+      developers that contributed to a file
+    * Developers Count Prior Release: counts the number of developer who \
+      modified the file during the prior release
+    * New Developers Count Prior Release: counts the number of new developer \
+      who modified the file during the prior release
+    * Normalized Lines Added/Deleted: are the normalized (by the total number \
+      of added and deleted lines) added and deleted lines in the file
     """
 
     def commits_count(self, path_to_repo: str, filepath: str,
@@ -274,3 +278,51 @@ class ProcessMetrics:
             return 0
 
         return float(added/total)
+
+
+    def normalized_deleted_lines(self, path_to_repo: str, filepath: str,
+                               from_commit: str = None, to_commit: str = None):
+        """
+        Return the number of normalized (by the total number of deleted lines)
+        deleted lines in the file.
+
+        :path_to_repo: path to a single repo
+        :to_commit: the SHA of the commit to stop counting. If None, the
+            analysis starts from the latest commit
+        :from_commit: the SHA of the commit to start counting. If None, the
+            normalization is given by the total number of deleted lines from
+            the first commit
+        :filepath: the path to the file to count for. E.g. 'doc/README.md'
+
+        :return: float number of normalized deleted lines
+        """
+
+        filepath = str(Path(filepath))
+        total = 0
+        deleted = 0
+
+        for commit in RepositoryMining(path_to_repo, from_commit=from_commit,
+                                       to_commit=to_commit,
+                                       reversed_order=True).traverse_commits():
+
+            for modified_file in commit.modifications:
+                if filepath in (modified_file.new_path,
+                                modified_file.old_path):
+
+                    if commit.hash == to_commit:
+                        deleted = modified_file.removed
+
+                    total += modified_file.removed
+
+                    if modified_file.change_type == ModificationType.RENAME:
+                        filepath = str(Path(modified_file.old_path))
+
+                    break
+
+            if commit.hash == from_commit:
+                break
+
+        if total == 0:
+            return 0
+
+        return float(deleted/total)

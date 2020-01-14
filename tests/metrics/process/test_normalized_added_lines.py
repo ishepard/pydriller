@@ -7,7 +7,7 @@ def test_to_commit_remote_1():
                                                     to_commit='772c636bb098eaba6adbafe301ce69d5f25c2c7a')
     assert count == float(0)
 
-def test_to_commit_remot_2():
+def test_to_commit_remote_2():
     count = ProcessMetrics().normalized_added_lines(path_to_repo='https://github.com/ishepard/pydriller',
                                                     filepath='README.md',
                                                     to_commit='bf5208c06e64153d180faf26cd9a86426631c2e4')

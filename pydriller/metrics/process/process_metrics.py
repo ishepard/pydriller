@@ -227,3 +227,50 @@ class ProcessMetrics:
 
         new_devs = developers - duplicates
         return len(new_devs)
+
+
+    def normalized_added_lines(self, path_to_repo: str, filepath: str,
+                               from_commit: str = None, to_commit: str = None):
+        """
+        Return the number of normalized (by the total number of added lines)
+        added lines in the file.
+
+        :path_to_repo: path to a single repo
+        :to_commit: the SHA of the commit to stop counting. If None, the
+            analysis starts from the latest commit
+        :from_commit: the SHA of the commit to start counting. If None, the
+            normalization is given by the total number of added lines from
+            the first commit
+        :filepath: the path to the file to count for. E.g. 'doc/README.md'
+
+        :return: float number of normalized added lines
+        """
+
+        filepath = str(Path(filepath))
+        total = 0
+        added = 0
+
+        for commit in RepositoryMining(path_to_repo, from_commit=from_commit,
+                                       to_commit=to_commit,
+                                       reversed_order=True).traverse_commits():
+
+            for modified_file in commit.modifications:
+                if filepath in (modified_file.new_path,
+                                modified_file.old_path):
+
+                    if commit.hash == to_commit:
+                        added = modified_file.added
+
+                    total += modified_file.added
+                    if modified_file.change_type == ModificationType.RENAME:
+                        filepath = str(Path(modified_file.old_path))
+
+                    break
+
+            if commit.hash == from_commit:
+                break
+
+        if total == 0:
+            return 0
+
+        return float(added/total)

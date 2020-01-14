@@ -21,12 +21,13 @@ import os
 import tempfile
 from datetime import datetime
 from typing import List, Generator, Union
+from pathlib import Path
 
-import pytz
 from git import Repo
 
 from pydriller.domain.commit import Commit
 from pydriller.git_repository import GitRepository
+from pydriller.utils.conf import Conf
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +50,10 @@ class RepositoryMining:
                  only_authors: List[str] = None,
                  only_commits: List[str] = None,
                  only_releases: bool = False,
-                 filepath: str = None):
+                 filepath: str = None,
+                 histogram_diff: bool = False,
+                 skip_whitespaces: bool = False,
+                 clone_repo_to: str = None):
         """
         Init a repository mining. The only required parameter is
         "path_to_repo": to analyze a single repo, pass the absolute path to
@@ -84,95 +88,35 @@ class RepositoryMining:
         :param str filepath: only commits that modified this file will be
             analyzed
         """
+        options = {
+            "git_repo": None,
+            "path_to_repo": path_to_repo,
+            "from_commit": from_commit,
+            "to_commit": to_commit,
+            "from_tag": from_tag,
+            "to_tag": to_tag,
+            "since": since,
+            "to": to,
+            "single": single,
+            "reversed_order": reversed_order,
+            "only_in_branch": only_in_branch,
+            "only_modifications_with_file_types":
+                only_modifications_with_file_types,
+            "only_no_merge": only_no_merge,
+            "only_authors": only_authors,
+            "only_commits": only_commits,
+            "only_releases": only_releases,
+            "skip_whitespaces": skip_whitespaces,
+            "filepath": filepath,
+            "filepath_commits": None,
+            "tagged_commits": None,
+            "histogram": histogram_diff,
+            "clone_repo_to": clone_repo_to
+        }
+        self._conf = Conf(options)
 
-        self._sanity_check_repos(path_to_repo)
-        if isinstance(path_to_repo, str):
-            self._path_to_repo = [path_to_repo]
-        else:
-            self._path_to_repo = path_to_repo
-
-        self._from_commit = from_commit
-        self._to_commit = to_commit
-        self._from_tag = from_tag
-        self._to_tag = to_tag
-        self._single = single
-        self._since = since
-        self._to = to
-        self._reversed_order = reversed_order
-        self._only_in_branch = only_in_branch
-        self._only_modifications_with_file_types = \
-            only_modifications_with_file_types
-        self._only_no_merge = only_no_merge
-        self._only_authors = only_authors
-        self._only_commits = only_commits
-        self._only_releases = only_releases
-        self._filepath = filepath
-        self._filepath_commits = None
-        self._tagged_commits = None
-
-    def _sanity_check_repos(self, path_to_repo):
-        if not isinstance(path_to_repo, str) and \
-                not isinstance(path_to_repo, list):
-            raise Exception("The path to the repo has to be of type "
-                            "'string' or 'list of strings'!")
-
-    def _sanity_check_filters(self, git_repo: GitRepository):
-        # If single is defined, no other filters should be
-        if self._single is not None:
-            if not self._check_filters_none([self._since,
-                                             self._to,
-                                             self._from_commit,
-                                             self._to_commit,
-                                             self._from_tag,
-                                             self._to_tag]):
-                raise Exception('You can not specify a single commit with '
-                                'other filters')
-
-        self._check_starting_commit(git_repo)
-        self._check_ending_commit(git_repo)
-
-    def _check_ending_commit(self, git_repo):
-        # If to_commit is defined, to should not be
-        if self._to_commit is not None:
-            if not self._check_filters_none([self._to, self._to_tag]):
-                raise Exception('You can not specify both <to date> '
-                                'and <to commit>')
-            self._to = git_repo.get_commit(self._to_commit).committer_date
-        # If to_tag is defined, to and to_commit should not be
-        if self._to_tag is not None:
-            if not self._check_filters_none([self._to, self._to_commit]):
-                raise Exception('You can not specify <to date> or <to commit> '
-                                'when using <to tag>')
-            self._to = git_repo.get_commit_from_tag(
-                self._to_tag).committer_date
-
-    def _check_starting_commit(self, git_repo):
-        # If from_commit is defined, since should not be
-        if self._from_commit is not None:
-            if not self._check_filters_none([self._since, self._from_tag]):
-                raise Exception('You can not specify both <since date> '
-                                'and <from commit>')
-            self._since = git_repo.get_commit(self._from_commit).committer_date
-        # If from_tag is defined, since and from_commit should not be
-        if self._from_tag is not None:
-            if not self._check_filters_none([self._since, self._from_commit]):
-                raise Exception('You can not specify <since date> or '
-                                '<from commit> when using <from tag>')
-            self._since = git_repo.get_commit_from_tag(
-                self._from_tag).committer_date
-
-    # TODO: check this function!!!!!
-    # def single_true(iterable):
-    #     i = iter(iterable)
-    #     return any(i) and not any(i)
-
-    def _check_filters_none(self, filters: List):
-        for filt in filters:
-            if filt is not None:
-                return False
-        return True
-
-    def _isremote(self, repo: str) -> bool:
+    @staticmethod
+    def _is_remote(repo: str) -> bool:
         return repo.startswith("git@") or repo.startswith("https://")
 
     def _clone_remote_repos(self, tmp_folder: str, repo: str) -> str:
@@ -189,94 +133,50 @@ class RepositoryMining:
         Analyze all the specified commits (all of them by default), returning
         a generator of commits.
         """
-        for path_repo in self._path_to_repo:
+        for path_repo in self._conf.get('path_to_repos'):
             # if it is a remote repo, clone it first in a temporary folder!
-            if self._isremote(path_repo):
-                tmp_folder = tempfile.TemporaryDirectory()
-                path_repo = self._clone_remote_repos(tmp_folder.name,
-                                                     path_repo)
+            if self._is_remote(path_repo):
+                if self._conf.get('clone_repo_to'):
+                    clone_folder = str(Path(self._conf.get('clone_repo_to')))
+                    if not os.path.isdir(clone_folder):
+                        raise Exception("Not a directory: "\
+                                "{0}".format(clone_folder))
+                    path_repo = self._clone_remote_repos(clone_folder,
+                                                         path_repo)
+                else:
+                    tmp_folder = tempfile.TemporaryDirectory()
+                    path_repo = self._clone_remote_repos(tmp_folder.name,
+                                                         path_repo)
 
-            git_repo = GitRepository(path_repo)
-
-            self._sanity_check_filters(git_repo)
-            self._check_timezones()
+            git_repo = GitRepository(path_repo, self._conf)
+            self._conf.set_value("git_repo", git_repo)
+            self._conf.sanity_check_filters()
 
             logger.info('Analyzing git repository in %s', git_repo.path)
 
-            if self._filepath is not None:
-                self._filepath_commits = git_repo.get_commits_modified_file(
-                    self._filepath)
+            if self._conf.get('filepath') is not None:
+                self._conf.set_value('filepath_commits',
+                                     git_repo.get_commits_modified_file(
+                                         self._conf.get('filepath')))
 
-            if self._only_releases:
-                self._tagged_commits = git_repo.get_tagged_commits()
+            if self._conf.get('only_releases'):
+                self._conf.set_value('tagged_commits',
+                                     git_repo.get_tagged_commits())
 
-            for commit in git_repo.get_list_commits(self._only_in_branch,
-                                                    not self._reversed_order):
+            for commit in git_repo.get_list_commits(self._conf.get(
+                    'only_in_branch'), not self._conf.get('reversed_order')):
                 logger.info('Commit #%s in %s from %s', commit.hash,
                             commit.committer_date,
                             commit.author.name)
 
-                if self._is_commit_filtered(commit):
+                if self._conf.is_commit_filtered(commit):
                     logger.info('Commit #%s filtered', commit.hash)
                     continue
 
                 yield commit
 
-    def _is_commit_filtered(self, commit: Commit):  # pylint: disable=R0911
-        if self._single is not None and commit.hash != self._single:
-            logger.debug(
-                'Commit filtered because is not the defined in single')
-            return True
-        if (self._since is not None and commit.committer_date < self._since) \
-                or (self._to is not None and commit.committer_date > self._to):
-            return True
-        if self._only_modifications_with_file_types is not None:
-            if not self._has_modification_with_file_type(commit):
-                logger.debug('Commit filtered for modification types')
-                return True
-        if self._only_no_merge is True and commit.merge is True:
-            logger.debug('Commit filtered for no merge')
-            return True
-        if self._only_authors is not None and commit.author.name not in \
-                self._only_authors:
-            logger.debug("Commit filtered for author")
-            return True
-        if self._only_commits is not None and commit.hash not in \
-                self._only_commits:
-            logger.debug("Commit filtered because it is not one of the "
-                         "specified commits")
-            return True
-        if self._filepath_commits is not None and commit.hash not in \
-                self._filepath_commits:
-            logger.debug("Commit filtered because it did not modify the "
-                         "specified file")
-            return True
-        if self._tagged_commits is not None and commit.hash not in \
-                self._tagged_commits:
-            logger.debug("Commit filtered because it is not tagged")
-            return True
-
-        return False
-
-    def _has_modification_with_file_type(self, commit):
-        for mod in commit.modifications:
-            if mod.filename.endswith(
-                    tuple(self._only_modifications_with_file_types)):
-                return True
-        return False
-
-    def _check_timezones(self):
-        if self._since is not None:
-            self._since = self._replace_timezone(self._since)
-        if self._to is not None:
-            self._to = self._replace_timezone(self._to)
-
-    def _replace_timezone(self, dt: datetime):
-        if dt.tzinfo is None or dt.tzinfo.utcoffset(dt) is None:
-            dt = dt.replace(tzinfo=pytz.utc)
-        return dt
-
-    def _get_repo_name_from_url(self, url: str) -> str:
+    @staticmethod
+    def _get_repo_name_from_url(url: str) -> str:
         last_slash_index = url.rfind("/")
         last_suffix_index = url.rfind(".git")
         if last_suffix_index < 0:

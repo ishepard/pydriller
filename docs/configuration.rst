@@ -114,3 +114,34 @@ Examples::
 
 
 
+
+Other Configurations
+=====================
+
+Some :code:`git` commands, such as :code:`git diff`, can be customized by the user. In this section, we report some of the customization
+that can be used within pydriller.
+
+* **histogram** *(bool)*: uses :code:`git diff --histogram` instead of the normal git. See :ref:`git-diff-algorithms`.
+
+
+.. _git-diff-algorithms:
+
+Git Diff Algorithms
+===================
+
+Git offers four different algorithms in :code:`git diff`:
+
+* Myers (default)
+* Minimal (improved Myers)
+* Patience (try to give contextual diff)
+* Histogram (kind of enhanced patience)
+
+`Differences between four diff algorithms`_
+
+.. _Differences between four diff algorithms: https://git-scm.com/docs/git-diff#Documentation/git-diff.txt---diff-algorithmpatienceminimalhistogrammyers).
+
+Based on the comparison between Myers and Histogram in a study by `Nugroho, et al (2019)`_, various :code:`diff` algorithms in the :code:`git diff` command produced unequal `diff` outputs.
+From the result of patches analysis, they found that Histogram is better than Myers to show the changes of code that can be expected to recover the changing operations.
+Thus, in this tool, we implement histogram :code:`diff` algorithm to consider differences in source code.
+
+.. _Nugroho, et al (2019): https://doi.org/10.1007/s10664-019-09772-z

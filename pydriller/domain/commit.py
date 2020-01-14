@@ -17,7 +17,6 @@ This module contains all the classes regarding a specific commit, such as
 Commit, Modification,
 ModificationType and Method.
 """
-
 import logging
 from _datetime import datetime
 from enum import Enum
@@ -25,13 +24,11 @@ from pathlib import Path
 from typing import List, Set, Dict
 
 import lizard
-from git import Repo, Diff, Git, Commit as GitCommit
+from git import Diff, Git, Commit as GitCommit, NULL_TREE
 
 from pydriller.domain.developer import Developer
 
 logger = logging.getLogger(__name__)
-
-NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
 class ModificationType(Enum):
@@ -210,14 +207,15 @@ class Modification:  # pylint: disable=R0902
 
     def _calculate_metrics(self):
         if self.source_code and self._nloc is None:
-            l = lizard.analyze_file.analyze_source_code(self.filename,
-                                                        self.source_code)
+            analysis = lizard.analyze_file.analyze_source_code(self.filename,
+                                                               self.source_code
+                                                               )
 
-            self._nloc = l.nloc
-            self._complexity = l.CCN
-            self._token_count = l.token_count
+            self._nloc = analysis.nloc
+            self._complexity = analysis.CCN
+            self._token_count = analysis.token_count
 
-            for func in l.function_list:
+            for func in analysis.function_list:
                 self._function_list.append(Method(func))
 
     def __eq__(self, other):
@@ -227,17 +225,6 @@ class Modification:  # pylint: disable=R0902
             return True
         return self.__dict__ == other.__dict__
 
-    def __str__(self): # pragma: no cover
-        return (
-            'MODIFICATION\n' +
-            'Old Path: {}\n'.format(self.old_path) +
-            'New Path: {}\n'.format(self.new_path) +
-            'Type: {}\n'.format(self.change_type.name) +
-            'Diff: {}\n'.format(self.diff) +
-            'Source code before: {}\n'.format(self.source_code_before) +
-            'Source code: {}\n'.format(self.source_code)
-        )
-
 
 class Commit:
     """
@@ -245,22 +232,18 @@ class Commit:
     as hash, author, dates, and modified files.
     """
 
-    def __init__(self, commit: GitCommit, project_path: Path,
-                 main_branch: str) -> None:
+    def __init__(self, commit: GitCommit, conf) -> None:
         """
         Create a commit object.
 
         :param commit: GitPython Commit object
-        :param project_path: path to the project (temporary folder in case
-            of a remote repository)
-        :param main_branch: main branch of the repo
+        :param conf: Configuration class
         """
         self._c_object = commit
-        self._main_branch = main_branch
-        self.project_path = project_path
 
         self._modifications = None
         self._branches = None
+        self._conf = conf
 
     @property
     def hash(self) -> str:
@@ -298,7 +281,7 @@ class Commit:
 
         :return: project name
         """
-        return self.project_path.name
+        return Path(self._conf.get('path_to_repo')).name
 
     @property
     def author_date(self) -> datetime:
@@ -379,13 +362,18 @@ class Commit:
         return self._modifications
 
     def _get_modifications(self):
-        repo = Repo(str(self.project_path))
-        commit = self._c_object
+        options = {}
+        if self._conf.get('histogram'):
+            options['histogram'] = True
+
+        if self._conf.get('skip_whitespaces'):
+            options['w'] = True
 
         if len(self.parents) == 1:
             # the commit has a parent
-            diff_index = self._c_object.parents[0].diff(commit,
-                                                        create_patch=True)
+            diff_index = self._c_object.parents[0].diff(self._c_object,
+                                                        create_patch=True,
+                                                        **options)
         elif len(self.parents) > 1:
             # if it's a merge commit, the modified files of the commit are the
             # conflicts. This because if the file is not in conflict,
@@ -401,8 +389,9 @@ class Commit:
         else:
             # this is the first commit of the repo. Comparing it with git
             # NULL TREE
-            parent = repo.tree(NULL_TREE)
-            diff_index = parent.diff(commit.tree, create_patch=True)
+            diff_index = self._c_object.diff(NULL_TREE,
+                                             create_patch=True,
+                                             **options)
 
         return self._parse_diff(diff_index)
 
@@ -449,7 +438,7 @@ class Commit:
 
         :return: bool in_main_branch
         """
-        return self._main_branch in self.branches
+        return self._conf.get('main_branch') in self.branches
 
     @property
     def branches(self) -> Set[str]:
@@ -464,14 +453,15 @@ class Commit:
         return self._branches
 
     def _get_branches(self):
-        c_git = Git(str(self.project_path))
+        c_git = Git(str(self._conf.get('path_to_repo')))
         branches = set()
         for branch in set(c_git.branch('--contains', self.hash).split('\n')):
             branches.add(branch.strip().replace('* ', ''))
         return branches
 
     # pylint disable=R0902
-    def _from_change_to_modification_type(self, diff: Diff):
+    @staticmethod
+    def _from_change_to_modification_type(diff: Diff):
         if diff.new_file:
             return ModificationType.ADD
         if diff.deleted_file:
@@ -490,23 +480,3 @@ class Commit:
             return True
 
         return self.__dict__ == other.__dict__
-
-    def __str__(self): # pragma: no cover
-        return (
-            'Hash: {}\n'.format(self.hash) +
-            'Author: {}\n'.format(self.author.name) +
-            'Author email: {}\n'.format(self.author.email) +
-            'Committer: {}\n'.format(self.committer.name) +
-            'Committer email: {}\n'.format(self.committer.email) +
-            'Author date: {}\n'.format(
-                self.author_date.strftime("%Y-%m-%d %H:%M:%S")) +
-            'Committer date: {}\n'.format(
-                self.committer_date.strftime("%Y-%m-%d %H:%M:%S")) +
-            'Message: {}\n'.format(self.msg) +
-            'Parent: {}\n'.format("\n".join(map(str, self.parents))) +
-            'Merge: {}\n'.format(self.merge) +
-            'Modifications: \n{}'.format(
-                "\n".join(map(str, self.modifications))) +
-            'Branches: \n{}'.format("\n".join(map(str, self.branches))) +
-            'In main branch: {}\n'.format(self.in_main_branch)
-        )

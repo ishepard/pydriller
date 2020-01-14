@@ -13,11 +13,11 @@
 # limitations under the License.
 import os
 import platform
+import pytest
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-import pytest
-from git import Repo
+from git import Git
 
 from pydriller.domain.commit import ModificationType
 from pydriller.git_repository import GitRepository
@@ -88,6 +88,9 @@ def test_get_first_commit():
     assert len(c.modifications) == 2
     assert c.msg == 'First commit adding 2 files'
     assert c.in_main_branch is True
+
+    assert c.modifications[0].change_type == ModificationType.ADD
+    assert c.modifications[1].change_type == ModificationType.ADD
 
 
 def test_files():
@@ -459,33 +462,50 @@ def test_get_commits_last_modified_lines_hyper_blame():
     gr = GitRepository('test-repos/test5/')
 
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit(
-        'e6d3b38a9ef683e8184eac10a0471075c2808bbd'), hyper_blame=True)
+        'e6d3b38a9ef683e8184eac10a0471075c2808bbd'))
 
     assert len(buggy_commits) == 1
     assert '540c7f31c18664a38190fafb6721b5174ff4a166' in buggy_commits[
         'B.java']
 
 
-def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(tmp_path):
+@pytest.mark.skipif(Git().version_info < (2, 23),
+                    reason="requires python3.6 or higher")
+def test_get_commits_last_modified_lines_hyper_blame_unblamable(tmp_path):
     p = tmp_path / "ignore.txt"
     p.write_text("540c7f31c18664a38190fafb6721b5174ff4a166")
 
     gr = GitRepository('test-repos/test5/')
 
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit(
-        'e6d3b38a9ef683e8184eac10a0471075c2808bbd'), hyper_blame=True,
+        'e6d3b38a9ef683e8184eac10a0471075c2808bbd'),
+        hashes_to_ignore_path=str(p))
+
+    assert len(buggy_commits) == 0
+
+
+@pytest.mark.skipif(Git().version_info < (2, 23),
+                    reason="requires python3.6 or higher")
+def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(tmp_path):
+    p = tmp_path / "ignore.txt"
+    p.write_text("5cb9e9ae44a0949ec91d06a955975289be766f34")
+
+    gr = GitRepository('test-repos/test5/')
+
+    buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit(
+        'c7002fb321a8ba32a28fac200538f7c2ba76f175'),
         hashes_to_ignore_path=str(p))
 
     assert len(buggy_commits) == 1
-    assert '22505e97dca6f843549b3a484b3609be4e3acf17' in buggy_commits[
-        'B.java']
+    assert 'c41d270f8abc203c895309235adbd5f3f81d4a45' in buggy_commits[
+        'A.java']
 
 
 def test_get_commits_last_modified_lines_hyper_blame_with_renaming():
     gr = GitRepository('test-repos/test5/')
 
     buggy_commits = gr.get_commits_last_modified_lines(gr.get_commit(
-        'be0772cbaa2eba32bf97aae885199d1a357ddc93'), hyper_blame=True)
+        'be0772cbaa2eba32bf97aae885199d1a357ddc93'))
 
     assert len(buggy_commits) == 2
     assert '9568d20856728304ab0b4d2d02fb9e81d0e5156d' in buggy_commits[

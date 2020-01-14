@@ -15,6 +15,7 @@
 import json
 import os
 import sys
+import platform
 
 import psutil
 
@@ -58,9 +59,9 @@ def test_memory(caplog):
 
     if any(val > 250 for val in max_values) or \
             minutes_with_everything >= 1 or \
-            minutes_with_metrics >= 5:
+            minutes_with_metrics >= 7:
         # if to analyze 1000 commits requires more than 250MB of RAM, more than 1 minute without metrics or
-        # 5 minutes with metrics, print it on the Slack channel
+        # 7 minutes with metrics, print it on the Slack channel
         logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
                                diff_with_everything, all_commits_with_everything,
                                diff_with_metrics, all_commits_with_metrics)
@@ -71,7 +72,7 @@ def test_memory(caplog):
 def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
                            diff_with_everything, all_commits_with_everything,
                            diff_with_metrics, all_commits_with_metrics):
-    text = "*PYTHON V{}.{}*\n" \
+    text = "*PYTHON V{}.{} - System: {}*\n" \
            "*Max memory (MB)*\n" \
            "With nothing: {}, with everything: {}, with metrics: {}\n" \
            "*Min memory (MB)*\n" \
@@ -84,7 +85,7 @@ def logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
 
     slack_data = {
         'text': text.format(
-            sys.version_info[0], sys.version_info[1],
+            sys.version_info[0], sys.version_info[1], platform.system(),
             max(all_commits_with_nothing), max(all_commits_with_everything), max(all_commits_with_metrics),
             min(all_commits_with_nothing), min(all_commits_with_everything), min(all_commits_with_metrics),
             diff_with_nothing.seconds // 3600, (diff_with_nothing.seconds % 3600) // 60, diff_with_nothing.seconds % 60,

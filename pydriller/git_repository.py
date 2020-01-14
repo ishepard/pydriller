@@ -25,11 +25,9 @@ from typing import List, Dict, Tuple, Set, Generator
 from git import Git, Repo, GitCommandError, Commit as GitCommit
 
 from pydriller.domain.commit import Commit, ModificationType, Modification
-from pydriller.utils.hyperblame import GitHyperBlame
+from pydriller.utils.conf import Conf
 
 logger = logging.getLogger(__name__)
-
-NULL_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
 
 class GitRepository:
@@ -38,20 +36,29 @@ class GitRepository:
     PyDriller: obtaining the list of commits, checkout, reset, etc.
     """
 
-    def __init__(self, path: str):
+    # pylint: disable=too-many-instance-attributes
+    def __init__(self, path: str, conf=None):
         """
         Init the Git RepositoryMining.
 
         :param str path: path to the repository
         """
         self.path = Path(path)
-        self.hyperblame = GitHyperBlame(path)
         self.project_name = self.path.name
-        self.main_branch = None
         self.lock = Lock()
-        self._hyper_blame_available = None
         self._git = None
         self._repo = None
+
+        # if no configuration is passed, then creates a new "emtpy" one
+        # with just "path_to_repo" inside.
+        if conf is None:
+            conf = Conf({
+                "path_to_repo": str(self.path),
+                "git_repo": self
+            })
+
+        self._conf = conf
+        self._conf.set_value("main_branch", None)  # init main_branch to None
 
     @property
     def git(self):
@@ -80,16 +87,17 @@ class GitRepository:
 
     def _open_repository(self):
         self._repo = Repo(str(self.path))
-        if self.main_branch is None:
+        self._repo.config_writer().set_value("blame", "markUnblamableLines", "true").release()
+        if self._conf.get("main_branch") is None:
             self._discover_main_branch(self._repo)
 
     def _discover_main_branch(self, repo):
         try:
-            self.main_branch = repo.active_branch.name
+            self._conf.set_value("main_branch", repo.active_branch.name)
         except TypeError:
             logger.info("HEAD is a detached symbolic reference, setting "
                         "main branch to empty string")
-            self.main_branch = ''
+            self._conf.set_value("main_branch", '')
 
     def get_head(self) -> Commit:
         """
@@ -98,7 +106,7 @@ class GitRepository:
         :return: Commit of the head commit
         """
         head_commit = self.repo.head.commit
-        return Commit(head_commit, self.path, self.main_branch)
+        return Commit(head_commit, self._conf)
 
     def get_list_commits(self, branch: str = None,
                          reverse_order: bool = True) \
@@ -119,7 +127,8 @@ class GitRepository:
         :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
-        return Commit(self.repo.commit(commit_id), self.path, self.main_branch)
+        gp_commit = self.repo.commit(commit_id)
+        return Commit(gp_commit, self._conf)
 
     def get_commit_from_gitpython(self, commit: GitCommit) -> Commit:
         """
@@ -130,7 +139,7 @@ class GitRepository:
         :param GitCommit commit: GitPython commit
         :return: Commit commit: PyDriller commit
         """
-        return Commit(commit, self.path, self.main_branch)
+        return Commit(commit, self._conf)
 
     def checkout(self, _hash: str) -> None:
         """
@@ -149,7 +158,7 @@ class GitRepository:
             # we are already in _PD, so checkout the master branch before
             # deleting it
             if self.repo.active_branch.name == '_PD':
-                self.git.checkout('-f', self.main_branch)
+                self.git.checkout('-f', self._conf.get("main_branch"))
             self.repo.delete_head('_PD', force=True)
         except GitCommandError:
             logger.debug("Branch _PD not found")
@@ -168,7 +177,6 @@ class GitRepository:
                 _all.append(os.path.join(path, name))
         return _all
 
-
     def reset(self) -> None:
         """
         Reset the state of the repo, checking out the main branch and
@@ -177,7 +185,7 @@ class GitRepository:
 
         """
         with self.lock:
-            self.git.checkout('-f', self.main_branch)
+            self.git.checkout('-f', self._conf.get("main_branch"))
             self._delete_tmp_branch()
 
     def total_commits(self) -> int:
@@ -254,7 +262,8 @@ class GitRepository:
 
         return modified_lines
 
-    def _get_line_numbers(self, line):
+    @staticmethod
+    def _get_line_numbers(line):
         token = line.split(" ")
         numbers_old_file = token[1]
         numbers_new_file = token[2]
@@ -265,20 +274,12 @@ class GitRepository:
 
     def get_commits_last_modified_lines(self, commit: Commit,
                                         modification: Modification = None,
-                                        hyper_blame: bool = False,
                                         hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
         """
         Given the Commit object, returns the set of commits that last
         "touched" the lines that are modified in the files included in the
         commit. It applies SZZ.
-
-        IMPORTANT: for better results, we suggest to install Google
-        depot_tools first (see
-        https://dev.chromium.org/developers/how-tos/install-depot-tools).
-        This allows PyDriller to use "git hyper-blame" instead of the normal
-        blame. If depot_tools are not installed, PyDriller will automatically
-        switch to the normal blame.
 
         The algorithm works as follow: (for every file in the commit)
 
@@ -293,34 +294,24 @@ class GitRepository:
 
         :param Commit commit: the commit to analyze
         :param Modification modification: single modification to analyze
-        :param bool hyper_blame: whether to use git hyper blame or the
-            normal blame (by default it uses the normal blame).
         :param str hashes_to_ignore_path: path to a file containing hashes of
-               commits to ignore. (only works with git hyper blame)
+               commits to ignore.
         :return: the set containing all the bug inducing commits
         """
-        hashes_to_ignore = []
-        if hashes_to_ignore_path is not None:
-            assert os.path.exists(hashes_to_ignore_path), \
-                "The file with the commit hashes to ignore does not exist"
-            hashes_to_ignore = open(hashes_to_ignore_path).readlines()
-
         if modification is not None:
             modifications = [modification]
         else:
             modifications = commit.modifications
 
         return self._calculate_last_commits(commit, modifications,
-                                            hyper_blame,
-                                            hashes_to_ignore)
+                                            hashes_to_ignore_path)
 
     def _calculate_last_commits(self, commit: Commit,
                                 modifications: List[Modification],
-                                hyper_blame: bool = False,
-                                hashes_to_ignore: List[str] = None) \
+                                hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
 
-        buggy_commits = {}
+        commits = {}
 
         for mod in modifications:
             path = mod.new_path
@@ -329,39 +320,42 @@ class GitRepository:
                 path = mod.old_path
             deleted_lines = self.parse_diff(mod.diff)['deleted']
             try:
-                blame = self._get_blame(commit.hash, path, hyper_blame,
-                                        hashes_to_ignore)
+                blame = self._get_blame(commit.hash, path,
+                                        hashes_to_ignore_path)
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):
                         buggy_commit = blame[num_line - 1].split(' ')[
                             0].replace('^', '')
 
+                        # Skip unblamable lines.
+                        if buggy_commit.startswith("*"):
+                            continue
+
                         if mod.change_type == ModificationType.RENAME:
                             path = mod.new_path
 
-                        buggy_commits.setdefault(path, set()).add(
+                        commits.setdefault(path, set()).add(
                             self.get_commit(buggy_commit).hash)
             except GitCommandError:
                 logger.debug(
                     "Could not found file %s in commit %s. Probably a double "
                     "rename!", mod.filename, commit.hash)
 
-        return buggy_commits
+        return commits
 
-    def _get_blame(self, hash: str, path: str,
-                   hyper_blame: bool = False,
-                   hashes_to_ignore: List[str] = None):
-        """
-        If "git hyper-blame" is available, use it. Otherwise use normal blame.
-        """
-        if not hyper_blame or hashes_to_ignore is None:
-            return self.git.blame('-w', hash + '^',
-                                  '--', path).split('\n')
-        else:
-            return self.hyperblame.hyper_blame(hashes_to_ignore, path,
-                                               hash + '^')
+    def _get_blame(self, commit_hash: str, path: str,
+                   hashes_to_ignore_path: List[str] = None):
+        args = ['-w', commit_hash + '^']
+        if hashes_to_ignore_path is not None:
+            if self.git.version_info >= (2, 23):
+                args += ["--ignore-revs-file", hashes_to_ignore_path]
+            else:
+                logger.info("'--ignore-revs-file' is only available from "
+                            "git v2.23")
+        return self.git.blame(*args, '--', path).split('\n')
 
-    def _useless_line(self, line: str):
+    @staticmethod
+    def _useless_line(line: str):
         # this covers comments in Java and Python, as well as empty lines.
         # More have to be added!
         return not line or \

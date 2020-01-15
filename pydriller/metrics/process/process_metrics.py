@@ -24,9 +24,25 @@ class ProcessMetrics:
       of added and deleted lines) added and deleted lines in the file
     """
 
+    def get_commits_within_same_release(self, path_to_repo: str, commit_hash: str = None):
+        """
+        Return the commits within the same release up to the specified commit
+        :commit_hash: the SHA of the commit
+        """
 
+        releases = self.__get_releases(path_to_repo, to_commit=commit_hash)
+
+        for commit in RepositoryMining(path_to_repo,
+                                       to_commit=commit_hash,
+                                       reversed_order=True).traverse_commits():
+
+            yield commit
+
+            if commit.hash in releases:
+                break
+        
     def __get_releases(self, path_to_repo: str, from_commit: str = None,
-                       to_commit: str  = None):
+                       to_commit: str = None):
         """
         Return all releases' sha of a repo between two commits sorted descending from latest.
         :to_commit: the SHA of the commit to stop counting. If None, the

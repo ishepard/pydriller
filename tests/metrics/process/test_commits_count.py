@@ -1,27 +1,22 @@
-import unittest
-from parameterized import parameterized_class
+import pytest
 from pydriller.metrics.process.commit_count import CommitCount
 
-@parameterized_class([
-   {'path_to_repo': 'test-repos/git-1', 'filepath': 'Arquivo.java', 'from_commit': None, 'to_commit': 'ffccf1e7497eb8136fd66ed5e42bef29677c4b71', 'release_scope': False, 'expected': 0},
-   {'path_to_repo': 'test-repos/git-1', 'filepath': 'Matricula.java', 'from_commit': None, 'to_commit': 'ffccf1e7497eb8136fd66ed5e42bef29677c4b71', 'release_scope': False, 'expected': 2},
-   {'path_to_repo': 'test-repos/git-1', 'filepath': 'unexisting.java', 'from_commit': None, 'to_commit': None, 'release_scope': False, 'expected': 0},
-   {'path_to_repo': 'test-repos/git-1', 'filepath': 'Matricula.java', 'from_commit': None, 'to_commit': None, 'release_scope': False, 'expected': 6},
-   {'path_to_repo': 'https://github.com/ishepard/pydriller', 'filepath': 'domain/developer.py', 'from_commit': None, 'to_commit': 'fdf671856b260aca058e6595a96a7a0fba05454b', 'release_scope': False, 'expected': 2},
-   {'path_to_repo': 'https://github.com/ishepard/pydriller', 'filepath': 'domain/developer.py', 'from_commit': None, 'to_commit': 'fdf671856b260aca058e6595a96a7a0fba05454b', 'release_scope': True, 'expected': 2}
-])
+test_data = [
+    ('test-repos/git-1', 'Arquivo.java', None, 'ffccf1e7497eb8136fd66ed5e42bef29677c4b71', False, 0),
+    ('test-repos/git-1', 'Matricula.java', None, 'ffccf1e7497eb8136fd66ed5e42bef29677c4b71', False, 2),
+    ('test-repos/git-1', 'unexisting.java', None, None, False, 0),
+    ('test-repos/git-1', 'Matricula.java', None, None, False, 6),
+    ('https://github.com/ishepard/pydriller', 'domain/developer.py', None, 'fdf671856b260aca058e6595a96a7a0fba05454b', False, 2),
+    ('https://github.com/ishepard/pydriller', 'domain/developer.py', None, 'fdf671856b260aca058e6595a96a7a0fba05454b', True, 2)
+]
 
-class TestCommitCount(unittest.TestCase):
-
-    def test(self):
-        metric = CommitCount(path_to_repo=self.path_to_repo,
-                            filepath=self.filepath,
-                            from_commit=self.from_commit,
-                            to_commit=self.to_commit,
-                            release_scope=self.release_scope)
-        
-        count = metric.count()
-        self.assertEqual(count, self.expected, 'Test failed because expected ' + str(self.expected) + ' and got ' + str(count) +'!') 
-
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.parametrize('path_to_repo, filepath, from_commit, to_commit, release_scope, expected', test_data)
+def test(path_to_repo, filepath, from_commit, to_commit, release_scope, expected):
+    metric = CommitCount(path_to_repo=path_to_repo,
+                                    filepath=filepath,
+                                    from_commit=from_commit,
+                                    to_commit=to_commit,
+                                    release_scope=release_scope)
+    
+    count = metric.count()
+    assert count == expected, f'Test failed because expected {str(expected)} and got {str(count)}!'

@@ -8,7 +8,7 @@ from pydriller.metrics.process.lines_count import NormalizedLinesCount
    {'path_to_repo': 'https://github.com/ishepard/pydriller', 'filepath': 'README.md', 'from_commit': None, 'to_commit': 'e7255f596a1cde0f9f42a962969d541e5186c441', 'expected': (1, 0)},
 ])
 
-class TestDevsCount(unittest.TestCase):
+class TestNormalizedLinesCount(unittest.TestCase):
 
     def test(self):
         metric = NormalizedLinesCount(path_to_repo=self.path_to_repo,

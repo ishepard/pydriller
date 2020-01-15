@@ -1,7 +1,6 @@
 """
 Module that calculates the number of developers that contributed to a file
 """
-from enum import Enum
 from pathlib import Path
 from pydriller.domain.commit import ModificationType
 from pydriller.repository_mining import RepositoryMining

@@ -55,6 +55,5 @@ class DevsCount(ProcessMetric):
             if commit.hash in self.releases:
                 count_active_devs = False
 
-        print(len(cumulative_devs), len(active_devs))
         return (len(cumulative_devs), len(active_devs))
         

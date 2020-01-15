@@ -27,5 +27,5 @@ def devs_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return DevsCount(path_to_repo, filepath, to_commit=to_commit).count()
 
 def norm_lines_count(path_to_repo: str, filepath: str, to_commit: str = None):
-    return NormalizedLinesCount(path_to_repo, filepath, 
+    return NormalizedLinesCount(path_to_repo, filepath,
                                 to_commit=to_commit).count()

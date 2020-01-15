@@ -42,7 +42,7 @@ Developer
 Process Metrics
 ----------------
 
-.. automodule:: pydriller.metrics.process.process_metrics
+.. automodule:: pydriller.metrics.process.process_metric
    :members:
    :undoc-members:
    :special-members:

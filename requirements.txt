@@ -2,3 +2,4 @@ gitpython
 typing; python_version < '3.5'
 pytz
 lizard
+parameterized==0.7.0

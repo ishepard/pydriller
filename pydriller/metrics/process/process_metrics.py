@@ -1,5 +1,6 @@
 """
 Module that calculates process metrics.
+Note: All process metrics are release-duration.
 See https://ieeexplore.ieee.org/document/6606589 for more info.
 """
 
@@ -23,6 +24,29 @@ class ProcessMetrics:
       of added and deleted lines) added and deleted lines in the file
     """
 
+
+    def __get_releases(self, path_to_repo: str, from_commit: str = None,
+                       to_commit: str  = None):
+        """
+        Return all releases' sha of a repo between two commits sorted descending from latest.
+        :to_commit: the SHA of the commit to stop counting. If None, the
+            analysis starts from the latest commit
+        :from_commit: the SHA of the commit to start counting. If None, the
+            analysis ends to the first commit
+        
+        :return: set of commit hash
+        """
+        # Get the sha of all releases in the repo
+        releases = set()
+        for commit in RepositoryMining(path_to_repo,
+                                       from_commit=from_commit,
+                                       to_commit=to_commit,
+                                       reversed_order=True,
+                                       only_releases=True).traverse_commits():
+            releases.add(commit.hash)
+        
+        return releases
+
     def commits_count(self, path_to_repo: str, filepath: str,
                       from_commit: str = None, to_commit: str = None):
         """
@@ -41,6 +65,10 @@ class ProcessMetrics:
 
         filepath = str(Path(filepath))
         count = 0
+        
+        #releases = self.__get_releases(path_to_repo, 
+        #                               from_commit=from_commit,
+        #                               to_commit=to_commit)
 
         for commit in RepositoryMining(path_to_repo, from_commit=from_commit,
                                        to_commit=to_commit,
@@ -111,13 +139,9 @@ class ProcessMetrics:
         filepath = str(Path(filepath))
 
         # Get the sha of all releases in the repo
-        releases = set()
-        for commit in RepositoryMining(path_to_repo, from_commit=from_commit,
-                                       to_commit=to_commit,
-                                       reversed_order=True,
-                                       only_releases=True).traverse_commits():
-            releases.add(commit.hash)
-
+        releases = self.__get_releases(path_to_repo,
+                                       from_commit=from_commit,
+                                       to_commit=to_commit)
         in_prior_release = False
 
         for commit in RepositoryMining(path_to_repo, from_commit=from_commit,
@@ -178,12 +202,9 @@ class ProcessMetrics:
         filepath = str(Path(filepath))
 
         # Get the sha of all releases in the repo
-        releases = set()
-        for commit in RepositoryMining(path_to_repo, from_commit=from_commit,
-                                       to_commit=to_commit,
-                                       reversed_order=True,
-                                       only_releases=True).traverse_commits():
-            releases.add(commit.hash)
+        releases = self.__get_releases(path_to_repo,
+                                       from_commit=from_commit,
+                                       to_commit=to_commit)
 
         in_prior_release = False
         in_older_release = False

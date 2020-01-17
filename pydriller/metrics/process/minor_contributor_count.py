@@ -1,25 +1,27 @@
 """
-Module that calculates the percentage of the lines authored by the highest \
-    contributor of a file
+Module that calculates the number of contributors who authored less than 5% \
+    of the code in a file
+
+See https://dl.acm.org/doi/10.1145/2025113.2025119
 """
 from pathlib import Path
 from pydriller.domain.commit import ModificationType
 from pydriller.repository_mining import RepositoryMining
 from pydriller.metrics.process.process_metric import ProcessMetric
 
-class OwnersContributedLines(ProcessMetric):
+class MinorContributorCount(ProcessMetric):
     """
-    This class is responsible to implement the metrics "Owner's Contributed \
-        Lines" that measures the percentage of the lines authored by the \
-        highest contributor of a file.
+    This class is responsible to implement the metrics "Minor Contributor \
+        Count" that measures the number of contributors who authored less \
+        than 5% of code of a file.
     """
 
     def count(self):
         """
-        Return the percentage of the lines authored by the highest contributor
-        of a file.
+        Return the number of contributors who authored less than 5% of code \
+            of a file
 
-        :return: float between 0 and 1 - percentage of lines
+        :return: int number of contributors
         """
         contributions = {}
         filepath = self.filepath
@@ -50,15 +52,9 @@ class OwnersContributedLines(ProcessMetric):
             if commit.hash in self.releases:
                 break
 
-        # Return the highest value from the dictionary of contributions
-        highest = total = 0
-
+        # Return the # of contributors with < 5% on the file
         if contributions.values():
-            highest = max(contributions.values())
             total = sum(contributions.values())
+            return sum(1 for v in contributions.values() if v/total < .05)
 
-        if total == 0:
-            return 0.0
-
-        return float(highest/total)
-        
+        return 0

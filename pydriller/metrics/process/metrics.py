@@ -13,6 +13,8 @@ at a given commit:
       of deleted lines) deleted lines in the file
     * Owner's Contributed Lines: measures the percentage of the lines \
       authored by the highest contributor of a file
+    * Minor Contributor Count: measures the number of contributors who \
+      authored less than 5% of the code of a file
 
 Note: All process metrics are release-duration.
 See https://ieeexplore.ieee.org/document/6606589 for more info.
@@ -22,6 +24,7 @@ from pydriller.metrics.process.commit_count import CommitCount
 from pydriller.metrics.process.devs_count import DevsCount
 from pydriller.metrics.process.lines_count import NormalizedLinesCount
 from pydriller.metrics.process.owner_lines_count import OwnersContributedLines
+from pydriller.metrics.process.minor_contributor_count import MinorContributorCount
 
 def commits_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return CommitCount(path_to_repo, filepath, to_commit=to_commit).count()
@@ -35,4 +38,8 @@ def norm_lines_count(path_to_repo: str, filepath: str, to_commit: str = None):
 
 def owner_contributed_lines(path_to_repo: str, filepath: str, to_commit: str = None):
     return OwnersContributedLines(path_to_repo, filepath,
+                                to_commit=to_commit).count()
+
+def minor_contributors_count(path_to_repo: str, filepath: str, to_commit: str = None):
+    return MinorContributorCount(path_to_repo, filepath,
                                 to_commit=to_commit).count()

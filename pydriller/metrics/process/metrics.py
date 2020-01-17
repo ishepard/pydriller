@@ -16,6 +16,8 @@ at a given commit:
     * Owner's Experience: is the experience of the highest contributor of a file \
       using the percent of lines he authored in the project at a given point \
       in time.
+    * All Committers' Experience (EXP): is the geometric mean of the experiences \
+        of all the developers.
     * Minor Contributor Count: measures the number of contributors who \
       authored less than 5% of the code of a file
 
@@ -25,8 +27,8 @@ See https://ieeexplore.ieee.org/document/6606589 for more info.
 
 from pydriller.metrics.process.commit_count import CommitCount
 from pydriller.metrics.process.devs_count import DevsCount
+from pydriller.metrics.process.devs_experience import DevsExperience
 from pydriller.metrics.process.lines_count import NormalizedLinesCount
-from pydriller.metrics.process.owner_experience import OwnerExperience
 from pydriller.metrics.process.minor_contributor_count import MinorContributorCount
 
 def commits_count(path_to_repo: str, filepath: str, to_commit: str = None):
@@ -39,10 +41,10 @@ def norm_lines_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return NormalizedLinesCount(path_to_repo, filepath,
                                 to_commit=to_commit).count()
 
-def owner_experience(path_to_repo: str, filepath: str, to_commit: str = None):
-    return OwnerExperience(path_to_repo, filepath,
-                                to_commit=to_commit).count()
+def devs_experience(path_to_repo: str, filepath: str, to_commit: str = None):
+    return DevsExperience(path_to_repo, filepath,
+                          to_commit=to_commit).count()
 
 def minor_contributors_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return MinorContributorCount(path_to_repo, filepath,
-                                to_commit=to_commit).count()
+                                 to_commit=to_commit).count()

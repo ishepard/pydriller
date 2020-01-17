@@ -11,8 +11,11 @@ at a given commit:
       of added lines) added lines in the file
     * Normalized Lines Deleted: are the normalized (by the total number \
       of deleted lines) deleted lines in the file
-    * Owner's Contributed Lines: measures the percentage of the lines \
-      authored by the highest contributor of a file
+    * Owner's Contributed Lines: is the percentage of the lines authored by \
+      the highest contributor of a file.
+    * Owner's Experience: is the experience of the highest contributor of a file \
+      using the percent of lines he authored in the project at a given point \
+      in time.
     * Minor Contributor Count: measures the number of contributors who \
       authored less than 5% of the code of a file
 
@@ -23,7 +26,7 @@ See https://ieeexplore.ieee.org/document/6606589 for more info.
 from pydriller.metrics.process.commit_count import CommitCount
 from pydriller.metrics.process.devs_count import DevsCount
 from pydriller.metrics.process.lines_count import NormalizedLinesCount
-from pydriller.metrics.process.owner_lines_count import OwnersContributedLines
+from pydriller.metrics.process.owner_experience import OwnerExperience
 from pydriller.metrics.process.minor_contributor_count import MinorContributorCount
 
 def commits_count(path_to_repo: str, filepath: str, to_commit: str = None):
@@ -36,8 +39,8 @@ def norm_lines_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return NormalizedLinesCount(path_to_repo, filepath,
                                 to_commit=to_commit).count()
 
-def owner_contributed_lines(path_to_repo: str, filepath: str, to_commit: str = None):
-    return OwnersContributedLines(path_to_repo, filepath,
+def owner_experience(path_to_repo: str, filepath: str, to_commit: str = None):
+    return OwnerExperience(path_to_repo, filepath,
                                 to_commit=to_commit).count()
 
 def minor_contributors_count(path_to_repo: str, filepath: str, to_commit: str = None):

@@ -18,9 +18,10 @@ at a given commit:
       in time.
     * All Committers' Experience (EXP): is the geometric mean of the experiences \
         of all the developers.
-    * Minor Contributor Count: measures the number of contributors who \
+    * Minor Contributor Count (MIN): measures the number of contributors who \
       authored less than 5% of the code of a file.
-    * Hunks Count: is the number of continuous block of changes in a diff.
+    * Hunks Count (HUN): is the number of continuous block of changes in a diff.
+    * History Complexity (SCTR): is the scattering of changes to a file.
 
 Note: All process metrics are release-duration.
 See https://ieeexplore.ieee.org/document/6606589 for more info.
@@ -29,9 +30,10 @@ See https://ieeexplore.ieee.org/document/6606589 for more info.
 from pydriller.metrics.process.commit_count import CommitCount
 from pydriller.metrics.process.devs_count import DevsCount
 from pydriller.metrics.process.devs_experience import DevsExperience
+from pydriller.metrics.process.history_complexity import HistoryComplexity
+from pydriller.metrics.process.hunks_count import HunksCount
 from pydriller.metrics.process.lines_count import NormalizedLinesCount
 from pydriller.metrics.process.minor_contributor_count import MinorContributorCount
-from pydriller.metrics.process.hunks_count import HunksCount
 
 def commits_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return CommitCount(path_to_repo, filepath, to_commit=to_commit).count()
@@ -39,13 +41,13 @@ def commits_count(path_to_repo: str, filepath: str, to_commit: str = None):
 def devs_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return DevsCount(path_to_repo, filepath, to_commit=to_commit).count()
 
-def norm_lines_count(path_to_repo: str, filepath: str, to_commit: str = None):
-    return NormalizedLinesCount(path_to_repo, filepath,
-                                to_commit=to_commit).count()
-
 def devs_experience(path_to_repo: str, filepath: str, to_commit: str = None):
     return DevsExperience(path_to_repo, filepath,
                           to_commit=to_commit).count()
+
+def history_complexity(path_to_repo: str, filepath: str, to_commit: str = None):
+    return HistoryComplexity(path_to_repo, filepath,
+                      to_commit=to_commit).count()
 
 def hunks_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return HunksCount(path_to_repo, filepath,
@@ -54,3 +56,7 @@ def hunks_count(path_to_repo: str, filepath: str, to_commit: str = None):
 def minor_contributors_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return MinorContributorCount(path_to_repo, filepath,
                                  to_commit=to_commit).count()
+
+def norm_lines_count(path_to_repo: str, filepath: str, to_commit: str = None):
+    return NormalizedLinesCount(path_to_repo, filepath,
+                                to_commit=to_commit).count()

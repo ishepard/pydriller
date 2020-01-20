@@ -36,6 +36,7 @@ from pydriller.metrics.process.history_complexity import HistoryComplexity
 from pydriller.metrics.process.hunks_count import HunksCount
 from pydriller.metrics.process.lines_count import NormalizedLinesCount
 from pydriller.metrics.process.minor_contributor_count import MinorContributorCount
+from pydriller.metrics.process.new_devs_count import NewDevsCount
 
 def commits_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return CommitCount(path_to_repo, filepath, to_commit=to_commit).count()
@@ -58,6 +59,9 @@ def hunks_count(path_to_repo: str, filepath: str, to_commit: str = None):
 def minor_contributors_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return MinorContributorCount(path_to_repo, filepath,
                                  to_commit=to_commit).count()
+
+def news_devs_count(path_to_repo: str, filepath: str, to_commit: str = None):
+    return NewDevsCount(path_to_repo, filepath, to_commit=to_commit).count()
 
 def norm_lines_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return NormalizedLinesCount(path_to_repo, filepath,

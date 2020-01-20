@@ -32,7 +32,7 @@ class ProcessMetric:
                                      from_commit=self.from_commit,
                                      to_commit=self.to_commit)
 
-    def count(self):
+    def count(self, *args, **kwargs):
         """
         Implement the main functionality of the metric
         """

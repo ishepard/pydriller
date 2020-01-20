@@ -70,10 +70,10 @@ class NewDevsCount(ProcessMetric):
 
                     if modified_file.change_type == ModificationType.RENAME:
                         filepath = str(Path(modified_file.old_path))
+                        break
+
                     elif modified_file.change_type == ModificationType.ADD:
                         stop_count = True
-
-                    break
 
                 if stop_count:
                     break

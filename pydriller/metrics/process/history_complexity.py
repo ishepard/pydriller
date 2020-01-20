@@ -5,7 +5,6 @@ See https://ieeexplore.ieee.org/document/5070510
 """
 from enum import Enum
 from math import log
-from pathlib import Path
 from pydriller.domain.commit import ModificationType
 from pydriller.repository_mining import RepositoryMining
 from pydriller.metrics.process.process_metric import ProcessMetric

@@ -7,6 +7,8 @@ at a given commit:
       to the file
     * Distinct Developers Count: is the cumulative number of distinct \
       developers who contributed to the file
+    * New Developers Count: is the number of new developers who modified \
+      the file durint the prior release.
     * Normalized Lines Added: are the normalized (by the total number \
       of added lines) added lines in the file
     * Normalized Lines Deleted: are the normalized (by the total number \
@@ -23,7 +25,7 @@ at a given commit:
     * Hunks Count (HUN): is the number of continuous block of changes in a diff.
     * History Complexity (SCTR): is the scattering of changes to a file.
 
-Note: All process metrics are release-duration.
+Note: All process metrics are cumulated and measured on a per-release basis.
 See https://ieeexplore.ieee.org/document/6606589 for more info.
 """
 

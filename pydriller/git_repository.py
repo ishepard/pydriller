@@ -85,6 +85,9 @@ class GitRepository:
     def _open_git(self):
         self._git = Git(str(self.path))
 
+    def clear(self):
+        self.repo.git.clear_cache()
+
     def _open_repository(self):
         self._repo = Repo(str(self.path))
         self._repo.config_writer().set_value("blame", "markUnblamableLines", "true").release()

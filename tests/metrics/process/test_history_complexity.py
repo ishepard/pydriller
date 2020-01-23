@@ -15,4 +15,4 @@ def test(path_to_repo, filepath, to_commit, period, expected):
                                     to_commit=to_commit)
     
     count = metric.count(period=period)
-    assert count == expected, f'Test failed because expected {str(expected)} and got {str(count)}!'
+    assert count == expected

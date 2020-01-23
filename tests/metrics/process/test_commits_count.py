@@ -19,4 +19,4 @@ def test(path_to_repo, filepath, from_commit, to_commit, release_scope, expected
                                     release_scope=release_scope)
     
     count = metric.count()
-    assert count == expected, f'Test failed because expected {str(expected)} and got {str(count)}!'
+    assert count == expected

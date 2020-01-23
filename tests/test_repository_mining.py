@@ -188,7 +188,6 @@ def test_ignore_add_whitespaces_and_changed_file():
     assert len(commit.modifications) == 1
 
 
-@pytest.mark.skipif(platform.system() == "Windows", reason="Sometimes Windows give an error 'Handle is not valid' in this test, though it works anyway outside the test.")
 def test_clone_repo_to():
     tmp_folder = tempfile.TemporaryDirectory()
     dt2 = datetime(2018, 10, 20)

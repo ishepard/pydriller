@@ -3,10 +3,8 @@ Module to calculate the following process metrics for a file \
 at a given commit:
 
     * Commit Count: is the number of commits made to a file
-    * Active Developers Count: is the number of developers who contributed \
-      to the file
-    * Distinct Developers Count: is the cumulative number of distinct \
-      developers who contributed to the file
+    * Devs Count: is the distinct number of developers who contributed \
+      to a file
     * New Developers Count: is the number of new developers who modified \
       the file durint the prior release.
     * Normalized Lines Added: are the normalized (by the total number \
@@ -41,8 +39,8 @@ from pydriller.metrics.process.new_devs_count import NewDevsCount
 def commits_count(path_to_repo: str, from_commit: str = None, to_commit: str = None):
     return CommitsCount(path_to_repo, from_commit=from_commit, to_commit=to_commit).count()
 
-def devs_count(path_to_repo: str, filepath: str, to_commit: str = None):
-    return DevsCount(path_to_repo, filepath, to_commit=to_commit).count()
+def devs_count(path_to_repo: str, from_commit: str = None, to_commit: str = None):
+    return DevsCount(path_to_repo, from_commit=from_commit, to_commit=to_commit).count()
 
 def devs_experience(path_to_repo: str, filepath: str, to_commit: str = None):
     return DevsExperience(path_to_repo, filepath,

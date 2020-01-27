@@ -1,36 +1,28 @@
 """
-Module that calculates the number of developers that contributed to a file
+Module that calculates the number of developers that contributed to each modified file \
+    in the repo in a given time range.
 """
-from pathlib import Path
 from pydriller.domain.commit import ModificationType
 from pydriller.repository_mining import RepositoryMining
 from pydriller.metrics.process.process_metric import ProcessMetric
 
 class DevsCount(ProcessMetric):
     """
-    This class is responsible to implement the following metrics: \
-    * Active Developers Count: is the number of developers who changed \
-        the file in the commit release.
-    * Distinct Developers Count: is the cumulative number of distinct \
-        developers who contributed to the file up to the commit release.
+    This class counts the number of developers who changed the file \
+        in the given time range [from_commit, to_commit].
     """
 
     def count(self):
         """
-        Return the active or cumulative number of distinct developers who
-        contributed to the file up to the indicated commit.
+        Return a dictionary with the number of distinct developers who \
+            contributed to each modified file.
+            The key is the modified filepath;
+            The value is the number of developers that changed it.
 
-        :return: a tuple (int, int) indicating the number of distinct
-            cumulative and active developers contributing to the file.
-            E.g. (5, 2) means that 5 distinct developers modified the
-            file during is history, 2 of which in the release the commit
-            belongs to.
+        :return: dict {str: int}
         """
-        active_devs = set()
-        cumulative_devs = set()
-        filepath = self.filepath
-
-        count_active_devs = True
+        renamed_files = {}
+        files = {}
 
         for commit in RepositoryMining(path_to_repo=self.path_to_repo,
                                        from_commit=self.from_commit,
@@ -38,21 +30,21 @@ class DevsCount(ProcessMetric):
                                        reversed_order=True).traverse_commits():
 
             for modified_file in commit.modifications:
-                if filepath in (modified_file.new_path,
-                                modified_file.old_path):
 
-                    cumulative_devs.add(commit.author.email.strip())
+                filepath = renamed_files.get(modified_file.new_path,
+                                             modified_file.new_path)
 
-                    if count_active_devs:
-                        active_devs.add(commit.author.email.strip())
+                if modified_file.change_type == ModificationType.RENAME:
+                    renamed_files[modified_file.old_path] = filepath
 
-                    if modified_file.change_type == ModificationType.RENAME:
-                        filepath = str(Path(modified_file.old_path))
+                developer = commit.author.email.strip()
 
-                    break
+                if filepath not in files:
+                    files[filepath] = set([developer])
 
-            if commit.hash in self.releases:
-                count_active_devs = False
+                files[filepath].add(developer)
 
-        return (len(cumulative_devs), len(active_devs))
-        
+        for path, devs in files.items():
+            files[path] = len(devs)
+
+        return files

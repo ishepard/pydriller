@@ -29,7 +29,7 @@ Note: All process metrics are cumulated and measured on a per-release basis.
 See https://ieeexplore.ieee.org/document/6606589 for more info.
 """
 
-from pydriller.metrics.process.commit_count import CommitCount
+from pydriller.metrics.process.commits_count import CommitsCount
 from pydriller.metrics.process.devs_count import DevsCount
 from pydriller.metrics.process.devs_experience import DevsExperience
 from pydriller.metrics.process.history_complexity import HistoryComplexity
@@ -38,8 +38,8 @@ from pydriller.metrics.process.lines_count import NormalizedLinesCount
 from pydriller.metrics.process.minor_contributor_count import MinorContributorCount
 from pydriller.metrics.process.new_devs_count import NewDevsCount
 
-def commits_count(path_to_repo: str, filepath: str, to_commit: str = None):
-    return CommitCount(path_to_repo, filepath, to_commit=to_commit).count()
+def commits_count(path_to_repo: str, from_commit: str = None, to_commit: str = None):
+    return CommitsCount(path_to_repo, from_commit=from_commit, to_commit=to_commit).count()
 
 def devs_count(path_to_repo: str, filepath: str, to_commit: str = None):
     return DevsCount(path_to_repo, filepath, to_commit=to_commit).count()

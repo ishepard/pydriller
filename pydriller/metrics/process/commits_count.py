@@ -2,13 +2,11 @@
 Module that calculates the number of commits made to a file.
 """
 
-from pathlib import Path
 from pydriller.domain.commit import ModificationType
 from pydriller.repository_mining import RepositoryMining
 from pydriller.metrics.process.process_metric import ProcessMetric
 
-
-class CommitCount(ProcessMetric):
+class CommitsCount(ProcessMetric):
     """
     This class is responsible to implement the Commit Count metric to \
     measure the number of commits made to a file
@@ -16,25 +14,22 @@ class CommitCount(ProcessMetric):
 
 
     def count(self):
-        count = 0
-        filepath = self.filepath
+        files = {}
+        renamed_files = {} # To keep track of renamed files
 
-        for commit in RepositoryMining(path_to_repo=self.path_to_repo, 
+        for commit in RepositoryMining(path_to_repo=self.path_to_repo,
                                        from_commit=self.from_commit,
                                        to_commit=self.to_commit,
                                        reversed_order=True).traverse_commits():
 
             for modified_file in commit.modifications:
 
-                if filepath in (modified_file.new_path,
-                                modified_file.old_path):
-                    count += 1
-                    if modified_file.change_type == ModificationType.RENAME:
-                        filepath = str(Path(modified_file.old_path))
+                filepath = renamed_files.get(modified_file.new_path, modified_file.new_path)
 
-                    break
+                if modified_file.change_type == ModificationType.RENAME:
+                    renamed_files[modified_file.old_path] = filepath
 
-            if self.release_scope and commit.hash in self.releases:
-                break
+                files[filepath] = files.get(filepath, 0) + 1
 
-        return count
+        return files
+     

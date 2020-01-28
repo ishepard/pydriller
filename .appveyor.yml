@@ -15,6 +15,10 @@ environment:
       GIT_PATH: "%GIT_DAEMON_PATH%"
 
 notifications:
+  - provider: Slack
+    incoming_webhook:
+      secure: pIuy/qP0oJmXuYm+DKX3oGLNcXuQ376bfiB2sSHFlTvrnveUWPo6mY5P1JtFW1UJwCk189YGPUyLR1n8h1N7kmSe3L9opZRpTL7W8yY8f84=
+
   - provider: Email
     to:
       - spadini.davide@gmail.com

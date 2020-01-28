@@ -73,5 +73,4 @@ class HistoryComplexity(ProcessMetric):
             files[filepath] *= entropy
             files[filepath] = round(files[filepath] * 100, 2)
 
-        print(files)
         return files

@@ -5,17 +5,23 @@ from pydriller.domain.commit import ModificationType
 from pydriller.repository_mining import RepositoryMining
 from pydriller.metrics.process.process_metric import ProcessMetric
 
-class NormalizedLinesCount(ProcessMetric):
+class LinesCount(ProcessMetric):
     """
     This class is responsible to implement the following metrics: \
+    * Added Lines: the number of added lines in commit 'to_commit'
+    * Deleted Lines: the number of deleted lines in commit 'to_commit'
     * Normalized Added Lines: is the number of added lines in a file \
         of a given commit over the total number of added lines in the \
-        provided time range, e.g. a [from_commit, to_commit] representing \
+        provided evolution period, e.g. a [from_commit, to_commit] representing \
         a release.
     * Normalized Deleted Lines: is the number of deleted lines in a file \
         of a given commit over the total number of deleted lines in the \
-        provided time range, e.g. a [from_commit, to_commit] representing \
+        provided evolution period, e.g. a [from_commit, to_commit] representing \
         a release.
+    * Total Added Lines: the number of added lines in the evolution period \
+        [from_commit, to_commit]
+    * Total Deleted Lines: the number of deleted lines in the evolution period \
+        [from_commit, to_commit]
     """
 
     def count(self):
@@ -24,8 +30,11 @@ class NormalizedLinesCount(ProcessMetric):
         deleted lines) added and deleted lines per each modified file in \
         'to_commit', returning a dictionary:
         {filepath: {
-            added: float,
-            removed: float}
+            added: int,
+            removed: int,
+            norm_added: float,
+            norm_removed: float
+            }
         }
 
         :return: dict of normalized added and deleted lines per modified file
@@ -60,13 +69,16 @@ class NormalizedLinesCount(ProcessMetric):
                     files[filepath]['total_removed'] += modified_file.removed
 
         for path in list(files.keys()):
+            files[path]['norm_added'] = 0
+            files[path]['norm_removed'] = 0
+
             if files[path]['total_added']:
-                files[path]['added'] = round(100 * files[path]['added'] / files[path]['total_added'], 2)
+                files[path]['norm_added'] = round(100 * files[path]['added'] / files[path]['total_added'], 2)
 
             if files[path]['total_removed']:
-                files[path]['removed'] = round(100 * files[path]['removed'] / files[path]['total_removed'], 2)
+                files[path]['norm_removed'] = round(100 * files[path]['removed'] / files[path]['total_removed'], 2)
 
-            del files[path]['total_added']   # Remove key 'total_added': not useful anymore
-            del files[path]['total_removed'] # Remove key 'total_removed': not useful anymore
+            #del files[path]['total_added']   # Remove key 'total_added': not useful anymore
+            #del files[path]['total_removed'] # Remove key 'total_removed': not useful anymore
 
         return files

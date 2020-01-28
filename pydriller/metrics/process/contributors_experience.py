@@ -1,33 +1,24 @@
 """
-Module that calculates the number of developers that contributed to each modified file \
-in the repo in a given time range.
-
-See https://dl.acm.org/doi/10.1145/2025113.2025119
+Module that calculates the experience of contributors of a file.
 """
 from pydriller.domain.commit import ModificationType
 from pydriller.repository_mining import RepositoryMining
 from pydriller.metrics.process.process_metric import ProcessMetric
 
-class ContributorsCount(ProcessMetric):
+class ContributorsExperience(ProcessMetric):
     """
-    This class is responsible to implement the following metrics:
-    * Contributors Count: measures the number of contributors who modified a file.
-    * Minor Contributors Count: measures the number of contributors who authored less \
-        than 5% of code of a file.
+    This class is responsible to implement the metric to measure the \
+    percentage of the lines authored by the highest contributor of a \
+    file in the provided evolution period [from_commit, to_commit].
     """
 
     def count(self):
         """
-        Return the number of contributors who modified a file and those that authored \
-        less than 5% of code for each modified file in the repository in the provided \
+        Return the percentage of the lines authored by the highest contributor of a \
+        file for each modified file in the repository in the provided \
         time range [from_commit, to_commit]
 
-        :return: dict 
-            {filepath: {
-                   contributors_count: int,
-                   minor_contributors_count: int
-                 }    
-            }
+        :return: dict { filepath: float }
         of number of contributors for each modified file
         """
         renamed_files = {}
@@ -51,18 +42,12 @@ class ContributorsCount(ProcessMetric):
 
                 files[filepath] = files.get(filepath, {})
                 files[filepath][author] = files[filepath].get(author, 0) + lines_authored
-        
+
         for path, contributions in list(files.items()):
             total = sum(contributions.values())
             if total == 0:
                 del files[path]
             else:
-                contributors_count = len(contributions.values())
-                minor_contributors_count = sum(1 for v in contributions.values() if v/total < .05)
-
-                files[path] = {
-                    'contributors_count': contributors_count,
-                    'minor_contributors_count': minor_contributors_count
-                }
+                files[path] = round(100*max(contributions.values()) / total, 2)
 
         return files

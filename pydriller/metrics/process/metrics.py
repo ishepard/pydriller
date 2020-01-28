@@ -1,13 +1,14 @@
 """
 This module provides an entry point to compute the following metrics:\
     * Commit Count: is the number of commits made to a file
-    * Devs Count: is the distinct number of developers who contributed \
+    * Contributors Count: is the distinct number of developers who contributed \
       to a file.
+    * Minor Contributor Count (MIN): measures the number of contributors who \
+      authored less than 5% of the code of a file.
     * Normalized Lines Added: are the normalized (by the total number \
       of added lines) added lines in the file in a given time range.
     * Hunks Count (HUN): is the number of continuous block of changes in a diff.
-    * Minor Contributor Count (MIN): measures the number of contributors who \
-      authored less than 5% of the code of a file.
+    
     * Normalized Lines Deleted: are the normalized (by the total number \
       of deleted lines) deleted lines in the file in a given time range.
 
@@ -27,10 +28,9 @@ See https://ieeexplore.ieee.org/document/6606589 for more info.
 """
 
 from pydriller.metrics.process.commits_count import CommitsCount
-from pydriller.metrics.process.devs_count import DevsCount
+from pydriller.metrics.process.contributors_count import ContributorsCount
 from pydriller.metrics.process.hunks_count import HunksCount
 from pydriller.metrics.process.lines_count import NormalizedLinesCount
-from pydriller.metrics.process.minor_contributors_count import MinorContributorsCount
 
 from pydriller.metrics.process.devs_experience import DevsExperience
 from pydriller.metrics.process.history_complexity import HistoryComplexity
@@ -41,10 +41,10 @@ def commits_count(path_to_repo: str, from_commit: str = None, to_commit: str = N
                         from_commit=from_commit,
                         to_commit=to_commit).count()
 
-def devs_count(path_to_repo: str, from_commit: str = None, to_commit: str = None):
-    return DevsCount(path_to_repo,
-                    from_commit=from_commit,
-                    to_commit=to_commit).count()
+def contributors_count(path_to_repo: str, from_commit: str = None, to_commit: str = None):
+    return ContributorsCount(path_to_repo,
+                             from_commit=from_commit,
+                             to_commit=to_commit).count()
 
 def hunks_count(path_to_repo: str, from_commit: str = None, to_commit: str = None):
     return HunksCount(path_to_repo,
@@ -55,11 +55,6 @@ def norm_lines_count(path_to_repo: str, from_commit: str = None, to_commit: str 
     return NormalizedLinesCount(path_to_repo,
                                 from_commit=from_commit,
                                 to_commit=to_commit).count()
-
-def minor_contributors_count(path_to_repo: str, from_commit: str = None, to_commit: str = None):
-    return MinorContributorsCount(path_to_repo,
-                                 from_commit=from_commit,
-                                 to_commit=to_commit).count()
 
 def devs_experience(path_to_repo: str, filepath: str, to_commit: str = None):
     return DevsExperience(path_to_repo, filepath,

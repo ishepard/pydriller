@@ -1,17 +1,19 @@
 import pytest
 from pydriller.metrics.process.hunks_count import HunksCount
 
-test_data = [
-    ('https://github.com/ishepard/pydriller', 'pydriller/repository_mining.py', None, '4be0402d466470ae7274c4244bad2712dfeda3ab', 2),
-    ('https://github.com/ishepard/pydriller', 'README.md', None, 'e7255f596a1cde0f9f42a962969d541e5186c441', 1)
+TEST_DATA = [
+    ('https://github.com/ishepard/pydriller', 'scm/git_repository.py', '71e053f61fc5d31b3e31eccd9c79df27c31279bf', '71e053f61fc5d31b3e31eccd9c79df27c31279bf', 8),
+    ('https://github.com/ishepard/pydriller', 'scm/git_repository.py', None, '71e053f61fc5d31b3e31eccd9c79df27c31279bf', 3),
+    ('https://github.com/ishepard/pydriller', 'domain/modification.py', None, 'fdf671856b260aca058e6595a96a7a0fba05454b', 1),
+    ('https://github.com/ishepard/pydriller', 'domain/modification.py', 'ab36bf45859a210b0eae14e17683f31d19eea041', 'fdf671856b260aca058e6595a96a7a0fba05454b', 1)
 ]
 
-@pytest.mark.parametrize('path_to_repo, filepath, from_commit, to_commit, expected', test_data)
+@pytest.mark.parametrize('path_to_repo, filepath, from_commit, to_commit, expected', TEST_DATA)
 def test(path_to_repo, filepath, from_commit, to_commit, expected):
     metric = HunksCount(path_to_repo=path_to_repo,
-                                    filepath=filepath,
-                                    from_commit=from_commit,
-                                    to_commit=to_commit)
+                        filepath=filepath,
+                        from_commit=from_commit,
+                        to_commit=to_commit)
     
     count = metric.count()
-    assert count == expected
+    assert count[filepath] == expected

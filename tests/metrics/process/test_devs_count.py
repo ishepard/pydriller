@@ -11,6 +11,6 @@ def test(path_to_repo, filepath, from_commit, to_commit, expected):
     metric = DevsCount(path_to_repo=path_to_repo,
                        from_commit=from_commit,
                        to_commit=to_commit)
-    
+
     count = metric.count()
     assert count.get(filepath, 0) == expected

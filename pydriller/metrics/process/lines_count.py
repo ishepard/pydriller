@@ -1,7 +1,6 @@
 """
 Module that calculates the number of normalized added and deleted lines of a file.
 """
-from pathlib import Path
 from pydriller.domain.commit import ModificationType
 from pydriller.repository_mining import RepositoryMining
 from pydriller.metrics.process.process_metric import ProcessMetric
@@ -10,30 +9,29 @@ class NormalizedLinesCount(ProcessMetric):
     """
     This class is responsible to implement the following metrics: \
     * Normalized Added Lines: is the number of added lines in a file \
-        of a given commit over the total number of added lines in the   
-        release the commit belongs to.
+        of a given commit over the total number of added lines in the \
+        provided time range, e.g. a [from_commit, to_commit] representing \
+        a release.
     * Normalized Deleted Lines: is the number of deleted lines in a file \
-        of a given commit over the total number of deleted lines in the
-        release the commit belongs to.
+        of a given commit over the total number of deleted lines in the \
+        provided time range, e.g. a [from_commit, to_commit] representing \
+        a release.
     """
 
     def count(self):
         """
-        Return the number of normalized (by the total number of added lines)
-        added and deleted lines in the file.
+        Calculate the number of normalized (by the total number of added and \
+        deleted lines) added and deleted lines per each modified file in \
+        'to_commit', returning a dictionary:
+        {filepath: {
+            added: float,
+            removed: float}
+        }
 
-        :return: a tuple of float normalized added and deleted lines,
-            respectively.
-            E.g. (0.6, 0.2) indicates that 60% of the total added lines of a
-            file in the release have been added at the specified commit, while
-            20% of the total deleted lines of that file in the release have
-            been deleted at the specified commit.
+        :return: dict of normalized added and deleted lines per modified file
         """
-        filepath = self.filepath
-        total_added = 0
-        total_deleted = 0
-        added = 0
-        deleted = 0
+        renamed_files = {}
+        files = {}
 
         for commit in RepositoryMining(self.path_to_repo,
                                        from_commit=self.from_commit,
@@ -41,33 +39,34 @@ class NormalizedLinesCount(ProcessMetric):
                                        reversed_order=True).traverse_commits():
 
             for modified_file in commit.modifications:
-                if filepath in (modified_file.new_path,
-                                modified_file.old_path):
 
-                    if commit.hash == self.to_commit:
-                        added = modified_file.added
-                        deleted = modified_file.removed
+                filepath = renamed_files.get(modified_file.new_path,
+                                             modified_file.new_path)
 
-                    total_added += modified_file.added
-                    total_deleted += modified_file.removed
+                if modified_file.change_type == ModificationType.RENAME:
+                    renamed_files[modified_file.old_path] = filepath
 
-                    if modified_file.change_type == ModificationType.RENAME:
-                        filepath = str(Path(modified_file.old_path))
+                if commit.hash == self.to_commit:
+                    files[filepath] = files.get(filepath,
+                                                {'added': 0,            # Added in to_commit
+                                                 'removed': 0,          # Removed in to_commit
+                                                 'total_added': 0,      # Added in time range [from_commit, to_commit]
+                                                 'total_removed': 0})   # Removed in time range [from_commit, to_commit]
+                    files[filepath]['added'] += modified_file.added
+                    files[filepath]['removed'] += modified_file.removed
 
-                    break
+                if filepath in files:
+                    files[filepath]['total_added'] += modified_file.added
+                    files[filepath]['total_removed'] += modified_file.removed
 
-            if commit.hash in self.releases:
-                break
+        for path in list(files.keys()):
+            if files[path]['total_added']:
+                files[path]['added'] = round(100 * files[path]['added'] / files[path]['total_added'], 2)
 
-        if total_added == 0:
-            norm_added = 0
-        else:
-            norm_added = float(added/total_added)
+            if files[path]['total_removed']:
+                files[path]['removed'] = round(100 * files[path]['removed'] / files[path]['total_removed'], 2)
 
-        if total_deleted == 0:
-            norm_deleted = 0
-        else:
-            norm_deleted = float(deleted/total_deleted)
+            del files[path]['total_added']   # Remove key 'total_added': not useful anymore
+            del files[path]['total_removed'] # Remove key 'total_removed': not useful anymore
 
-        return (norm_added, norm_deleted)
-        
+        return files

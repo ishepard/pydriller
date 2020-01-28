@@ -175,6 +175,9 @@ class RepositoryMining:
 
                 yield commit
 
+            # cleaning
+            git_repo.clear()
+
     @staticmethod
     def _get_repo_name_from_url(url: str) -> str:
         last_slash_index = url.rfind("/")

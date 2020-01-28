@@ -11,7 +11,6 @@ TEST_DATA = [
 @pytest.mark.parametrize('path_to_repo, filepath, from_commit, to_commit, expected', TEST_DATA)
 def test(path_to_repo, filepath, from_commit, to_commit, expected):
     metric = HunksCount(path_to_repo=path_to_repo,
-                        filepath=filepath,
                         from_commit=from_commit,
                         to_commit=to_commit)
     

@@ -1,18 +1,14 @@
 import pytest
-from pydriller.metrics.process.history_complexity import HistoryComplexity, HistoryPeriod
+from pydriller.metrics.process.metrics import history_complexity
 
-test_data = [
-    ('https://github.com/ishepard/pydriller', 'README.md', '2d96492b6b446f424d55f197f2717655077973ab', HistoryPeriod.RELEASE, (6.888, 0.3326, 0.0603)),
-    ('https://github.com/ishepard/pydriller', 'README.md', '2d96492b6b446f424d55f197f2717655077973ab', HistoryPeriod.WEEK, (11.017, 0.8243, 0.2543)),
-    ('https://github.com/ishepard/pydriller', 'README.md', '2d96492b6b446f424d55f197f2717655077973ab', HistoryPeriod.MONTH, (5.4096, 0.2542, 0.0212)),
-    ('https://github.com/ishepard/pydriller', 'README.md', '2d96492b6b446f424d55f197f2717655077973ab', HistoryPeriod.ALL, (0.3498, 0.013, 0.0))
+TEST_DATA = [
+    ('https://github.com/ishepard/pydriller', 'scm/git_repository.py', 
+        [('90ca34ebfe69629cb7f186a1582fc38a73cc572e', '90ca34ebfe69629cb7f186a1582fc38a73cc572e'),
+        ('71e053f61fc5d31b3e31eccd9c79df27c31279bf', '71e053f61fc5d31b3e31eccd9c79df27c31279bf')],
+        40.49+42.68)
 ]
 
-@pytest.mark.parametrize('path_to_repo, filepath, to_commit, period,  expected', test_data)
-def test(path_to_repo, filepath, to_commit, period, expected):
-    metric = HistoryComplexity(path_to_repo=path_to_repo,
-                                    filepath=filepath,
-                                    to_commit=to_commit)
-    
-    count = metric.count(period=period)
-    assert count == expected
+@pytest.mark.parametrize('path_to_repo, filepath, periods, expected', TEST_DATA)
+def test(path_to_repo, filepath, periods, expected):
+    result = history_complexity(path_to_repo=path_to_repo, periods=periods)
+    assert result[filepath] == expected

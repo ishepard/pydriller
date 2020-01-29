@@ -42,6 +42,7 @@ jobs:
         run: pytest tests/
 
       - name: Upload coverage to Codecov
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

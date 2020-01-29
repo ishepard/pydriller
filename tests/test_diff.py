@@ -12,9 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from pydriller import GitRepository
+import pytest
+
+@pytest.fixture
+def repo():
+    gr = GitRepository('test-repos/test1')
+    yield gr
+    gr.clear()
 
 
-def test_extract_line_number_and_content():
+def test_extract_line_number_and_content(repo):
     diff = "@@ -1,8 +1,8 @@\r\n" + \
            "-a\r\n" + \
            "-b\r\n" + \
@@ -31,8 +38,7 @@ def test_extract_line_number_and_content():
            "+ee\r\n" + \
            "+ff\r\n" + \
            " "
-    gr = GitRepository('test-repos/test1')
-    parsed_lines = gr.parse_diff(diff)
+    parsed_lines = repo.parse_diff(diff)
 
     added = parsed_lines['added']
     deleted = parsed_lines['deleted']
@@ -54,7 +60,7 @@ def test_extract_line_number_and_content():
     assert (7, 'ff') in added
 
 
-def test_additions():
+def test_additions(repo):
     diff = '@@ -2,6 +2,7 @@ aa\r\n' + \
            ' bb\r\n' + \
            ' cc\r\n' + \
@@ -64,8 +70,7 @@ def test_additions():
            ' ee\r\n' + \
            ' ff'
 
-    gr = GitRepository('test-repos/test1')
-    parsed_lines = gr.parse_diff(diff)
+    parsed_lines = repo.parse_diff(diff)
 
     added = parsed_lines['added']
     deleted = parsed_lines['deleted']
@@ -75,7 +80,7 @@ def test_additions():
     assert len(added) == 1
 
 
-def test_deletions():
+def test_deletions(repo):
     diff = '@@ -2,6 +2,7 @@ aa\r\n' + \
            ' bb\r\n' + \
            ' cc\r\n' + \
@@ -85,8 +90,7 @@ def test_deletions():
            ' ee\r\n' + \
            ' ff'
 
-    gr = GitRepository('test-repos/test1')
-    parsed_lines = gr.parse_diff(diff)
+    parsed_lines = repo.parse_diff(diff)
 
     added = parsed_lines['added']
     deleted = parsed_lines['deleted']
@@ -96,7 +100,7 @@ def test_deletions():
     assert len(added) == 0
 
 
-def test_tabs():
+def test_tabs(repo):
     diff = '@@ -1,4 +1,17 @@\r\n' + \
            ' a\r\n' + \
            ' b\r\n' + \
@@ -117,8 +121,7 @@ def test_tabs():
            '+j\r\n' + \
            ' '
 
-    gr = GitRepository('test-repos/test1')
-    parsed_lines = gr.parse_diff(diff)
+    parsed_lines = repo.parse_diff(diff)
 
     added = parsed_lines['added']
     deleted = parsed_lines['deleted']
@@ -143,7 +146,7 @@ def test_tabs():
     assert len(added) == 14
 
 
-def test_real_example():
+def test_real_example(repo):
     diff = '@@ -72,7 +72,7 @@ public class GitRepository implements SCM {\r\n' + \
            ' \r\n' + \
            '        private static Logger log = Logger.getLogger(GitRepository.class);\r\n' + \
@@ -171,8 +174,7 @@ def test_real_example():
            '        private void setContext(DiffFormatter df) {\r\n' + \
            '                String context = System.getProperty(\"git.diffcontext\");'
 
-    gr = GitRepository('test-repos/test1')
-    parsed_lines = gr.parse_diff(diff)
+    parsed_lines = repo.parse_diff(diff)
 
     added = parsed_lines['added']
     deleted = parsed_lines['deleted']
@@ -204,3 +206,5 @@ def test_diff_no_newline():
     assert (1, 'test1') in deleted  # is considered as deleted as a 'newline' command is added
     assert (1, 'test1') in added  # now with added 'newline'
     assert (2, 'test2') in added
+
+    gr.clear()

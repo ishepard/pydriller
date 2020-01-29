@@ -92,7 +92,7 @@ def hunks_count(path_to_repo: str, from_commit: str = None, to_commit: str = Non
                       from_commit=from_commit,
                       to_commit=to_commit).count()
 
-def norm_lines_count(path_to_repo: str, from_commit: str = None, to_commit: str = None):
+def lines_count(path_to_repo: str, from_commit: str = None, to_commit: str = None):
     return LinesCount(path_to_repo,
                                 from_commit=from_commit,
                                 to_commit=to_commit).count()

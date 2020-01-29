@@ -78,7 +78,4 @@ class LinesCount(ProcessMetric):
             if files[path]['total_removed']:
                 files[path]['norm_removed'] = round(100 * files[path]['removed'] / files[path]['total_removed'], 2)
 
-            #del files[path]['total_added']   # Remove key 'total_added': not useful anymore
-            #del files[path]['total_removed'] # Remove key 'total_removed': not useful anymore
-
         return files

@@ -1,4 +1,6 @@
 import pytest
+
+from pathlib import Path
 from pydriller.metrics.process.hunks_count import HunksCount
 
 TEST_DATA = [
@@ -15,4 +17,5 @@ def test(path_to_repo, filepath, from_commit, to_commit, expected):
                         to_commit=to_commit)
     
     count = metric.count()
+    filepath = str(Path(filepath))
     assert count[filepath] == expected

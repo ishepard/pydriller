@@ -1,4 +1,6 @@
 import pytest
+
+from pathlib import Path
 from pydriller.metrics.process.contributors_count import ContributorsCount
 
 TEST_DATA = [
@@ -13,4 +15,5 @@ def test(path_to_repo, filepath, from_commit, to_commit, expected):
                                from_commit=from_commit,
                                to_commit=to_commit)
     count = metric.count()
+    filepath = str(Path(filepath))
     assert count[filepath]['minor_contributors_count'] == expected

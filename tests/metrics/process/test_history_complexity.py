@@ -1,4 +1,6 @@
 import pytest
+
+from pathlib import Path
 from pydriller.metrics.process.metrics import history_complexity
 
 TEST_DATA = [
@@ -11,4 +13,5 @@ TEST_DATA = [
 @pytest.mark.parametrize('path_to_repo, filepath, periods, expected', TEST_DATA)
 def test(path_to_repo, filepath, periods, expected):
     result = history_complexity(path_to_repo=path_to_repo, periods=periods)
+    filepath = str(Path(filepath))
     assert result[filepath] == expected

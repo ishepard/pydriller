@@ -189,10 +189,10 @@ def test_ignore_add_whitespaces_and_changed_file():
 
 
 def test_clone_repo_to():
-    tmp_folder = tempfile.TemporaryDirectory()
-    dt2 = datetime(2018, 10, 20)
-    url = "https://github.com/ishepard/pydriller.git"
-    assert len(list(RepositoryMining(
-        path_to_repo=url,
-        to=dt2,
-        clone_repo_to=tmp_folder.name).traverse_commits())) == 159
+    with tempfile.TemporaryDirectory() as tmp_dirname:
+        dt2 = datetime(2018, 10, 20)
+        url = "https://github.com/ishepard/pydriller.git"
+        assert len(list(RepositoryMining(
+            path_to_repo=url,
+            to=dt2,
+            clone_repo_to=tmp_dirname).traverse_commits())) == 159

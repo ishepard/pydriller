@@ -86,6 +86,8 @@ class GitRepository:
         self._git = Git(str(self.path))
 
     def clear(self):
+        if self.git:
+            self.git.clear_cache()
         self.repo.git.clear_cache()
 
     def _open_repository(self):
@@ -386,3 +388,6 @@ class GitRepository:
             logger.debug("Could not find information of file %s", path)
 
         return commits
+
+    def __del__(self):
+        self.clear()

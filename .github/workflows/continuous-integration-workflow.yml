@@ -27,8 +27,6 @@ jobs:
           pip install -r test-requirements.txt
           pip install codecov pytest-cov
           unzip test-repos
-          cd test-repos
-          git clone https://github.com/ishepard/pydriller
 
       - name: Run pytest
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'

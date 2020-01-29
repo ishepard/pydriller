@@ -4,8 +4,8 @@ from pathlib import Path
 from pydriller.metrics.process.commits_count import CommitsCount
 
 TEST_DATA = [
-    ('test-repos/pydriller', 'domain/developer.py', 'ab36bf45859a210b0eae14e17683f31d19eea041', 'fdf671856b260aca058e6595a96a7a0fba05454b', 2),
-    ('test-repos/pydriller', 'domain/developer.py', None, 'fdf671856b260aca058e6595a96a7a0fba05454b', 2)
+    ('https://github.com/ishepard/pydriller', 'domain/developer.py', 'ab36bf45859a210b0eae14e17683f31d19eea041', 'fdf671856b260aca058e6595a96a7a0fba05454b', 2),
+    ('https://github.com/ishepard/pydriller', 'domain/developer.py', None, 'fdf671856b260aca058e6595a96a7a0fba05454b', 2)
 ]
 
 @pytest.mark.parametrize('path_to_repo, filepath, from_commit, to_commit, expected', TEST_DATA)

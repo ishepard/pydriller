@@ -13,6 +13,32 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 
+@pytest.fixture
+def path():
+    return None
+
+
+@pytest.fixture
+def to():
+    return None
+
+
+@pytest.fixture
+def repo(path):
+    return list(RepositoryMining(path_to_repo=path).traverse_commits())
+
+
+@pytest.fixture
+def repo_to(path, to):
+    return list(RepositoryMining(path_to_repo=path, to=to).traverse_commits())
+
+
+@pytest.fixture()
+def git_repo(path):
+    gr = GitRepository(path)
+    yield gr
+    gr.clear()
+
 # It should fail when no URLs are specified
 def test_no_url():
     with pytest.raises(Exception):
@@ -25,54 +51,63 @@ def test_badly_formatted_repo_url():
         list(RepositoryMining(path_to_repo=set('repo')).traverse_commits())
 
 
-def test_simple_url():
-    assert len(list(RepositoryMining(
-        path_to_repo="test-repos/test1").traverse_commits())) == 5
+@pytest.mark.parametrize('path,expected', [
+    ("test-repos/test1", 5)
+])
+def test_simple_url(repo, expected):
+    assert len(repo) == expected
 
 
-def test_two_local_urls():
-    urls = ["test-repos/test1", "test-repos/test3"]
-    assert len(list(RepositoryMining(
-        path_to_repo=urls).traverse_commits())) == 11
+@pytest.mark.parametrize('path,expected', [
+    (["test-repos/test1", "test-repos/test3"], 11)
+])
+def test_two_local_urls(repo, expected):
+    assert len(repo) == expected
 
 
-def test_simple_remote_url():
-    dt2 = datetime(2018, 10, 20)
-    assert len(list(RepositoryMining(
-        path_to_repo="https://github.com/ishepard/pydriller.git",
-        to=dt2).traverse_commits())) == 159
+@pytest.mark.parametrize('path,to,expected', [
+    ("https://github.com/ishepard/pydriller.git",
+     datetime(2018, 10, 20),
+     159)
+])
+def test_simple_remote_url(repo_to, expected):
+    assert len(repo_to) == expected
 
 
-def test_two_remote_urls():
-    urls = ["https://github.com/mauricioaniche/repodriller.git",
-            "https://github.com/ishepard/pydriller"]
-    dt2 = datetime(2018, 10, 20)
-    assert len(list(RepositoryMining(path_to_repo=urls,
-                                     to=dt2).traverse_commits())) == 518
+@pytest.mark.parametrize('path,to,expected', [
+    (["https://github.com/mauricioaniche/repodriller.git",
+      "https://github.com/ishepard/pydriller"],
+     datetime(2018, 10, 20),
+     518)
+])
+def test_two_remote_urls(repo_to, expected):
+    assert len(repo_to) == expected
 
 
-def test_2_identical_local_urls():
-    urls = ["test-repos/test1", "test-repos/test1"]
-    assert len(list(RepositoryMining(
-        path_to_repo=urls).traverse_commits())) == 10
+@pytest.mark.parametrize('path,expected', [
+    (["test-repos/test1", "test-repos/test1"], 10)
+])
+def test_2_identical_local_urls(repo, expected):
+    assert len(repo) == expected
 
 
-def test_both_local_and_remote_urls():
-    dt2 = datetime(2018, 10, 20)
-    assert len(list(RepositoryMining(
-        path_to_repo=["test-repos/test1",
-                      "https://github.com/ishepard/pydriller.git"],
-        to=dt2).traverse_commits())) == 164
+@pytest.mark.parametrize('path,to,expected', [
+    (["test-repos/test1", "https://github.com/ishepard/pydriller.git"],
+     datetime(2018, 10, 20),
+     164)
+])
+def test_both_local_and_remote_urls(repo_to, expected):
+    assert len(repo_to) == expected
 
 
-def test_both_local_and_remote_urls_list():
-    dt2 = datetime(2018, 10, 20)
-    urls = ["test-repos/test1",
-            "https://github.com/mauricioaniche/repodriller.git",
-            "test-repos/test3",
-            "https://github.com/ishepard/pydriller.git"]
-    assert len(list(RepositoryMining(path_to_repo=urls,
-                                     to=dt2).traverse_commits())) == 529
+@pytest.mark.parametrize('path,to,expected', [
+    (["test-repos/test1", "https://github.com/mauricioaniche/repodriller.git",
+      "test-repos/test3", "https://github.com/ishepard/pydriller.git"],
+     datetime(2018, 10, 20),
+     529)
+])
+def test_both_local_and_remote_urls_list(repo_to, expected):
+    assert len(repo_to) == expected
 
 
 def test_badly_formatted_url():
@@ -85,13 +120,13 @@ def test_badly_formatted_url():
         list(RepositoryMining(path_to_repo='test').traverse_commits())
 
 
-def test_diff_histogram():
+@pytest.mark.parametrize('path', ["test-repos/test13"])
+def test_diff_without_histogram(git_repo):
     # without histogram
-    commit = list(RepositoryMining('test-repos/test13',
-                                   single="93df8676e6fab70d9677e94fd0f6b17db095e890").traverse_commits())[0]
+    commit = list(RepositoryMining('test-repos/test13',single="93df8676e6fab70d9677e94fd0f6b17db095e890").traverse_commits())[0]
+
     mod = commit.modifications[0]
-    gr = GitRepository('test-repos/test13')
-    diff = gr.parse_diff(mod.diff)
+    diff = git_repo.parse_diff(mod.diff)
     assert len(diff['added']) == 11
     assert (3, '    if (path == null)') in diff['added']
     assert (5, '        log.error("Icon path is null");') in diff['added']
@@ -114,13 +149,15 @@ def test_diff_histogram():
     assert (10, '    {') in diff['deleted']
     assert (13, '    return null;') in diff['deleted']
 
+
+@pytest.mark.parametrize('path', ["test-repos/test13"])
+def test_diff_with_histogram(git_repo):
     # with histogram
     commit = list(RepositoryMining('test-repos/test13',
                                    single="93df8676e6fab70d9677e94fd0f6b17db095e890",
                                    histogram_diff=True).traverse_commits())[0]
     mod = commit.modifications[0]
-    gr = GitRepository('test-repos/test13')
-    diff = gr.parse_diff(mod.diff)
+    diff = git_repo.parse_diff(mod.diff)
     assert (4, '    {') in diff["added"]
     assert (5, '        log.error("Icon path is null");') in diff["added"]
     assert (6, '        return null;') in diff["added"]
@@ -150,17 +187,17 @@ def test_ignore_add_whitespaces():
     assert len(commit.modifications) == 0
 
 
-def test_ignore_add_whitespaces_and_modified_normal_line():
-    gr = GitRepository('test-repos/test14')
+@pytest.mark.parametrize('path', ["test-repos/test14"])
+def test_ignore_add_whitespaces_and_modified_normal_line(git_repo):
     commit = list(RepositoryMining('test-repos/test14',
                                    single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
     assert len(commit.modifications) == 1
-    parsed_normal_diff = gr.parse_diff(commit.modifications[0].diff)
+    parsed_normal_diff = git_repo.parse_diff(commit.modifications[0].diff)
     commit = list(RepositoryMining('test-repos/test14',
                                    skip_whitespaces=True,
                                    single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
     assert len(commit.modifications) == 1
-    parsed_wo_whitespaces_diff = gr.parse_diff(commit.modifications[0].diff)
+    parsed_wo_whitespaces_diff = git_repo.parse_diff(commit.modifications[0].diff)
     assert len(parsed_normal_diff['added']) == 2
     assert len(parsed_wo_whitespaces_diff['added']) == 1
 

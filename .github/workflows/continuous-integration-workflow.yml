@@ -27,6 +27,7 @@ jobs:
           pip install -r test-requirements.txt
           pip install codecov pytest-cov
           unzip test-repos
+          git clone https://github.com/ishepard/pydriller test-repos/pydriller
 
       - name: Run pytest
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
@@ -35,13 +36,16 @@ jobs:
           MEM_CONS_TEST: 'TO_RUN'
         run: |
            git clone https://github.com/apache/hadoop.git test-repos/hadoop
-           pytest tests/ --cov=pydriller/
+           pytest tests/ --cov=pydriller/ --cov-report=xml
 
       - name: Run tests on windows
         if: matrix.os == 'windows-latest'
-        run: pytest tests/ --cov=pydriller/
+        run: pytest tests/
 
-      - name: Publish to codecov
-        uses: codecov/codecov-action@v1.0.5
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          yml: .codecov.yml
+          fail_ci_if_error: true

@@ -24,7 +24,7 @@ from datetime import datetime, timezone, timedelta
 
 def test_one_timezone():
     lc = list(
-        RepositoryMining('test-repos/git-2/',
+        RepositoryMining('test-repos/branches_merged',
                          single='29e929fbc5dc6a2e9c620069b24e2a143af4285f')
             .traverse_commits())
 
@@ -36,7 +36,7 @@ def test_one_timezone():
 
 def test_between_dates_reversed():
     lc = list(
-        RepositoryMining('test-repos/git-4/',
+        RepositoryMining('test-repos/different_files',
                          single='375de7a8275ecdc0b28dc8de2568f47241f443e9')
             .traverse_commits())
 

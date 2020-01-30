@@ -26,7 +26,7 @@ dt2 = datetime(2016, 10, 8, 17, 59, 0, tzinfo=to_zone)
 
 
 def test_between_dates():
-    list_commits = list(RepositoryMining('test-repos/git-4/',
+    list_commits = list(RepositoryMining('test-repos/different_files',
                                          since=dt1,
                                          to=dt2).traverse_commits())
 
@@ -38,7 +38,7 @@ def test_between_dates():
 def test_between_dates_without_timezone():
     dt1 = datetime(2016, 10, 8, 21, 0, 0)
     dt2 = datetime(2016, 10, 8, 21, 59, 0)
-    list_commits = list(RepositoryMining('test-repos/git-4/',
+    list_commits = list(RepositoryMining('test-repos/different_files',
                                          since=dt1,
                                          to=dt2).traverse_commits())
 
@@ -48,7 +48,7 @@ def test_between_dates_without_timezone():
 
 
 def test_between_dates_reversed():
-    lc = list(RepositoryMining('test-repos/git-4/',
+    lc = list(RepositoryMining('test-repos/different_files',
                                since=dt1,
                                to=dt2,
                                reversed_order=True).traverse_commits())

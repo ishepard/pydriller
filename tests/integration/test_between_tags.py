@@ -23,7 +23,7 @@ def test_between_revisions():
     from_tag = 'tag1'
     to_tag = 'tag3'
 
-    lc = list(RepositoryMining('test-repos/git-8/',
+    lc = list(RepositoryMining('test-repos/tags',
                                from_tag=from_tag,
                                to_tag=to_tag).traverse_commits())
 

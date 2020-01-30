@@ -24,7 +24,7 @@ from pydriller.repository_mining import RepositoryMining
 
 
 def test_mod_with_file_types():
-    lc = list(RepositoryMining('test-repos/git-4/',
+    lc = list(RepositoryMining('test-repos/different_files',
                                only_modifications_with_file_types=['.java'])
               .traverse_commits())
 
@@ -32,7 +32,7 @@ def test_mod_with_file_types():
     assert lc[0].hash == 'a1b6136f978644ff1d89816bc0f2bd86f6d9d7f5'
     assert lc[1].hash == 'b8c2be250786975f1c6f47e96922096f1bb25e39'
 
-    lc = list(RepositoryMining('test-repos/git-7/',
+    lc = list(RepositoryMining('test-repos/different_files1',
                                only_modifications_with_file_types=['.java'])
               .traverse_commits())
 
@@ -42,7 +42,7 @@ def test_mod_with_file_types():
 
 
 def test_mod_with_file_types_no_extension():
-    lc = list(RepositoryMining('test-repos/git-4/',
+    lc = list(RepositoryMining('test-repos/different_files',
                                only_modifications_with_file_types=['.py'])
               .traverse_commits())
 
@@ -53,7 +53,7 @@ def test_mod_with_file_types_and_date():
     to_zone = timezone(timedelta(hours=2))
     dt1 = datetime(2016, 10, 8, 23, 57, 49, tzinfo=to_zone)
     print(dt1)
-    lc = list(RepositoryMining('test-repos/git-4/',
+    lc = list(RepositoryMining('test-repos/different_files',
                                only_modifications_with_file_types=['.java'],
                                since=dt1)
               .traverse_commits())
@@ -64,29 +64,26 @@ def test_mod_with_file_types_and_date():
 
 
 def test_only_in_main_branch():
-    lc = list(RepositoryMining('test-repos/git-5/').traverse_commits())
+    lc = list(RepositoryMining('test-repos/branches_not_merged').traverse_commits())
 
-    assert len(lc) == 5
-    assert lc[0].hash == '4a17f31c0d1285477a3a467d0bc3cb38e775097d'
-    assert lc[1].hash == 'ff663cf1931a67d5e47b75fc77dcea432c728052'
-    assert lc[2].hash == 'fa8217c324e7fb46c80e1ddf907f4e141449637e'
-    assert lc[3].hash == '5d9d79607d7e82b6f236aa29be4ba89a28fb4f15'
-    assert lc[4].hash == '377e0f474d70f6205784d0150ee0069a050c29ed'
+    assert len(lc) == 3
+    assert lc[0].hash == '04b0af7b53c2a0095e98951571aa41c2e0e0dbec'
+    assert lc[1].hash == 'e51421e0beae6a3c20bdcdfc21066e05db675e03'
+    assert lc[2].hash == 'b197ef4f0b4bc5b7d55c8949ecb1c861731f0b9d'
 
 
 def test_only_no_merge():
-    lc = list(RepositoryMining('test-repos/git-5/',
+    lc = list(RepositoryMining('test-repos/branches_merged',
                                only_no_merge=True).traverse_commits())
 
-    assert len(lc) == 4
-    assert lc[0].hash == '4a17f31c0d1285477a3a467d0bc3cb38e775097d'
-    assert lc[1].hash == 'ff663cf1931a67d5e47b75fc77dcea432c728052'
-    assert lc[2].hash == 'fa8217c324e7fb46c80e1ddf907f4e141449637e'
-    assert lc[3].hash == '377e0f474d70f6205784d0150ee0069a050c29ed'
+    assert len(lc) == 3
+    assert lc[0].hash == '168b3aab057ed61a769acf336a4ef5e64f76c9fd'
+    assert lc[1].hash == '8169f76a3d7add54b4fc7bca7160d1f1eede6eda'
+    assert lc[2].hash == '8986af2a679759e5a15794f6d56e6d46c3f302f1'
 
 
 def test_no_filters():
-    lc = list(RepositoryMining('test-repos/git-4/').traverse_commits())
+    lc = list(RepositoryMining('test-repos/different_files').traverse_commits())
 
     assert len(lc) == 3
     assert lc[0].hash == 'a1b6136f978644ff1d89816bc0f2bd86f6d9d7f5'
@@ -95,108 +92,103 @@ def test_no_filters():
 
 
 def test_only_in_branch():
-    lc = list(RepositoryMining('test-repos/git-5/',
-                               only_in_branch='branch2').traverse_commits())
-    assert len(lc) == 6
+    lc = list(RepositoryMining('test-repos/branches_not_merged',
+                               only_in_branch='b1').traverse_commits())
+    assert len(lc) == 5
 
-    assert lc[0].hash == '4a17f31c0d1285477a3a467d0bc3cb38e775097d'
-    assert lc[1].hash == 'ff663cf1931a67d5e47b75fc77dcea432c728052'
-    assert lc[2].hash == 'fa8217c324e7fb46c80e1ddf907f4e141449637e'
-    assert lc[3].hash == '5d9d79607d7e82b6f236aa29be4ba89a28fb4f15'
-    assert lc[4].hash == '377e0f474d70f6205784d0150ee0069a050c29ed'
-    assert lc[5].hash == '6fe83d9fbf9a63cc1c51e5fe6fd5230f7fbbce6f'
+    assert lc[0].hash == '04b0af7b53c2a0095e98951571aa41c2e0e0dbec'
+    assert lc[1].hash == 'e51421e0beae6a3c20bdcdfc21066e05db675e03'
+    assert lc[2].hash == 'b197ef4f0b4bc5b7d55c8949ecb1c861731f0b9d'
+    assert lc[3].hash == '87a31153090808f1e6f679a14ea28729a0b74f4d'
+    assert lc[4].hash == '702d469710d2087e662c210fd0e4f9418ec813fd'
 
 
 def test_only_in_branches():
     # by default, only analyze master
-    assert len(list(RepositoryMining('test-repos/branches2/')
+    assert len(list(RepositoryMining('test-repos/branches_not_merged')
                     .traverse_commits())) == 3
     # only analyze b2
-    assert len(list(RepositoryMining('test-repos/branches2/', only_in_branch='b2')
+    assert len(list(RepositoryMining('test-repos/branches_not_merged',
+                                     only_in_branch='b2')
                     .traverse_commits())) == 4
     # only analyze b1
-    assert len(list(RepositoryMining('test-repos/branches2/', only_in_branch='b1')
+    assert len(list(RepositoryMining('test-repos/branches_not_merged',
+                                     only_in_branch='b1')
                     .traverse_commits())) == 5
 
 
 def test_only_in_branch_not_exist():
     with pytest.raises(Exception):
-        list(RepositoryMining('test-repos/git-5/', only_in_branch='branch7')
+        list(RepositoryMining('test-repos/branches_not_merged', only_in_branch='branch2')
              .traverse_commits())
 
 
 def test_only_authors():
-    lc = list(RepositoryMining('test-repos/git-10/',
+    lc = list(RepositoryMining('test-repos/multiple_authors',
                                only_authors=["Maurício Aniche"])
               .traverse_commits())
     assert len(lc) == 4
 
-    lc = list(RepositoryMining('test-repos/git-10/',
+    lc = list(RepositoryMining('test-repos/multiple_authors',
                                only_authors=["ishepard"])
               .traverse_commits())
     assert len(lc) == 1
 
 
 def test_only_authors_not_existing():
-    lc = list(RepositoryMining('test-repos/git-10/',
+    lc = list(RepositoryMining('test-repos/multiple_authors',
                                only_authors=["Uncle Bob"])
               .traverse_commits())
     assert len(lc) == 0
 
 
 def test_only_commits():
-    # 4e669cb4f69245dc669e116517d80d038d8e0434
-    # 29e929fbc5dc6a2e9c620069b24e2a143af4285f
-    # 8986af2a679759e5a15794f6d56e6d46c3f302f1
-    # 8169f76a3d7add54b4fc7bca7160d1f1eede6eda
-    # 168b3aab057ed61a769acf336a4ef5e64f76c9fd
-    lc = list(RepositoryMining('test-repos/git-10/',
-                               only_commits=["4e669cb4f69245dc669e116517d80d038d8e0434"]).traverse_commits())
+    lc = list(RepositoryMining('test-repos/complex_repo',
+                               only_commits=["9e71dd5726d775fb4a5f08506a539216e878adbb"]).traverse_commits())
     assert len(lc) == 1
-    assert lc[0].hash == "4e669cb4f69245dc669e116517d80d038d8e0434"
+    assert lc[0].hash == "9e71dd5726d775fb4a5f08506a539216e878adbb"
 
-    lc = list(RepositoryMining('test-repos/git-10/',
-                               only_commits=["4e669cb4f69245dc669e116517d80d038d8e0434",
-                                             "8986af2a679759e5a15794f6d56e6d46c3f302f1"]).traverse_commits())
+    lc = list(RepositoryMining('test-repos/complex_repo',
+                               only_commits=["953737b199de233896f00b4d87a0bc2794317253",
+                                             "ffccf1e7497eb8136fd66ed5e42bef29677c4b71"]).traverse_commits())
     assert len(lc) == 2
-    assert lc[0].hash == "8986af2a679759e5a15794f6d56e6d46c3f302f1"
-    assert lc[1].hash == "4e669cb4f69245dc669e116517d80d038d8e0434"
+    assert lc[0].hash == "ffccf1e7497eb8136fd66ed5e42bef29677c4b71"
+    assert lc[1].hash == "953737b199de233896f00b4d87a0bc2794317253"
 
-    lc = list(RepositoryMining('test-repos/git-10/',
-                               only_commits=["4e669cb4f69245dc669e116517d80d038d8e0434",
-                                             "8986af2a679759e5a15794f6d56e6d46c3f302f1",
-                                             "29e929fbc5dc6a2e9c620069b24e2a143af4285f"]).traverse_commits())
+    lc = list(RepositoryMining('test-repos/complex_repo',
+                               only_commits=["866e997a9e44cb4ddd9e00efe49361420aff2559",
+                                             "57dbd017d1a744b949e7ca0b1c1a3b3dd4c1cbc1",
+                                             "e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2"]).traverse_commits())
     assert len(lc) == 3
-    assert lc[0].hash == "8986af2a679759e5a15794f6d56e6d46c3f302f1"
-    assert lc[1].hash == "29e929fbc5dc6a2e9c620069b24e2a143af4285f"
-    assert lc[2].hash == "4e669cb4f69245dc669e116517d80d038d8e0434"
+    assert lc[0].hash == "866e997a9e44cb4ddd9e00efe49361420aff2559"
+    assert lc[1].hash == "57dbd017d1a744b949e7ca0b1c1a3b3dd4c1cbc1"
+    assert lc[2].hash == "e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2"
 
-    lc = list(RepositoryMining('test-repos/git-10/',
+    lc = list(RepositoryMining('test-repos/complex_repo',
                                only_commits=["fake hash"]).traverse_commits())
     assert len(lc) == 0
 
-    only_commits = len(list(RepositoryMining('test-repos/git-10/',
-                                             only_commits=["4e669cb4f69245dc669e116517d80d038d8e0434",
-                                                           "29e929fbc5dc6a2e9c620069b24e2a143af4285f",
-                                                           "8986af2a679759e5a15794f6d56e6d46c3f302f1",
-                                                           "8169f76a3d7add54b4fc7bca7160d1f1eede6eda",
-                                                           "168b3aab057ed61a769acf336a4ef5e64f76c9fd"]).traverse_commits()))
+    total_commits = len(list(RepositoryMining('test-repos/complex_repo').traverse_commits()))
 
-    total_commits = len(list(RepositoryMining('test-repos/git-10/').traverse_commits()))
-
-    assert total_commits == only_commits
+    assert total_commits == 13
 
 
 def test_single_commit():
-    lc = list(RepositoryMining('test-repos/git-10/',
-                               single="4e669cb4f69245dc669e116517d80d038d8e0434").traverse_commits())
+    lc = list(RepositoryMining('test-repos/complex_repo',
+                               single="866e997a9e44cb4ddd9e00efe49361420aff2559").traverse_commits())
     assert len(lc) == 1
-    assert lc[0].hash == "4e669cb4f69245dc669e116517d80d038d8e0434"
+    assert lc[0].hash == "866e997a9e44cb4ddd9e00efe49361420aff2559"
 
-    lc = list(RepositoryMining('test-repos/git-10/',
-                               single="168b3aab057ed61a769acf336a4ef5e64f76c9fd").traverse_commits())
+    lc = list(RepositoryMining('test-repos/complex_repo',
+                               single="ffccf1e7497eb8136fd66ed5e42bef29677c4b71").traverse_commits())
     assert len(lc) == 1
-    assert lc[0].hash == "168b3aab057ed61a769acf336a4ef5e64f76c9fd"
+    assert lc[0].hash == "ffccf1e7497eb8136fd66ed5e42bef29677c4b71"
+
+
+def test_single_commit_not_existing():
+    lc = list(RepositoryMining('test-repos/complex_repo',
+                               single="ffccf1e7497eb813ASD66ed5e42bef29677c4b71").traverse_commits())
+    assert len(lc) == 0
 
 
 def test_filepath_with_to():
@@ -231,7 +223,7 @@ def test_filepath_with_rename():
 
 def test_filepath_with_rename_complex():
     commits = list(RepositoryMining(
-        path_to_repo='test-repos/git-1',
+        path_to_repo='test-repos/complex_repo',
         filepath='Matricula.javax').traverse_commits())
     assert len(commits) == 6
 
@@ -246,7 +238,7 @@ def test_filepath_with_rename_complex():
 
 
 def test_only_releases():
-    lc = list(RepositoryMining('test-repos/git-8/',
+    lc = list(RepositoryMining('test-repos/tags',
                                only_releases=True).traverse_commits())
 
     assert len(lc) == 3
@@ -256,7 +248,7 @@ def test_only_releases():
 
 
 def test_only_releases_wo_releases():
-    lc = list(RepositoryMining('test-repos/git-1/',
+    lc = list(RepositoryMining('test-repos/complex_repo',
                                only_releases=True).traverse_commits())
 
     assert len(lc) == 0

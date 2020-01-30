@@ -133,7 +133,7 @@ def test_get_commit_from_tag(repo):
         repo.get_commit_from_tag('v1.5')
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-1/'])
+@pytest.mark.parametrize('path', ['test-repos/complex_repo'])
 def test_list_files_in_commit(repo):
     repo.checkout('a7053a4dcd627f5f4f213dc9aa002eb1caf926f8')
     files1 = repo.files()
@@ -151,7 +151,7 @@ def test_list_files_in_commit(repo):
     repo.reset()
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-1/'])
+@pytest.mark.parametrize('path', ['test-repos/complex_repo'])
 def test_checkout_consecutive_commits(repo):
     repo.checkout('a7053a4dcd627f5f4f213dc9aa002eb1caf926f8')
     repo.checkout('f0dd1308bd904a9b108a6a40865166ee962af3d4')
@@ -161,7 +161,7 @@ def test_checkout_consecutive_commits(repo):
     repo.reset()
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-9/'])
+@pytest.mark.parametrize('path', ['test-repos/branches_without_files'])
 def test_checkout_with_commit_not_fully_merged_to_master(repo):
     repo.checkout('developing')
     files1 = repo.files()
@@ -178,7 +178,7 @@ def test_checkout_with_commit_not_fully_merged_to_master(repo):
     repo.reset()
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-1/'])
+@pytest.mark.parametrize('path', ['test-repos/complex_repo'])
 def test_get_all_commits(repo):
     change_sets = list(repo.get_list_commits())
 
@@ -187,7 +187,7 @@ def test_get_all_commits(repo):
     assert change_sets[12].hash == 'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-1/'])
+@pytest.mark.parametrize('path', ['test-repos/complex_repo'])
 def test_branches_from_commit(repo):
     commit = repo.get_commit('a997e9d400f742003dea601bb05a9315d14d1124')
 
@@ -200,29 +200,28 @@ def test_branches_from_commit(repo):
     assert 'b2' in commit.branches
 
 
-@pytest.mark.parametrize('path', ['test-repos/branches/'])
+@pytest.mark.parametrize('path', ['test-repos/branches_not_merged'])
 def test_other_branches_with_merge(repo):
-    commit = repo.get_commit('8cdf925bde3be3a21490d75686116b88b8263e82')
+    commit = repo.get_commit('7203c0b8220dcc7a59614bc7549799cd203ac072')
     assert commit.in_main_branch is False
 
-    commit = repo.get_commit('189988aa490b0e5f14ed0ecb155e0e2901425d05')
+    commit = repo.get_commit('87a31153090808f1e6f679a14ea28729a0b74f4d')
+    assert commit.in_main_branch is False
+
+    commit = repo.get_commit('b197ef4f0b4bc5b7d55c8949ecb1c861731f0b9d')
     assert commit.in_main_branch is True
 
-    commit = repo.get_commit('17bfb3f02331a7ce770e0a6b90584cdd473c6993')
+    commit = repo.get_commit('e51421e0beae6a3c20bdcdfc21066e05db675e03')
     assert commit.in_main_branch is True
 
-    commit = repo.get_commit('b5c103c7f61d05b9a35364f1923ceacc9afe7ed9')
-    assert commit.in_main_branch is True
-    assert commit.merge is True
 
-
-@pytest.mark.parametrize('path', ['test-repos/git-2/'])
+@pytest.mark.parametrize('path', ['test-repos/branches_merged'])
 def test_commit_in_master_branch(repo):
     assert repo.get_head().hash == '29e929fbc5dc6a2e9c620069b24e2a143af4285f'
 
     repo.checkout('8986af2a679759e5a15794f6d56e6d46c3f302f1')
 
-    git_to_change_head = GitRepository('test-repos/git-2/')
+    git_to_change_head = GitRepository('test-repos/branches_merged')
     commit = git_to_change_head.get_commit('8169f76a3d7add54b4fc7bca7160d1f1eede6eda')
     assert commit.in_main_branch is False
 
@@ -233,7 +232,7 @@ def test_commit_in_master_branch(repo):
     assert repo.get_head().hash == '29e929fbc5dc6a2e9c620069b24e2a143af4285f'
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-1/'])
+@pytest.mark.parametrize('path', ['test-repos/complex_repo'])
 def test_should_detail_a_commit(repo):
     commit = repo.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
 
@@ -248,7 +247,7 @@ def test_should_detail_a_commit(repo):
     assert commit.modifications[0].source_code.startswith("package model;") is True
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-2/'])
+@pytest.mark.parametrize('path', ['test-repos/branches_merged'])
 def test_merge_commits(repo):
     commit = repo.get_commit("168b3aab057ed61a769acf336a4ef5e64f76c9fd")
     assert commit.merge is False
@@ -260,7 +259,7 @@ def test_merge_commits(repo):
     assert commit.merge is True
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-1/'])
+@pytest.mark.parametrize('path', ['test-repos/complex_repo'])
 def test_number_of_modifications(repo):
     commit = repo.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
     assert commit.modifications[0].added == 62
@@ -271,7 +270,7 @@ def test_number_of_modifications(repo):
     assert commit.modifications[0].removed == 1
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-1/'])
+@pytest.mark.parametrize('path', ['test-repos/complex_repo'])
 def test_modification_status(repo):
     commit = repo.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
     assert commit.modifications[0].change_type == ModificationType.ADD
@@ -302,7 +301,7 @@ def test_diffs(repo):
             assert mod.added == 0
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-1/'])
+@pytest.mark.parametrize('path', ['test-repos/complex_repo'])
 def test_detail_rename(repo):
     commit = repo.get_commit('f0dd1308bd904a9b108a6a40865166ee962af3d4')
 
@@ -313,19 +312,19 @@ def test_detail_rename(repo):
     assert commit.modifications[0].old_path == "Matricula.java"
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-5/'])
+@pytest.mark.parametrize('path', ['test-repos/branches_merged'])
 def test_parent_commits(repo):
-    merge_commit = repo.get_commit('5d9d79607d7e82b6f236aa29be4ba89a28fb4f15')
+    merge_commit = repo.get_commit('29e929fbc5dc6a2e9c620069b24e2a143af4285f')
     assert len(merge_commit.parents) == 2
-    assert 'fa8217c324e7fb46c80e1ddf907f4e141449637e' in merge_commit.parents
-    assert 'ff663cf1931a67d5e47b75fc77dcea432c728052' in merge_commit.parents
+    assert '8986af2a679759e5a15794f6d56e6d46c3f302f1' in merge_commit.parents
+    assert '8169f76a3d7add54b4fc7bca7160d1f1eede6eda' in merge_commit.parents
 
-    normal_commit = repo.get_commit('ff663cf1931a67d5e47b75fc77dcea432c728052')
+    normal_commit = repo.get_commit('8169f76a3d7add54b4fc7bca7160d1f1eede6eda')
     assert len(normal_commit.parents) == 1
-    assert '4a17f31c0d1285477a3a467d0bc3cb38e775097d' in normal_commit.parents
+    assert '168b3aab057ed61a769acf336a4ef5e64f76c9fd' in normal_commit.parents
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-8/'])
+@pytest.mark.parametrize('path', ['test-repos/tags'])
 def test_tags(repo):
     commit = repo.get_commit_from_tag('tag1')
     assert commit.hash == '6bb9e2c6a8080e6b5b34e6e316c894b2ddbf7fcd'
@@ -450,7 +449,7 @@ def test_get_commits_modified_file_missing_file(repo):
     assert len(commits) == 0
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-8/'])
+@pytest.mark.parametrize('path', ['test-repos/tags'])
 def test_get_tagged_commits(repo):
 
     tagged_commits = repo.get_tagged_commits()
@@ -461,7 +460,7 @@ def test_get_tagged_commits(repo):
     assert '627e1ad917a188a861c9fedf6e5858b79edbe439' == tagged_commits[2]
 
 
-@pytest.mark.parametrize('path', ['test-repos/git-7/'])
+@pytest.mark.parametrize('path', ['test-repos/different_files'])
 def test_get_tagged_commits_wo_tags(repo):
 
     tagged_commits = repo.get_tagged_commits()

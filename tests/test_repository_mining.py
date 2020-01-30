@@ -56,7 +56,7 @@ def test_simple_url(repo, expected):
 
 
 @pytest.mark.parametrize('path,expected', [
-    (["test-repos/small_repo", "test-repos/branches"], 11)
+    (["test-repos/small_repo", "test-repos/branches_merged"], 9)
 ])
 def test_two_local_urls(repo, expected):
     assert len(repo) == expected
@@ -99,9 +99,9 @@ def test_both_local_and_remote_urls(repo_to, expected):
 
 @pytest.mark.parametrize('path,to,expected', [
     (["test-repos/small_repo", "https://github.com/mauricioaniche/repodriller.git",
-      "test-repos/branches", "https://github.com/ishepard/pydriller.git"],
+      "test-repos/branches_merged", "https://github.com/ishepard/pydriller.git"],
      datetime(2018, 10, 20),
-     529)
+     527)
 ])
 def test_both_local_and_remote_urls_list(repo_to, expected):
     assert len(repo_to) == expected

@@ -24,7 +24,7 @@ from pydriller.repository_mining import RepositoryMining
 @pytest.yield_fixture(scope="function")
 def lc(request):
     reversed = request.param
-    yield list(RepositoryMining('test-repos/git-4',
+    yield list(RepositoryMining('test-repos/different_files',
                                 reversed_order=reversed).traverse_commits())
 
 

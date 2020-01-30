@@ -6,16 +6,16 @@ from pydriller.domain.commit import ModificationType
 from pydriller.repository_mining import RepositoryMining
 from pydriller.metrics.process.process_metric import ProcessMetric
 
+
 class CommitsCount(ProcessMetric):
     """
     This class is responsible to implement the Commit Count metric to \
     measure the number of commits made to a file
     """
 
-
     def count(self):
         files = {}
-        renamed_files = {} # To keep track of renamed files
+        renamed_files = {}  # To keep track of renamed files
 
         for commit in RepositoryMining(path_to_repo=self.path_to_repo,
                                        from_commit=self.from_commit,
@@ -32,4 +32,3 @@ class CommitsCount(ProcessMetric):
                 files[filepath] = files.get(filepath, 0) + 1
 
         return files
-     

@@ -6,7 +6,8 @@ from pydriller.metrics.process.contributors_count import ContributorsCount
 
 TEST_DATA = [
    ('test-repos/pydriller', 'pydriller/git_repository.py', '115953109b57d841ccd0952d70f8ed6703d175cd', '8b69cae085581256adfdbd58c0e499395819b84d', 2),
-   ('test-repos/pydriller', 'domain/modification.py', None, '71e053f61fc5d31b3e31eccd9c79df27c31279bf', 1)
+   ('test-repos/pydriller', 'domain/modification.py', None, '71e053f61fc5d31b3e31eccd9c79df27c31279bf', 1),
+   ('test-repos/pydriller', 'pydriller/domain/developer.py', None, None, 1)
 ]
 
 @pytest.mark.parametrize('path_to_repo, filepath, from_commit, to_commit, expected', TEST_DATA)

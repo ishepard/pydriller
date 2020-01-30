@@ -22,17 +22,24 @@ logging.basicConfig(
 import pytest
 from pathlib import Path
 from pydriller.git_repository import GitRepository
-from datetime import timezone
-
-@pytest.yield_fixture(scope="module")
-def resource():
-    yield GitRepository('test-repos/git-1/')
 
 
-def test_equal(resource):
-    c1 = resource.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2')
-    c2 = resource.get_commit(c1.parents[0])
-    c3 = resource.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58')
+@pytest.fixture
+def path():
+    return None
+
+@pytest.fixture()
+def repo(path):
+    gr = GitRepository(path)
+    yield gr
+    gr.clear()
+
+
+@pytest.mark.parametrize('path', ['test-repos/git-1/'])
+def test_equal(repo):
+    c1 = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2')
+    c2 = repo.get_commit(c1.parents[0])
+    c3 = repo.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58')
 
     assert c1.parents[0] == 'a4ece0762e797d2e2dcbd471115108dd6e05ff58'
     assert c3 == c2
@@ -62,7 +69,7 @@ def test_filename():
 
 
 def test_metrics_python():
-    with open('test-repos/test6/git_repository.py') as f:
+    with open('test-repos/lizard/git_repository.py') as f:
         sc = f.read()
 
     diff_and_sc = {
@@ -71,8 +78,8 @@ def test_metrics_python():
         'source_code_before': sc
     }
 
-    m1 = Modification('test-repos/test6/git_repository.py',
-                      "test-repos/test6/git_repository.py",
+    m1 = Modification('test-repos/lizard/git_repository.py',
+                      "test-repos/lizard/git_repository.py",
                       ModificationType.MODIFY, diff_and_sc)
 
     assert m1.nloc == 196
@@ -83,7 +90,7 @@ def test_metrics_python():
 
 
 def test_metrics_cpp():
-    with open('test-repos/test6/FileCPP.cpp') as f:
+    with open('test-repos/lizard/FileCPP.cpp') as f:
         sc = f.read()
 
     diff_and_sc = {
@@ -92,8 +99,8 @@ def test_metrics_cpp():
         'source_code_before': sc
     }
 
-    m1 = Modification('test-repos/test6/FileCPP.cpp',
-                      "test-repos/test6/FileCPP.cpp",
+    m1 = Modification('test-repos/lizard/FileCPP.cpp',
+                      "test-repos/lizard/FileCPP.cpp",
                       ModificationType.MODIFY, diff_and_sc)
 
     assert m1.nloc == 793
@@ -104,7 +111,7 @@ def test_metrics_cpp():
 
 
 def test_metrics_java():
-    with open('test-repos/test6/FileJava.java') as f:
+    with open('test-repos/lizard/FileJava.java') as f:
         sc = f.read()
 
     diff_and_sc = {
@@ -113,8 +120,8 @@ def test_metrics_java():
         'source_code_before': sc
     }
 
-    m1 = Modification('test-repos/test6/FileJava.java',
-                      "test-repos/test6/FileJava.java",
+    m1 = Modification('test-repos/lizard/FileJava.java',
+                      "test-repos/lizard/FileJava.java",
                       ModificationType.MODIFY, diff_and_sc)
 
     assert m1.nloc == 466
@@ -133,17 +140,17 @@ def test_metrics_not_supported_file():
         'source_code_before': sc
     }
 
-    m1 = Modification('test-repos/test6/NotSupported.pdf',
-                      "test-repos/test6/NotSupported.pdf",
+    m1 = Modification('test-repos/lizard/NotSupported.pdf',
+                      "test-repos/lizard/NotSupported.pdf",
                       ModificationType.MODIFY, diff_and_sc)
 
     assert m1.nloc == 2
     assert len(m1.methods) == 0
 
 
-def test_filepahs():
-    gr = GitRepository('test-repos/test7')
-    c = gr.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
+@pytest.mark.parametrize('path', ['test-repos/files_in_directories'])
+def test_filepahs(repo):
+    c = repo.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
     mod0 = c.modifications[0]
 
@@ -152,37 +159,37 @@ def test_filepahs():
     assert mod0.old_path == str(Path('dir2/a.java'))
 
 
-def test_projectname():
-    gr = GitRepository('test-repos/test7')
-    c = gr.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
+@pytest.mark.parametrize('path', ['test-repos/files_in_directories'])
+def test_projectname(repo):
+    c = repo.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
-    assert c.project_name == 'test7'
+    assert c.project_name == 'files_in_directories'
 
 
-def test_modification_type_unknown():
-    gr = GitRepository('test-repos/git-11')
-    c = gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
+@pytest.mark.parametrize('path', ['test-repos/git-11'])
+def test_modification_type_unknown(repo):
+    c = repo.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
 
     mod0 = c.modifications[0]
 
     assert mod0.change_type.name == 'UNKNOWN'
 
-    
-def test_modification_with_more_parents():
-    gr = GitRepository('test-repos/test11')
-    c = gr.get_commit('ce6bcd987a6a53cc55da7cef9f8bb128adf68741')
+
+@pytest.mark.parametrize('path', ['test-repos/empty_modifications'])
+def test_modification_with_more_parents(repo):
+    c = repo.get_commit('ce6bcd987a6a53cc55da7cef9f8bb128adf68741')
     assert len(c.modifications) == 0
 
-    c = gr.get_commit('1b03d13c816f576eb82a8c3e935fbcacff6c2e8d')
+    c = repo.get_commit('1b03d13c816f576eb82a8c3e935fbcacff6c2e8d')
     assert len(c.modifications) == 0
 
 
-def test_eq_commit():
-    gr = GitRepository('test-repos/git-11')
-    c1 = gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
-    c2 = gr.get_commit('2c1327f957ba3b2a5e86eaed097b0a425236719e')
-    c3 = gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
-    m1 = gr.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc'
+@pytest.mark.parametrize('path', ['test-repos/git-11'])
+def test_eq_commit(repo):
+    c1 = repo.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
+    c2 = repo.get_commit('2c1327f957ba3b2a5e86eaed097b0a425236719e')
+    c3 = repo.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
+    m1 = repo.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc'
                        '').modifications[0]
     assert c1 == c3
     assert c1 == c1
@@ -190,15 +197,15 @@ def test_eq_commit():
     assert c1 != c2
 
 
-def test_eq_modifications():
-    gr = GitRepository('test-repos/git-1')
-    m1 = gr.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
+@pytest.mark.parametrize('path', ['test-repos/git-1'])
+def test_eq_modifications(repo):
+    m1 = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
                        '').modifications[0]
-    m2 = gr.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
+    m2 = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
                        '').modifications[0]
-    m3 = gr.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58'
+    m3 = repo.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58'
                        '').modifications[0]
-    c1 = gr.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58')
+    c1 = repo.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58')
 
     assert m1 == m2
     assert m1 == m1
@@ -206,40 +213,41 @@ def test_eq_modifications():
     assert m1 != c1
 
 
-def test_tzoffset():
-    gr = GitRepository('test-repos/git-1')
-    tz1 = gr.get_commit(
+@pytest.mark.parametrize('path', ['test-repos/git-1'])
+def test_tzoffset_minus_hours(repo):
+    tz1 = repo.get_commit(
         'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2').author_timezone
-    tz2 = gr.get_commit(
+    tz2 = repo.get_commit(
         'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2').committer_timezone
     assert tz1 == 10800 # -3 hours
     assert tz2 == 10800 # -3 hours
 
-    gr = GitRepository('test-repos/test1')
-    tz1 = gr.get_commit(
+
+@pytest.mark.parametrize('path', ['test-repos/small_repo'])
+def test_tzoffset_plus_hours(repo):
+    tz1 = repo.get_commit(
         'da39b1326dbc2edfe518b90672734a08f3c13458').author_timezone
-    tz2 = gr.get_commit(
+    tz2 = repo.get_commit(
         'da39b1326dbc2edfe518b90672734a08f3c13458').committer_timezone
     assert tz1 == -7200 # +2 hours
     assert tz2 == -7200 # +2 hours
 
 
-def test_source_code_before():
-    gr = GitRepository('test-repos/git-1')
-    m1 = gr.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71'
+@pytest.mark.parametrize('path', ['test-repos/git-1'])
+def test_source_code_before(repo):
+    m1 = repo.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71'
                        '').modifications[0]
 
     assert m1.source_code is None
     assert m1.source_code_before is not None
 
 
-def test_source_code_before_complete():
-    gr = GitRepository('test-repos/test12')
-    m1 = gr.get_commit('ca1f75455f064410360bc56218d0418221cf9484'
-                       '').modifications[0]
+@pytest.mark.parametrize('path', ['test-repos/source_code_before_commit'])
+def test_source_code_before_complete(repo):
+    m1 = repo.get_commit('ca1f75455f064410360bc56218d0418221cf9484').modifications[0]
 
-    with open('test-repos/test12/sc_A_ca1f75455f064410360bc56218d0418221cf9484'
-              '.txt') as f:
+    with open('test-repos/source_code_before_commit/'
+              'sc_A_ca1f75455f064410360bc56218d0418221cf9484.txt') as f:
         sc = f.read()
 
     assert m1.source_code == sc
@@ -247,19 +255,17 @@ def test_source_code_before_complete():
 
     old_sc = sc
     with open(
-            'test-repos/test12/sc_A_022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0'
-            '.txt') as f:
+            'test-repos/source_code_before_commit/'
+            'sc_A_022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0.txt') as f:
         sc = f.read()
 
-    m1 = gr.get_commit('022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0'
-                       '').modifications[0]
+    m1 = repo.get_commit('022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0').modifications[0]
 
     assert m1.source_code == sc
     assert m1.source_code_before == old_sc
 
     old_sc = sc
-    m1 = gr.get_commit('ecd6780457835a2fc85c532338a29f2c98a6cfeb'
-                       '').modifications[0]
+    m1 = repo.get_commit('ecd6780457835a2fc85c532338a29f2c98a6cfeb').modifications[0]
 
     assert m1.source_code is None
     assert m1.source_code_before == old_sc

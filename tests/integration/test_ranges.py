@@ -30,7 +30,7 @@ dt3 = datetime(2018, 3, 27, 17, 20, 3, tzinfo=to_zone)
 
 @pytest.fixture
 def path():
-    return 'test-repos/test1/'
+    return 'test-repos/small_repo/'
 
 
 @pytest.fixture
@@ -150,39 +150,39 @@ def test_multiple_filters_exceptions():
     from_tag = 'v1.4'
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/',
+        for commit in RepositoryMining('test-repos/small_repo/',
                                        since=dt2,
                                        from_commit=from_commit
                                        ).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/',
+        for commit in RepositoryMining('test-repos/small_repo/',
                                        since=dt2,
                                        from_tag=from_tag).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/',
+        for commit in RepositoryMining('test-repos/small_repo/',
                                        from_commit=from_commit,
                                        from_tag=from_tag).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/',
+        for commit in RepositoryMining('test-repos/small_repo/',
                                        to=dt2,
                                        to_commit=from_commit
                                        ).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/',
+        for commit in RepositoryMining('test-repos/small_repo/',
                                        to=dt2,
                                        to_tag=from_tag).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/test1/',
+        for commit in RepositoryMining('test-repos/small_repo/',
                                        single=from_commit,
                                        to=dt2,
                                        to_tag=from_tag).traverse_commits():

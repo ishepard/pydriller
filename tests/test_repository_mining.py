@@ -1,9 +1,5 @@
 import logging
 from datetime import datetime
-import tempfile
-import os
-import shutil
-import platform
 
 import pytest
 
@@ -39,6 +35,7 @@ def git_repo(path):
     yield gr
     gr.clear()
 
+
 # It should fail when no URLs are specified
 def test_no_url():
     with pytest.raises(Exception):
@@ -52,14 +49,14 @@ def test_badly_formatted_repo_url():
 
 
 @pytest.mark.parametrize('path,expected', [
-    ("test-repos/test1", 5)
+    ("test-repos/small_repo", 5)
 ])
 def test_simple_url(repo, expected):
     assert len(repo) == expected
 
 
 @pytest.mark.parametrize('path,expected', [
-    (["test-repos/test1", "test-repos/test3"], 11)
+    (["test-repos/small_repo", "test-repos/branches"], 11)
 ])
 def test_two_local_urls(repo, expected):
     assert len(repo) == expected
@@ -85,14 +82,14 @@ def test_two_remote_urls(repo_to, expected):
 
 
 @pytest.mark.parametrize('path,expected', [
-    (["test-repos/test1", "test-repos/test1"], 10)
+    (["test-repos/small_repo", "test-repos/small_repo"], 10)
 ])
 def test_2_identical_local_urls(repo, expected):
     assert len(repo) == expected
 
 
 @pytest.mark.parametrize('path,to,expected', [
-    (["test-repos/test1", "https://github.com/ishepard/pydriller.git"],
+    (["test-repos/small_repo", "https://github.com/ishepard/pydriller.git"],
      datetime(2018, 10, 20),
      164)
 ])
@@ -101,8 +98,8 @@ def test_both_local_and_remote_urls(repo_to, expected):
 
 
 @pytest.mark.parametrize('path,to,expected', [
-    (["test-repos/test1", "https://github.com/mauricioaniche/repodriller.git",
-      "test-repos/test3", "https://github.com/ishepard/pydriller.git"],
+    (["test-repos/small_repo", "https://github.com/mauricioaniche/repodriller.git",
+      "test-repos/branches", "https://github.com/ishepard/pydriller.git"],
      datetime(2018, 10, 20),
      529)
 ])
@@ -120,10 +117,11 @@ def test_badly_formatted_url():
         list(RepositoryMining(path_to_repo='test').traverse_commits())
 
 
-@pytest.mark.parametrize('path', ["test-repos/test13"])
+@pytest.mark.parametrize('path', ["test-repos/histogram"])
 def test_diff_without_histogram(git_repo):
     # without histogram
-    commit = list(RepositoryMining('test-repos/test13',single="93df8676e6fab70d9677e94fd0f6b17db095e890").traverse_commits())[0]
+    commit = list(RepositoryMining('test-repos/histogram',
+                                   single="93df8676e6fab70d9677e94fd0f6b17db095e890").traverse_commits())[0]
 
     mod = commit.modifications[0]
     diff = git_repo.parse_diff(mod.diff)
@@ -150,10 +148,10 @@ def test_diff_without_histogram(git_repo):
     assert (13, '    return null;') in diff['deleted']
 
 
-@pytest.mark.parametrize('path', ["test-repos/test13"])
+@pytest.mark.parametrize('path', ["test-repos/histogram"])
 def test_diff_with_histogram(git_repo):
     # with histogram
-    commit = list(RepositoryMining('test-repos/test13',
+    commit = list(RepositoryMining('test-repos/histogram',
                                    single="93df8676e6fab70d9677e94fd0f6b17db095e890",
                                    histogram_diff=True).traverse_commits())[0]
     mod = commit.modifications[0]
@@ -178,22 +176,22 @@ def test_diff_with_histogram(git_repo):
 
 
 def test_ignore_add_whitespaces():
-    commit = list(RepositoryMining('test-repos/test14',
+    commit = list(RepositoryMining('test-repos/whitespace',
                                    single="338a74ceae164784e216555d930210371279ba8e").traverse_commits())[0]
     assert len(commit.modifications) == 1
-    commit = list(RepositoryMining('test-repos/test14',
+    commit = list(RepositoryMining('test-repos/whitespace',
                                    skip_whitespaces=True,
                                    single="338a74ceae164784e216555d930210371279ba8e").traverse_commits())[0]
     assert len(commit.modifications) == 0
 
 
-@pytest.mark.parametrize('path', ["test-repos/test14"])
+@pytest.mark.parametrize('path', ["test-repos/whitespace"])
 def test_ignore_add_whitespaces_and_modified_normal_line(git_repo):
-    commit = list(RepositoryMining('test-repos/test14',
+    commit = list(RepositoryMining('test-repos/whitespace',
                                    single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
     assert len(commit.modifications) == 1
     parsed_normal_diff = git_repo.parse_diff(commit.modifications[0].diff)
-    commit = list(RepositoryMining('test-repos/test14',
+    commit = list(RepositoryMining('test-repos/whitespace',
                                    skip_whitespaces=True,
                                    single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
     assert len(commit.modifications) == 1
@@ -206,20 +204,20 @@ def test_ignore_add_whitespaces_and_modified_normal_line(git_repo):
 
 
 def test_ignore_deleted_whitespaces():
-    commit = list(RepositoryMining('test-repos/test14',
+    commit = list(RepositoryMining('test-repos/whitespace',
                                    single="e6e429f6b485e18fb856019d9953370fd5420b20").traverse_commits())[0]
     assert len(commit.modifications) == 1
-    commit = list(RepositoryMining('test-repos/test14',
+    commit = list(RepositoryMining('test-repos/whitespace',
                                    skip_whitespaces=True,
                                    single="e6e429f6b485e18fb856019d9953370fd5420b20").traverse_commits())[0]
     assert len(commit.modifications) == 0
 
 
 def test_ignore_add_whitespaces_and_changed_file():
-    commit = list(RepositoryMining('test-repos/test14',
+    commit = list(RepositoryMining('test-repos/whitespace',
                                    single="532068e9d64b8a86e07eea93de3a57bf9e5b4ae0").traverse_commits())[0]
     assert len(commit.modifications) == 2
-    commit = list(RepositoryMining('test-repos/test14',
+    commit = list(RepositoryMining('test-repos/whitespace',
                                    skip_whitespaces=True,
                                    single="532068e9d64b8a86e07eea93de3a57bf9e5b4ae0").traverse_commits())[0]
     assert len(commit.modifications) == 1

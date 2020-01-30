@@ -13,9 +13,9 @@
 # limitations under the License.
 
 import logging
+from datetime import datetime, timezone, timedelta
 
 import pytest
-from datetime import datetime, timezone, timedelta
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -109,13 +109,13 @@ def test_only_in_branch():
 
 def test_only_in_branches():
     # by default, only analyze master
-    assert len(list(RepositoryMining('test-repos/test8/')
+    assert len(list(RepositoryMining('test-repos/branches2/')
                     .traverse_commits())) == 3
     # only analyze b2
-    assert len(list(RepositoryMining('test-repos/test8/', only_in_branch='b2')
+    assert len(list(RepositoryMining('test-repos/branches2/', only_in_branch='b2')
                     .traverse_commits())) == 4
     # only analyze b1
-    assert len(list(RepositoryMining('test-repos/test8/', only_in_branch='b1')
+    assert len(list(RepositoryMining('test-repos/branches2/', only_in_branch='b1')
                     .traverse_commits())) == 5
 
 
@@ -202,7 +202,7 @@ def test_single_commit():
 def test_filepath_with_to():
     dt = datetime(2018, 6, 6)
     assert len(list(RepositoryMining(
-        path_to_repo='test-repos/test5',
+        path_to_repo='test-repos/szz',
         filepath='myfolder/A.java',
         to=dt).traverse_commits())) == 4
 
@@ -210,7 +210,7 @@ def test_filepath_with_to():
 def test_filepath_with_since():
     since = datetime(2018, 6, 6)
     assert len(list(RepositoryMining(
-        path_to_repo='test-repos/test5',
+        path_to_repo='test-repos/szz',
         filepath='myfolder/A.java',
         since=since).traverse_commits())) == 10
 
@@ -218,7 +218,7 @@ def test_filepath_with_since():
 def test_filepath_with_rename():
     dt = datetime(2018, 6, 6)
     commits = list(RepositoryMining(
-        path_to_repo='test-repos/test1',
+        path_to_repo='test-repos/small_repo',
         filepath='file4.java',
         to=dt).traverse_commits())
     assert len(commits) == 2

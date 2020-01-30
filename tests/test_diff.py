@@ -11,12 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pydriller import GitRepository
 import pytest
+
+from pydriller import GitRepository
+
 
 @pytest.fixture
 def repo():
-    gr = GitRepository('test-repos/test1')
+    gr = GitRepository('test-repos/small_repo')
     yield gr
     gr.clear()
 
@@ -195,7 +197,7 @@ def test_diff_no_newline():
         \\ No newline at end of file
     in diffs. This test asserts these additional lines are parsed correctly.
     """
-    gr = GitRepository('test-repos/test9')
+    gr = GitRepository('test-repos/no_newline')
 
     diff = gr.get_commit('52a78c1ee5d100528eccba0a3d67371dbd22d898').modifications[0].diff
     parsed_lines = gr.parse_diff(diff)

@@ -17,178 +17,62 @@ from pydriller import GitRepository
 
 
 @pytest.fixture
-def repo():
-    gr = GitRepository('test-repos/small_repo')
-    yield gr
+def commit():
+    return None
+
+
+@pytest.fixture()
+def modification(commit):
+    gr = GitRepository("test-repos/diff")
+    yield gr.get_commit(commit).modifications[0]
     gr.clear()
 
 
-def test_extract_line_number_and_content(repo):
-    diff = "@@ -1,8 +1,8 @@\r\n" + \
-           "-a\r\n" + \
-           "-b\r\n" + \
-           "-c\r\n" + \
-           "-log.info(\"a\")\r\n" + \
-           "-d\r\n" + \
-           "-e\r\n" + \
-           "-f\r\n" + \
-           "+aa\r\n" + \
-           "+bb\r\n" + \
-           "+cc\r\n" + \
-           "+log.info(\"aa\")\r\n" + \
-           "+dd\r\n" + \
-           "+ee\r\n" + \
-           "+ff\r\n" + \
-           " "
-    parsed_lines = repo.parse_diff(diff)
+@pytest.mark.parametrize('commit', ["9a985d4a12a3a12f009ef39750fd9b2187b766d1"])
+def test_extract_line_number_and_content(modification):
+    added = modification.diff_parsed['added']
+    deleted = modification.diff_parsed['deleted']
 
-    added = parsed_lines['added']
-    deleted = parsed_lines['deleted']
-
-    assert (1, 'a') in deleted
-    assert (2, 'b') in deleted
-    assert (3, 'c') in deleted
-    assert (4, 'log.info(\"a\")') in deleted
-    assert (5, 'd') in deleted
-    assert (6, 'e') in deleted
-    assert (7, 'f') in deleted
-
-    assert (1, 'aa') in added
-    assert (2, 'bb') in added
-    assert (3, 'cc') in added
-    assert (4, 'log.info(\"aa\")') in added
-    assert (5, 'dd') in added
-    assert (6, 'ee') in added
-    assert (7, 'ff') in added
+    assert (127, '            RevCommit root = rw.parseCommit(headId);') in deleted
+    assert (128, '            rw.sort(RevSort.REVERSE);') in deleted
+    assert (129, '            rw.markStart(root);') in deleted
+    assert (130, '            RevCommit lastCommit = rw.next();') in deleted
+    assert (131, '            throw new RuntimeException("Changing this line " + path);') in added
 
 
-def test_additions(repo):
-    diff = '@@ -2,6 +2,7 @@ aa\r\n' + \
-           ' bb\r\n' + \
-           ' cc\r\n' + \
-           ' log.info(\"aa\")\r\n' + \
-           '+log.debug(\"b\")\r\n' + \
-           ' dd\r\n' + \
-           ' ee\r\n' + \
-           ' ff'
+@pytest.mark.parametrize('commit', ["f45ee2f8976d5f018a1e4ec83eb4556a3df8b0a5"])
+def test_additions(modification):
+    added = modification.diff_parsed['added']
+    deleted = modification.diff_parsed['deleted']
 
-    parsed_lines = repo.parse_diff(diff)
-
-    added = parsed_lines['added']
-    deleted = parsed_lines['deleted']
-
-    assert (5, 'log.debug("b")') in added
+    assert (127, '            RevCommit root = rw.parseCommit(headId);') in added
+    assert (128, '            rw.sort(RevSort.REVERSE);') in added
+    assert (129, '            rw.markStart(root);') in added
+    assert (130, '            RevCommit lastCommit = rw.next();') in added
+    assert (131, '') in added
     assert len(deleted) == 0
-    assert len(added) == 1
+    assert len(added) == 5
 
 
-def test_deletions(repo):
-    diff = '@@ -2,6 +2,7 @@ aa\r\n' + \
-           ' bb\r\n' + \
-           ' cc\r\n' + \
-           ' log.info(\"aa\")\r\n' + \
-           '-log.debug(\"b\")\r\n' + \
-           ' dd\r\n' + \
-           ' ee\r\n' + \
-           ' ff'
+@pytest.mark.parametrize('commit', ["147c7ce9f725a0e259d63f0bf4e6c8ac085ff8c8"])
+def test_deletions(modification):
+    added = modification.diff_parsed['added']
+    deleted = modification.diff_parsed['deleted']
 
-    parsed_lines = repo.parse_diff(diff)
-
-    added = parsed_lines['added']
-    deleted = parsed_lines['deleted']
-
-    assert (5, 'log.debug("b")') in deleted
-    assert len(deleted) == 1
+    assert (184, '            List<ChangeSet> allCs = new ArrayList<>();') in deleted
+    assert (221, '    private GregorianCalendar convertToDate(RevCommit revCommit) {') in deleted
+    assert (222, '        GregorianCalendar date = new GregorianCalendar();') in deleted
+    assert (223, '        date.setTimeZone(revCommit.getAuthorIdent().getTimeZone());') in deleted
+    assert (224, '        date.setTime(revCommit.getAuthorIdent().getWhen());') in deleted
+    assert (225, '') in deleted
+    assert (226, '        return date;') in deleted
+    assert (227, '    }') in deleted
+    assert (228, '') in deleted
+    assert (301, '        if(!collectConfig.isCollectingBranches())') in deleted
+    assert (302, '            return new HashSet<>();') in deleted
+    assert (303, '') in deleted
+    assert len(deleted) == 12
     assert len(added) == 0
-
-
-def test_tabs(repo):
-    diff = '@@ -1,4 +1,17 @@\r\n' + \
-           ' a\r\n' + \
-           ' b\r\n' + \
-           '-c\r\n' + \
-           '+\td\r\n' + \
-           '+cc\r\n' + \
-           '+\r\n' + \
-           '+\r\n' + \
-           '+\r\n' + \
-           '+\r\n' + \
-           '+\r\n' + \
-           '+\r\n' + \
-           '+\r\n' + \
-           '+\r\n' + \
-           '+\r\n' + \
-           '+\tg\r\n' + \
-           '+\r\n' + \
-           '+j\r\n' + \
-           ' '
-
-    parsed_lines = repo.parse_diff(diff)
-
-    added = parsed_lines['added']
-    deleted = parsed_lines['deleted']
-
-    assert (3, 'c') in deleted
-    assert len(deleted) == 1
-
-    assert (3, '\td') in added
-    assert (4, 'cc') in added
-    assert (5, '') in added
-    assert (6, '') in added
-    assert (7, '') in added
-    assert (8, '') in added
-    assert (9, '') in added
-    assert (10, '') in added
-    assert (11, '') in added
-    assert (12, '') in added
-    assert (13, '') in added
-    assert (14, '\tg') in added
-    assert (15, '') in added
-    assert (16, 'j') in added
-    assert len(added) == 14
-
-
-def test_real_example(repo):
-    diff = '@@ -72,7 +72,7 @@ public class GitRepository implements SCM {\r\n' + \
-           ' \r\n' + \
-           '        private static Logger log = Logger.getLogger(GitRepository.class);\r\n' + \
-           ' \r\n' + \
-           '-       public GitRepository(String path) {\r\n' + \
-           '+       public GitRepository2(String path) {\r\n' + \
-           '                this.path = path;\r\n' + \
-           '                this.maxNumberFilesInACommit = checkMaxNumberOfFiles();\r\n' + \
-           '                this.maxSizeOfDiff = checkMaxSizeOfDiff();\r\n' + \
-           '@@ -155,7 +155,7 @@ public class GitRepository implements SCM {\r\n' + \
-           '                return git.getRepository().getBranch();\r\n' + \
-           '        }\r\n' + \
-           ' \r\n' + \
-           '-       public ChangeSet getHead() {\r\n' + \
-           '+       public ChangeSet getHead2() {\r\n' + \
-           '                Git git = null;\r\n' + \
-           '                try {\r\n' + \
-           '                        git = openRepository();\r\n' + \
-           '@@ -320,6 +320,7 @@ public class GitRepository implements SCM {\r\n' + \
-           ' \r\n' + \
-           '                return diffs;\r\n' + \
-           '        }\r\n' + \
-           '+       newline\r\n' + \
-           ' \r\n' + \
-           '        private void setContext(DiffFormatter df) {\r\n' + \
-           '                String context = System.getProperty(\"git.diffcontext\");'
-
-    parsed_lines = repo.parse_diff(diff)
-
-    added = parsed_lines['added']
-    deleted = parsed_lines['deleted']
-
-    assert (75, '       public GitRepository(String path) {') in deleted
-    assert (158, '       public ChangeSet getHead() {') in deleted
-    assert len(deleted) == 2
-
-    assert (75, '       public GitRepository2(String path) {') in added
-    assert (158, '       public ChangeSet getHead2() {') in added
-    assert (323, '       newline') in added
-    assert len(added) == 3
 
 
 def test_diff_no_newline():

@@ -21,7 +21,7 @@ import os
 from pathlib import Path
 from threading import Lock
 from typing import List, Dict, Tuple, Set, Generator
-
+import warnings
 from git import Git, Repo, GitCommandError, Commit as GitCommit
 
 from pydriller.domain.commit import Commit, ModificationType, Modification
@@ -239,6 +239,9 @@ class GitRepository:
         :param str diff: diff of the commit
         :return: Dictionary
         """
+        warnings.warn('parse_diff is deprecated. You can now access the '
+                      'parsed_diff directly from the modification (e.g. '
+                      'modification.diff_parsed)')
         lines = diff.split('\n')
         modified_lines = {'added': [], 'deleted': []}
 

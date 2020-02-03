@@ -83,11 +83,9 @@ def test_diff_no_newline():
     """
     gr = GitRepository('test-repos/no_newline')
 
-    diff = gr.get_commit('52a78c1ee5d100528eccba0a3d67371dbd22d898').modifications[0].diff
-    parsed_lines = gr.parse_diff(diff)
-
-    added = parsed_lines['added']
-    deleted = parsed_lines['deleted']
+    mod = gr.get_commit('52a78c1ee5d100528eccba0a3d67371dbd22d898').modifications[0]
+    added = mod.diff_parsed['added']
+    deleted = mod.diff_parsed['deleted']
 
     assert (1, 'test1') in deleted  # is considered as deleted as a 'newline' command is added
     assert (1, 'test1') in added  # now with added 'newline'

@@ -86,9 +86,10 @@ class GitRepository:
         self._git = Git(str(self.path))
 
     def clear(self):
-        if self.git:
+        if self._git:
             self.git.clear_cache()
-        self.repo.git.clear_cache()
+        if self._repo:
+            self.repo.git.clear_cache()
 
     def _open_repository(self):
         self._repo = Repo(str(self.path))
@@ -326,7 +327,7 @@ class GitRepository:
             if mod.change_type == ModificationType.RENAME or \
                     mod.change_type == ModificationType.DELETE:
                 path = mod.old_path
-            deleted_lines = self.parse_diff(mod.diff)['deleted']
+            deleted_lines = mod.diff_parsed['deleted']
             try:
                 blame = self._get_blame(commit.hash, path,
                                         hashes_to_ignore_path)

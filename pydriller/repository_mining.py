@@ -20,8 +20,8 @@ import logging
 import os
 import tempfile
 from datetime import datetime
-from typing import List, Generator, Union
 from pathlib import Path
+from typing import List, Generator, Union
 
 from git import Repo
 
@@ -139,8 +139,8 @@ class RepositoryMining:
                 if self._conf.get('clone_repo_to'):
                     clone_folder = str(Path(self._conf.get('clone_repo_to')))
                     if not os.path.isdir(clone_folder):
-                        raise Exception("Not a directory: "\
-                                "{0}".format(clone_folder))
+                        raise Exception("Not a directory: " \
+                                        "{0}".format(clone_folder))
                     path_repo = self._clone_remote_repos(clone_folder,
                                                          path_repo)
                 else:
@@ -176,6 +176,7 @@ class RepositoryMining:
                 yield commit
 
             # cleaning
+            self._conf.set_value("git_repo", None)
             git_repo.clear()
 
     @staticmethod

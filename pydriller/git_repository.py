@@ -21,7 +21,7 @@ import os
 from pathlib import Path
 from threading import Lock
 from typing import List, Dict, Tuple, Set, Generator
-
+import warnings
 from git import Git, Repo, GitCommandError, Commit as GitCommit
 
 from pydriller.domain.commit import Commit, ModificationType, Modification
@@ -86,9 +86,10 @@ class GitRepository:
         self._git = Git(str(self.path))
 
     def clear(self):
-        if self.git:
+        if self._git:
             self.git.clear_cache()
-        self.repo.git.clear_cache()
+        if self._repo:
+            self.repo.git.clear_cache()
 
     def _open_repository(self):
         self._repo = Repo(str(self.path))
@@ -239,6 +240,9 @@ class GitRepository:
         :param str diff: diff of the commit
         :return: Dictionary
         """
+        warnings.warn('parse_diff is deprecated. You can now access the '
+                      'parsed_diff directly from the modification (e.g. '
+                      'modification.diff_parsed)')
         lines = diff.split('\n')
         modified_lines = {'added': [], 'deleted': []}
 
@@ -323,7 +327,7 @@ class GitRepository:
             if mod.change_type == ModificationType.RENAME or \
                     mod.change_type == ModificationType.DELETE:
                 path = mod.old_path
-            deleted_lines = self.parse_diff(mod.diff)['deleted']
+            deleted_lines = mod.diff_parsed['deleted']
             try:
                 blame = self._get_blame(commit.hash, path,
                                         hashes_to_ignore_path)

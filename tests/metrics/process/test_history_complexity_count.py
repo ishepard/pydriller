@@ -6,7 +6,7 @@ from pydriller.metrics.process.history_complexity import HistoryComplexity
 
 TEST_DATA = [
     ('test-repos/pydriller', 'scm/git_repository.py', '90ca34ebfe69629cb7f186a1582fc38a73cc572e', '90ca34ebfe69629cb7f186a1582fc38a73cc572e', 40.49),
-    ('test-repos/pydriller', 'scm/git_repository.py', '90ca34ebfe69629cb7f186a1582fc38a73cc572e', '71e053f61fc5d31b3e31eccd9c79df27c31279bf', 47.05)
+    ('test-repos/pydriller', 'scm/git_repository.py', '71e053f61fc5d31b3e31eccd9c79df27c31279bf', '90ca34ebfe69629cb7f186a1582fc38a73cc572e', 47.05)
 ]
 
 @pytest.mark.parametrize('path_to_repo, filepath, from_commit, to_commit, expected', TEST_DATA)

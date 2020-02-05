@@ -71,20 +71,6 @@ class Conf:
         self.check_ending_commit()
         self._check_timezones()
 
-        if self.get('reverse_order'):
-            if self.get('from_commit') and self.get('to_commit'):
-                # reverse from and to commit
-                from_commit = self.get('from_commit')
-                to_commit = self.get('to_commit')
-                self.set_value('from_commit', to_commit)
-                self.set_value('to_commit', from_commit)
-            elif self.get('from_commit'):
-                from_commit = self.get('from_commit')
-                self.set_value('to_commit', from_commit)
-            elif self.get('to_commit'):
-                to_commit = self.get('to_commit')
-                self.set_value('from_commit', to_commit)
-
         if self.get("from_commit") and self.get("to_commit") and self.get(
                 "from_commit") == self.get("to_commit"):
             logger.warning("You should not point from_commit and "

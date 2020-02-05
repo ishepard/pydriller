@@ -98,8 +98,6 @@ For information on how to use PyDriller, refer to the official documentation:
 - [http://pydriller.readthedocs.io](http://pydriller.readthedocs.io)
 - a video on Youtube: [https://www.youtube.com/watch?v=7Oui4bP9eN8](https://www.youtube.com/watch?v=7Oui4bP9eN8)
 
-or have a look at our [example](https://github.com/ishepard/pydriller/tree/master/examples) folder.
-
 ## How to contribute
 Fork the project and follow the instructions on how to get started with [source code](#source-code). I tend to not accept a Pull Request without tests, so:
 

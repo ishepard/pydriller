@@ -29,7 +29,7 @@ setup(
     long_description=long_description,
     author='Davide Spadini',
     author_email='spadini.davide@gmail.com',
-    version='1.10.1',
+    version='1.11',
     packages=find_packages('.'),
     url='https://github.com/ishepard/pydriller',
     license='Apache License',

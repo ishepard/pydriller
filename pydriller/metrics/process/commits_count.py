@@ -21,11 +21,9 @@ class CommitsCount(ProcessMetric):
                                        from_commit=self.from_commit,
                                        to_commit=self.to_commit,
                                        reversed_order=True).traverse_commits():
-
             for modified_file in commit.modifications:
 
                 filepath = renamed_files.get(modified_file.new_path, modified_file.new_path)
-
                 if modified_file.change_type == ModificationType.RENAME:
                     renamed_files[modified_file.old_path] = filepath
 

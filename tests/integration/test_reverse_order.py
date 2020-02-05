@@ -12,33 +12,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from pydriller.repository_mining import RepositoryMining
 import logging
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-import pytest
 
-from pydriller.repository_mining import RepositoryMining
+def test_should_visit_ascendent_order():
+    lc = list(RepositoryMining('test-repos/small_repo',
+                               reversed_order=False).traverse_commits())
+    assert len(lc) == 5
+    assert lc[0].hash == 'a88c84ddf42066611e76e6cb690144e5357d132c'
+    assert lc[1].hash == '6411e3096dd2070438a17b225f44475136e54e3a'
+    assert lc[2].hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
+    assert lc[3].hash == '1f99848edadfffa903b8ba1286a935f1b92b2845'
+    assert lc[4].hash == 'da39b1326dbc2edfe518b90672734a08f3c13458'
 
 
-@pytest.yield_fixture(scope="function")
-def lc(request):
-    reversed = request.param
-    yield list(RepositoryMining('test-repos/different_files',
-                                reversed_order=reversed).traverse_commits())
+def test_should_visit_descendent_order():
+    lc = list(RepositoryMining('test-repos/small_repo',
+                               reversed_order=True).traverse_commits())
+    assert len(lc) == 5
+    assert lc[0].hash == 'da39b1326dbc2edfe518b90672734a08f3c13458'
+    assert lc[1].hash == '1f99848edadfffa903b8ba1286a935f1b92b2845'
+    assert lc[2].hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
+    assert lc[3].hash == '6411e3096dd2070438a17b225f44475136e54e3a'
+    assert lc[4].hash == 'a88c84ddf42066611e76e6cb690144e5357d132c'
 
 
-@pytest.mark.parametrize('lc', [False], indirect=True)
-def test_should_visit_ascendent_order(lc):
+def test_should_visit_descendent_order_with_filters():
+    lc = list(RepositoryMining('test-repos/small_repo',
+                               from_commit='1f99848edadfffa903b8ba1286a935f1b92b2845',
+                               to_commit='6411e3096dd2070438a17b225f44475136e54e3a',
+                               reversed_order=True).traverse_commits())
     assert len(lc) == 3
-    assert lc[0].hash == 'a1b6136f978644ff1d89816bc0f2bd86f6d9d7f5'
-    assert lc[1].hash == '375de7a8275ecdc0b28dc8de2568f47241f443e9'
-    assert lc[2].hash == 'b8c2be250786975f1c6f47e96922096f1bb25e39'
-
-
-@pytest.mark.parametrize('lc', [True], indirect=True)
-def test_should_visit_descendent_order(lc):
-    assert len(lc) == 3
-    assert lc[2].hash == 'a1b6136f978644ff1d89816bc0f2bd86f6d9d7f5'
-    assert lc[1].hash == '375de7a8275ecdc0b28dc8de2568f47241f443e9'
-    assert lc[0].hash == 'b8c2be250786975f1c6f47e96922096f1bb25e39'
+    assert lc[0].hash == '1f99848edadfffa903b8ba1286a935f1b92b2845'
+    assert lc[1].hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
+    assert lc[2].hash == '6411e3096dd2070438a17b225f44475136e54e3a'

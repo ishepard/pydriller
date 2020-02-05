@@ -4,7 +4,7 @@
 Configuration
 =============
 
-One of the main advantage of using PyDriller to mine software repositories, is that is highly configurable. Let's start with selecting which commit to analyze.
+One of the main advantage of using PyDriller to mine software repositories, is that it is highly configurable. We will now see all the options that once can pass to RepositoryMining.
 
 Selecting projects to analyze
 =============================
@@ -49,7 +49,7 @@ By default, PyDriller analyzes all the commits in the repository. However, filte
 
 *ORDER*:
 
-* **reversed\_order** *(bool)*: by default PyDriller returns the commits in chronological order (from the oldest to the newest, the contrary of `git log`). If you need viceversa instead, put this field to **True**.
+* **reversed\_order** *(bool)*: by default PyDriller returns the commits in chronological order (from the oldest to the newest, the contrary of `git log`). If you need viceversa instead, put this field to **True**. **NOTE**: if you use reverse_order together from\_commit and to\_commit, you need to set them according to the order (e.g., if the order of commits is A -> B -> C, ).
 
 Examples::
 

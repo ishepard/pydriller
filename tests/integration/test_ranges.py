@@ -77,6 +77,12 @@ def repository_mining_cc(path, from_commit, to_commit):
 def repository_mining_tt(path, from_tag, to_tag):
     return list(RepositoryMining(path, from_tag=from_tag, to_tag=to_tag).traverse_commits())
 
+@pytest.fixture
+def repository_mining_complex_tags(path, from_tag, to_tag):
+    return list(RepositoryMining('test-repos/tags',
+                                 from_tag=from_tag,
+                                 to_tag=to_tag).traverse_commits())
+
 
 @pytest.mark.parametrize('to,expected_commits', [
     (None, 5),
@@ -139,10 +145,12 @@ def test_from_tag_filter(repository_mining_tt, expected_commits):
 
 
 @pytest.mark.parametrize('from_tag,to_tag,expected_commits', [
-    ('v1.4', 'v1.4', 1),
+    ('tag1', 'tag2', 3),
+    ('tag1', 'tag3', 5),
+    ('tag2', 'tag3', 3),
 ])
-def test_from_and_to_tag(repository_mining_tt, expected_commits):
-    assert len(repository_mining_tt) == expected_commits
+def test_from_and_to_tag(repository_mining_complex_tags, expected_commits):
+    assert len(repository_mining_complex_tags) == expected_commits
 
 
 def test_multiple_filters_exceptions():

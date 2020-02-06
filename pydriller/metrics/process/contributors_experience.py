@@ -1,21 +1,21 @@
 """
 Module that calculates the experience of contributors of a file.
 """
-from pydriller.domain.commit import ModificationType
-from pydriller.repository_mining import RepositoryMining
+from pydriller import ModificationType, RepositoryMining
 from pydriller.metrics.process.process_metric import ProcessMetric
+
 
 class ContributorsExperience(ProcessMetric):
     """
-    This class is responsible to implement the metric to measure the \
-    percentage of the lines authored by the highest contributor of a \
+    This class is responsible to implement the metric to measure the
+    percentage of the lines authored by the highest contributor of a
     file in the provided evolution period [from_commit, to_commit].
     """
 
     def count(self):
         """
-        Return the percentage of the lines authored by the highest contributor of a \
-        file for each modified file in the repository in the provided \
+        Return the percentage of the lines authored by the highest contributor
+        of a file for each modified file in the repository in the provided
         time range [from_commit, to_commit]
 
         :return: dict { filepath: float }
@@ -41,7 +41,8 @@ class ContributorsExperience(ProcessMetric):
                 lines_authored = modified_file.added + modified_file.removed
 
                 files[filepath] = files.get(filepath, {})
-                files[filepath][author] = files[filepath].get(author, 0) + lines_authored
+                files[filepath][author] = files[filepath].get(author, 0) + \
+                    lines_authored
 
         for path, contributions in list(files.items()):
             total = sum(contributions.values())

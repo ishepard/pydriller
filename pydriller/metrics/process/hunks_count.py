@@ -3,18 +3,19 @@ Module that calculates the number of hunks made to a commit file.
 """
 from statistics import median
 
-from pydriller.domain.commit import ModificationType
+from pydriller import ModificationType, RepositoryMining
 from pydriller.metrics.process.process_metric import ProcessMetric
-from pydriller.repository_mining import RepositoryMining
+
 
 class HunksCount(ProcessMetric):
     """
-    This class is responsible to implement the Number of Hunks metric for a file. \
-    As a hunk is a continuous block of changes in a diff, this number assesses \
-    how fragmented the commit file is (i.e. lots of changes all over the file \
-    versus one big change).
-    
-    If multiple commits are passed, it returns the median number of hunks in that range.
+    This class is responsible to implement the Number of Hunks metric for a
+    file. As a hunk is a continuous block of changes in a diff, this number
+    assesses how fragmented the commit file is (i.e. lots of changes all
+    over the file versus one big change).
+
+    If multiple commits are passed, it returns the median number of hunks in
+    that range.
     """
 
     def count(self):

@@ -1,8 +1,13 @@
+"""
+This module contains the abstract class to implement process metrics.
+"""
+
+
 class ProcessMetric:
     """
     Abstract class to implement process metrics
     """
-    
+
     def __init__(self, path_to_repo: str,
                  from_commit: str = None,
                  to_commit: str = None):

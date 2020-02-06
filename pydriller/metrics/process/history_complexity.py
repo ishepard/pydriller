@@ -17,9 +17,9 @@ See https://ieeexplore.ieee.org/document/5070510
 """
 
 from math import log
-from pydriller.domain.commit import ModificationType
-from pydriller.repository_mining import RepositoryMining
+from pydriller import ModificationType, RepositoryMining
 from pydriller.metrics.process.process_metric import ProcessMetric
+
 
 class HistoryComplexity(ProcessMetric):
     """
@@ -44,7 +44,7 @@ class HistoryComplexity(ProcessMetric):
         files = {}
 
         for commit in RepositoryMining(path_to_repo=self.path_to_repo,
-                                       from_commit=self.from_commit,  
+                                       from_commit=self.from_commit,
                                        to_commit=self.to_commit,
                                        reversed_order=True).traverse_commits():
 
@@ -59,8 +59,11 @@ class HistoryComplexity(ProcessMetric):
                 if modifications:
                     files[filepath] = files.get(filepath, 0) + modifications
 
-        total_modifications = sum(files.values()) # Total lines modified in the period
-        n_files = len(files) # Number of modified files in the period
+        # Total lines modified in the period
+        total_modifications = sum(files.values())
+
+        # Number of modified files in the period
+        n_files = len(files)
 
         # From absolute number of changes to relative number of changes
         for filepath in files:

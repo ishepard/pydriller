@@ -86,6 +86,11 @@ class GitRepository:
         self._git = Git(str(self.path))
 
     def clear(self):
+        """
+        According to GitPython's documentation, sometimes it leaks resources.
+        This holds especially for Windows users. Hence, we need to clear the
+        cache manually.
+        """
         if self._git:
             self.git.clear_cache()
         if self._repo:
@@ -93,7 +98,9 @@ class GitRepository:
 
     def _open_repository(self):
         self._repo = Repo(str(self.path))
-        self._repo.config_writer().set_value("blame", "markUnblamableLines", "true").release()
+        self._repo.config_writer().set_value("blame",
+                                             "markUnblamableLines",
+                                             "true").release()
         if self._conf.get("main_branch") is None:
             self._discover_main_branch(self._repo)
 

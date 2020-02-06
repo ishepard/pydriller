@@ -128,7 +128,8 @@ class Conf:
         """
         return len([x for x in arr if x is not None]) <= 1
 
-    def is_commit_filtered(self, commit: Commit):  # pylint: disable=R0911
+    def is_commit_filtered(self, commit: Commit):
+        # pylint: disable=too-many-branches,too-many-return-statements
         """
         Check if commit has to be filtered according to the filters provided
         by the user.

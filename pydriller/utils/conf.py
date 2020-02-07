@@ -81,6 +81,8 @@ class Conf:
             self.set_value("to_commit", None)
             self.set_value("single", single)
 
+        self._check_correct_filters_order()
+
         if self.get('single') is not None:
             if any([self.get('since'),
                     self.get('to'),
@@ -90,6 +92,33 @@ class Conf:
                     self.get('to_tag')]):
                 raise Exception('You can not specify a single commit with '
                                 'other filters')
+
+    def _check_correct_filters_order(self):
+        """
+        from_commit should come before to_commit when analyzing a repository
+        with the default settings, while they should be swapped when
+        analyzing the repository with reversed_order=True
+        """
+        if self.get('from_commit') and self.get('to_commit'):
+            chronological_order = self._is_commit_before(
+                self.get('git_repo').get_commit(self.get('from_commit')),
+                self.get('git_repo').get_commit(self.get('to_commit')))
+
+            if self.get('reversed_order') and chronological_order:
+                self._swap_commit_fiters()
+            elif not self.get('reversed_order') and not chronological_order:
+                self._swap_commit_fiters()
+
+    def _swap_commit_fiters(self):
+        # reverse from and to commit
+        from_commit = self.get('from_commit')
+        to_commit = self.get('to_commit')
+        self.set_value('from_commit', to_commit)
+        self.set_value('to_commit', from_commit)
+
+    @staticmethod
+    def _is_commit_before(commit_before, commit_after):
+        return commit_before.committer_date < commit_after.committer_date
 
     def check_starting_commit(self):
         """

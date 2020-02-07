@@ -49,3 +49,14 @@ def test_should_visit_descendent_order_with_filters():
     assert lc[0].hash == '1f99848edadfffa903b8ba1286a935f1b92b2845'
     assert lc[1].hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
     assert lc[2].hash == '6411e3096dd2070438a17b225f44475136e54e3a'
+
+
+def test_should_visit_descendent_order_with_filters_reversed():
+    lc = list(RepositoryMining('test-repos/small_repo',
+                               from_commit='6411e3096dd2070438a17b225f44475136e54e3a',
+                               to_commit='1f99848edadfffa903b8ba1286a935f1b92b2845',
+                               reversed_order=True).traverse_commits())
+    assert len(lc) == 3
+    assert lc[0].hash == '1f99848edadfffa903b8ba1286a935f1b92b2845'
+    assert lc[1].hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
+    assert lc[2].hash == '6411e3096dd2070438a17b225f44475136e54e3a'

@@ -58,15 +58,15 @@ def test_memory(caplog):
         diff_with_nothing.seconds // 3600,
         (diff_with_nothing.seconds % 3600) // 60,
         diff_with_nothing.seconds % 60,
-        973 / diff_with_nothing.seconds,
+        973 // diff_with_nothing.seconds,
         diff_with_everything.seconds // 3600,
         (diff_with_everything.seconds % 3600) // 60,
         diff_with_everything.seconds % 60,
-        973 / diff_with_everything.seconds,
+        973 // diff_with_everything.seconds,
         diff_with_metrics.seconds // 3600,
         (diff_with_metrics.seconds % 3600) // 60,
         diff_with_metrics.seconds % 60,
-        973 / diff_with_metrics.seconds
+        973 // diff_with_metrics.seconds
     ))
 
     if any(val > 250 for val in max_values) or \

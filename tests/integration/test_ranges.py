@@ -129,6 +129,13 @@ def test_from_and_to_commit(repository_mining_cc, expected_commits):
     assert len(repository_mining_cc) == expected_commits
 
 
+@pytest.mark.parametrize('from_commit,to_commit,expected_commits', [
+    ('09f6182cef737db02a085e1d018963c7a29bde5a', '6411e3096dd2070438a17b225f44475136e54e3a', 2),
+])
+def test_from_and_to_commit(repository_mining_cc, expected_commits):
+    assert len(repository_mining_cc) == expected_commits
+
+
 # FROM AND TO TAG
 @pytest.mark.parametrize('to_tag,expected_commits', [
     ('v1.4', 3),

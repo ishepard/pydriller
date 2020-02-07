@@ -44,23 +44,36 @@ def test_memory(caplog):
     logging.warning("Starting with metrics...")
     diff_with_metrics, all_commits_with_metrics = mine(2)
 
-    max_values = [max(all_commits_with_nothing), max(all_commits_with_everything), max(all_commits_with_metrics)]
+    max_values = [max(all_commits_with_nothing),
+                  max(all_commits_with_everything),
+                  max(all_commits_with_metrics)]
     logging.warning("Max values are: {}".format(max_values))
 
     minutes_with_everything = (diff_with_everything.seconds % 3600) // 60
     minutes_with_metrics = (diff_with_metrics.seconds % 3600) // 60
 
-    logging.warning("TIME: With nothing: {}:{}:{}, with everything: {}:{}:{}, with metrics: {}:{}:{}".format(
-        diff_with_nothing.seconds // 3600, (diff_with_nothing.seconds % 3600) // 60, diff_with_nothing.seconds % 60,
-        diff_with_everything.seconds // 3600, (diff_with_everything.seconds % 3600) // 60,
+    logging.warning("TIME: With nothing: {}:{}:{} ({} commits/sec), "
+                    "with everything: {}:{}:{}  ({} commits/sec), "
+                    "with metrics: {}:{}:{}  ({} commits/sec)".format(
+        diff_with_nothing.seconds // 3600,
+        (diff_with_nothing.seconds % 3600) // 60,
+        diff_with_nothing.seconds % 60,
+        973 // diff_with_nothing.seconds,
+        diff_with_everything.seconds // 3600,
+        (diff_with_everything.seconds % 3600) // 60,
         diff_with_everything.seconds % 60,
-        diff_with_metrics.seconds // 3600, (diff_with_metrics.seconds % 3600) // 60, diff_with_metrics.seconds % 60
+        973 // diff_with_everything.seconds,
+        diff_with_metrics.seconds // 3600,
+        (diff_with_metrics.seconds % 3600) // 60,
+        diff_with_metrics.seconds % 60,
+        973 // diff_with_metrics.seconds
     ))
 
     if any(val > 250 for val in max_values) or \
             minutes_with_everything >= 1 or \
             minutes_with_metrics >= 7:
-        # if to analyze 1000 commits requires more than 250MB of RAM, more than 1 minute without metrics or
+        # if to analyze 1000 commits requires more than 250MB of RAM,
+        # more than 1 minute without metrics or
         # 7 minutes with metrics, print it on the Slack channel
         logs_and_post_on_slack(diff_with_nothing, all_commits_with_nothing,
                                diff_with_everything, all_commits_with_everything,

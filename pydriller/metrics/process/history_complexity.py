@@ -70,7 +70,9 @@ class HistoryComplexity(ProcessMetric):
             files[filepath] /= total_modifications
 
         # Normalized entropy
-        entropy = -sum(p*log(p+1/1e10, n_files) for p in files.values())
+        entropy = 0
+        if len(files.values()) > 1:
+            entropy = -sum(p*log(p+1/1e10, n_files) for p in files.values())
 
         for filepath in files:
             files[filepath] *= entropy

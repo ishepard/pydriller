@@ -6,7 +6,7 @@ from pydriller.metrics.process.contributors_experience import \
     ContributorsExperience
 
 TEST_DATA = [
-   ('test-repos/pydriller', 'domain/modification.py', 'fdf671856b260aca058e6595a96a7a0fba05454b', None, 100.0),
+   ('test-repos/pydriller', 'domain/modification.py', 'fdf671856b260aca058e6595a96a7a0fba05454b', 'ab36bf45859a210b0eae14e17683f31d19eea041', 100.0),
    ('test-repos/pydriller', 'pydriller/git_repository.py', 'e9854bbea1cb7b7f06cbb559f7b06724d11ae1e5', 'e9854bbea1cb7b7f06cbb559f7b06724d11ae1e5', 100.0),
    ('test-repos/pydriller', 'pydriller/git_repository.py', 'e9854bbea1cb7b7f06cbb559f7b06724d11ae1e5', '9d0924301e4fae00eea6d00945bf834455e9a2a6', round(100*28/30, 2))
 ]

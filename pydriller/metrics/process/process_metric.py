@@ -18,6 +18,9 @@ class ProcessMetric:
         :from_commit: the SHA of the commit to start counting. If None, the
             analysis ends to the first commit
         """
+        if not from_commit or not to_commit:
+            raise TypeError
+
         self.path_to_repo = path_to_repo
         self.from_commit = from_commit
         self.to_commit = to_commit

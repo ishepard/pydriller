@@ -9,8 +9,8 @@ class ProcessMetric:
     """
 
     def __init__(self, path_to_repo: str,
-                 from_commit: str = None,
-                 to_commit: str = None):
+                 from_commit: str,
+                 to_commit: str):
         """
         :path_to_repo: path to a single repo
         :to_commit: the SHA of the commit to stop counting. If None, the

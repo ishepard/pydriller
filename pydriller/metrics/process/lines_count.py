@@ -2,7 +2,7 @@
 Module that calculates the number of normalized added and deleted lines of a
 file.
 """
-from pydriller import ModificationType, RepositoryMining
+from pydriller import ModificationType
 from pydriller.metrics.process.process_metric import ProcessMetric
 
 
@@ -32,10 +32,7 @@ class LinesCount(ProcessMetric):
         renamed_files = {}
         files = {}
 
-        for commit in RepositoryMining(self.path_to_repo,
-                                       from_commit=self.from_commit,
-                                       to_commit=self.to_commit,
-                                       reversed_order=True).traverse_commits():
+        for commit in self.repo_miner.traverse_commits():
 
             for modified_file in commit.modifications:
 

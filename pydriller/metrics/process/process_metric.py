@@ -2,6 +2,7 @@
 This module contains the abstract class to implement process metrics.
 """
 
+from pydriller import RepositoryMining
 
 class ProcessMetric:
     """
@@ -21,9 +22,13 @@ class ProcessMetric:
         if not from_commit or not to_commit:
             raise TypeError
 
-        self.path_to_repo = path_to_repo
-        self.from_commit = from_commit
-        self.to_commit = to_commit
+        self.repo_miner = RepositoryMining(path_to_repo, single=from_commit)
+
+        if from_commit != to_commit:
+            self.repo_miner = RepositoryMining(path_to_repo=path_to_repo,
+                                               from_commit=from_commit,
+                                               to_commit=to_commit,
+                                               reversed_order=True)
 
     def count(self):
         """

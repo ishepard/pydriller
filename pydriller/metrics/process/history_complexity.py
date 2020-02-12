@@ -17,7 +17,7 @@ See https://ieeexplore.ieee.org/document/5070510
 """
 
 from math import log
-from pydriller import ModificationType, RepositoryMining
+from pydriller import ModificationType
 from pydriller.metrics.process.process_metric import ProcessMetric
 
 
@@ -43,10 +43,7 @@ class HistoryComplexity(ProcessMetric):
         renamed_files = {}
         files = {}
 
-        for commit in RepositoryMining(path_to_repo=self.path_to_repo,
-                                       from_commit=self.from_commit,
-                                       to_commit=self.to_commit,
-                                       reversed_order=True).traverse_commits():
+        for commit in self.repo_miner.traverse_commits():
 
             for modified_file in commit.modifications:
                 filepath = renamed_files.get(modified_file.new_path,

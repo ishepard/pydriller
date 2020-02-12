@@ -1,7 +1,7 @@
 """
 Module that calculates the experience of contributors of a file.
 """
-from pydriller import ModificationType, RepositoryMining
+from pydriller import ModificationType
 from pydriller.metrics.process.process_metric import ProcessMetric
 
 
@@ -24,10 +24,7 @@ class ContributorsExperience(ProcessMetric):
         renamed_files = {}
         files = {}
 
-        for commit in RepositoryMining(path_to_repo=self.path_to_repo,
-                                       from_commit=self.from_commit,
-                                       to_commit=self.to_commit,
-                                       reversed_order=True).traverse_commits():
+        for commit in self.repo_miner.traverse_commits():
 
             for modified_file in commit.modifications:
 

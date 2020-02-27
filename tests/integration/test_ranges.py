@@ -109,14 +109,20 @@ def test_since_and_to_filters(repository_mining_st, expected_commits):
 
 # FROM AND TO COMMIT
 @pytest.mark.parametrize('to_commit,expected_commits', [
+    ('6411e3096dd2070438a17b225f44475136e54e3a', 2),
     ('09f6182cef737db02a085e1d018963c7a29bde5a', 3),
+    ('1f99848edadfffa903b8ba1286a935f1b92b2845', 4),
+    ('HEAD', 5),
 ])
-def test_to_commit_filter_new(repository_mining_cc, expected_commits):
+def test_to_commit_filter(repository_mining_cc, expected_commits):
     assert len(repository_mining_cc) == expected_commits
 
 
 @pytest.mark.parametrize('from_commit,expected_commits', [
     ('6411e3096dd2070438a17b225f44475136e54e3a', 4),
+    ('09f6182cef737db02a085e1d018963c7a29bde5a', 3),
+    ('1f99848edadfffa903b8ba1286a935f1b92b2845', 2),
+    ('HEAD', 1)
 ])
 def test_from_commit_filter(repository_mining_cc, expected_commits):
     assert len(repository_mining_cc) == expected_commits
@@ -124,13 +130,9 @@ def test_from_commit_filter(repository_mining_cc, expected_commits):
 
 @pytest.mark.parametrize('from_commit,to_commit,expected_commits', [
     ('6411e3096dd2070438a17b225f44475136e54e3a', '09f6182cef737db02a085e1d018963c7a29bde5a', 2),
-])
-def test_from_and_to_commit(repository_mining_cc, expected_commits):
-    assert len(repository_mining_cc) == expected_commits
-
-
-@pytest.mark.parametrize('from_commit,to_commit,expected_commits', [
     ('09f6182cef737db02a085e1d018963c7a29bde5a', '6411e3096dd2070438a17b225f44475136e54e3a', 2),
+    ('6411e3096dd2070438a17b225f44475136e54e3a', 'HEAD', 4),
+    ('09f6182cef737db02a085e1d018963c7a29bde5a', 'HEAD', 3),
 ])
 def test_from_and_to_commit(repository_mining_cc, expected_commits):
     assert len(repository_mining_cc) == expected_commits

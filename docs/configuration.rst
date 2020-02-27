@@ -38,18 +38,22 @@ By default, PyDriller analyzes all the commits in the repository. However, filte
 *FROM*:
 
 * **since** *(datetime)*: only commits after this date will be analyzed
-* **from_commit** *(str)*: only commits after this commit hash will be analyzed
-* **from_tag** *(str)*: only commits after this commit tag will be analyzed
+* **from\_commit** *(str)*: only commits after this commit hash will be analyzed
+* **from\_tag** *(str)*: only commits after this commit tag will be analyzed
 
 *TO*:
 
 * **to** *(datetime)*: only commits up to this date will be analyzed
-* **to_commit** *(str)*: only commits up to this commit hash will be analyzed
-* **to_tag** *(str)*: only commits up to this commit tag will be analyzed
+* **to\_commit** *(str)*: only commits up to this commit hash will be analyzed
+* **to\_tag** *(str)*: only commits up to this commit tag will be analyzed
 
 *ORDER*:
 
-* **reversed\_order** *(bool)*: by default PyDriller returns the commits in chronological order (from the oldest to the newest, the contrary of `git log`). If you need viceversa instead, put this field to **True**. 
+* **reversed\_order** *(bool)*: by default PyDriller returns the commits in chronological order (from the oldest to the newest, the contrary of `git log`). If you need viceversa instead, put this field to **True**.
+ Note: If you use *reversed\_order* with *from\_commit* or *to\_commit*, be sure to double check their order! For example, if we 
+ have 4 commits: A -> B -> C -> D, and you apply the filter *from\_commit=B*, you will obtain: B -> C -> D. 
+ With *reverse\_order=True*, normally you would obtain D -> C -> B -> A, while with the filter *from\_commit=B*, 
+ you will only obtain B -> A. Two completely different results! 
 
 Examples::
 

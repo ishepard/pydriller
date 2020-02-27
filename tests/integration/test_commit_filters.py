@@ -185,10 +185,40 @@ def test_single_commit():
     assert lc[0].hash == "ffccf1e7497eb8136fd66ed5e42bef29677c4b71"
 
 
-def test_single_commit_not_existing():
+def test_single_commit_head():
     lc = list(RepositoryMining('test-repos/complex_repo',
-                               single="ffccf1e7497eb813ASD66ed5e42bef29677c4b71").traverse_commits())
-    assert len(lc) == 0
+                               single="e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2").traverse_commits())
+    assert len(lc) == 1
+
+    lc_head = list(RepositoryMining('test-repos/complex_repo',
+                               single="HEAD").traverse_commits())
+    assert len(lc_head) == 1
+    assert lc[0].hash == lc_head[0].hash
+
+
+def test_single_commit_not_existing_single_commit():
+    with pytest.raises(Exception):
+        list(RepositoryMining('test-repos/complex_repo',
+                              single="ASD").traverse_commits())
+
+
+def test_single_commit_not_existing_from_commit():
+    with pytest.raises(Exception):
+        list(RepositoryMining('test-repos/complex_repo',
+                              from_commit="ASD").traverse_commits())
+
+
+def test_single_commit_not_existing_to_commit():
+    with pytest.raises(Exception):
+        list(RepositoryMining('test-repos/complex_repo',
+                              to_commit="ASD").traverse_commits())
+
+
+def test_single_commit_not_existing_from_and_to_commit():
+    with pytest.raises(Exception):
+        list(RepositoryMining('test-repos/complex_repo',
+                              from_commit="ASD",
+                              to_commit="ASD").traverse_commits())
 
 
 def test_filepath_with_to():

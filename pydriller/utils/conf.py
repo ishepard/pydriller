@@ -6,6 +6,7 @@ import logging
 from datetime import datetime
 
 import pytz
+from gitdb.exc import BadName
 
 from pydriller.domain.commit import Commit
 
@@ -19,6 +20,7 @@ class Conf:
     It's also responsible for checking whether the filters are correct (i.e.,
     the user did not specify 2 starting commits).
     """
+
     def __init__(self, options):
         # insert all the configurations in a local dictionary
         self._options = {}
@@ -92,6 +94,13 @@ class Conf:
                     self.get('to_tag')]):
                 raise Exception('You can not specify a single commit with '
                                 'other filters')
+            try:
+                self.set_value('single', self.get("git_repo").get_commit(
+                    self.get('single')).hash)
+            except BadName:
+                raise Exception("The commit {} defined in "
+                                "the 'single' filtered does "
+                                "not exist".format(self.get('single')))
 
     def _check_correct_filters_order(self):
         """
@@ -133,6 +142,14 @@ class Conf:
         if self.get('from_tag') is not None:
             self.set_value('from_commit', self.get(
                 "git_repo").get_commit_from_tag(self.get('from_tag')).hash)
+        if self.get('from_commit'):
+            try:
+                self.set_value('from_commit', self.get("git_repo").get_commit(
+                    self.get('from_commit')).hash)
+            except BadName:
+                raise Exception("The commit {} defined in the 'from_tag' "
+                                "or 'from_commit' filter does "
+                                "not exist".format(self.get('single')))
 
     def check_ending_commit(self):
         """
@@ -146,6 +163,14 @@ class Conf:
         if self.get('to_tag') is not None:
             self.set_value('to_commit', self.get(
                 "git_repo").get_commit_from_tag(self.get('to_tag')).hash)
+        if self.get('to_commit'):
+            try:
+                self.set_value('to_commit', self.get("git_repo").get_commit(
+                    self.get('to_commit')).hash)
+            except BadName as e:
+                raise Exception("The commit {} defined in the 'to_tag' "
+                                "or 'to_commit' filter does "
+                                "not exist".format(self.get('single')))
 
     @staticmethod
     def only_one_filter(arr):
@@ -172,7 +197,7 @@ class Conf:
                          'the defined in single')
             return True
         if (self.get('since') is not None and
-                commit.committer_date < self.get('since')) or \
+            commit.committer_date < self.get('since')) or \
                 (self.get('to') is not None and
                  commit.committer_date > self.get('to')):
             return True

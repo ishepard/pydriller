@@ -271,8 +271,8 @@ class Modification:  # pylint: disable=R0902
     def changed_methods(self) -> List[Method]:
         """
         Return the list of methods that were changed. This analysis
-        is more complex because lizzard runs twice: once for all methods
-        and once for previous methods
+        is more complex because lizzard runs twice: for methods before
+        and after the change
 
         :return: list of methods
         """

@@ -87,8 +87,15 @@ def test_metrics_python():
     assert m1.complexity == 43
 
     assert len(m1.methods) == 19
-    assert len(m1.methods_before) == 19
-    assert len(m1.changed_methods) == 0
+
+
+def test_changed_methods():
+
+    gr = GitRepository("test-repos/diff")
+    mod = gr.get_commit(
+        'f45ee2f8976d5f018a1e4ec83eb4556a3df8b0a5').modifications[0]
+
+    assert len(mod.changed_methods) == 1
 
 
 def test_metrics_cpp():

@@ -280,16 +280,24 @@ class Modification:  # pylint: disable=R0902
         old_methods = self.methods_before
 
         # get methods that were removed
-        intersect_methods = [
+        intersect_methods_old = [
             x for x in old_methods for y in new_methods if x.name == y.name]
-        removed_methods = list(set(old_methods) - set(intersect_methods))
+        removed_methods = list(set(old_methods) - set(intersect_methods_old))
+
+        # get methods that were added
+        # here we take the intersection again because we want objects
+        # from the 'new_methods' list, which may be different than the
+        # ones from the 'old_methods'
+        intersect_methods_new = [
+            x for x in new_methods for y in old_methods if x.name == y.name]
+        new_methods = list(set(new_methods) - set(intersect_methods_new))
 
         # get methods that were changed
         # TODO: change the nloc with a more realistic metric
         changed_methods = [
             x for x in old_methods for y in new_methods if x.name == y.name and x.nloc != y.nloc]
         # sanity check for duplicates by converting to set and back to list
-        return list(set(removed_methods+changed_methods))
+        return list(set(removed_methods+new_methods+changed_methods))
 
     def _calculate_metrics(self, include_before=False):
         """

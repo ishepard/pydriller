@@ -88,7 +88,7 @@ def test_metrics_python():
 
     assert len(m1.methods) == 19
     assert len(m1.methods_before) == 19
-    assert len(j=m1.changed_methods) == 0
+    assert len(m1.changed_methods) == 0
 
 
 def test_metrics_cpp():

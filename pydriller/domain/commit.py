@@ -302,7 +302,7 @@ class Modification:  # pylint: disable=R0902
     def _calculate_metrics(self, include_before=False):
         """
         :param include_before: either to compute the metrics
-        for source_code_before, e.g. before the change happened
+        for source_code_before, i.e. before the change happened
         """
         if self.source_code and self._nloc is None:
             analysis = lizard.analyze_file.analyze_source_code(self.filename,

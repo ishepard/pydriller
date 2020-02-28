@@ -271,8 +271,8 @@ class Modification:  # pylint: disable=R0902
     def changed_methods(self) -> List[Method]:
         """
         Return the list of methods that were changed. This analysis
-        is more complex because lizzard runs twice: once for all methods
-        and once for previous methods
+        is more complex because lizzard runs twice: for methods before
+        and after the change
 
         :return: list of methods
         """
@@ -292,7 +292,7 @@ class Modification:  # pylint: disable=R0902
     def _calculate_metrics(self, include_before=False):
         """
         :param include_before: either to compute the metrics
-        for source_code_before, e.g. before the change happened
+        for source_code_before, i.e. before the change happened
         """
         if self.source_code and self._nloc is None:
             analysis = lizard.analyze_file.analyze_source_code(self.filename,

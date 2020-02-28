@@ -98,6 +98,7 @@ class Modification:  # pylint: disable=R0902
         self._complexity = None
         self._token_count = None
         self._function_list = []
+        self._function_list_before = []
 
     @property
     def added(self) -> int:
@@ -254,18 +255,63 @@ class Modification:  # pylint: disable=R0902
         self._calculate_metrics()
         return self._function_list
 
-    def _calculate_metrics(self):
+    @property
+    def methods_before(self) -> List[Method]:
+        """
+        Return the list of methods in the file before the
+        change happened. Each method will have all specific
+        info, e.g. complexity, loc, name, etc.
+
+        :return: list of methods
+        """
+        self._calculate_metrics(include_before=True)
+        return self._function_list_before
+
+    @property
+    def changed_methods(self) -> List[Method]:
+        """
+        Return the list of methods that were changed. This analysis
+        is more complex because lizzard runs twice: once for all methods
+        and once for previous methods
+
+        :return: list of methods
+        """
+        new_methods = self.methods
+        old_methods = self.methods_before
+
+        # get methods that were removed
+        intersect_methods = [
+            x for x in old_methods for y in new_methods if x.name == y.name]
+        removed_methods = list(set(old_methods) - set(intersect_methods))
+
+        # get methods that were changed
+        # TODO: change the nloc with a more realistic metric
+        changed_methods = [
+            x for x in old_methods for y in new_methods if x.name == y.name and x.nloc != y.nloc]
+        # sanity check for duplicates by converting to set and back to list
+        return list(set(removed_methods+changed_methods))
+
+    def _calculate_metrics(self, include_before=False):
+        """
+        :param include_before: either to compute the metrics
+        for source_code_before, e.g. before the change happened
+        """
         if self.source_code and self._nloc is None:
             analysis = lizard.analyze_file.analyze_source_code(self.filename,
                                                                self.source_code
                                                                )
-
             self._nloc = analysis.nloc
             self._complexity = analysis.CCN
             self._token_count = analysis.token_count
 
             for func in analysis.function_list:
                 self._function_list.append(Method(func))
+        # logic to parse the methods before the change
+        if include_before and self.source_code_before and not self._function_list_before:
+            anal = lizard.analyze_file.analyze_source_code(self.filename,
+                                                           self.source_code_before)
+            for func in anal.function_list:
+                self._function_list_before.append(Method(func))
 
     def __eq__(self, other):
         if not isinstance(other, Modification):

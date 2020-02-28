@@ -318,8 +318,9 @@ class Modification:  # pylint: disable=R0902
         if include_before and self.source_code_before and not self._function_list_before:
             anal = lizard.analyze_file.analyze_source_code(self.filename,
                                                            self.source_code_before)
-            for func in anal.function_list:
-                self._function_list_before.append(Method(func))
+
+            self._function_list_before = [
+                Method(x) for x in anal.function_list]
 
     def __eq__(self, other):
         if not isinstance(other, Modification):

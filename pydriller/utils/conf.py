@@ -146,10 +146,10 @@ class Conf:
             try:
                 self.set_value('from_commit', self.get("git_repo").get_commit(
                     self.get('from_commit')).hash)
-            except BadName:
+            except Exception:
                 raise Exception("The commit {} defined in the 'from_tag' "
                                 "or 'from_commit' filter does "
-                                "not exist".format(self.get('single')))
+                                "not exist".format(self.get('from_commit')))
 
     def check_ending_commit(self):
         """
@@ -167,10 +167,10 @@ class Conf:
             try:
                 self.set_value('to_commit', self.get("git_repo").get_commit(
                     self.get('to_commit')).hash)
-            except BadName as e:
+            except Exception:
                 raise Exception("The commit {} defined in the 'to_tag' "
                                 "or 'to_commit' filter does "
-                                "not exist".format(self.get('single')))
+                                "not exist".format(self.get('to_commit')))
 
     @staticmethod
     def only_one_filter(arr):

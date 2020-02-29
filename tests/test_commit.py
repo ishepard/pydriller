@@ -136,7 +136,7 @@ def test_changed_methods():
     assert len(mod.changed_methods) == 2
 
     # delete 3 methods (test cleanup - revert the test file to its
-    # initial set off methods)
+    # initial set of methods)
     mod = gr.get_commit(
         '9f6ddc2aac740a257af59a76860590cb8a84c77b').modifications[0]
     assert len(mod.changed_methods) == 3

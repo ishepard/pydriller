@@ -92,10 +92,48 @@ def test_metrics_python():
 def test_changed_methods():
 
     gr = GitRepository("test-repos/diff")
-    mod = gr.get_commit(
-        'f45ee2f8976d5f018a1e4ec83eb4556a3df8b0a5').modifications[0]
 
+    # add a new method
+    mod = gr.get_commit(
+        'ea95227e0fd128aa69c7ab6a8ac485f72251b3ed').modifications[0]
     assert len(mod.changed_methods) == 1
+    assert mod.changed_methods[0].name == 'GitRepository::singleProjectThirdMethod'
+
+    # add 2 new methods
+    mod = gr.get_commit(
+        'd8eb8e80b671246a43c98d97b05f6d1c5ada14fb').modifications[0]
+    assert len(mod.changed_methods) == 2
+
+    # remove one method
+    mod = gr.get_commit(
+        '0c8f9fdec926785198b399a2c49adb5884aa952c').modifications[0]
+    assert len(mod.changed_methods) == 1
+
+    # add and remove one one method at different locations
+    mod = gr.get_commit(
+        'd8bb142c5616041b71cbfaa11eeb768d9a1a296e').modifications[0]
+    assert len(mod.changed_methods) == 2
+
+    # add and remove one one method at the same location
+    # this is equivalent to replacing a method - although we expect 2 methods
+    mod = gr.get_commit(
+        '9e9473d5ca310b7663e9df93c402302b6b7f24aa').modifications[0]
+    assert len(mod.changed_methods) == 2
+
+    # update a method
+    mod = gr.get_commit(
+        'b267a14e0503fdac36d280422f16360d1f661f12').modifications[0]
+    assert len(mod.changed_methods) == 1
+
+    # update and add a new method
+    mod = gr.get_commit(
+        '2489099dfd90edb99ddc2c82b62524b66c07c687').modifications[0]
+    assert len(mod.changed_methods) == 2
+
+    # update and delete methods
+    mod = gr.get_commit(
+        '5aebeb30e0238543a93e5bed806639481460cd9a').modifications[0]
+    assert len(mod.changed_methods) == 2
 
 
 def test_metrics_cpp():

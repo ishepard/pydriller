@@ -73,6 +73,16 @@ class Method:  # pylint: disable=R0902
         self.length = func.length
         self.top_nesting_level = func.top_nesting_level
 
+    def __eq__(self, other):
+        return self.name == other.name and self.parameters == other.parameters
+
+    def __hash__(self):
+        # parameters are used in hashing in order to
+        # prevent collisions when overloading method names
+        return hash(('name', self.name,
+                     'long_name', self.long_name,
+                     'params', (x for x in self.parameters)))
+
 
 class Modification:  # pylint: disable=R0902
     """

@@ -135,6 +135,12 @@ def test_changed_methods():
         '5aebeb30e0238543a93e5bed806639481460cd9a').modifications[0]
     assert len(mod.changed_methods) == 2
 
+    # delete 3 methods (test cleanup - revert the test file to its
+    # initial set off methods)
+    mod = gr.get_commit(
+        '9f6ddc2aac740a257af59a76860590cb8a84c77b').modifications[0]
+    assert len(mod.changed_methods) == 3
+
 
 def test_metrics_cpp():
     with open('test-repos/lizard/FileCPP.cpp') as f:

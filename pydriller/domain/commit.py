@@ -283,9 +283,8 @@ class Modification:  # pylint: disable=R0902
 
         methods_changed_new = set([
             y for x in added for y in new_methods if y.start_line <= x[0] <= y.end_line])
-        methods_changed_old = set([
-            y for x in deleted for y in old_methods if x[0] <= y.end_line and x[0] >= y.start_line
-        ])
+        methods_changed_old = set(
+            [y for x in deleted for y in old_methods if y.start_line <= x[0] <= y.end_line])
 
         return list(methods_changed_new.union(methods_changed_old))
 

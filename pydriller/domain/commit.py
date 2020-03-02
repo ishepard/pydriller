@@ -291,10 +291,10 @@ class Modification:  # pylint: disable=R0902
         added = self.diff_parsed['added']
         deleted = self.diff_parsed['deleted']
 
-        methods_changed_new = set([
-            y for x in added for y in new_methods if y.start_line <= x[0] <= y.end_line])
-        methods_changed_old = set(
-            [y for x in deleted for y in old_methods if y.start_line <= x[0] <= y.end_line])
+        methods_changed_new = {y for x in added for y in new_methods if
+                               y.start_line <= x[0] <= y.end_line}
+        methods_changed_old = {y for x in deleted for y in old_methods if
+                               y.start_line <= x[0] <= y.end_line}
 
         return list(methods_changed_new.union(methods_changed_old))
 
@@ -304,19 +304,19 @@ class Modification:  # pylint: disable=R0902
         for source_code_before, i.e. before the change happened
         """
         if self.source_code and self._nloc is None:
-            analysis = lizard.analyze_file.analyze_source_code(self.filename,
-                                                               self.source_code
-                                                               )
+            analysis = lizard.analyze_file.analyze_source_code(
+                self.filename, self.source_code)
             self._nloc = analysis.nloc
             self._complexity = analysis.CCN
             self._token_count = analysis.token_count
 
             for func in analysis.function_list:
                 self._function_list.append(Method(func))
-        # logic to parse the methods before the change
-        if include_before and self.source_code_before and not self._function_list_before:
-            anal = lizard.analyze_file.analyze_source_code(self.filename,
-                                                           self.source_code_before)
+
+        if include_before and self.source_code_before and \
+                not self._function_list_before:
+            anal = lizard.analyze_file.analyze_source_code(
+                self.filename, self.source_code_before)
 
             self._function_list_before = [
                 Method(x) for x in anal.function_list]

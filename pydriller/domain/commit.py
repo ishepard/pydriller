@@ -73,6 +73,16 @@ class Method:  # pylint: disable=R0902
         self.length = func.length
         self.top_nesting_level = func.top_nesting_level
 
+    def __eq__(self, other):
+        return self.name == other.name and self.parameters == other.parameters
+
+    def __hash__(self):
+        # parameters are used in hashing in order to
+        # prevent collisions when overloading method names
+        return hash(('name', self.name,
+                     'long_name', self.long_name,
+                     'params', (x for x in self.parameters)))
+
 
 class Modification:  # pylint: disable=R0902
     """
@@ -98,6 +108,7 @@ class Modification:  # pylint: disable=R0902
         self._complexity = None
         self._token_count = None
         self._function_list = []
+        self._function_list_before = []
 
     @property
     def added(self) -> int:
@@ -254,18 +265,61 @@ class Modification:  # pylint: disable=R0902
         self._calculate_metrics()
         return self._function_list
 
-    def _calculate_metrics(self):
+    @property
+    def methods_before(self) -> List[Method]:
+        """
+        Return the list of methods in the file before the
+        change happened. Each method will have all specific
+        info, e.g. complexity, loc, name, etc.
+
+        :return: list of methods
+        """
+        self._calculate_metrics(include_before=True)
+        return self._function_list_before
+
+    @property
+    def changed_methods(self) -> List[Method]:
+        """
+        Return the list of methods that were changed. This analysis
+        is more complex because lizzard runs twice: for methods before
+        and after the change
+
+        :return: list of methods
+        """
+        new_methods = self.methods
+        old_methods = self.methods_before
+        added = self.diff_parsed['added']
+        deleted = self.diff_parsed['deleted']
+
+        methods_changed_new = set([
+            y for x in added for y in new_methods if y.start_line <= x[0] <= y.end_line])
+        methods_changed_old = set(
+            [y for x in deleted for y in old_methods if y.start_line <= x[0] <= y.end_line])
+
+        return list(methods_changed_new.union(methods_changed_old))
+
+    def _calculate_metrics(self, include_before=False):
+        """
+        :param include_before: either to compute the metrics
+        for source_code_before, i.e. before the change happened
+        """
         if self.source_code and self._nloc is None:
             analysis = lizard.analyze_file.analyze_source_code(self.filename,
                                                                self.source_code
                                                                )
-
             self._nloc = analysis.nloc
             self._complexity = analysis.CCN
             self._token_count = analysis.token_count
 
             for func in analysis.function_list:
                 self._function_list.append(Method(func))
+        # logic to parse the methods before the change
+        if include_before and self.source_code_before and not self._function_list_before:
+            anal = lizard.analyze_file.analyze_source_code(self.filename,
+                                                           self.source_code_before)
+
+            self._function_list_before = [
+                Method(x) for x in anal.function_list]
 
     def __eq__(self, other):
         if not isinstance(other, Modification):

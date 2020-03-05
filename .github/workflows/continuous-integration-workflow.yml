@@ -45,7 +45,5 @@ jobs:
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
         uses: codecov/codecov-action@v1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           file: ./coverage.xml
           yml: .codecov.yml
-          fail_ci_if_error: true

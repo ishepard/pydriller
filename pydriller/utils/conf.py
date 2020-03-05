@@ -69,6 +69,7 @@ class Conf:
         Check if the values passed by the user are correct.
 
         """
+        self._check_correct_filters_order()
         self.check_starting_commit()
         self.check_ending_commit()
         self._check_timezones()
@@ -82,8 +83,6 @@ class Conf:
             self.set_value("from_commit", None)
             self.set_value("to_commit", None)
             self.set_value("single", single)
-
-        self._check_correct_filters_order()
 
         if self.get('single') is not None:
             if any([self.get('since'),
@@ -113,9 +112,7 @@ class Conf:
                 self.get('git_repo').get_commit(self.get('from_commit')),
                 self.get('git_repo').get_commit(self.get('to_commit')))
 
-            if self.get('reversed_order') and chronological_order:
-                self._swap_commit_fiters()
-            elif not self.get('reversed_order') and not chronological_order:
+            if not chronological_order:
                 self._swap_commit_fiters()
 
     def _swap_commit_fiters(self):
@@ -140,12 +137,17 @@ class Conf:
             raise Exception('You can only specify one between since, '
                             'from_tag and from_commit')
         if self.get('from_tag') is not None:
-            self.set_value('from_commit', self.get(
-                "git_repo").get_commit_from_tag(self.get('from_tag')).hash)
+            self.set_value('from_commit', self.get("git_repo").get_commit_from_tag(self.get('from_tag')).hash)
         if self.get('from_commit'):
             try:
-                self.set_value('from_commit', self.get("git_repo").get_commit(
-                    self.get('from_commit')).hash)
+                commit = self.get("git_repo").get_commit(self.get('from_commit'))
+                if len(commit.parents) == 0:
+                    self.set_value('from_commit', [commit.hash])
+                elif len(commit.parents) == 1:
+                    self.set_value('from_commit', ['^' + commit.hash + '^'])
+                else:
+                    commits = ['^' + x for x in commit.parents]
+                    self.set_value('from_commit', commits)
             except Exception:
                 raise Exception("The commit {} defined in the 'from_tag' "
                                 "or 'from_commit' filter does "
@@ -165,8 +167,8 @@ class Conf:
                 "git_repo").get_commit_from_tag(self.get('to_tag')).hash)
         if self.get('to_commit'):
             try:
-                self.set_value('to_commit', self.get("git_repo").get_commit(
-                    self.get('to_commit')).hash)
+                commit = self.get("git_repo").get_commit(self.get('to_commit'))
+                self.set_value('to_commit', commit.hash)
             except Exception:
                 raise Exception("The commit {} defined in the 'to_tag' "
                                 "or 'to_commit' filter does "
@@ -181,6 +183,37 @@ class Conf:
         :return:
         """
         return len([x for x in arr if x is not None]) <= 1
+
+    def build_args(self):
+        from_commit = self.get('from_commit')
+        to_commit = self.get('to_commit')
+        branch = self.get('only_in_branch')
+
+        args = []
+
+        if from_commit is not None or to_commit is not None:
+            if from_commit is not None and to_commit is not None:
+                args.extend(from_commit)
+                args.append(to_commit)
+            elif from_commit is not None:
+                args.extend(from_commit)
+                args.append('HEAD')
+            else:
+                args.append(to_commit)
+        else:
+            args.append('HEAD')
+
+        if branch is not None:
+            args.append(branch)
+
+        if self.get('only_no_merge'):
+            args.append('--no-merges')
+
+        if not self.get('reversed_order'):
+            args.append('--reverse')
+
+        print(f'Returning args: {args}')
+        return args
 
     def is_commit_filtered(self, commit: Commit):
         # pylint: disable=too-many-branches,too-many-return-statements
@@ -201,22 +234,6 @@ class Conf:
                 (self.get('to') is not None and
                  commit.committer_date > self.get('to')):
             return True
-        if self.get('from_commit') is not None and \
-                self.get('from_commit') == commit.hash:
-            self.set_value('from_commit_started', True)
-            return False
-        if self.get('from_commit') is not None and \
-                self.get('from_commit') != commit.hash and \
-                self.get('from_commit_started') is None:
-            return True
-        if self.get('to_commit') is not None and \
-                self.get('to_commit') != commit.hash and \
-                self.get('to_commit_reached') is not None:
-            return True
-        if self.get('to_commit') is not None and \
-                self.get('to_commit') == commit.hash:
-            self.set_value('to_commit_reached', True)
-            return False
         if self.get('only_modifications_with_file_types') is not None:
             if not self._has_modification_with_file_type(commit):
                 logger.debug('Commit filtered for modification types')

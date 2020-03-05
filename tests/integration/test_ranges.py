@@ -138,6 +138,13 @@ def test_from_and_to_commit(repository_mining_cc, expected_commits):
     assert len(repository_mining_cc) == expected_commits
 
 
+def test_from_and_to_commit_with_merge_commit():
+    commits = RepositoryMining('test-repos/pydriller',
+                               from_commit="015f7144641a418f6a9fae4d024286ec17fd7ce8",
+                               to_commit="01d2f2fbeb6980cc5568825d008017ca8ca767d6").traverse_commits()
+    assert len(list(commits)) == 3
+
+
 # FROM AND TO TAG
 @pytest.mark.parametrize('to_tag,expected_commits', [
     ('v1.4', 3),

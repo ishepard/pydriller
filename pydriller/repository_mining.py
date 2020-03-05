@@ -139,14 +139,11 @@ class RepositoryMining:
                 if self._conf.get('clone_repo_to'):
                     clone_folder = str(Path(self._conf.get('clone_repo_to')))
                     if not os.path.isdir(clone_folder):
-                        raise Exception("Not a directory: " \
-                                        "{0}".format(clone_folder))
-                    path_repo = self._clone_remote_repos(clone_folder,
-                                                         path_repo)
+                        raise Exception("Not a directory: {0}".format(clone_folder))
+                    path_repo = self._clone_remote_repos(clone_folder, path_repo)
                 else:
                     tmp_folder = tempfile.TemporaryDirectory()
-                    path_repo = self._clone_remote_repos(tmp_folder.name,
-                                                         path_repo)
+                    path_repo = self._clone_remote_repos(tmp_folder.name, path_repo)
 
             git_repo = GitRepository(path_repo, self._conf)
             self._conf.set_value("git_repo", git_repo)
@@ -155,19 +152,15 @@ class RepositoryMining:
             logger.info('Analyzing git repository in %s', git_repo.path)
 
             if self._conf.get('filepath') is not None:
-                self._conf.set_value('filepath_commits',
-                                     git_repo.get_commits_modified_file(
-                                         self._conf.get('filepath')))
+                self._conf.set_value('filepath_commits', git_repo.get_commits_modified_file(self._conf.get('filepath')))
 
             if self._conf.get('only_releases'):
-                self._conf.set_value('tagged_commits',
-                                     git_repo.get_tagged_commits())
+                self._conf.set_value('tagged_commits', git_repo.get_tagged_commits())
 
-            for commit in git_repo.get_list_commits(self._conf.get(
-                    'only_in_branch'), not self._conf.get('reversed_order')):
-                logger.info('Commit #%s in %s from %s', commit.hash,
-                            commit.committer_date,
-                            commit.author.name)
+            args = self._conf.build_args()
+
+            for commit in git_repo.get_list_commits(args):
+                logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
 
                 if self._conf.is_commit_filtered(commit):
                     logger.info('Commit #%s filtered', commit.hash)

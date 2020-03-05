@@ -121,16 +121,20 @@ class GitRepository:
         head_commit = self.repo.head.commit
         return Commit(head_commit, self._conf)
 
-    def get_list_commits(self, branch: str = None,
-                         reverse_order: bool = True) \
-            -> Generator[Commit, None, None]:
+    def get_list_commits(self, args: List = None) -> Generator[Commit, None, None]:
         """
         Return a generator of commits of all the commits in the repo.
 
         :return: Generator[Commit], the generator of all the commits in the
             repo
         """
-        for commit in self.repo.iter_commits(branch, reverse=reverse_order):
+        # With no arguments, just analyze all the commits until the HEAD,
+        # in reverse order
+        if args is None or not args:
+            args = [self.repo.head.commit.hexsha, '--reverse']
+
+        print(args)
+        for commit in self.repo.iter_commits(args):
             yield self.get_commit_from_gitpython(commit)
 
     def get_commit(self, commit_id: str) -> Commit:

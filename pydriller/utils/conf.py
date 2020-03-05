@@ -212,7 +212,6 @@ class Conf:
         if not self.get('reversed_order'):
             args.append('--reverse')
 
-        print(f'Returning args: {args}')
         return args
 
     def is_commit_filtered(self, commit: Commit):

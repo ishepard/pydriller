@@ -133,7 +133,6 @@ class GitRepository:
         if args is None or not args:
             args = [self.repo.head.commit.hexsha, '--reverse']
 
-        print(args)
         for commit in self.repo.iter_commits(args):
             yield self.get_commit_from_gitpython(commit)
 

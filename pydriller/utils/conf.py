@@ -188,31 +188,36 @@ class Conf:
         from_commit = self.get('from_commit')
         to_commit = self.get('to_commit')
         branch = self.get('only_in_branch')
-
-        args = []
+        authors = self.get('only_authors')
+        rev = []
+        kwargs = {}
 
         if from_commit is not None or to_commit is not None:
             if from_commit is not None and to_commit is not None:
-                args.extend(from_commit)
-                args.append(to_commit)
+                rev.extend(from_commit)
+                rev.append(to_commit)
             elif from_commit is not None:
-                args.extend(from_commit)
-                args.append('HEAD')
+                rev.extend(from_commit)
+                rev.append('HEAD')
             else:
-                args.append(to_commit)
+                rev = to_commit
+        elif branch is not None:
+            rev = branch
         else:
-            args.append('HEAD')
-
-        if branch is not None:
-            args.append(branch)
+            rev = 'HEAD'
 
         if self.get('only_no_merge'):
-            args.append('--no-merges')
+            kwargs['no-merges'] = True
 
         if not self.get('reversed_order'):
-            args.append('--reverse')
+            kwargs['reverse'] = True
+        else:
+            kwargs['reverse'] = False
 
-        return args
+        if authors is not None:
+            kwargs['author'] = authors
+
+        return rev, kwargs
 
     def is_commit_filtered(self, commit: Commit):
         # pylint: disable=too-many-branches,too-many-return-statements
@@ -237,13 +242,6 @@ class Conf:
             if not self._has_modification_with_file_type(commit):
                 logger.debug('Commit filtered for modification types')
                 return True
-        if self.get('only_no_merge') is True and commit.merge is True:
-            logger.debug('Commit filtered for no merge')
-            return True
-        if self.get('only_authors') is not None and \
-                commit.author.name not in self.get('only_authors'):
-            logger.debug("Commit filtered for author")
-            return True
         if self.get('only_commits') is not None and \
                 commit.hash not in self.get('only_commits'):
             logger.debug("Commit filtered because it is not one of the "

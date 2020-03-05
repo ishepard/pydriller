@@ -51,11 +51,11 @@ def test_get_head(repo):
 def test_list_commits(repo):
     change_sets = list(repo.get_list_commits())
 
-    list_commits = ['a88c84ddf42066611e76e6cb690144e5357d132c',
+    list_commits = {'a88c84ddf42066611e76e6cb690144e5357d132c',
                     '6411e3096dd2070438a17b225f44475136e54e3a',
                     '09f6182cef737db02a085e1d018963c7a29bde5a',
                     '1f99848edadfffa903b8ba1286a935f1b92b2845',
-                    'da39b1326dbc2edfe518b90672734a08f3c13458']
+                    'da39b1326dbc2edfe518b90672734a08f3c13458'}
 
     for commit in change_sets:
         assert commit.hash in list_commits

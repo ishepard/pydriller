@@ -21,7 +21,7 @@ import os
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import List, Generator, Union
+from typing import List, Generator, Union, Set
 
 from git import Repo
 
@@ -88,6 +88,11 @@ class RepositoryMining:
         :param str filepath: only commits that modified this file will be
             analyzed
         """
+        if only_modifications_with_file_types is not None:
+            only_modifications_with_file_types = set(only_modifications_with_file_types)
+        if only_commits is not None:
+            only_commits = set(only_commits)
+
         options = {
             "git_repo": None,
             "path_to_repo": path_to_repo,
@@ -100,8 +105,7 @@ class RepositoryMining:
             "single": single,
             "reversed_order": reversed_order,
             "only_in_branch": only_in_branch,
-            "only_modifications_with_file_types":
-                only_modifications_with_file_types,
+            "only_modifications_with_file_types": only_modifications_with_file_types,
             "only_no_merge": only_no_merge,
             "only_authors": only_authors,
             "only_commits": only_commits,
@@ -157,9 +161,9 @@ class RepositoryMining:
             if self._conf.get('only_releases'):
                 self._conf.set_value('tagged_commits', git_repo.get_tagged_commits())
 
-            args = self._conf.build_args()
+            rev, kwargs = self._conf.build_args()
 
-            for commit in git_repo.get_list_commits(args):
+            for commit in git_repo.get_list_commits(rev, **kwargs):
                 logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
 
                 if self._conf.is_commit_filtered(commit):

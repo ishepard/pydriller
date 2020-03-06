@@ -17,4 +17,4 @@ def test(path_to_repo, filepath, from_commit, to_commit, expected):
 
     count = metric.count()
     filepath = str(Path(filepath))
-    assert count[filepath]['contributors_count'] == expected
+    assert count[filepath] == expected

@@ -88,6 +88,11 @@ class RepositoryMining:
         :param str filepath: only commits that modified this file will be
             analyzed
         """
+        if only_modifications_with_file_types is not None:
+            only_modifications_with_file_types = set(only_modifications_with_file_types)
+        if only_commits is not None:
+            only_commits = set(only_commits)
+
         options = {
             "git_repo": None,
             "path_to_repo": path_to_repo,
@@ -100,8 +105,7 @@ class RepositoryMining:
             "single": single,
             "reversed_order": reversed_order,
             "only_in_branch": only_in_branch,
-            "only_modifications_with_file_types":
-                only_modifications_with_file_types,
+            "only_modifications_with_file_types": only_modifications_with_file_types,
             "only_no_merge": only_no_merge,
             "only_authors": only_authors,
             "only_commits": only_commits,
@@ -139,14 +143,11 @@ class RepositoryMining:
                 if self._conf.get('clone_repo_to'):
                     clone_folder = str(Path(self._conf.get('clone_repo_to')))
                     if not os.path.isdir(clone_folder):
-                        raise Exception("Not a directory: " \
-                                        "{0}".format(clone_folder))
-                    path_repo = self._clone_remote_repos(clone_folder,
-                                                         path_repo)
+                        raise Exception("Not a directory: {0}".format(clone_folder))
+                    path_repo = self._clone_remote_repos(clone_folder, path_repo)
                 else:
                     tmp_folder = tempfile.TemporaryDirectory()
-                    path_repo = self._clone_remote_repos(tmp_folder.name,
-                                                         path_repo)
+                    path_repo = self._clone_remote_repos(tmp_folder.name, path_repo)
 
             git_repo = GitRepository(path_repo, self._conf)
             self._conf.set_value("git_repo", git_repo)
@@ -154,20 +155,22 @@ class RepositoryMining:
 
             logger.info('Analyzing git repository in %s', git_repo.path)
 
+            # Get the commits that modified the filepath. In this case, we can not use
+            # git rev-list since it doesn't have the option --follow, necessary to follow
+            # the renames. Hence, we manually call git log instead
             if self._conf.get('filepath') is not None:
-                self._conf.set_value('filepath_commits',
-                                     git_repo.get_commits_modified_file(
-                                         self._conf.get('filepath')))
+                self._conf.set_value('filepath_commits', git_repo.get_commits_modified_file(self._conf.get('filepath')))
 
+            # Gets only the commits that are tagged
             if self._conf.get('only_releases'):
-                self._conf.set_value('tagged_commits',
-                                     git_repo.get_tagged_commits())
+                self._conf.set_value('tagged_commits', git_repo.get_tagged_commits())
 
-            for commit in git_repo.get_list_commits(self._conf.get(
-                    'only_in_branch'), not self._conf.get('reversed_order')):
-                logger.info('Commit #%s in %s from %s', commit.hash,
-                            commit.committer_date,
-                            commit.author.name)
+            # Build the arguments to pass to git rev-list.
+            rev, kwargs = self._conf.build_args()
+
+            # Iterate over all the commits returned by git rev-list
+            for commit in git_repo.get_list_commits(rev, **kwargs):
+                logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
 
                 if self._conf.is_commit_filtered(commit):
                     logger.info('Commit #%s filtered', commit.hash)
@@ -175,7 +178,7 @@ class RepositoryMining:
 
                 yield commit
 
-            # cleaning
+            # cleaning, this is necessary since GitPython issues on memory leaks
             self._conf.set_value("git_repo", None)
             git_repo.clear()
 

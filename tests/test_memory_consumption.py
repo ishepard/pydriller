@@ -58,7 +58,7 @@ def test_memory(caplog):
         diff_with_nothing.seconds // 3600,
         (diff_with_nothing.seconds % 3600) // 60,
         diff_with_nothing.seconds % 60,
-        973 // diff_with_nothing.seconds,
+        973 // diff_with_nothing.seconds if diff_with_nothing.seconds != 0 else 0,
         diff_with_everything.seconds // 3600,
         (diff_with_everything.seconds % 3600) // 60,
         diff_with_everything.seconds % 60,

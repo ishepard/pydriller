@@ -228,3 +228,9 @@ def test_clone_repo_to(tmp_path):
         path_to_repo=url,
         to=dt2,
         clone_repo_to=str(tmp_path)).traverse_commits())) == 159
+
+
+def test_clone_repo_to_not_existing():
+    with pytest.raises(Exception):
+        list(RepositoryMining("https://github.com/ishepard/pydriller",
+                              clone_repo_to="NOTEXISTINGDIR").traverse_commits())

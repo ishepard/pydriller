@@ -14,19 +14,17 @@
 
 import logging
 from datetime import datetime, timezone, timedelta
+from pydriller.repository_mining import RepositoryMining
 
 import pytest
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
-from pydriller.repository_mining import RepositoryMining
-
 
 def test_mod_with_file_types():
     lc = list(RepositoryMining('test-repos/different_files',
-                               only_modifications_with_file_types=['.java'])
-              .traverse_commits())
+                               only_modifications_with_file_types=['.java']).traverse_commits())
 
     assert len(lc) == 2
     assert lc[0].hash == 'a1b6136f978644ff1d89816bc0f2bd86f6d9d7f5'
@@ -190,8 +188,7 @@ def test_single_commit_head():
                                single="e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2").traverse_commits())
     assert len(lc) == 1
 
-    lc_head = list(RepositoryMining('test-repos/complex_repo',
-                               single="HEAD").traverse_commits())
+    lc_head = list(RepositoryMining('test-repos/complex_repo', single="HEAD").traverse_commits())
     assert len(lc_head) == 1
     assert lc[0].hash == lc_head[0].hash
 
@@ -278,7 +275,6 @@ def test_only_releases():
 
 
 def test_only_releases_wo_releases():
-    lc = list(RepositoryMining('test-repos/complex_repo',
-                               only_releases=True).traverse_commits())
+    lc = list(RepositoryMining('test-repos/complex_repo', only_releases=True).traverse_commits())
 
     assert len(lc) == 0

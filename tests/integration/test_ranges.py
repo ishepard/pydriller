@@ -22,8 +22,8 @@ from datetime import datetime, timezone, timedelta
 
 to_zone = timezone(timedelta(hours=1))
 dt = datetime(2018, 3, 22, 10, 41, 30, tzinfo=to_zone)
-dt1 = datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone)
-dt2 = datetime(2018, 3, 22, 10, 41, 45, tzinfo=to_zone)
+dt1 = datetime(2018, 3, 22, 10, 41, 45, tzinfo=to_zone)
+dt2 = datetime(2018, 3, 22, 10, 42, 3, tzinfo=to_zone)
 to_zone = timezone(timedelta(hours=2))
 dt3 = datetime(2018, 3, 27, 17, 20, 3, tzinfo=to_zone)
 
@@ -77,6 +77,7 @@ def repository_mining_cc(path, from_commit, to_commit):
 def repository_mining_tt(path, from_tag, to_tag):
     return list(RepositoryMining(path, from_tag=from_tag, to_tag=to_tag).traverse_commits())
 
+
 @pytest.fixture
 def repository_mining_complex_tags(path, from_tag, to_tag):
     return list(RepositoryMining('test-repos/tags',
@@ -86,7 +87,10 @@ def repository_mining_complex_tags(path, from_tag, to_tag):
 
 @pytest.mark.parametrize('to,expected_commits', [
     (None, 5),
-    (dt1, 3),
+    (dt, 1),
+    (dt1, 1),
+    (dt2, 3),
+    (dt3, 4),
 ])
 def test_to_filter(repository_mining_st, expected_commits):
     assert len(repository_mining_st) == expected_commits
@@ -95,13 +99,18 @@ def test_to_filter(repository_mining_st, expected_commits):
 @pytest.mark.parametrize('since,expected_commits', [
     (None, 5),
     (dt, 4),
+    (dt1, 4),
+    (dt2, 3),
+    (dt3, 1),
 ])
 def test_since_filter(repository_mining_st, expected_commits):
     assert len(repository_mining_st) == expected_commits
 
 
 @pytest.mark.parametrize('since,to,expected_commits', [
-    (dt2, dt3, 3),
+    (dt1, dt3, 3),
+    (dt, dt3, 3),
+    (dt2, dt3, 2),
 ])
 def test_since_and_to_filters(repository_mining_st, expected_commits):
     assert len(repository_mining_st) == expected_commits
@@ -138,6 +147,13 @@ def test_from_and_to_commit(repository_mining_cc, expected_commits):
     assert len(repository_mining_cc) == expected_commits
 
 
+def test_from_and_to_commit_with_merge_commit():
+    commits = RepositoryMining('test-repos/pydriller',
+                               from_commit="015f7144641a418f6a9fae4d024286ec17fd7ce8",
+                               to_commit="01d2f2fbeb6980cc5568825d008017ca8ca767d6").traverse_commits()
+    assert len(list(commits)) == 3
+
+
 # FROM AND TO TAG
 @pytest.mark.parametrize('to_tag,expected_commits', [
     ('v1.4', 3),
@@ -168,14 +184,14 @@ def test_multiple_filters_exceptions():
 
     with pytest.raises(Exception):
         for commit in RepositoryMining('test-repos/small_repo/',
-                                       since=dt2,
+                                       since=dt1,
                                        from_commit=from_commit
                                        ).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
         for commit in RepositoryMining('test-repos/small_repo/',
-                                       since=dt2,
+                                       since=dt1,
                                        from_tag=from_tag).traverse_commits():
             print(commit.hash)
 
@@ -187,20 +203,20 @@ def test_multiple_filters_exceptions():
 
     with pytest.raises(Exception):
         for commit in RepositoryMining('test-repos/small_repo/',
-                                       to=dt2,
+                                       to=dt1,
                                        to_commit=from_commit
                                        ).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
         for commit in RepositoryMining('test-repos/small_repo/',
-                                       to=dt2,
+                                       to=dt1,
                                        to_tag=from_tag).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
         for commit in RepositoryMining('test-repos/small_repo/',
                                        single=from_commit,
-                                       to=dt2,
+                                       to=dt1,
                                        to_tag=from_tag).traverse_commits():
             print(commit.hash)

@@ -22,10 +22,9 @@ class CodeChurn(ProcessMetric):
                  from_commit: str,
                  to_commit: str):
         super().__init__(path_to_repo, from_commit, to_commit)
-        self.__initialize()
+        self._initialize()
 
-
-    def __initialize(self):
+    def _initialize(self):
 
         renamed_files = {}
         self.files = {}

@@ -15,8 +15,8 @@ PyDriller documentation!
    commit
    modifications
    gitrepository
+   processmetrics
    reference
-
 
 
 Indices and tables

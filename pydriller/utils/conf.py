@@ -185,6 +185,7 @@ class Conf:
         return len([x for x in arr if x is not None]) <= 1
 
     def build_args(self):
+        single = self.get('single')
         from_commit = self.get('from_commit')
         to_commit = self.get('to_commit')
         branch = self.get('only_in_branch')
@@ -192,7 +193,9 @@ class Conf:
         rev = []
         kwargs = {}
 
-        if from_commit is not None or to_commit is not None:
+        if single is not None:
+            rev = [single, '-n', 1]
+        elif from_commit is not None or to_commit is not None:
             if from_commit is not None and to_commit is not None:
                 rev.extend(from_commit)
                 rev.append(to_commit)
@@ -228,11 +231,6 @@ class Conf:
         :param Commit commit: Commit to check
         :return:
         """
-        if self.get('single') is not None and \
-                commit.hash != self.get('single'):
-            logger.debug('Commit filtered because is not '
-                         'the defined in single')
-            return True
         if (self.get('since') is not None and
             commit.committer_date < self.get('since')) or \
                 (self.get('to') is not None and

@@ -2,36 +2,49 @@
 Module that calculates the number of normalized added and deleted lines of a
 file.
 """
+import statistics
 from pydriller import ModificationType
 from pydriller.metrics.process.process_metric import ProcessMetric
-
 
 class LinesCount(ProcessMetric):
     """
     This class is responsible to implement the following metrics:
-    * Added Lines: the number of added lines in the evolution period
-        [from_commit, to_commit]
-    * Deleted Lines: the number of deleted lines in the evolution period
-        [from_commit, to_commit]
+
+    * Changed Lines: the number of added and deleted lines in the evolution
+        period [from_commit, to_commit]
+
+    * Added Lines: the sum over all commits of the lines of code added to a
+        file in the evolution period [from_commit, to_commit]
+
+    * Max Added Lines: the maximum number of lines of code added to a file
+        per commit in the evolution period [from_commit, to_commit]
+
+    * Average Added Lines: the average lines of code added to a file per commit
+        in the evolution period [from_commit, to_commit]
+
+    * Removed Lines: the sum over all commits of the lines of code removed to a
+        file in the evolution period [from_commit, to_commit]
+
+    * Max Removed Lines: the maximum number of lines of code removed to a file
+        per commit in the evolution period [from_commit, to_commit]
+
+    * Average Removed Lines: the average lines of code removed to a file per
+        commit in the evolution period [from_commit, to_commit]
+
     """
 
-    def count(self):
-        """
-        Calculate the number of normalized (by the total number of added and
-        deleted lines) added and deleted lines per each modified file in
-        'to_commit', returning a dictionary:
-        {
-          filepath: {
-            added: int,
-            removed: int
-          }
-        }
+    def __init__(self, path_to_repo: str,
+                 from_commit: str,
+                 to_commit: str):
+        super().__init__(path_to_repo, from_commit, to_commit)
+        self.__initialize()
 
-        :return: dict of total added and deleted lines per modified file
-        """
+    def __initialize(self):
+
+        self.lines_added = dict()
+        self.lines_removed = dict()
+
         renamed_files = {}
-        files = {}
-
         for commit in self.repo_miner.traverse_commits():
 
             for modified_file in commit.modifications:
@@ -42,9 +55,93 @@ class LinesCount(ProcessMetric):
                 if modified_file.change_type == ModificationType.RENAME:
                     renamed_files[modified_file.old_path] = filepath
 
-                if filepath not in files:
-                    files[filepath] = {'added': 0, 'removed': 0}
-                files[filepath]['added'] += modified_file.added
-                files[filepath]['removed'] += modified_file.removed
+                self.lines_added.setdefault(filepath, []).append(modified_file.added)
+                self.lines_removed.setdefault(filepath, []).append(modified_file.removed)
 
-        return files
+    def count(self):
+        """
+        Sum over all commits of the lines of code added and removed to a file .
+
+        :return: int lines added + lines removed
+        """
+        count = dict()
+
+        for path, lines in self.lines_added.items():
+            count[path] = count.get(path, 0) + sum(lines)
+
+        for path, lines in self.lines_removed.items():
+            count[path] = count.get(path, 0) + sum(lines)
+
+        return count
+
+    def count_added(self):
+        """
+        Sum over all commits of the lines of code added to a file .
+
+        :return: int lines added
+        """
+        count = dict()
+        for path, lines in self.lines_added.items():
+            count[path] = sum(lines)
+
+        return count
+
+    def max_added(self):
+        """
+        Maximum number of lines of code added to a file for all commits
+
+        :return: int max number of lines added
+        """
+        maximum = dict()
+        for path, lines in self.lines_added.items():
+            maximum[path] = max(lines)
+
+        return maximum
+
+    def avg_added(self):
+        """
+        Average lines of code added to a file per commit
+
+        :return: int avg number of lines rounded off to the nearest integer
+        """
+        avg = dict()
+        for path, lines in self.lines_added.items():
+            avg[path] = round(statistics.mean(lines))
+
+        return avg
+
+    def count_removed(self):
+        """
+        Sum over all commits of the lines of code removed to a file .
+
+        :return: int lines removed
+        """
+        count = dict()
+        for path, lines in self.lines_removed.items():
+            count[path] = sum(lines)
+
+        return count
+
+    def max_removed(self):
+        """
+        Maximum number of lines of code removed in a file for all commits
+
+        :return: int max number of lines removed
+        """
+        maximum = dict()
+        for path, lines in self.lines_removed.items():
+            maximum[path] = max(lines)
+
+        return maximum
+
+    def avg_removed(self):
+        """
+        Average lines of code removed in a file per commit
+
+        :return: int rounded off to the nearest integer
+        """
+        avg = dict()
+        for path, lines in self.lines_removed.items():
+            avg[path] = round(statistics.mean(lines))
+
+        return avg

@@ -98,9 +98,7 @@ class GitRepository:
 
     def _open_repository(self):
         self._repo = Repo(str(self.path))
-        self._repo.config_writer().set_value("blame",
-                                             "markUnblamableLines",
-                                             "true").release()
+        self._repo.config_writer().set_value("blame", "markUnblamableLines", "true").release()
         if self._conf.get("main_branch") is None:
             self._discover_main_branch(self._repo)
 
@@ -108,8 +106,9 @@ class GitRepository:
         try:
             self._conf.set_value("main_branch", repo.active_branch.name)
         except TypeError:
-            logger.info("HEAD is a detached symbolic reference, setting "
-                        "main branch to empty string")
+            # The current HEAD is detached. In this case, it doesn't belong to
+            # any branch, hence we return an empty string
+            logger.info("HEAD is a detached symbolic reference, setting main branch to empty string")
             self._conf.set_value("main_branch", '')
 
     def get_head(self) -> Commit:
@@ -280,17 +279,15 @@ class GitRepository:
 
         for mod in modifications:
             path = mod.new_path
-            if mod.change_type == ModificationType.RENAME or \
-                    mod.change_type == ModificationType.DELETE:
+            if mod.change_type == ModificationType.RENAME or mod.change_type == ModificationType.DELETE:
                 path = mod.old_path
             deleted_lines = mod.diff_parsed['deleted']
+
             try:
-                blame = self._get_blame(commit.hash, path,
-                                        hashes_to_ignore_path)
+                blame = self._get_blame(commit.hash, path, hashes_to_ignore_path)
                 for num_line, line in deleted_lines:
                     if not self._useless_line(line.strip()):
-                        buggy_commit = blame[num_line - 1].split(' ')[
-                            0].replace('^', '')
+                        buggy_commit = blame[num_line - 1].split(' ')[0].replace('^', '')
 
                         # Skip unblamable lines.
                         if buggy_commit.startswith("*"):
@@ -299,8 +296,7 @@ class GitRepository:
                         if mod.change_type == ModificationType.RENAME:
                             path = mod.new_path
 
-                        commits.setdefault(path, set()).add(
-                            self.get_commit(buggy_commit).hash)
+                        commits.setdefault(path, set()).add(self.get_commit(buggy_commit).hash)
             except GitCommandError:
                 logger.debug(
                     "Could not found file %s in commit %s. Probably a double "
@@ -308,15 +304,13 @@ class GitRepository:
 
         return commits
 
-    def _get_blame(self, commit_hash: str, path: str,
-                   hashes_to_ignore_path: List[str] = None):
+    def _get_blame(self, commit_hash: str, path: str, hashes_to_ignore_path: List[str] = None):
         args = ['-w', commit_hash + '^']
         if hashes_to_ignore_path is not None:
             if self.git.version_info >= (2, 23):
                 args += ["--ignore-revs-file", hashes_to_ignore_path]
             else:
-                logger.info("'--ignore-revs-file' is only available from "
-                            "git v2.23")
+                logger.info("'--ignore-revs-file' is only available from git v2.23")
         return self.git.blame(*args, '--', path).split('\n')
 
     @staticmethod

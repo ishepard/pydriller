@@ -61,8 +61,7 @@ class Conf:
         """
         if not isinstance(path_to_repo, str) and \
                 not isinstance(path_to_repo, list):
-            raise Exception("The path to the repo has to be of type "
-                            "'string' or 'list of strings'!")
+            raise Exception("The path to the repo has to be of type 'string' or 'list of strings'!")
 
     def sanity_check_filters(self):
         """
@@ -74,11 +73,12 @@ class Conf:
         self.check_ending_commit()
         self._check_timezones()
 
-        if self.get("from_commit") and self.get("to_commit") and self.get(
-                "from_commit") == self.get("to_commit"):
-            logger.warning("You should not point from_commit and "
-                           "to_commit to the same commit, but use the "
-                           "'single' filter instead.")
+        # Check if from_commit and to_commit point to the same commit, in which case
+        # we remove both filters and use the "single" filter instead. This prevents
+        # errors with dates.
+        if self.get("from_commit") and self.get("to_commit") and self.get("from_commit") == self.get("to_commit"):
+            logger.warning("You should not point from_commit and to_commit to the same "
+                           "commit, but use the 'single' filter instead.")
             single = self.get("to_commit")
             self.set_value("from_commit", None)
             self.set_value("to_commit", None)
@@ -134,10 +134,10 @@ class Conf:
         if not self.only_one_filter([self.get('since'),
                                      self.get('from_commit'),
                                      self.get('from_tag')]):
-            raise Exception('You can only specify one between since, '
-                            'from_tag and from_commit')
+            raise Exception('You can only specify one between since, from_tag and from_commit')
         if self.get('from_tag') is not None:
-            self.set_value('from_commit', self.get("git_repo").get_commit_from_tag(self.get('from_tag')).hash)
+            tagged_commit = self.get("git_repo").get_commit_from_tag(self.get('from_tag'))
+            self.set_value('from_commit', tagged_commit.hash)
         if self.get('from_commit'):
             try:
                 commit = self.get("git_repo").get_commit(self.get('from_commit'))
@@ -149,8 +149,7 @@ class Conf:
                     commits = ['^' + x for x in commit.parents]
                     self.set_value('from_commit', commits)
             except Exception:
-                raise Exception("The commit {} defined in the 'from_tag' "
-                                "or 'from_commit' filter does "
+                raise Exception("The commit {} defined in the 'from_tag' or 'from_commit' filter does "
                                 "not exist".format(self.get('from_commit')))
 
     def check_ending_commit(self):
@@ -160,18 +159,16 @@ class Conf:
         if not self.only_one_filter([self.get('to'),
                                      self.get('to_commit'),
                                      self.get('to_tag')]):
-            raise Exception('You can only specify one between since, '
-                            'from_tag and from_commit')
+            raise Exception('You can only specify one between since, from_tag and from_commit')
         if self.get('to_tag') is not None:
-            self.set_value('to_commit', self.get(
-                "git_repo").get_commit_from_tag(self.get('to_tag')).hash)
+            tagged_commit = self.get("git_repo").get_commit_from_tag(self.get('to_tag'))
+            self.set_value('to_commit', tagged_commit.hash)
         if self.get('to_commit'):
             try:
                 commit = self.get("git_repo").get_commit(self.get('to_commit'))
                 self.set_value('to_commit', commit.hash)
             except Exception:
-                raise Exception("The commit {} defined in the 'to_tag' "
-                                "or 'to_commit' filter does "
+                raise Exception("The commit {} defined in the 'to_tag' or 'to_commit' filter does "
                                 "not exist".format(self.get('to_commit')))
 
     @staticmethod
@@ -185,6 +182,11 @@ class Conf:
         return len([x for x in arr if x is not None]) <= 1
 
     def build_args(self):
+        """
+        This function builds the argument for git rev-list.
+
+        :return:
+        """
         single = self.get('single')
         since = self.get('since')
         until = self.get('to')
@@ -243,26 +245,20 @@ class Conf:
             if not self._has_modification_with_file_type(commit):
                 logger.debug('Commit filtered for modification types')
                 return True
-        if self.get('only_commits') is not None and \
-                commit.hash not in self.get('only_commits'):
-            logger.debug("Commit filtered because it is not one of the "
-                         "specified commits")
+        if self.get('only_commits') is not None and commit.hash not in self.get('only_commits'):
+            logger.debug("Commit filtered because it is not one of the specified commits")
             return True
-        if self.get('filepath_commits') is not None and \
-                commit.hash not in self.get('filepath_commits'):
-            logger.debug("Commit filtered because it did not modify the "
-                         "specified file")
+        if self.get('filepath_commits') is not None and commit.hash not in self.get('filepath_commits'):
+            logger.debug("Commit filtered because it did not modify the specified file")
             return True
-        if self.get('tagged_commits') is not None and \
-                commit.hash not in self.get('tagged_commits'):
+        if self.get('tagged_commits') is not None and commit.hash not in self.get('tagged_commits'):
             logger.debug("Commit filtered because it is not tagged")
             return True
         return False
 
     def _has_modification_with_file_type(self, commit):
         for mod in commit.modifications:
-            if mod.filename.endswith(
-                    tuple(self.get('only_modifications_with_file_types'))):
+            if mod.filename.endswith(tuple(self.get('only_modifications_with_file_types'))):
                 return True
         return False
 

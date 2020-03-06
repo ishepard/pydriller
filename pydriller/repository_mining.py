@@ -155,14 +155,20 @@ class RepositoryMining:
 
             logger.info('Analyzing git repository in %s', git_repo.path)
 
+            # Get the commits that modified the filepath. In this case, we can not use
+            # git rev-list since it doesn't have the option --follow, necessary to follow
+            # the renames. Hence, we manually call git log instead
             if self._conf.get('filepath') is not None:
                 self._conf.set_value('filepath_commits', git_repo.get_commits_modified_file(self._conf.get('filepath')))
 
+            # Gets only the commits that are tagged
             if self._conf.get('only_releases'):
                 self._conf.set_value('tagged_commits', git_repo.get_tagged_commits())
 
+            # Build the arguments to pass to git rev-list.
             rev, kwargs = self._conf.build_args()
 
+            # Iterate over all the commits returned by git rev-list
             for commit in git_repo.get_list_commits(rev, **kwargs):
                 logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
 
@@ -172,7 +178,7 @@ class RepositoryMining:
 
                 yield commit
 
-            # cleaning
+            # cleaning, this is necessary since GitPython issues on memory leaks
             self._conf.set_value("git_repo", None)
             git_repo.clear()
 

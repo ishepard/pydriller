@@ -186,6 +186,8 @@ class Conf:
 
     def build_args(self):
         single = self.get('single')
+        since = self.get('since')
+        until = self.get('to')
         from_commit = self.get('from_commit')
         to_commit = self.get('to_commit')
         branch = self.get('only_in_branch')
@@ -220,6 +222,12 @@ class Conf:
         if authors is not None:
             kwargs['author'] = authors
 
+        if since is not None:
+            kwargs['since'] = since
+
+        if until is not None:
+            kwargs['until'] = until
+
         return rev, kwargs
 
     def is_commit_filtered(self, commit: Commit):
@@ -231,11 +239,6 @@ class Conf:
         :param Commit commit: Commit to check
         :return:
         """
-        if (self.get('since') is not None and
-            commit.committer_date < self.get('since')) or \
-                (self.get('to') is not None and
-                 commit.committer_date > self.get('to')):
-            return True
         if self.get('only_modifications_with_file_types') is not None:
             if not self._has_modification_with_file_type(commit):
                 logger.debug('Commit filtered for modification types')

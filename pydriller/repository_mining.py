@@ -21,7 +21,7 @@ import os
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import List, Generator, Union, Set
+from typing import List, Generator, Union
 
 from git import Repo
 

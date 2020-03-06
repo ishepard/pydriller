@@ -17,6 +17,7 @@ See https://ieeexplore.ieee.org/document/5070510
 """
 
 from math import log
+
 from pydriller import ModificationType
 from pydriller.metrics.process.process_metric import ProcessMetric
 

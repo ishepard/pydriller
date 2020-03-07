@@ -53,7 +53,8 @@ Optionally (but suggested), make use of virtualenv::
 
 Install the requirements::
     
-    $ pip install -r requirements
+    $ pip install -r requirements.txt
+    $ pip install -r test-requirements.txt
     $ unzip test-repos.zip
 
 and run the tests using pytest::

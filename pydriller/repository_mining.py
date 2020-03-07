@@ -139,22 +139,23 @@ class RepositoryMining:
 
         return repo_folder
 
+    def _clone_folder(self) -> str:
+        if self._conf.get('clone_repo_to'):
+            clone_folder = str(Path(self._conf.get('clone_repo_to')))
+            if not os.path.isdir(clone_folder):
+                raise Exception("Not a directory: {0}".format(clone_folder))
+        else:
+            clone_folder = tempfile.TemporaryDirectory().name
+        return clone_folder
+
     def traverse_commits(self) -> Generator[Commit, None, None]:
         """
         Analyze all the specified commits (all of them by default), returning
         a generator of commits.
         """
         for path_repo in self._conf.get('path_to_repos'):
-            # if it is a remote repo, clone it first in a temporary folder!
             if self._is_remote(path_repo):
-                if self._conf.get('clone_repo_to'):
-                    clone_folder = str(Path(self._conf.get('clone_repo_to')))
-                    if not os.path.isdir(clone_folder):
-                        raise Exception("Not a directory: {0}".format(clone_folder))
-                    path_repo = self._clone_remote_repos(clone_folder, path_repo)
-                else:
-                    tmp_folder = tempfile.TemporaryDirectory()
-                    path_repo = self._clone_remote_repos(tmp_folder.name, path_repo)
+                path_repo = self._clone_remote_repos(self._clone_folder(), path_repo)
 
             git_repo = GitRepository(path_repo, self._conf)
             self._conf.set_value("git_repo", git_repo)

@@ -123,8 +123,13 @@ class Conf:
         self.set_value('to_commit', from_commit)
 
     @staticmethod
-    def _is_commit_before(commit_before, commit_after):
-        return commit_before.committer_date < commit_after.committer_date
+    def _is_commit_before(commit_before: Commit, commit_after: Commit):
+        if commit_before.committer_date < commit_after.committer_date:
+            return True
+        if commit_before.committer_date == commit_after.committer_date and \
+                commit_before.author_date < commit_after.author_date:
+            return True
+        return False
 
     def check_starting_commit(self):
         """

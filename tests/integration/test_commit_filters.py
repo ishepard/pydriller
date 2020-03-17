@@ -278,3 +278,72 @@ def test_only_releases_wo_releases():
     lc = list(RepositoryMining('test-repos/complex_repo', only_releases=True).traverse_commits())
 
     assert len(lc) == 0
+
+
+def test_date_order():
+    date_order = list(RepositoryMining('test-repos/order', order='date-order').traverse_commits())
+    author_date_order = list(RepositoryMining('test-repos/order', order='author-date-order').traverse_commits())
+    assert '5e3cfa27b3fe6dd4d12fd89664fea9397141b843' == date_order[0].hash == author_date_order[0].hash
+    assert '19732de9e2b58ba7285f272810a9d8ddf18e7c89' == date_order[1].hash == author_date_order[1].hash
+    assert '78a94953a3e140f2d0027fb57963345fbf6d59fe' == date_order[2].hash == author_date_order[2].hash
+    assert '9cc3af5f242a1eba297f270acbdb8b6628556413' == date_order[3].hash == author_date_order[3].hash
+    assert '6564f9e0bfb38725ebcfb4547e98e7f545c7de12' == date_order[4].hash == author_date_order[4].hash
+    assert '5c95c1c6ba95a1bdb12772d1a63c7d331e664819' == date_order[5].hash == author_date_order[5].hash
+    assert 'd23d7f6d37fd1163022a5dd46985acd34e6818d7' == date_order[6].hash == author_date_order[6].hash
+    assert 'a45c8649b00d8b48cee04a822bd1d82acd667db2' == date_order[7].hash == author_date_order[7].hash
+
+
+def test_topo_order():
+    topo_order = list(RepositoryMining('test-repos/order', order='topo-order').traverse_commits())
+
+    assert '5e3cfa27b3fe6dd4d12fd89664fea9397141b843' == topo_order[0].hash
+    assert '19732de9e2b58ba7285f272810a9d8ddf18e7c89' == topo_order[1].hash
+    assert '9cc3af5f242a1eba297f270acbdb8b6628556413' == topo_order[2].hash
+    assert 'd23d7f6d37fd1163022a5dd46985acd34e6818d7' == topo_order[3].hash
+    assert '78a94953a3e140f2d0027fb57963345fbf6d59fe' == topo_order[4].hash
+    assert '6564f9e0bfb38725ebcfb4547e98e7f545c7de12' == topo_order[5].hash
+    assert '5c95c1c6ba95a1bdb12772d1a63c7d331e664819' == topo_order[6].hash
+    assert 'a45c8649b00d8b48cee04a822bd1d82acd667db2' == topo_order[7].hash
+
+
+def test_should_visit_ascendent_order():
+    lc = list(RepositoryMining('test-repos/small_repo').traverse_commits())
+    assert len(lc) == 5
+    assert lc[0].hash == 'a88c84ddf42066611e76e6cb690144e5357d132c'
+    assert lc[1].hash == '6411e3096dd2070438a17b225f44475136e54e3a'
+    assert lc[2].hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
+    assert lc[3].hash == '1f99848edadfffa903b8ba1286a935f1b92b2845'
+    assert lc[4].hash == 'da39b1326dbc2edfe518b90672734a08f3c13458'
+
+
+def test_should_visit_descendent_order():
+    lc = list(RepositoryMining('test-repos/small_repo',
+                               order='reverse').traverse_commits())
+    assert len(lc) == 5
+    assert lc[0].hash == 'da39b1326dbc2edfe518b90672734a08f3c13458'
+    assert lc[1].hash == '1f99848edadfffa903b8ba1286a935f1b92b2845'
+    assert lc[2].hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
+    assert lc[3].hash == '6411e3096dd2070438a17b225f44475136e54e3a'
+    assert lc[4].hash == 'a88c84ddf42066611e76e6cb690144e5357d132c'
+
+
+def test_should_visit_descendent_order_with_filters():
+    lc = list(RepositoryMining('test-repos/small_repo',
+                               from_commit='1f99848edadfffa903b8ba1286a935f1b92b2845',
+                               to_commit='6411e3096dd2070438a17b225f44475136e54e3a',
+                               order='reverse').traverse_commits())
+    assert len(lc) == 3
+    assert lc[0].hash == '1f99848edadfffa903b8ba1286a935f1b92b2845'
+    assert lc[1].hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
+    assert lc[2].hash == '6411e3096dd2070438a17b225f44475136e54e3a'
+
+
+def test_should_visit_descendent_order_with_filters_reversed():
+    lc = list(RepositoryMining('test-repos/small_repo',
+                               from_commit='6411e3096dd2070438a17b225f44475136e54e3a',
+                               to_commit='1f99848edadfffa903b8ba1286a935f1b92b2845',
+                               order='reverse').traverse_commits())
+    assert len(lc) == 3
+    assert lc[0].hash == '1f99848edadfffa903b8ba1286a935f1b92b2845'
+    assert lc[1].hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
+    assert lc[2].hash == '6411e3096dd2070438a17b225f44475136e54e3a'

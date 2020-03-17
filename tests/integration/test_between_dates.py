@@ -51,7 +51,7 @@ def test_between_dates_reversed():
     lc = list(RepositoryMining('test-repos/different_files',
                                since=dt1,
                                to=dt2,
-                               reversed_order=True).traverse_commits())
+                               order='reverse').traverse_commits())
 
     assert len(lc) == 2
     assert lc[0].hash == '375de7a8275ecdc0b28dc8de2568f47241f443e9'

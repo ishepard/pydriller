@@ -53,7 +53,8 @@ class RepositoryMining:
                  filepath: str = None,
                  histogram_diff: bool = False,
                  skip_whitespaces: bool = False,
-                 clone_repo_to: str = None):
+                 clone_repo_to: str = None,
+                 order: str = None):
         """
         Init a repository mining. The only required parameter is
         "path_to_repo": to analyze a single repo, pass the absolute path to
@@ -77,7 +78,7 @@ class RepositoryMining:
         :param str to_tag: ending the analysis from specified tag (only if
             `to` and `to_commit` are None)
         :param bool reversed_order: whether the commits should be analyzed
-            in reversed order
+            in reversed order (**DEPRECATED**)
         :param str only_in_branch: only commits in this branch will be analyzed
         :param List[str] only_modifications_with_file_types: only
             modifications with that file types will be analyzed
@@ -87,11 +88,17 @@ class RepositoryMining:
         :param List[str] only_commits: only these commits will be analyzed
         :param str filepath: only commits that modified this file will be
             analyzed
+        :param str order: order of commits. It can be one of: 'date-order',
+            'author-date-order', 'topo-order', or 'reverse'. Default is reverse.
         """
         if only_modifications_with_file_types is not None:
             only_modifications_with_file_types = set(only_modifications_with_file_types)
         if only_commits is not None:
             only_commits = set(only_commits)
+        if reversed_order:
+            logger.info("'reversed_oder' is deprecated and will be removed in the next release. "
+                        "Use 'order=reverse' instead. ")
+            order = 'reverse'
 
         options = {
             "git_repo": None,
@@ -103,7 +110,6 @@ class RepositoryMining:
             "since": since,
             "to": to,
             "single": single,
-            "reversed_order": reversed_order,
             "only_in_branch": only_in_branch,
             "only_modifications_with_file_types": only_modifications_with_file_types,
             "only_no_merge": only_no_merge,
@@ -115,7 +121,8 @@ class RepositoryMining:
             "filepath_commits": None,
             "tagged_commits": None,
             "histogram": histogram_diff,
-            "clone_repo_to": clone_repo_to
+            "clone_repo_to": clone_repo_to,
+            "order": order
         }
         self._conf = Conf(options)
 

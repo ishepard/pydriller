@@ -25,7 +25,7 @@ from pydriller.git_repository import GitRepository
 def path():
     return None
 
-@pytest.fixture()
+@pytest.fixture
 def repo(path):
     gr = GitRepository(path)
     yield gr

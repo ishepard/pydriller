@@ -49,11 +49,9 @@ By default, PyDriller analyzes all the commits in the repository. However, filte
 
 *ORDER*:
 
-* **reversed\_order** *(bool)*: by default PyDriller returns the commits in chronological order (from the oldest to the newest, the contrary of `git log`). If you need viceversa instead, put this field to **True**.
- Note: If you use *reversed\_order* with *from\_commit* or *to\_commit*, be sure to double check their order! For example, if we 
- have 4 commits: A -> B -> C -> D, and you apply the filter *from\_commit=B*, you will obtain: B -> C -> D. 
- With *reverse\_order=True*, normally you would obtain D -> C -> B -> A, while with the filter *from\_commit=B*, 
- you will only obtain B -> A. Two completely different results! 
+* **order** *(str)*: one between 'date-order', 'author-date-order', 'topo-order', and 'reverse' (see `this`_ for more information). By default, PyDriller uses the flag "--reverse", and it returns the commits in reversed chronological order (from the oldest to the newest). If you need viceversa instead (from the newest to the oldest), use "order='reverse'".
+
+.. _this: https://git-scm.com/docs/git-rev-list#_commit_ordering
 
 Examples::
 

@@ -28,7 +28,7 @@ class ProcessMetric:
             self.repo_miner = RepositoryMining(path_to_repo=path_to_repo,
                                                from_commit=from_commit,
                                                to_commit=to_commit,
-                                               reversed_order=True)
+                                               order='reverse')
 
     def count(self):
         """

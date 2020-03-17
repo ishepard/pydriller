@@ -103,9 +103,7 @@ class Conf:
 
     def _check_correct_filters_order(self):
         """
-        from_commit should come before to_commit when analyzing a repository
-        with the default settings, while they should be swapped when
-        analyzing the repository with reversed_order=True
+        Check that from_commit comes before to_commit
         """
         if self.get('from_commit') and self.get('to_commit'):
             chronological_order = self._is_commit_before(
@@ -199,6 +197,7 @@ class Conf:
         to_commit = self.get('to_commit')
         branch = self.get('only_in_branch')
         authors = self.get('only_authors')
+        order = self.get('order')
         rev = []
         kwargs = {}
 
@@ -221,10 +220,16 @@ class Conf:
         if self.get('only_no_merge'):
             kwargs['no-merges'] = True
 
-        if not self.get('reversed_order'):
+        if not order:
             kwargs['reverse'] = True
-        else:
+        elif order == 'reverse':
             kwargs['reverse'] = False
+        elif order == 'date-order':
+            kwargs['date-order'] = True
+        elif order == 'author-date-order':
+            kwargs['author-date-order'] = True
+        elif order == 'topo-order':
+            kwargs['topo-order'] = True
 
         if authors is not None:
             kwargs['author'] = authors

@@ -7,6 +7,8 @@ Process Metrics
 Process metrics capture aspects of the development process rather than aspects about the code itself.
 From release 1.11 PyDriller can calculate ``change_set``, ``code churn``, ``commits count``, ``contributors count``, ``contributors experience``, ``history complexity``, ``hunks count``, ``lines count`` and ``minor contributors``. Everything in just one line!
 
+The metrics can be run between two commits (setting up the parameters ``from_commit`` and ``to_commit``) or between two dates (setting up the parameters ``since`` and ``to``)
+
 Below an example of how call the metrics.
 
 
@@ -35,6 +37,22 @@ For example::
 will print the maximum and average number of files committed together in the evolution period ``[from_commit, to_commit]``. 
 
 **Note:** differently from the other metrics below, the scope of this metrics is the evolution period rather than the single files.
+
+
+It is possible to specify the dates as follows::
+
+    from datetime import datetime
+    from pydriller.metrics.process.change_set import ChangeSet
+    metric = ChangeSet(path_to_repo='path/to/the/repo',
+                       since=datetime(2019, 1, 1),
+                       to=datetime(2019, 12, 31))
+    
+    maximum = metric.max()
+    average = metric.avg()
+    print('Maximum number of files committed together: {}'.format(maximum))
+    print('Average number of files committed together: {}'.format(average))
+
+The code above will print the maximum and average number of files committed together between the ``1st January 2019`` and ``31st December 2019``. 
 
 
 Code Churn

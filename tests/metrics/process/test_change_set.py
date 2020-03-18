@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime
 from pydriller.metrics.process.change_set import ChangeSet
 
 TEST_DATA = [
@@ -6,10 +7,27 @@ TEST_DATA = [
 ]
 
 @pytest.mark.parametrize('path_to_repo, from_commit, to_commit, expected_max, expected_avg', TEST_DATA)
-def test(path_to_repo, from_commit, to_commit, expected_max, expected_avg):
+def test_with_commits(path_to_repo, from_commit, to_commit, expected_max, expected_avg):
     metric = ChangeSet(path_to_repo=path_to_repo,
                        from_commit=from_commit,
                        to_commit=to_commit)
+
+    actual_max = metric.max()
+    actual_avg = metric.avg()
+
+    assert actual_max == expected_max
+    assert actual_avg == expected_avg
+
+
+TEST_DATA = [
+    ('test-repos/pydriller', datetime(2018, 3, 21), datetime(2018, 3, 27), 13, 8)
+]
+
+@pytest.mark.parametrize('path_to_repo, since, to, expected_max, expected_avg', TEST_DATA)
+def test_with_dates(path_to_repo, since, to, expected_max, expected_avg):
+    metric = ChangeSet(path_to_repo=path_to_repo,
+                       since=since,
+                       to=to)
 
     actual_max = metric.max()
     actual_avg = metric.avg()

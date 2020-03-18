@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime
 
 import pytest
 
@@ -10,10 +11,25 @@ TEST_DATA = [
 ]
 
 @pytest.mark.parametrize('path_to_repo, filepath, from_commit, to_commit, expected', TEST_DATA)
-def test(path_to_repo, filepath, from_commit, to_commit, expected):
+def test_with_commits(path_to_repo, filepath, from_commit, to_commit, expected):
     metric = ContributorsCount(path_to_repo=path_to_repo,
                                from_commit=from_commit,
                                to_commit=to_commit)
+
+    count = metric.count()
+    filepath = str(Path(filepath))
+    assert count[filepath] == expected
+
+TEST_DATA = [
+   ('test-repos/pydriller', 'pydriller/git_repository.py', datetime(2019, 12, 17), datetime(2019, 12, 24), 2),
+   ('test-repos/pydriller', 'domain/modification.py', datetime(2018, 3, 21), datetime(2018, 3, 27), 1)
+]
+
+@pytest.mark.parametrize('path_to_repo, filepath, since, to, expected', TEST_DATA)
+def test_with_dates(path_to_repo, filepath, since, to, expected):
+    metric = ContributorsCount(path_to_repo=path_to_repo,
+                               since=since,
+                               to=to)
 
     count = metric.count()
     filepath = str(Path(filepath))

@@ -33,10 +33,13 @@ class ProcessMetric:
         if not to and not to_commit:
             raise TypeError('You must pass one between to and to_commit')
 
-        self.repo_miner = RepositoryMining(path_to_repo, single=from_commit)
+        if from_commit and to_commit and from_commit == to_commit:  # Use 'single' param to avoid Warning
+            self.repo_miner = RepositoryMining(path_to_repo, single=from_commit)
 
-        if from_commit != to_commit:
+        else:
             self.repo_miner = RepositoryMining(path_to_repo=path_to_repo,
+                                               since=since,
+                                               to=to,
                                                from_commit=from_commit,
                                                to_commit=to_commit,
                                                order='reverse')

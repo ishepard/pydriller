@@ -22,7 +22,8 @@ class ContributorsCount(ProcessMetric):
     def __init__(self, path_to_repo: str,
                  from_commit: str,
                  to_commit: str):
-        super().__init__(path_to_repo, from_commit, to_commit)
+
+        super().__init__(path_to_repo, from_commit=from_commit, to_commit=to_commit)
         self._initialize()
 
     def _initialize(self):

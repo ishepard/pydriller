@@ -1,7 +1,7 @@
 from pathlib import Path
+from datetime import datetime
 
 import pytest
-
 from pydriller.metrics.process.history_complexity import HistoryComplexity
 
 TEST_DATA = [
@@ -11,10 +11,26 @@ TEST_DATA = [
 ]
 
 @pytest.mark.parametrize('path_to_repo, filepath, from_commit, to_commit, expected', TEST_DATA)
-def test(path_to_repo, filepath, from_commit, to_commit, expected):
+def test_with_commits(path_to_repo, filepath, from_commit, to_commit, expected):
     metric = HistoryComplexity(path_to_repo=path_to_repo,
                                from_commit=from_commit,
                                to_commit=to_commit)
+    
+    count = metric.count()
+    filepath = str(Path(filepath))
+    assert count[filepath] == expected
+
+
+TEST_DATA = [
+    ('test-repos/pydriller', 'scm/git_repository.py', datetime(2018, 3, 22, 11, 30), datetime(2018, 3, 23), 40.49),
+    ('test-repos/pydriller', 'scm/git_repository.py', datetime(2018, 3, 22, 11, 30), datetime(2018, 3, 27), 47.05),
+]
+
+@pytest.mark.parametrize('path_to_repo, filepath, since, to, expected', TEST_DATA)
+def test_with_dates(path_to_repo, filepath, since, to, expected):
+    metric = HistoryComplexity(path_to_repo=path_to_repo,
+                               since=since,
+                               to=to)
     
     count = metric.count()
     filepath = str(Path(filepath))

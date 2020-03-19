@@ -1,19 +1,10 @@
 from setuptools import setup, find_packages
 
+with open('requirements.txt') as reqs_file:
+    requirements = reqs_file.read().splitlines()
 
-def read_reqs(filename: str):
-    req = []
-    with open(filename, 'r') as f:
-        for line in f:
-            if line.strip() and not line.startswith('-r'):
-                req.append(line.strip())
-
-    return req
-
-
-install_requires = read_reqs("requirements.txt")
-test_requires = read_reqs("test-requirements.txt")
-
+with open('test-requirements.txt') as reqs_file:
+    test_requirements = reqs_file.read().splitlines()
 
 # Get the long description from the relevant file
 long_description = 'PyDriller is a Python framework that helps developers on ' \
@@ -29,14 +20,14 @@ setup(
     long_description=long_description,
     author='Davide Spadini',
     author_email='spadini.davide@gmail.com',
-    version='1.12',
+    version='1.13',
     packages=find_packages('.'),
     url='https://github.com/ishepard/pydriller',
     license='Apache License',
     package_dir={'pydriller': 'pydriller'},
-    python_requires='>=3.4',
-    install_requires=install_requires,
-    test_requirements=test_requires + install_requires,
+    python_requires='>=3.5',
+    install_requires=requirements,
+    test_requirements=requirements + test_requirements,
     classifiers=[
             # How mature is this project? Common values are
             #   3 - Alpha

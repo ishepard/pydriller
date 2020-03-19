@@ -24,6 +24,7 @@ jobs:
       - name: Install dependencies and unzip test-repos
         run: |
           python -m pip install --upgrade pip
+          pip install -r requirements.txt
           pip install -r test-requirements.txt
           pip install codecov pytest-cov
           unzip test-repos

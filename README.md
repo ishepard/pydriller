@@ -77,17 +77,16 @@ It is suggested to make use of `virtualenv`:
 
 ### INSTALL THE REQUIREMENTS AND RUN THE TESTS
 
-Install the requirements:
+Install pydriller and the requirements:
 
 ```
-> pip install -r requirements.txt
+> python setup.py install
 ```
 
 to run the tests (using pytest):
 
 ```
 > unzip test-repos.zip
-> pip install -r test-requirements.txt
 > pytest
 ```
 

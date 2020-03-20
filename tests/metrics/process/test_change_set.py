@@ -20,7 +20,8 @@ def test_with_commits(path_to_repo, from_commit, to_commit, expected_max, expect
 
 
 TEST_DATA = [
-    ('test-repos/pydriller', datetime(2018, 3, 21), datetime(2018, 3, 27), 13, 8)
+    ('test-repos/pydriller', datetime(2018, 3, 21), datetime(2018, 3, 27), 13, 8),
+    ('test-repos/pydriller', datetime(2018, 3, 23), datetime(2018, 3, 23), 0, 0)
 ]
 
 @pytest.mark.parametrize('path_to_repo, since, to, expected_max, expected_avg', TEST_DATA)

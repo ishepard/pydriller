@@ -36,7 +36,7 @@ class ChangeSet(ProcessMetric):
 
         :return: int max number of files committed together
         """
-        return max(self.committed_together)
+        return max(self.committed_together, default=0)
 
     def avg(self):
         """
@@ -44,5 +44,7 @@ class ChangeSet(ProcessMetric):
 
         :return: int avg number of files rounded off to the nearest integer
         """
+        if not self.committed_together:
+            return 0
 
         return round(statistics.mean(self.committed_together))

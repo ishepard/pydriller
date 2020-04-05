@@ -15,6 +15,7 @@
 import logging
 from datetime import datetime, timezone, timedelta
 from pydriller.repository_mining import RepositoryMining
+from git import Repo
 
 import pytest
 
@@ -347,3 +348,42 @@ def test_should_visit_descendent_order_with_filters_reversed():
     assert lc[0].hash == '1f99848edadfffa903b8ba1286a935f1b92b2845'
     assert lc[1].hash == '09f6182cef737db02a085e1d018963c7a29bde5a'
     assert lc[2].hash == '6411e3096dd2070438a17b225f44475136e54e3a'
+
+
+def test_include_refs():
+    commits_no_refs = list(RepositoryMining('test-repos/branches_not_merged/',
+                                            include_refs=False).traverse_commits())
+    assert len(commits_no_refs) == 3
+    commit_no_refs_hashes = [commit.hash for commit in commits_no_refs]
+
+    commits_with_refs = list(RepositoryMining('test-repos/branches_not_merged/',
+                                              include_refs=True).traverse_commits())
+    assert len(commits_with_refs) == 6
+    commit_with_refs_hashes = [commit.hash for commit in commits_with_refs]
+
+    commits_not_in_commits_no_refs = list(set(commit_with_refs_hashes) - set(commit_no_refs_hashes))
+    assert len(commits_not_in_commits_no_refs) == 3
+
+    # First commit on branch b1
+    assert '87a31153090808f1e6f679a14ea28729a0b74f4d' in commits_not_in_commits_no_refs
+    # Commit that branch b1 points to
+    assert '702d469710d2087e662c210fd0e4f9418ec813fd' in commits_not_in_commits_no_refs
+    # Commit that branch b2 points to
+    assert '7203c0b8220dcc7a59614bc7549799cd203ac072' in commits_not_in_commits_no_refs
+
+
+def test_include_remotes():
+    repo = Repo('test-repos/pydriller/')
+
+    # Prove that a recent commit is not in 'test-repos/pydriller'
+    commits_before_fetch = [commit.hash for commit in RepositoryMining('test-repos/pydriller/').traverse_commits()]
+    assert '2fa0d8c57829b086c9372722115a89d11c9bdd35' not in commits_before_fetch
+
+    # Fetch and re-assert that the commit is still not in the repo
+    repo.git.fetch('--all')
+    commits_after_fetch = [commit.hash for commit in RepositoryMining('test-repos/pydriller/').traverse_commits()]
+    assert '2fa0d8c57829b086c9372722115a89d11c9bdd35' not in commits_after_fetch
+
+    # Set include_remotes=True and assert that the commit is now found
+    commits_with_remotes = [commit.hash for commit in RepositoryMining('test-repos/pydriller/', include_remotes=True).traverse_commits()]
+    assert '2fa0d8c57829b086c9372722115a89d11c9bdd35' in commits_with_remotes

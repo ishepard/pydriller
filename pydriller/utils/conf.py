@@ -195,6 +195,8 @@ class Conf:
         until = self.get('to')
         from_commit = self.get('from_commit')
         to_commit = self.get('to_commit')
+        include_refs = self.get('include_refs')
+        remotes = self.get('include_remotes')
         branch = self.get('only_in_branch')
         authors = self.get('only_authors')
         order = self.get('order')
@@ -230,6 +232,12 @@ class Conf:
             kwargs['author-date-order'] = True
         elif order == 'topo-order':
             kwargs['topo-order'] = True
+
+        if include_refs is not None:
+            kwargs['all'] = include_refs
+
+        if remotes is not None:
+            kwargs['remotes'] = remotes
 
         if authors is not None:
             kwargs['author'] = authors

@@ -43,6 +43,8 @@ class RepositoryMining:
                  since: datetime = None, to: datetime = None,
                  from_commit: str = None, to_commit: str = None,
                  from_tag: str = None, to_tag: str = None,
+                 include_refs: bool = False,
+                 include_remotes: bool = False,
                  reversed_order: bool = False,
                  only_in_branch: str = None,
                  only_modifications_with_file_types: List[str] = None,
@@ -77,6 +79,8 @@ class RepositoryMining:
             if `since` and `from_commit` are None)
         :param str to_tag: ending the analysis from specified tag (only if
             `to` and `to_commit` are None)
+        :param bool include_refs: whether to include refs and HEAD in commit analysis
+        :param bool include_remotes: whether to include remote commits in analysis
         :param bool reversed_order: whether the commits should be analyzed
             in reversed order (**DEPRECATED**)
         :param str only_in_branch: only commits in this branch will be analyzed
@@ -96,7 +100,7 @@ class RepositoryMining:
         if only_commits is not None:
             only_commits = set(only_commits)
         if reversed_order:
-            logger.info("'reversed_oder' is deprecated and will be removed in the next release. "
+            logger.info("'reversed_order' is deprecated and will be removed in the next release. "
                         "Use 'order=reverse' instead. ")
             order = 'reverse'
 
@@ -110,6 +114,8 @@ class RepositoryMining:
             "since": since,
             "to": to,
             "single": single,
+            "include_refs": include_refs,
+            "include_remotes": include_remotes,
             "only_in_branch": only_in_branch,
             "only_modifications_with_file_types": only_modifications_with_file_types,
             "only_no_merge": only_no_merge,

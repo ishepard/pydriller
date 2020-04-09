@@ -21,7 +21,7 @@ import logging
 from _datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import List, Set, Dict, Tuple
+from typing import List, Set, Dict, Tuple, Callable
 
 import lizard
 from git import Diff, Git, Commit as GitCommit, NULL_TREE
@@ -298,6 +298,35 @@ class Modification:  # pylint: disable=R0902
 
         return list(methods_changed_new.union(methods_changed_old))
 
+    def _risk_profile(self, methods: List[Method], is_low_risk: Callable[[Method], bool]) -> Tuple[int, int]:
+        """
+        Return the risk profile of the set of methods, with two bins: risky, or non risky.
+        The risk profile is a pair (v_low, v_high), where
+        v_low is the volume of the low risk methods in the list, and
+        v_high is the volume of the high risk methods in the list.
+
+        :param methods: List of methods for which risk profile is to be determined
+        :param is_low_risk: Predicate indicating whether a method is low risk.
+        :return: total risk profile for methods according to predicate.
+        """
+        low = sum([m.nloc for m in methods if is_low_risk(m)])
+        high = sum([m.nloc for m in methods if not is_low_risk(m)])
+        return (low, high)
+
+    def _delta_risk_profile(self, is_low_risk: Callable[[Method], bool]) ->  Tuple[int, int]:
+        """
+        Return the delta risk profile of this commit, which a pair (dv1, dv2), where
+        dv1 is the total change in volume (lines of code) of low risk methods, and
+        dv2 is the total change in volume of the high risk methods.
+
+        :param is_low_risk: Predicate indicating whether a method is low risk.
+        :return: total delta risk profile for this modification.
+        """
+        low_before, high_before = self._risk_profile(self.methods_before, is_low_risk)
+        low_after, high_after = self._risk_profile(self.methods, is_low_risk)
+        return low_after - low_before, high_after - high_before
+
+
     def _calculate_metrics(self, include_before=False):
         """
         :param include_before: either to compute the metrics
@@ -327,7 +356,6 @@ class Modification:  # pylint: disable=R0902
         if self is other:
             return True
         return self.__dict__ == other.__dict__
-
 
 class Commit:
     """
@@ -561,6 +589,161 @@ class Commit:
         for branch in set(c_git.branch('--contains', self.hash).split('\n')):
             branches.add(branch.strip().replace('* ', ''))
         return branches
+
+
+    _UNIT_SIZE_LOW_RISK_THRESHOLD = 15
+    """
+    Threshold used in the Delta Maintainability Model to establish whether a method
+    is low risk in terms of its size.
+    """
+    @staticmethod
+    def _low_risk_unit_size(method) -> bool:
+        """
+        Predicate indicating whether a method is low risk in terms of its size,
+        i.e., whether its number of lines of code remains on or below the low risk threshold.
+        """
+        return method.nloc <= Commit._UNIT_SIZE_LOW_RISK_THRESHOLD
+
+    _UNIT_COMPLEXITY_LOW_RISK_THRESHOLD = 5
+    """
+    Threshold used in the Delta Maintainability Model to establish whether a method
+    is low risk in terms of its cyclomatic complexity.
+    """
+    @staticmethod
+    def _low_risk_unit_complexity(method: Method) -> bool:
+        """
+        Predicate indicating whether a method is low risk in terms of cyclomatic complexity,
+        i.e., whether the cyclomatic complexity remains on or below the low risk threshold.
+        """
+        return method.complexity <= Commit._UNIT_COMPLEXITY_LOW_RISK_THRESHOLD
+
+    _UNIT_INTERFACING_LOW_RISK_THRESHOLD = 2
+    """
+    Threshold used in the Delta Maintainability Model to establish whether a method
+    is low risk in terms of its interface.
+    """
+    @staticmethod
+    def _low_risk_unit_interfacing(method: Method) -> bool:
+        """
+        Predicate indicating whether a method is low risk in terms of interfacing,
+        i.e., whether the number of parameters of this method remains on or below
+        the low risk threshold.
+        """
+        return len(method.parameters) <= Commit._UNIT_INTERFACING_LOW_RISK_THRESHOLD
+
+    @property
+    def dmm_unit_size(self) -> float:
+        """
+        Return the Delta Maintainability Model (DMM) metric value for the unit size property.
+
+        It represents the proportion (between 0.0 and 1.0) of maintainability improving
+        change, when considering the lengths of the modified methods.
+
+        It rewards (value close to 1.0) modifications to low-risk (small) methods,
+        or spliting risky (large) ones.
+        It penalizes (value close to 0.0) working on methods that remain large
+        or get larger.
+
+        :return: The DMM value (between 0.0 and 1.0) for method size in this commit.
+        """
+        return self._delta_maintainability(self._low_risk_unit_size)
+
+    @property
+    def dmm_unit_complexity(self) -> float:
+        """
+        Return the Delta Maintainability Model (DMM) metric value for the unit complexity property.
+
+        It represents the proportion (between 0.0 and 1.0) of maintainability improving
+        change, when considering the cyclomatic complexity of the modified methods.
+
+        It rewards (value close to 1.0) modifications to low-risk (low complexity) methods,
+        or spliting risky (highly complex) ones.
+        It penalizes (value close to 0.0) working on methods that remain complex
+        or get more complex.
+
+        :return: The DMM value (between 0.0 and 1.0) for method complexity in this commit.
+        """
+        return self._delta_maintainability(self._low_risk_unit_complexity)
+
+    @property
+    def dmm_unit_interfacing(self):
+        """
+        Return the Delta Maintainability Model (DMM) metric value for the unit interfacing property.
+
+        It represents the proportion (between 0.0 and 1.0) of maintainability improving
+        change, when considering the interface (number of parameters) of the modified methods.
+
+        It rewards (value close to 1.0) modifications to low-risk (with  few parameters) methods,
+        or spliting risky (with many parameters) ones.
+        It penalizes (value close to 0.0) working on methods that continue to have
+        or are extended with too many parameters.
+
+        :return: The dmm value (between 0.0 and 1.0) for method interfacing in this commit.
+        """
+        return self._delta_maintainability(self._low_risk_unit_interfacing)
+
+    def _delta_maintainability(self, is_low_risk: Callable[[Method], bool]) -> float:
+        """
+        Compute the Delta Maintainability Model (DMM) value for the given risk predicate.
+        The DMM value is computed as the proportion of good change in the commit:
+        Good changes: Adding low risk code or removing high risk codee.
+        Bad changes: Adding high risk code or removing low risk code.
+        Furthermore, the special case where only low risk code is removed is also given the highest score.
+
+        :param is_low_risk: Predicate indicating whether a method is low risk.
+        :return: dmm value (between 0.0 and 1.0) for the property represented in the predicate.
+        """
+        (delta_low, delta_high) = self._delta_risk_profile(is_low_risk)
+        dmm = self._good_change_proportion(delta_low, delta_high)
+        if delta_low < 0 and delta_high == 0:
+            assert dmm == 0.0
+            # special case where removal of good (low risk) code is OK.
+            # re-adjust dmm accordingly:
+            dmm = 1.0
+        assert 0.0 <= dmm <= 1.0
+        return dmm
+
+    def _delta_risk_profile(self, is_low_risk: Callable[[Method], bool]) -> Tuple[int, int]:
+        """
+        Return the delta risk profile of this commit, which a pair (dv1, dv2), where
+        dv1 is the total change in volume (lines of code) of low risk methods, and
+        dv2 is the total change in volume of the high risk methods.
+
+        :param is_low_risk: Predicate indicating whether a method is low risk.
+        :return: total delta risk profile for this commit.
+        """
+        deltas = [mod._delta_risk_profile(is_low_risk) for mod in self.modifications]  #pylint: disable=W0212
+        delta_low = sum(d[0] for d in deltas)
+        delta_high = sum(d[1] for d in deltas)
+        return (delta_low, delta_high)
+
+    @staticmethod
+    def _good_change_proportion(low_risk_delta: int, high_risk_delta: int) -> float:
+        """
+        Given a delta risk profile, compute the proportion of "good" change in the total change.
+        Increasing low risk code, or decreasing high risk code, is considered good.
+        Other types of changes are considered not good.
+
+        :return: proportion of good change in total change.
+        """
+        bad_change, good_change = (0, 0)
+
+        if low_risk_delta >= 0:
+            good_change = low_risk_delta
+        else:
+            bad_change = abs(low_risk_delta)
+        if high_risk_delta >= 0:
+            bad_change += high_risk_delta
+        else:
+            good_change += abs(high_risk_delta)
+
+        assert good_change >= 0 and bad_change >= 0
+
+        total_change = good_change + bad_change
+        result = good_change / total_change if total_change > 0 else 1.0
+        assert 0.0 <= result <= 1.0
+
+        return result
 
     # pylint disable=R0902
     @staticmethod

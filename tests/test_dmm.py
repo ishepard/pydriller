@@ -16,7 +16,7 @@ import logging
 import pytest
 
 from pydriller.git_repository import GitRepository
-from pydriller.domain.commit import Commit
+from pydriller.domain.commit import Commit, DMMProperty
 
 
 logging.basicConfig(
@@ -120,17 +120,17 @@ def test_dmm_unit_interfacing(repo: GitRepository, msg: str, dmm: float):
 def test_delta_profile_modification(repo: GitRepository):
     commit = commit_by_msg(repo, 'Increase unit size to risky')
     mod = commit.modifications[0]
-    assert mod._delta_risk_profile(commit._low_risk_unit_size) == (-15, 16)
+    assert mod._delta_risk_profile(DMMProperty.UNIT_SIZE) == (-15, 16)
 
 def test_delta_profile_commit(repo: GitRepository):
     commit = commit_by_msg(repo, 'Increase in one, decrease in other file')
 
     m0 = commit.modifications[0]
-    assert m0._delta_risk_profile(commit._low_risk_unit_size) == (0, 1)
+    assert m0._delta_risk_profile(DMMProperty.UNIT_SIZE) == (0, 1)
     m1 = commit.modifications[1]
-    assert m1._delta_risk_profile(commit._low_risk_unit_size) == (3, 0)
+    assert m1._delta_risk_profile(DMMProperty.UNIT_SIZE) == (3, 0)
 
-    assert commit._delta_risk_profile(Commit._low_risk_unit_size) == (3, 1)
+    assert commit._delta_risk_profile(DMMProperty.UNIT_SIZE) == (3, 1)
 
 @pytest.mark.parametrize(
     'dlo,dhi,prop', [

@@ -1,4 +1,4 @@
-.. _deltamaintainability_:
+.. _deltamaintainability:
 
 =====================
 Delta Maintainability
@@ -30,6 +30,7 @@ The delta risk profile can then be used to determine good and bad change:
 
 The dmm value is then computed as: *good change / (good change + bad change)*.
 
+.. _Properties:
 
 Properties
 ==========

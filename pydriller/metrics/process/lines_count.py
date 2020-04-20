@@ -6,6 +6,7 @@ import statistics
 from pydriller import ModificationType
 from pydriller.metrics.process.process_metric import ProcessMetric
 
+
 class LinesCount(ProcessMetric):
     """
     This class is responsible to implement the following metrics:
@@ -34,8 +35,8 @@ class LinesCount(ProcessMetric):
     """
 
     def __init__(self, path_to_repo: str,
-                 since = None,
-                 to = None,
+                 since=None,
+                 to=None,
                  from_commit: str = None,
                  to_commit: str = None):
 

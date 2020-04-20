@@ -11,7 +11,7 @@ class CodeChurn(ProcessMetric):
     This class is responsible to implement the Code Churn metric for a
     file.
     A code churn is the sum of (added lines - removed lines) across the
-    analyzed commits. 
+    analyzed commits.
     It allows to count for the:
     * total number of code churns - count();
     * maximum code churn for all commits - max();
@@ -19,8 +19,8 @@ class CodeChurn(ProcessMetric):
     """
 
     def __init__(self, path_to_repo: str,
-                 since = None,
-                 to = None,
+                 since=None,
+                 to=None,
                  from_commit: str = None,
                  to_commit: str = None):
 
@@ -36,8 +36,7 @@ class CodeChurn(ProcessMetric):
 
             for modified_file in commit.modifications:
 
-                filepath = renamed_files.get(modified_file.new_path,
-                                                modified_file.new_path)
+                filepath = renamed_files.get(modified_file.new_path, modified_file.new_path)
 
                 if modified_file.change_type == ModificationType.RENAME:
                     renamed_files[modified_file.old_path] = filepath

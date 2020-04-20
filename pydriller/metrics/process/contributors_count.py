@@ -11,17 +11,17 @@ from pydriller.metrics.process.process_metric import ProcessMetric
 class ContributorsCount(ProcessMetric):
     """
     This class is responsible to implement the following metrics:
-    
+
     * Contributors Count: measures the number of contributors who modified a
       file.
-    
+
     * Minor Contributors Count: measures the number of contributors who
       authored less than 5% of code of a file.
     """
 
     def __init__(self, path_to_repo: str,
-                 since = None,
-                 to = None,
+                 since=None,
+                 to=None,
                  from_commit: str = None,
                  to_commit: str = None):
 
@@ -63,8 +63,7 @@ class ContributorsCount(ProcessMetric):
 
                 self.contributors[path] = contributors_count
                 self.minor_contributors[path] = minor_contributors_count
-    
-    
+
     def count(self):
         """
         Return the number of contributors who modified a file.

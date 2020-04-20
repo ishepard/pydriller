@@ -15,8 +15,8 @@ class ChangeSet(ProcessMetric):
     """
 
     def __init__(self, path_to_repo: str,
-                 since = None,
-                 to = None,
+                 since=None,
+                 to=None,
                  from_commit: str = None,
                  to_commit: str = None):
 

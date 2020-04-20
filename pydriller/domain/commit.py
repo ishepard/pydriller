@@ -43,6 +43,7 @@ class ModificationType(Enum):
     MODIFY = 5
     UNKNOWN = 6
 
+
 class DMMProperty(Enum):
     """
     Maintainability properties of the Delta Maintainability Model.
@@ -50,6 +51,7 @@ class DMMProperty(Enum):
     UNIT_SIZE = 1
     UNIT_COMPLEXITY = 2
     UNIT_INTERFACING = 3
+
 
 class Method:  # pylint: disable=R0902
     """
@@ -119,7 +121,7 @@ class Method:  # pylint: disable=R0902
         Predicate indicating whether this method is low risk in terms of
         the given property.
 
-        :param property: Property according to which this method is considered risky.
+        :param dmm_prop: Property according to which this method is considered risky.
         :return: True if and only if the method is considered low-risk w.r.t. this property.
         """
         if dmm_prop is DMMProperty.UNIT_SIZE:
@@ -327,7 +329,7 @@ class Modification:  # pylint: disable=R0902
     def changed_methods(self) -> List[Method]:
         """
         Return the list of methods that were changed. This analysis
-        is more complex because lizzard runs twice: for methods before
+        is more complex because Lizard runs twice: for methods before
         and after the change
 
         :return: list of methods
@@ -344,7 +346,8 @@ class Modification:  # pylint: disable=R0902
 
         return list(methods_changed_new.union(methods_changed_old))
 
-    def _risk_profile(self, methods: List[Method], dmm_prop: DMMProperty) -> Tuple[int, int]:
+    @staticmethod
+    def _risk_profile(methods: List[Method], dmm_prop: DMMProperty) -> Tuple[int, int]:
         """
         Return the risk profile of the set of methods, with two bins: risky, or non risky.
         The risk profile is a pair (v_low, v_high), where
@@ -357,9 +360,9 @@ class Modification:  # pylint: disable=R0902
         """
         low = sum([m.nloc for m in methods if m.is_low_risk(dmm_prop)])
         high = sum([m.nloc for m in methods if not m.is_low_risk(dmm_prop)])
-        return (low, high)
+        return low, high
 
-    def _delta_risk_profile(self, dmm_prop: DMMProperty) ->  Tuple[int, int]:
+    def _delta_risk_profile(self, dmm_prop: DMMProperty) -> Tuple[int, int]:
         """
         Return the delta risk profile of this commit, which a pair (dv1, dv2), where
         dv1 is the total change in volume (lines of code) of low risk methods, and
@@ -371,7 +374,6 @@ class Modification:  # pylint: disable=R0902
         low_before, high_before = self._risk_profile(self.methods_before, dmm_prop)
         low_after, high_after = self._risk_profile(self.methods, dmm_prop)
         return low_after - low_before, high_after - high_before
-
 
     def _calculate_metrics(self, include_before=False):
         """
@@ -402,6 +404,7 @@ class Modification:  # pylint: disable=R0902
         if self is other:
             return True
         return self.__dict__ == other.__dict__
+
 
 class Commit:
     """
@@ -720,7 +723,7 @@ class Commit:
         deltas = [mod._delta_risk_profile(dmm_prop) for mod in self.modifications]  #pylint: disable=W0212
         delta_low = sum(d[0] for d in deltas)
         delta_high = sum(d[1] for d in deltas)
-        return (delta_low, delta_high)
+        return delta_low, delta_high
 
     @staticmethod
     def _good_change_proportion(low_risk_delta: int, high_risk_delta: int) -> float:

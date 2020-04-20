@@ -15,6 +15,7 @@ PyDriller documentation!
    commit
    modifications
    gitrepository
+   deltamaintainability
    processmetrics
    reference
 

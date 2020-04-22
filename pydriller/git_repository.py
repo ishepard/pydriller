@@ -304,7 +304,7 @@ class GitRepository:
 
         return commits
 
-    def _get_blame(self, commit_hash: str, path: str, hashes_to_ignore_path: List[str] = None):
+    def _get_blame(self, commit_hash: str, path: str, hashes_to_ignore_path: str = None):
         args = ['-w', commit_hash + '^']
         if hashes_to_ignore_path is not None:
             if self.git.version_info >= (2, 23):

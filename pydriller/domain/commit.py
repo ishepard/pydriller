@@ -21,7 +21,7 @@ import logging
 from _datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import List, Set, Dict, Tuple
+from typing import List, Set, Dict, Tuple, Optional
 
 import lizard
 from git import Diff, Git, Commit as GitCommit, NULL_TREE
@@ -152,11 +152,11 @@ class Modification:  # pylint: disable=R0902
         self.source_code = diff_and_sc['source_code']
         self.source_code_before = diff_and_sc['source_code_before']
 
-        self._nloc = None
-        self._complexity = None
-        self._token_count = None
-        self._function_list = []
-        self._function_list_before = []
+        self._nloc: Optional[int] = None
+        self._complexity: Optional[int] = None
+        self._token_count: Optional[int] = None
+        self._function_list: List[Method] = []
+        self._function_list_before: List[Method] = []
 
     @property
     def added(self) -> int:
@@ -230,6 +230,7 @@ class Modification:  # pylint: disable=R0902
         :return: LOC of the file
         """
         self._calculate_metrics()
+        assert self._nloc is not None
         return self._nloc
 
     @property
@@ -240,6 +241,7 @@ class Modification:  # pylint: disable=R0902
         :return: Cyclomatic Complexity of the file
         """
         self._calculate_metrics()
+        assert self._complexity is not None
         return self._complexity
 
     @property
@@ -250,6 +252,7 @@ class Modification:  # pylint: disable=R0902
         :return: token count
         """
         self._calculate_metrics()
+        assert self._token_count is not None
         return self._token_count
 
     @property
@@ -264,7 +267,7 @@ class Modification:  # pylint: disable=R0902
         :return: Dictionary
         """
         lines = self.diff.split('\n')
-        modified_lines = {'added': [], 'deleted': []}
+        modified_lines: Dict[str, List[Tuple[int, str]]] = {'added': [], 'deleted': []}
 
         count_deletions = 0
         count_additions = 0
@@ -539,6 +542,7 @@ class Commit:
         if self._modifications is None:
             self._modifications = self._get_modifications()
 
+        assert self._modifications is not None
         return self._modifications
 
     def _get_modifications(self):
@@ -630,6 +634,7 @@ class Commit:
         if self._branches is None:
             self._branches = self._get_branches()
 
+        assert self._branches is not None
         return self._branches
 
     def _get_branches(self):

@@ -275,7 +275,7 @@ class GitRepository:
                                 hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
 
-        commits: Dict[str, Set[str]] = {}
+        commits = {} # type: Dict[str, Set[str]]
 
         for mod in modifications:
             path = mod.new_path

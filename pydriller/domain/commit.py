@@ -152,11 +152,11 @@ class Modification:  # pylint: disable=R0902
         self.source_code = diff_and_sc['source_code']
         self.source_code_before = diff_and_sc['source_code_before']
 
-        self._nloc: Optional[int] = None
-        self._complexity: Optional[int] = None
-        self._token_count: Optional[int] = None
-        self._function_list: List[Method] = []
-        self._function_list_before: List[Method] = []
+        self._nloc = None
+        self._complexity = None
+        self._token_count = None
+        self._function_list = [] # type: List[Method]
+        self._function_list_before = []  # type: List[Method]
 
     @property
     def added(self) -> int:
@@ -267,7 +267,7 @@ class Modification:  # pylint: disable=R0902
         :return: Dictionary
         """
         lines = self.diff.split('\n')
-        modified_lines: Dict[str, List[Tuple[int, str]]] = {'added': [], 'deleted': []}
+        modified_lines = {'added': [], 'deleted': []} # type: Dict[str, List[Tuple[int, str]]] 
 
         count_deletions = 0
         count_additions = 0

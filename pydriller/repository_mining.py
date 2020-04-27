@@ -95,10 +95,14 @@ class RepositoryMining:
         :param str order: order of commits. It can be one of: 'date-order',
             'author-date-order', 'topo-order', or 'reverse'. Default is reverse.
         """
-        if only_modifications_with_file_types is not None:
-            only_modifications_with_file_types = set(only_modifications_with_file_types)
-        if only_commits is not None:
-            only_commits = set(only_commits)
+        file_modification_set = (
+            None if only_modifications_with_file_types is None 
+            else set(only_modifications_with_file_types)
+            )
+        commit_set = (
+            None if only_commits is None
+            else set(only_commits)
+            )
         if reversed_order:
             logger.info("'reversed_order' is deprecated and will be removed in the next release. "
                         "Use 'order=reverse' instead. ")
@@ -117,10 +121,10 @@ class RepositoryMining:
             "include_refs": include_refs,
             "include_remotes": include_remotes,
             "only_in_branch": only_in_branch,
-            "only_modifications_with_file_types": only_modifications_with_file_types,
+            "only_modifications_with_file_types": file_modification_set,
             "only_no_merge": only_no_merge,
             "only_authors": only_authors,
-            "only_commits": only_commits,
+            "only_commits": commit_set,
             "only_releases": only_releases,
             "skip_whitespaces": skip_whitespaces,
             "filepath": filepath,

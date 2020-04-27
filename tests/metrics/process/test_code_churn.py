@@ -5,11 +5,11 @@ import pytest
 
 from pydriller.metrics.process.code_churn import CodeChurn
 
-TEST_DATA = [
+TEST_COMMIT_DATA = [
     ('test-repos/pydriller', 'domain/commit.py', 'ab36bf45859a210b0eae14e17683f31d19eea041', '71e053f61fc5d31b3e31eccd9c79df27c31279bf', 47, 34, 16)
 ]
 
-@pytest.mark.parametrize('path_to_repo, filepath, from_commit, to_commit, expected_count, expected_max, expected_avg', TEST_DATA)
+@pytest.mark.parametrize('path_to_repo, filepath, from_commit, to_commit, expected_count, expected_max, expected_avg', TEST_COMMIT_DATA)
 def test_with_commits(path_to_repo, filepath, from_commit, to_commit, expected_count, expected_max, expected_avg):
     metric = CodeChurn(path_to_repo=path_to_repo,
                        from_commit=from_commit,
@@ -26,11 +26,11 @@ def test_with_commits(path_to_repo, filepath, from_commit, to_commit, expected_c
     assert actual_avg[filepath] == expected_avg
 
 
-TEST_DATA = [
+TEST_DATE_DATA = [
     ('test-repos/pydriller', 'domain/commit.py', datetime(2018, 3, 21), datetime(2018, 3, 27), 47, 34, 16)
 ]
 
-@pytest.mark.parametrize('path_to_repo, filepath, since, to, expected_count, expected_max, expected_avg', TEST_DATA)
+@pytest.mark.parametrize('path_to_repo, filepath, since, to, expected_count, expected_max, expected_avg', TEST_DATE_DATA)
 def test_with_dates(path_to_repo, filepath, since, to, expected_count, expected_max, expected_avg):
     metric = CodeChurn(path_to_repo=path_to_repo,
                        since=since,

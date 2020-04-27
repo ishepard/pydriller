@@ -99,8 +99,7 @@ def commit_by_msg(repo: GitRepository, msg: str) -> Commit:
     for commit in repo.get_list_commits():
         if commit.msg == msg:
             return commit
-    logging.warning('cannot find commit with msg "%s"', msg)
-    return None
+    raise Exception('cannot find commit with msg {}'.format(msg))
 
 @pytest.mark.parametrize('msg,dmm', UNIT_SIZE_TEST_DATA)
 def test_dmm_unit_size(repo: GitRepository, msg: str, dmm: float):

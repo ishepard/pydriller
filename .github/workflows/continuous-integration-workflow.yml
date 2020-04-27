@@ -32,6 +32,11 @@ jobs:
       - name: Run pytest
         run: pytest tests/ --cov=pydriller/ --cov-report=xml
 
+      - name: Mypy
+        run: |
+          pip install mypy
+          mypy --ignore-missing-imports pydriller/ tests/
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:

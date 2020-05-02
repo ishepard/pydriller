@@ -116,6 +116,16 @@ def test_dmm_unit_interfacing(repo: GitRepository, msg: str, dmm: float):
     commit = commit_by_msg(repo, msg)
     assert commit.dmm_unit_interfacing == dmm
 
+def test_unsupported_language(repo: GitRepository):
+    # Add .md file that cannot be analyzed by Lizard
+    commit = commit_by_msg(repo, 'Offer README explaining the repo purpose')
+    assert  commit.dmm_unit_size is None
+
+def test_mixin_unsupported_language(repo: GitRepository):
+    # Add .txt file and update .java files
+    commit = commit_by_msg(repo, 'Release under Apache 2 license')
+    assert  commit.dmm_unit_size == 1.0
+
 def test_delta_profile_modification(repo: GitRepository):
     commit = commit_by_msg(repo, 'Increase unit size to risky')
     mod = commit.modifications[0]
@@ -130,6 +140,12 @@ def test_delta_profile_commit(repo: GitRepository):
     assert m1._delta_risk_profile(DMMProperty.UNIT_SIZE) == (3, 0)
 
     assert commit._delta_risk_profile(DMMProperty.UNIT_SIZE) == (3, 1)
+
+def test_supported_languages(repo: GitRepository):
+    # Add .md file that cannot be analyzed by Lizard
+    commit = commit_by_msg(repo, 'Offer README explaining the repo purpose')
+    mod = commit.modifications[0]
+    assert not mod.language_supported
 
 @pytest.mark.parametrize(
     'dlo,dhi,prop', [

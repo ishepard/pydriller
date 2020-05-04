@@ -24,6 +24,7 @@ from pathlib import Path
 from typing import List, Set, Dict, Tuple, Optional
 
 import lizard
+import lizard_languages
 from git import Diff, Git, Commit as GitCommit, NULL_TREE
 
 from pydriller.domain.developer import Developer
@@ -223,6 +224,17 @@ class Modification:  # pylint: disable=R0902
         return path.name
 
     @property
+    def language_supported(self) -> bool:
+        """
+        Return whether the language used in the modification can be analyzed by Pydriller.
+        Languages are derived from the file  extension.
+        Supported languages are those supported by Lizard.
+
+        :return: True iff language  of this Modification can be analyzed.
+        """
+        return lizard_languages.get_reader_for(self.filename) is not None
+
+    @property
     def nloc(self) -> int:
         """
         Calculate the LOC of the file.
@@ -267,7 +279,7 @@ class Modification:  # pylint: disable=R0902
         :return: Dictionary
         """
         lines = self.diff.split('\n')
-        modified_lines = {'added': [], 'deleted': []} # type: Dict[str, List[Tuple[int, str]]] 
+        modified_lines = {'added': [], 'deleted': []} # type: Dict[str, List[Tuple[int, str]]]
 
         count_deletions = 0
         count_additions = 0
@@ -374,6 +386,7 @@ class Modification:  # pylint: disable=R0902
         :param dmm_prop: Property indicating the type of risk
         :return: total delta risk profile for this property.
         """
+        assert self.language_supported
         low_before, high_before = self._risk_profile(self.methods_before, dmm_prop)
         low_after, high_after = self._risk_profile(self.methods, dmm_prop)
         return low_after - low_before, high_after - high_before
@@ -645,7 +658,7 @@ class Commit:
         return branches
 
     @property
-    def dmm_unit_size(self) -> float:
+    def dmm_unit_size(self) -> Optional[float]:
         """
         Return the Delta Maintainability Model (DMM) metric value for the unit size property.
 
@@ -657,12 +670,13 @@ class Commit:
         It penalizes (value close to 0.0) working on methods that remain large
         or get larger.
 
-        :return: The DMM value (between 0.0 and 1.0) for method size in this commit.
+        :return: The DMM value (between 0.0 and 1.0) for method size in this commit,
+                 or None if none of the programming languages in the commit are supported.
         """
         return self._delta_maintainability(DMMProperty.UNIT_SIZE)
 
     @property
-    def dmm_unit_complexity(self) -> float:
+    def dmm_unit_complexity(self) -> Optional[float]:
         """
         Return the Delta Maintainability Model (DMM) metric value for the unit complexity property.
 
@@ -675,11 +689,12 @@ class Commit:
         or get more complex.
 
         :return: The DMM value (between 0.0 and 1.0) for method complexity in this commit.
+                 or None if none of the programming languages in the commit are supported.
         """
         return self._delta_maintainability(DMMProperty.UNIT_COMPLEXITY)
 
     @property
-    def dmm_unit_interfacing(self):
+    def dmm_unit_interfacing(self) -> Optional[float]:
         """
         Return the Delta Maintainability Model (DMM) metric value for the unit interfacing property.
 
@@ -692,10 +707,11 @@ class Commit:
         or are extended with too many parameters.
 
         :return: The dmm value (between 0.0 and 1.0) for method interfacing in this commit.
-        """
+                  or None if none of the programming languages in the commit are supported.
+       """
         return self._delta_maintainability(DMMProperty.UNIT_INTERFACING)
 
-    def _delta_maintainability(self, dmm_prop: DMMProperty) -> float:
+    def _delta_maintainability(self, dmm_prop: DMMProperty) -> Optional[float]:
         """
         Compute the Delta Maintainability Model (DMM) value for the given risk predicate.
         The DMM value is computed as the proportion of good change in the commit:
@@ -706,17 +722,20 @@ class Commit:
         :param dmm_prop: Property indicating the type of risk
         :return: dmm value (between 0.0 and 1.0) for the property represented in the property.
         """
-        (delta_low, delta_high) = self._delta_risk_profile(dmm_prop)
-        dmm = self._good_change_proportion(delta_low, delta_high)
-        if delta_low < 0 and delta_high == 0:
-            assert dmm == 0.0
-            # special case where removal of good (low risk) code is OK.
-            # re-adjust dmm accordingly:
-            dmm = 1.0
-        assert 0.0 <= dmm <= 1.0
-        return dmm
+        delta_profile = self._delta_risk_profile(dmm_prop)
+        if delta_profile:
+            (delta_low, delta_high) = delta_profile
+            dmm = self._good_change_proportion(delta_low, delta_high)
+            if delta_low < 0 and delta_high == 0:
+                assert dmm == 0.0
+                # special case where removal of good (low risk) code is OK.
+                # re-adjust dmm accordingly:
+                dmm = 1.0
+            assert 0.0 <= dmm <= 1.0
+            return dmm
+        return None
 
-    def _delta_risk_profile(self, dmm_prop: DMMProperty) -> Tuple[int, int]:
+    def _delta_risk_profile(self, dmm_prop: DMMProperty) -> Optional[Tuple[int, int]]:
         """
         Return the delta risk profile of this commit, which a pair (dv1, dv2), where
         dv1 is the total change in volume (lines of code) of low risk methods, and
@@ -725,10 +744,13 @@ class Commit:
         :param dmm_prop: Property indicating the type of risk
         :return: total delta risk profile for this commit.
         """
-        deltas = [mod._delta_risk_profile(dmm_prop) for mod in self.modifications]  #pylint: disable=W0212
-        delta_low = sum(d[0] for d in deltas)
-        delta_high = sum(d[1] for d in deltas)
-        return delta_low, delta_high
+        supported_modifications = [mod for mod in self.modifications if mod.language_supported]
+        if supported_modifications:
+            deltas = [mod._delta_risk_profile(dmm_prop) for mod in supported_modifications]  #pylint: disable=W0212
+            delta_low = sum(dlow for (dlow, dhigh) in deltas)
+            delta_high = sum(dhigh for (dlow, dhigh) in deltas)
+            return delta_low, delta_high
+        return None
 
     @staticmethod
     def _good_change_proportion(low_risk_delta: int, high_risk_delta: int) -> float:

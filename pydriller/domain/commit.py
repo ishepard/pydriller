@@ -235,7 +235,7 @@ class Modification:  # pylint: disable=R0902
         return lizard_languages.get_reader_for(self.filename) is not None
 
     @property
-    def nloc(self) -> int:
+    def nloc(self) -> Optional[int]:
         """
         Calculate the LOC of the file.
 
@@ -245,7 +245,7 @@ class Modification:  # pylint: disable=R0902
         return self._nloc
 
     @property
-    def complexity(self) -> int:
+    def complexity(self) -> Optional[int]:
         """
         Calculate the Cyclomatic Complexity of the file.
 
@@ -255,7 +255,7 @@ class Modification:  # pylint: disable=R0902
         return self._complexity
 
     @property
-    def token_count(self) -> int:
+    def token_count(self) -> Optional[int]:
         """
         Calculate the token count of functions.
 

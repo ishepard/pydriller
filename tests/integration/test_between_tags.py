@@ -33,3 +33,17 @@ def test_between_revisions():
     assert '4638730126d40716e230c2040751a13153fb1556' == lc[2].hash
     assert 'a26f1438bd85d6b22497c0e5dae003812becd0bc' == lc[3].hash
     assert '627e1ad917a188a861c9fedf6e5858b79edbe439' == lc[4].hash
+
+
+def test_multiple_repos_with_tags():
+    from_tag = 'tag2'
+    to_tag = 'tag3'
+    repos = [
+        'test-repos/tags',
+        'test-repos/tags',
+        'test-repos/tags'
+    ]
+    lc = list(RepositoryMining(path_to_repo=repos,
+                               from_tag=from_tag,
+                               to_tag=to_tag).traverse_commits())
+    assert len(lc) == 9

@@ -63,14 +63,26 @@ class Conf:
                 not isinstance(path_to_repo, list):
             raise Exception("The path to the repo has to be of type 'string' or 'list of strings'!")
 
+    def _check_only_one_from_commit(self):
+        if not self.only_one_filter([self.get('since'),
+                                     self.get('from_commit'),
+                                     self.get('from_tag')]):
+            raise Exception('You can only specify one filter between since, from_tag and from_commit')
+
+    def _check_only_one_to_commit(self):
+        if not self.only_one_filter([self.get('to'),
+                                     self.get('to_commit'),
+                                     self.get('to_tag')]):
+            raise Exception('You can only specify one between since, from_tag and from_commit')
+
     def sanity_check_filters(self):
         """
         Check if the values passed by the user are correct.
 
         """
         self._check_correct_filters_order()
-        self.check_starting_commit()
-        self.check_ending_commit()
+        self._check_only_one_from_commit()
+        self._check_only_one_to_commit()
         self._check_timezones()
 
         # Check if from_commit and to_commit point to the same commit, in which case
@@ -94,8 +106,7 @@ class Conf:
                 raise Exception('You can not specify a single commit with '
                                 'other filters')
             try:
-                self.set_value('single', self.get("git_repo").get_commit(
-                    self.get('single')).hash)
+                self.set_value('single', self.get("git_repo").get_commit(self.get('single')).hash)
             except BadName:
                 raise Exception("The commit {} defined in "
                                 "the 'single' filtered does "
@@ -129,47 +140,41 @@ class Conf:
             return True
         return False
 
-    def check_starting_commit(self):
+    def get_starting_commit(self):
         """
         Get the starting commit from the 'since', 'from_commit' or 'from_tag'
         filter.
         """
-        if not self.only_one_filter([self.get('since'),
-                                     self.get('from_commit'),
-                                     self.get('from_tag')]):
-            raise Exception('You can only specify one between since, from_tag and from_commit')
-        if self.get('from_tag') is not None:
-            tagged_commit = self.get("git_repo").get_commit_from_tag(self.get('from_tag'))
-            self.set_value('from_commit', tagged_commit.hash)
-        if self.get('from_commit'):
+        from_tag = self.get('from_tag')
+        from_commit = self.get('from_commit')
+        if from_tag is not None:
+            tagged_commit = self.get("git_repo").get_commit_from_tag(from_tag)
+            from_commit = tagged_commit.hash
+        if from_commit is not None:
             try:
-                commit = self.get("git_repo").get_commit(self.get('from_commit'))
+                commit = self.get("git_repo").get_commit(from_commit)
                 if len(commit.parents) == 0:
-                    self.set_value('from_commit', [commit.hash])
+                    return [commit.hash]
                 elif len(commit.parents) == 1:
-                    self.set_value('from_commit', ['^' + commit.hash + '^'])
+                    return ['^' + commit.hash + '^']
                 else:
-                    commits = ['^' + x for x in commit.parents]
-                    self.set_value('from_commit', commits)
+                    return ['^' + x for x in commit.parents]
             except Exception:
                 raise Exception("The commit {} defined in the 'from_tag' or 'from_commit' filter does "
                                 "not exist".format(self.get('from_commit')))
 
-    def check_ending_commit(self):
+    def get_ending_commit(self):
         """
         Get the ending commit from the 'to', 'to_commit' or 'to_tag' filter.
         """
-        if not self.only_one_filter([self.get('to'),
-                                     self.get('to_commit'),
-                                     self.get('to_tag')]):
-            raise Exception('You can only specify one between since, from_tag and from_commit')
-        if self.get('to_tag') is not None:
-            tagged_commit = self.get("git_repo").get_commit_from_tag(self.get('to_tag'))
-            self.set_value('to_commit', tagged_commit.hash)
-        if self.get('to_commit'):
+        to_tag = self.get('to_tag')
+        to_commit = self.get('to_commit')
+        if to_tag is not None:
+            tagged_commit = self.get("git_repo").get_commit_from_tag(to_tag)
+            to_commit = tagged_commit.hash
+        if to_commit is not None:
             try:
-                commit = self.get("git_repo").get_commit(self.get('to_commit'))
-                self.set_value('to_commit', commit.hash)
+                return self.get("git_repo").get_commit(to_commit).hash
             except Exception:
                 raise Exception("The commit {} defined in the 'to_tag' or 'to_commit' filter does "
                                 "not exist".format(self.get('to_commit')))
@@ -193,8 +198,8 @@ class Conf:
         single = self.get('single')
         since = self.get('since')
         until = self.get('to')
-        from_commit = self.get('from_commit')
-        to_commit = self.get('to_commit')
+        from_commit = self.get_starting_commit()
+        to_commit = self.get_ending_commit()
         include_refs = self.get('include_refs')
         remotes = self.get('include_remotes')
         branch = self.get('only_in_branch')

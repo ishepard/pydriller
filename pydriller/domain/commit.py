@@ -230,7 +230,7 @@ class Modification:  # pylint: disable=R0902
         Languages are derived from the file  extension.
         Supported languages are those supported by Lizard.
 
-        :return: True iff language  of this Modification can be analyzed.
+        :return: True iff language of this Modification can be analyzed.
         """
         return lizard_languages.get_reader_for(self.filename) is not None
 
@@ -242,7 +242,6 @@ class Modification:  # pylint: disable=R0902
         :return: LOC of the file
         """
         self._calculate_metrics()
-        assert self._nloc is not None
         return self._nloc
 
     @property
@@ -253,7 +252,6 @@ class Modification:  # pylint: disable=R0902
         :return: Cyclomatic Complexity of the file
         """
         self._calculate_metrics()
-        assert self._complexity is not None
         return self._complexity
 
     @property
@@ -264,7 +262,6 @@ class Modification:  # pylint: disable=R0902
         :return: token count
         """
         self._calculate_metrics()
-        assert self._token_count is not None
         return self._token_count
 
     @property
@@ -311,8 +308,7 @@ class Modification:  # pylint: disable=R0902
         token = line.split(" ")
         numbers_old_file = token[1]
         numbers_new_file = token[2]
-        delete_line_number = int(numbers_old_file.split(",")[0]
-                                 .replace("-", "")) - 1
+        delete_line_number = int(numbers_old_file.split(",")[0].replace("-", "")) - 1
         additions_line_number = int(numbers_new_file.split(",")[0]) - 1
         return delete_line_number, additions_line_number
 
@@ -396,9 +392,12 @@ class Modification:  # pylint: disable=R0902
         :param include_before: either to compute the metrics
         for source_code_before, i.e. before the change happened
         """
+        if not self.language_supported:
+            return
+
         if self.source_code and self._nloc is None:
-            analysis = lizard.analyze_file.analyze_source_code(
-                self.filename, self.source_code)
+            analysis = lizard.analyze_file.analyze_source_code(self.filename,
+                                                               self.source_code)
             self._nloc = analysis.nloc
             self._complexity = analysis.CCN
             self._token_count = analysis.token_count

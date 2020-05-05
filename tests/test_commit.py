@@ -197,8 +197,7 @@ def test_metrics_not_supported_file():
                       "test-repos/lizard/NotSupported.pdf",
                       ModificationType.MODIFY, diff_and_sc)
 
-    assert m1.nloc == 2
-    assert len(m1.methods) == 0
+    assert m1.nloc is None
 
 
 @pytest.mark.parametrize('path', ['test-repos/files_in_directories'])

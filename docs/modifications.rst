@@ -23,6 +23,8 @@ You can get the list of modified files, as well as their diffs and current sourc
 * **complexity**: Cyclomatic Complexity of the file
 * **token_count**: Number of Tokens of the file
 
+**NOTE**: the list of modifications might me empty if the commit is a merge commit. For more info on this, check out `this post <https://haacked
+.com/archive/2014/02/21/reviewing-merge-commits/>`_.
 
 For example::
 

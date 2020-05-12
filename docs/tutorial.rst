@@ -13,7 +13,8 @@ Using PyDriller is very simple. You only need to create `RepositoryMining`: this
 
 will print the name of the developers for each commit. 
 
-Inside `RepositoryMining`, you will have to configure which projects to analyze, for which commits, for which dates etc. For all the possible configurations, have a look at :ref:`configuration_toplevel`.
+Inside `RepositoryMining`, you will have to configure which projects to analyze, for which commits, for which dates etc. For all the possible
+configurations, have a look at :ref:`repositorymining_toplevel`.
 
 We can also pass a list of repositories (both local and remote), and PyDriller will analyze sequentially. In case of a remote repository, PyDriller will clone it in a temporary folder, and delete it afterwards. For example::
 

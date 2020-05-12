@@ -21,6 +21,9 @@ A Commit object has all the information of a Git commit, and much more. More spe
 * **parents** *(Set[str])*: list of the commit parents
 * **project_name** *(str)*: project name 
 * **project_path** *(str)*: project path 
+* **dmm_unit_size** *(float)*: DMM metric value for the unit size property.
+* **dmm_unit_complexity** *(float)*: DMM metric value for the unit complexity property.
+* **dmm_unit_interfacing** *(float)*: DMM metric value for the unit interfacing property.
 
 
 Example::

@@ -45,7 +45,6 @@ class RepositoryMining:
                  from_tag: str = None, to_tag: str = None,
                  include_refs: bool = False,
                  include_remotes: bool = False,
-                 reversed_order: bool = False,
                  only_in_branch: str = None,
                  only_modifications_with_file_types: List[str] = None,
                  only_no_merge: bool = False,
@@ -81,8 +80,6 @@ class RepositoryMining:
             `to` and `to_commit` are None)
         :param bool include_refs: whether to include refs and HEAD in commit analysis
         :param bool include_remotes: whether to include remote commits in analysis
-        :param bool reversed_order: whether the commits should be analyzed
-            in reversed order (**DEPRECATED**)
         :param str only_in_branch: only commits in this branch will be analyzed
         :param List[str] only_modifications_with_file_types: only
             modifications with that file types will be analyzed
@@ -90,8 +87,11 @@ class RepositoryMining:
         :param List[str] only_authors: only commits of these authors will be
             analyzed (the check is done on the username, NOT the email)
         :param List[str] only_commits: only these commits will be analyzed
-        :param str filepath: only commits that modified this file will be
-            analyzed
+        :param bool only_releases: analyze only tagged commits
+        :param bool histogram_diff: add the "--histogram" option when asking for the diff
+        :param bool skip_whitespaces: add the "-w" option when asking for the diff
+        :param bool clone_repo_to: if the repo under analysis is remote, clone the repo to the specified directory
+        :param str filepath: only commits that modified this file will be analyzed
         :param str order: order of commits. It can be one of: 'date-order',
             'author-date-order', 'topo-order', or 'reverse'. Default is reverse.
         """
@@ -103,10 +103,6 @@ class RepositoryMining:
             None if only_commits is None
             else set(only_commits)
             )
-        if reversed_order:
-            logger.info("'reversed_order' is deprecated and will be removed in the next release. "
-                        "Use 'order=reverse' instead. ")
-            order = 'reverse'
 
         options = {
             "git_repo": None,

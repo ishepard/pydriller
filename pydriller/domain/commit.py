@@ -547,7 +547,10 @@ class Commit:
     @property
     def modifications(self) -> List[Modification]:
         """
-        Return a list of modified files.
+        Return a list of modified files. The list is empty if the commit is
+        a merge commit. For more info on this, see
+        https://haacked.com/archive/2014/02/21/reviewing-merge-commits/ or
+        https://github.com/ishepard/pydriller/issues/89#issuecomment-590243707
 
         :return: List[Modification] modifications
         """

@@ -1,5 +1,6 @@
 .. _api_reference_toplevel:
 
+=============
 API Reference
 =============
 

@@ -1,10 +1,20 @@
-.. _configuration_toplevel:
+.. _repositorymining_toplevel:
 
-=============
-Configuration
-=============
+=================
+RepositoryMining
+=================
+`RepositoryMining` is the main class of Pydriller, responsible of returning the list of commits you want.
+One of the main advantage of using PyDriller to mine software repositories is that it is highly configurable. We will now see all the options that once can pass to RepositoryMining.
 
-One of the main advantage of using PyDriller to mine software repositories, is that it is highly configurable. We will now see all the options that once can pass to RepositoryMining.
+Simple Scenario
+===============
+This is the "Hello World" of Pydriller::
+
+    for commit in RepositoryMining("/Users/dspadini/myrepo").traverse_commits():
+        print(commit.hash)
+
+The function `traverse_commits()` of `RepositoryMining` will return the selected commits, in this simple case *all of them*.
+Now let's see how we can customize `RepositoryMining`.
 
 Selecting projects to analyze
 =============================
@@ -115,8 +125,6 @@ Examples::
     RepositoryMining('path/to/the/repo', only_modifications_with_file_types=['.java']).traverse_commits()
 
 
-
-
 Other Configurations
 =====================
 
@@ -124,7 +132,9 @@ Some :code:`git` commands, such as :code:`git diff`, can be customized by the us
 that can be used within pydriller.
 
 * **histogram** *(bool)*: uses :code:`git diff --histogram` instead of the normal git. See :ref:`git-diff-algorithms`.
-
+* **include_refs** *(bool)*: whether to include refs and HEAD in commit analysis.
+* **include_remotes** *(bool)*: whether to include remote commits in analysis
+* **clone_repo_to** *(str)*: whether to include remote commits in analysis
 
 .. _git-diff-algorithms:
 

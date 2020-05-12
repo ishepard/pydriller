@@ -4,9 +4,8 @@
 GitRepository
 ==============
 
-GitRepository is a wrapper for the most common utilities of Git. It receives in input
-the path to repository, and it takes care of the rest. 
-For example, with GitRepository you can checkout a specific commit::
+GitRepository is a wrapper for the most common utilities of Git, such as checkout and reset.
+For example, to checkout a specific commit or branch::
 
     gr = GitRepository('test-repos/git-1/')
     gr.checkout('a7053a4dcd627f5f4f213dc9aa002eb1caf926f8')
@@ -15,30 +14,14 @@ However, **be careful!** Git checkout changes the state of the repository on the
 disk, hence you should not use this command if other processes (maybe threads? or multiple 
 repository mining?) read from the same repository.
 
-GitRepository also contains a function to parse the a `diff`, very useful to obtain the list
-of lines added or deleted for future analysis. For example, if we run this::
+Moreover, GitRepository can be used to obtain different information from the repository::
 
-    diff = '@@ -2,6 +2,7 @@ aa'+\
-        ' bb'+\
-        '-cc'+\
-        ' log.info(\"aa\")'+\
-        '+log.debug(\"b\")'+\
-        ' dd'+\
-        ' ee'+\
-        ' ff'
     gr = GitRepository('test-repos/test1')
-    parsed_lines = gr.parse_diff(diff)
-
-    added = parsed_lines['added']
-    deleted = parsed_lines['deleted']
-
-    print('Added: {}'.format(added))      # result: Added: [(4, 'log.debug("b")')]
-    print('Deleted: {}'.format(deleted))  # result: Deleted: [(3, 'cc')]
-
-the result is::
-
-    Added: [(4, 'log.debug("b")')]
-    Deleted: [(3, 'cc')]
+    gr.get_list_commits()                  # get the list of all commits
+    gr.get_commit('cc5b002')               # get the specific commit
+    gr.files()                             # get the list of files present in the repo at the current commit
+    gr.total_commits()                     # get total number of commits
+    gr.get_commit_from_tag('v1.15')        # get the commit with tag v1.15
 
 Another very useful API (especially for researchers ;) ) is the one that, given a commit, allows you to retrieve
 all the commits that last "touched" the modified lines of the file (if you pass a bug fixing commit, it will retrieve the bug inducing). 
@@ -62,5 +45,4 @@ Let's see an example::
 Since in commit **lmn** 2 lines were deleted (line 1 and 2), PyDriller can retrieve the commits in which those lines
 were last modified (in our example, commit **abc** and **def**).
 
-Checkout the API reference of this class for the complete list of the available functions.
-
+Checkout the :ref:`api_reference_toplevel` of this class for the complete list of the available functions.

@@ -11,7 +11,7 @@ PyDriller documentation!
    
    intro
    tutorial
-   configuration
+   repositorymining
    commit
    modifications
    gitrepository

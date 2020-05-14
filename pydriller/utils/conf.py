@@ -59,8 +59,7 @@ class Conf:
         @param path_to_repo: path to the repo as provided by the user.
         @return:
         """
-        if not isinstance(path_to_repo, str) and \
-                not isinstance(path_to_repo, list):
+        if not isinstance(path_to_repo, str) and not isinstance(path_to_repo, list):
             raise Exception("The path to the repo has to be of type 'string' or 'list of strings'!")
 
     def _check_only_one_from_commit(self):

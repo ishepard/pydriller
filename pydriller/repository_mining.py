@@ -164,7 +164,14 @@ class RepositoryMining:
                 path_repo = self._clone_remote_repos(self._clone_folder(), path_repo)
 
             git_repo = GitRepository(path_repo, self._conf)
+            # saving the GitRepository object for further use
             self._conf.set_value("git_repo", git_repo)
+
+            # when multiple repos are given in input, this variable will serve as a reminder
+            # of which one we are currently analyzing
+            self._conf.set_value('path_to_repo', path_repo)
+
+            # checking that the filters are set correctly
             self._conf.sanity_check_filters()
 
             logger.info('Analyzing git repository in %s', git_repo.path)

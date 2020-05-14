@@ -234,3 +234,22 @@ def test_clone_repo_to_not_existing():
     with pytest.raises(Exception):
         list(RepositoryMining("https://github.com/ishepard/pydriller",
                               clone_repo_to="NOTEXISTINGDIR").traverse_commits())
+
+
+def test_projectname_multiple_repos():
+    repos = [
+        'test-repos/files_in_directories',
+        'test-repos/files_in_directories',
+        'test-repos/files_in_directories'
+    ]
+    for commit in RepositoryMining(path_to_repo=repos).traverse_commits():
+        assert commit.project_name == 'files_in_directories'
+
+
+def test_projectname_multiple_repos_remote():
+    repos = [
+        'https://github.com/ishepard/pydriller',
+        'test-repos/pydriller'
+    ]
+    for commit in RepositoryMining(path_to_repo=repos).traverse_commits():
+        assert commit.project_name == 'pydriller'

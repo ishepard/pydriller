@@ -132,9 +132,9 @@ Some :code:`git` commands, such as :code:`git diff`, can be customized by the us
 that can be used within pydriller.
 
 * **histogram** *(bool)*: uses :code:`git diff --histogram` instead of the normal git. See :ref:`git-diff-algorithms`.
-* **include_refs** *(bool)*: whether to include refs and HEAD in commit analysis.
-* **include_remotes** *(bool)*: whether to include remote commits in analysis
-* **clone_repo_to** *(str)*: whether to include remote commits in analysis
+* **include_refs** *(bool)*: whether to include refs and HEAD in commit analysis (equivalent of adding the flag :code:`--all`).
+* **include_remotes** *(bool)*: whether to include remote commits in analysis (equivalent of adding the flag :code:`--remotes`).
+* **clone_repo_to** *(str)*: if the repository is a URL, Pydriller will clone it in this directory.
 
 .. _git-diff-algorithms:
 

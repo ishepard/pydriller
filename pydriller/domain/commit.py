@@ -719,7 +719,6 @@ class Commit:
         The DMM value is computed as the proportion of good change in the commit:
         Good changes: Adding low risk code or removing high risk codee.
         Bad changes: Adding high risk code or removing low risk code.
-        Furthermore, the special case where only low risk code is removed is also given the highest score.
 
         :param dmm_prop: Property indicating the type of risk
         :return: dmm value (between 0.0 and 1.0) for the property represented in the property.
@@ -727,14 +726,7 @@ class Commit:
         delta_profile = self._delta_risk_profile(dmm_prop)
         if delta_profile:
             (delta_low, delta_high) = delta_profile
-            dmm = self._good_change_proportion(delta_low, delta_high)
-            if delta_low < 0 and delta_high == 0:
-                assert dmm == 0.0
-                # special case where removal of good (low risk) code is OK.
-                # re-adjust dmm accordingly:
-                dmm = 1.0
-            assert 0.0 <= dmm <= 1.0
-            return dmm
+            return self._good_change_proportion(delta_low, delta_high)
         return None
 
     def _delta_risk_profile(self, dmm_prop: DMMProperty) -> Optional[Tuple[int, int]]:
@@ -755,13 +747,13 @@ class Commit:
         return None
 
     @staticmethod
-    def _good_change_proportion(low_risk_delta: int, high_risk_delta: int) -> float:
+    def _good_change_proportion(low_risk_delta: int, high_risk_delta: int) -> Optional[float]:
         """
         Given a delta risk profile, compute the proportion of "good" change in the total change.
         Increasing low risk code, or decreasing high risk code, is considered good.
         Other types of changes are considered not good.
 
-        :return: proportion of good change in total change.
+        :return: proportion of good change in total change, or None if the total change is zero.
         """
         bad_change, good_change = (0, 0)
 
@@ -777,10 +769,13 @@ class Commit:
         assert good_change >= 0 and bad_change >= 0
 
         total_change = good_change + bad_change
-        result = good_change / total_change if total_change > 0 else 1.0
-        assert 0.0 <= result <= 1.0
+        if total_change == 0:
+            proportion = None
+        else:
+            proportion = good_change / total_change
+            assert 0.0 <= proportion <= 1.0
 
-        return result
+        return proportion
 
     # pylint disable=R0902
     @staticmethod

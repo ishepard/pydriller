@@ -29,6 +29,7 @@ The delta risk profile can then be used to determine good and bad change:
 - Decreases in high risk code are good, and decreases in low risk code are good only if no high risk code is added instead, and bad otherwise.
 
 The dmm value is then computed as: *good change / (good change + bad change)*.
+It is undefined (``None``) if the denominator is zero.
 
 .. _Properties:
 
@@ -82,7 +83,7 @@ PyDriller's OS-DMM and SIG's DMM differ in the following ways:
 
 - OS-DMM offers only support for the approximately 15 languages supported by `Lizard <https://github.com/terryyin/lizard>`_.
 - OS-DMM relies on Lizard for the identification of *methods* (units) in source files. While for simple cases SIG and Lizard tooling will agree, this may not be the case for more intricate cases involving e.g., lambdas, inner classes, nested functions, etc.
-- OS-DMM relies on Lizard for simple line counting, which also counts white space. SIG's DMM on the other hand ignores blank lines.
+- OS-DMM relies on Lizard for simple line counting, which also counts white space. SIG's DMM on the other hand ignores lines that contain no statements (such as blank lines or lines with just ``{...}`` brackets)
 - OS-DMM uses the thresholds as empirically determined by SIG, based on SIG's measurement methodology [Alves2010]_. OS-DMM's Lizard-based metric values may be different, and hence may classify methods in different risk bins for methods close to the thresholds.
 
 Consequently, individual DMM values are likely to differ a few percentage points between the SIG DMM and OS-DMM implementations. However, in terms of trends and statistical analysis, the outcomes will likely be very similar.

@@ -485,7 +485,7 @@ class Commit:
 
         :return: project name
         """
-        return Path(self._conf.get('path_to_repo'))
+        return str(Path(self._conf.get('path_to_repo')))
 
     @property
     def author_date(self) -> datetime:

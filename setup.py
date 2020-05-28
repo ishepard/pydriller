@@ -1,3 +1,4 @@
+from os import path
 from setuptools import setup, find_packages
 
 with open('requirements.txt') as reqs_file:
@@ -14,13 +15,23 @@ long_description = 'PyDriller is a Python framework that helps developers on ' \
                    'modifications, diffs, and source codes, and ' \
                    'quickly export CSV files.'
 
+
+def get_version():
+    with open(path.join(path.dirname(__file__), 'pydriller', '__init__.py')) as f:
+        for line in f:
+            if line.startswith('__version__'):
+                delim = '"' if '"' in line else "'"
+                return line.split(delim)[1]
+        else:
+            raise RuntimeError("Unable to find version string.")
+
 setup(
     name='PyDriller',
     description='Framework for MSR',
     long_description=long_description,
     author='Davide Spadini',
     author_email='spadini.davide@gmail.com',
-    version='1.15.1',
+    version=get_version(),
     packages=find_packages('.'),
     url='https://github.com/ishepard/pydriller',
     license='Apache License',

@@ -25,6 +25,7 @@ from pydriller.git_repository import GitRepository
 def path():
     return None
 
+
 @pytest.fixture
 def repo(path):
     gr = GitRepository(path)
@@ -487,7 +488,6 @@ def test_get_commits_last_modified_lines_hyper_blame_unblamable(tmp_path,
     p = tmp_path / "ignore.txt"
     p.write_text("540c7f31c18664a38190fafb6721b5174ff4a166")
 
-
     buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit(
         'e6d3b38a9ef683e8184eac10a0471075c2808bbd'),
         hashes_to_ignore_path=str(p))
@@ -501,7 +501,6 @@ def test_get_commits_last_modified_lines_hyper_blame_unblamable(tmp_path,
 def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(tmp_path, repo):
     p = tmp_path / "ignore.txt"
     p.write_text("5cb9e9ae44a0949ec91d06a955975289be766f34")
-
 
     buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit(
         'c7002fb321a8ba32a28fac200538f7c2ba76f175'),

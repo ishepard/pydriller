@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from pydriller.repository_mining import RepositoryMining
+from datetime import datetime, timezone, timedelta
 import logging
+import pytest
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-import pytest
-from pydriller.repository_mining import RepositoryMining
-from datetime import datetime, timezone, timedelta
 
 to_zone = timezone(timedelta(hours=1))
 dt = datetime(2018, 3, 22, 10, 41, 30, tzinfo=to_zone)

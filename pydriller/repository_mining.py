@@ -37,7 +37,6 @@ class RepositoryMining:
     This is the main class of PyDriller, responsible for running the study.
     """
 
-    # pylint: disable=R0902,R0913,R0914
     def __init__(self, path_to_repo: Union[str, List[str]],
                  single: str = None,
                  since: datetime = None, to: datetime = None,
@@ -96,7 +95,7 @@ class RepositoryMining:
             'author-date-order', 'topo-order', or 'reverse'. Default is reverse.
         """
         file_modification_set = (
-            None if only_modifications_with_file_types is None 
+            None if only_modifications_with_file_types is None
             else set(only_modifications_with_file_types)
             )
         commit_set = (

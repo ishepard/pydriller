@@ -6,6 +6,7 @@ import statistics
 from pydriller import ModificationType
 from pydriller.metrics.process.process_metric import ProcessMetric
 
+
 class CodeChurn(ProcessMetric):
     """
     This class is responsible to implement the Code Churn metric for a

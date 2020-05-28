@@ -5,6 +5,7 @@ This module contains the abstract class to implement process metrics.
 from datetime import datetime
 from pydriller import RepositoryMining
 
+
 class ProcessMetric:
     """
     Abstract class to implement process metrics

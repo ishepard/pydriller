@@ -12,21 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from pydriller.repository_mining import RepositoryMining
+from datetime import datetime, timezone, timedelta
 import logging
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
-from pydriller.repository_mining import RepositoryMining
-
-from datetime import datetime, timezone, timedelta
-
 
 def test_one_timezone():
     lc = list(
         RepositoryMining('test-repos/branches_merged',
-                         single='29e929fbc5dc6a2e9c620069b24e2a143af4285f')
-            .traverse_commits())
+                         single='29e929fbc5dc6a2e9c620069b24e2a143af4285f').traverse_commits())
 
     to_zone = timezone(timedelta(hours=2))
     dt = datetime(2016, 4, 4, 13, 21, 25, tzinfo=to_zone)
@@ -37,8 +34,7 @@ def test_one_timezone():
 def test_between_dates_reversed():
     lc = list(
         RepositoryMining('test-repos/different_files',
-                         single='375de7a8275ecdc0b28dc8de2568f47241f443e9')
-            .traverse_commits())
+                         single='375de7a8275ecdc0b28dc8de2568f47241f443e9').traverse_commits())
 
     to_zone = timezone(timedelta(hours=-4))
     dt = datetime(2016, 10, 8, 17, 57, 49, tzinfo=to_zone)

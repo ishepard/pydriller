@@ -36,7 +36,6 @@ class GitRepository:
     PyDriller: obtaining the list of commits, checkout, reset, etc.
     """
 
-    # pylint: disable=too-many-instance-attributes
     def __init__(self, path: str, conf=None):
         """
         Init the Git RepositoryMining.
@@ -275,7 +274,7 @@ class GitRepository:
                                 hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
 
-        commits = {} # type: Dict[str, Set[str]]
+        commits = {}  # type: Dict[str, Set[str]]
 
         for mod in modifications:
             path = mod.new_path

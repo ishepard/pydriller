@@ -1,0 +1,6 @@
+[flake8]
+show-source = True
+count = True
+statistics = True
+max-line-length = 150
+exclude = .github,venv,build,dist,docs,test-repos,.venv

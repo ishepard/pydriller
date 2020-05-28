@@ -101,35 +101,42 @@ def commit_by_msg(repo: GitRepository, msg: str) -> Commit:
             return commit
     raise Exception('cannot find commit with msg {}'.format(msg))
 
+
 @pytest.mark.parametrize('msg,dmm', UNIT_SIZE_TEST_DATA)
 def test_dmm_unit_size(repo: GitRepository, msg: str, dmm: float):
     commit = commit_by_msg(repo, msg)
     assert commit.dmm_unit_size == dmm
+
 
 @pytest.mark.parametrize('msg,dmm', UNIT_COMPLEXITY_TEST_DATA)
 def test_dmm_unit_complexity(repo: GitRepository, msg: str, dmm: float):
     commit = commit_by_msg(repo, msg)
     assert commit.dmm_unit_complexity == dmm
 
+
 @pytest.mark.parametrize('msg,dmm', UNIT_INTERFACING_TEST_DATA)
 def test_dmm_unit_interfacing(repo: GitRepository, msg: str, dmm: float):
     commit = commit_by_msg(repo, msg)
     assert commit.dmm_unit_interfacing == dmm
 
+
 def test_unsupported_language(repo: GitRepository):
     # Add .md file that cannot be analyzed by Lizard
     commit = commit_by_msg(repo, 'Offer README explaining the repo purpose')
-    assert  commit.dmm_unit_size is None
+    assert commit.dmm_unit_size is None
+
 
 def test_mixin_unsupported_language(repo: GitRepository):
     # Add .txt file and update (comments in) .java files
     commit = commit_by_msg(repo, 'Release under Apache 2 license')
-    assert  commit.dmm_unit_size == None
+    assert commit.dmm_unit_size is None
+
 
 def test_delta_profile_modification(repo: GitRepository):
     commit = commit_by_msg(repo, 'Increase unit size to risky')
     mod = commit.modifications[0]
     assert mod._delta_risk_profile(DMMProperty.UNIT_SIZE) == (-15, 16)
+
 
 def test_delta_profile_commit(repo: GitRepository):
     commit = commit_by_msg(repo, 'Increase in one, decrease in other file')
@@ -141,23 +148,25 @@ def test_delta_profile_commit(repo: GitRepository):
 
     assert commit._delta_risk_profile(DMMProperty.UNIT_SIZE) == (3, 1)
 
+
 def test_supported_languages(repo: GitRepository):
     # Add .md file that cannot be analyzed by Lizard
     commit = commit_by_msg(repo, 'Offer README explaining the repo purpose')
     mod = commit.modifications[0]
     assert not mod.language_supported
 
+
 @pytest.mark.parametrize(
     'dlo,dhi,prop', [
-    ( 0,  0, None),
-    ( 1,  0, 1.0),
-    (-1,  0, 0.0),
-    ( 0,  1, 0.0),
-    ( 0, -1, 1.0),
-    ( 1,  1, 0.5),
-    (-1, -1, 0.5),
-    ( 1, -1, 1.0),
-    (-1,  1, 0.0)
+        (0,  0, None),
+        (1,  0, 1.0),
+        (-1,  0, 0.0),
+        (0,  1, 0.0),
+        (0, -1, 1.0),
+        (1,  1, 0.5),
+        (-1, -1, 0.5),
+        (1, -1, 1.0),
+        (-1,  1, 0.0)
     ])
 def test_good_proportion(dlo: int, dhi: int, prop: float):
     assert Commit._good_change_proportion(dlo, dhi) == prop

@@ -54,7 +54,7 @@ class DMMProperty(Enum):
     UNIT_INTERFACING = 3
 
 
-class Method:  # pylint: disable=R0902
+class Method:
     """
     This class represents a method in a class. Contains various information
     extracted through Lizard.
@@ -133,7 +133,7 @@ class Method:  # pylint: disable=R0902
         return len(self.parameters) <= Method.UNIT_INTERFACING_LOW_RISK_THRESHOLD
 
 
-class Modification:  # pylint: disable=R0902
+class Modification:
     """
     This class contains information regarding a modified file in a commit.
     """
@@ -156,7 +156,7 @@ class Modification:  # pylint: disable=R0902
         self._nloc = None
         self._complexity = None
         self._token_count = None
-        self._function_list = [] # type: List[Method]
+        self._function_list = []  # type: List[Method]
         self._function_list_before = []  # type: List[Method]
 
     @property
@@ -276,7 +276,7 @@ class Modification:  # pylint: disable=R0902
         :return: Dictionary
         """
         lines = self.diff.split('\n')
-        modified_lines = {'added': [], 'deleted': []} # type: Dict[str, List[Tuple[int, str]]]
+        modified_lines = {'added': [], 'deleted': []}  # type: Dict[str, List[Tuple[int, str]]]
 
         count_deletions = 0
         count_additions = 0
@@ -740,7 +740,7 @@ class Commit:
         """
         supported_modifications = [mod for mod in self.modifications if mod.language_supported]
         if supported_modifications:
-            deltas = [mod._delta_risk_profile(dmm_prop) for mod in supported_modifications]  #pylint: disable=W0212
+            deltas = [mod._delta_risk_profile(dmm_prop) for mod in supported_modifications]
             delta_low = sum(dlow for (dlow, dhigh) in deltas)
             delta_high = sum(dhigh for (dlow, dhigh) in deltas)
             return delta_low, delta_high
@@ -777,7 +777,6 @@ class Commit:
 
         return proportion
 
-    # pylint disable=R0902
     @staticmethod
     def _from_change_to_modification_type(diff: Diff):
         if diff.new_file:

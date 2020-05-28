@@ -46,22 +46,24 @@ def test_memory(caplog):
     minutes_with_everything = (diff_with_everything.seconds % 3600) // 60
     minutes_with_metrics = (diff_with_metrics.seconds % 3600) // 60
 
-    logging.warning("TIME: With nothing: {}:{}:{} ({} commits/sec), "
-                    "with everything: {}:{}:{}  ({} commits/sec), "
-                    "with metrics: {}:{}:{}  ({} commits/sec)".format(
-        diff_with_nothing.seconds // 3600,
-        (diff_with_nothing.seconds % 3600) // 60,
-        diff_with_nothing.seconds % 60,
-        973 // diff_with_nothing.seconds if diff_with_nothing.seconds != 0 else 0,
-        diff_with_everything.seconds // 3600,
-        (diff_with_everything.seconds % 3600) // 60,
-        diff_with_everything.seconds % 60,
-        973 // diff_with_everything.seconds,
-        diff_with_metrics.seconds // 3600,
-        (diff_with_metrics.seconds % 3600) // 60,
-        diff_with_metrics.seconds % 60,
-        973 // diff_with_metrics.seconds
-    ))
+    logging.warning(
+        "TIME: With nothing: {}:{}:{} ({} commits/sec), "
+        "with everything: {}:{}:{}  ({} commits/sec), "
+        "with metrics: {}:{}:{}  ({} commits/sec)".format(
+            diff_with_nothing.seconds // 3600,
+            (diff_with_nothing.seconds % 3600) // 60,
+            diff_with_nothing.seconds % 60,
+            973 // diff_with_nothing.seconds if diff_with_nothing.seconds != 0 else 0,
+            diff_with_everything.seconds // 3600,
+            (diff_with_everything.seconds % 3600) // 60,
+            diff_with_everything.seconds % 60,
+            973 // diff_with_everything.seconds,
+            diff_with_metrics.seconds // 3600,
+            (diff_with_metrics.seconds % 3600) // 60,
+            diff_with_metrics.seconds % 60,
+            973 // diff_with_metrics.seconds
+        )
+    )
 
     if any(val > 250 for val in max_values) or \
             minutes_with_everything >= 1 or \
@@ -118,19 +120,19 @@ def mine(_type):
         memory = p.memory_info()[0] / (2 ** 20)
         all_commits.append(memory)
 
-        h = commit.author.name
+        h = commit.author.name  # noqa
 
         if _type == 0:
             continue
 
         for mod in commit.modifications:
-            dd = mod.diff
+            dd = mod.diff  # noqa
 
             if _type == 1:
                 continue
 
             if mod.filename.endswith('.java'):
-                cc = mod.complexity
+                cc = mod.complexity  # noqa
 
     end = datetime.now()
 

@@ -5,6 +5,7 @@ import statistics
 
 from pydriller.metrics.process.process_metric import ProcessMetric
 
+
 class ChangeSet(ProcessMetric):
     """
     This class is responsible to implement the Change Set metric that

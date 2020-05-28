@@ -25,6 +25,7 @@ def get_version():
         else:
             raise RuntimeError("Unable to find version string.")
 
+
 setup(
     name='PyDriller',
     description='Framework for MSR',

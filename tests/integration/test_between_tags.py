@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from pydriller.repository_mining import RepositoryMining
 import logging
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
-
-from pydriller.repository_mining import RepositoryMining
 
 
 def test_between_revisions():

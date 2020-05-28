@@ -481,9 +481,9 @@ class Commit:
     @property
     def project_path(self) -> str:
         """
-        Return the project name.
+        Return the absolute path of the project.
 
-        :return: project name
+        :return: project path
         """
         return str(Path(self._conf.get('path_to_repo')))
 

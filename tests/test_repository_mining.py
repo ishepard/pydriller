@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-
+import os
 import pytest
 
 from pydriller import RepositoryMining, GitRepository
@@ -228,6 +228,7 @@ def test_clone_repo_to(tmp_path):
         path_to_repo=url,
         to=dt2,
         clone_repo_to=str(tmp_path)).traverse_commits())) == 159
+    assert tmp_path.exists() is True
 
 
 def test_clone_repo_to_not_existing():
@@ -253,3 +254,16 @@ def test_projectname_multiple_repos_remote():
     ]
     for commit in RepositoryMining(path_to_repo=repos).traverse_commits():
         assert commit.project_name == 'pydriller'
+
+
+def test_deletion_remotes():
+    repos = [
+        'https://github.com/ishepard/pydriller',
+        'https://github.com/ishepard/pydriller'
+    ]
+    paths = set()
+    for commit in RepositoryMining(path_to_repo=repos).traverse_commits():
+        paths.add(commit.project_path)
+
+    for path in paths:
+        assert os.path.exists(path) is False

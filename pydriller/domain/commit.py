@@ -479,6 +479,15 @@ class Commit:
         return Path(self._conf.get('path_to_repo')).name
 
     @property
+    def project_path(self) -> str:
+        """
+        Return the project name.
+
+        :return: project name
+        """
+        return str(Path(self._conf.get('path_to_repo')))
+
+    @property
     def author_date(self) -> datetime:
         """
         Return the authored datetime.

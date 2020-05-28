@@ -18,6 +18,8 @@ This module includes 1 class, RepositoryMining, main class of PyDriller.
 
 import logging
 import os
+import shutil
+import stat
 import tempfile
 from datetime import datetime
 from pathlib import Path
@@ -131,14 +133,16 @@ class RepositoryMining:
         }
         self._conf = Conf(options)
 
+        # If the user provides a directory where to clone the repositories,
+        # make sure we do not delete the directory after the study completes
+        self._cleanup = False if clone_repo_to is not None else True
+
     @staticmethod
     def _is_remote(repo: str) -> bool:
         return repo.startswith("git@") or repo.startswith("https://")
 
-    def _clone_remote_repos(self, tmp_folder: str, repo: str) -> str:
-
-        repo_folder = os.path.join(tmp_folder,
-                                   self._get_repo_name_from_url(repo))
+    def _clone_remote_repo(self, tmp_folder: str, repo: str) -> str:
+        repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
         logger.info("Cloning %s in temporary folder %s", repo, repo_folder)
         Repo.clone_from(url=repo, to_path=repo_folder)
 
@@ -150,7 +154,9 @@ class RepositoryMining:
             if not os.path.isdir(clone_folder):
                 raise Exception("Not a directory: {0}".format(clone_folder))
         else:
-            clone_folder = tempfile.TemporaryDirectory().name
+            # Save the temporary directory so we can clean it up later
+            self._tmp_dir = tempfile.TemporaryDirectory()
+            clone_folder = self._tmp_dir.name
         return clone_folder
 
     def traverse_commits(self) -> Generator[Commit, None, None]:
@@ -159,16 +165,17 @@ class RepositoryMining:
         a generator of commits.
         """
         for path_repo in self._conf.get('path_to_repos'):
+            local_path_repo = path_repo
             if self._is_remote(path_repo):
-                path_repo = self._clone_remote_repos(self._clone_folder(), path_repo)
+                local_path_repo = self._clone_remote_repo(self._clone_folder(), path_repo)
 
-            git_repo = GitRepository(path_repo, self._conf)
+            git_repo = GitRepository(local_path_repo, self._conf)
             # saving the GitRepository object for further use
             self._conf.set_value("git_repo", git_repo)
 
             # when multiple repos are given in input, this variable will serve as a reminder
             # of which one we are currently analyzing
-            self._conf.set_value('path_to_repo', path_repo)
+            self._conf.set_value('path_to_repo', local_path_repo)
 
             # checking that the filters are set correctly
             self._conf.sanity_check_filters()
@@ -201,6 +208,22 @@ class RepositoryMining:
             # cleaning, this is necessary since GitPython issues on memory leaks
             self._conf.set_value("git_repo", None)
             git_repo.clear()
+
+            # delete the temporary directory if created
+            if self._is_remote(path_repo) and self._cleanup is True:
+                assert self._tmp_dir is not None
+                try:
+                    self._tmp_dir.cleanup()
+                except PermissionError:
+                    # on Windows, Python 3.5, 3.6, 3.7 are not able to delete
+                    # git directories because of read-only files. This is now fixed
+                    # in python 3.8. In this case, we need to use an
+                    # onerror callback to clear the read-only bit.
+                    # see https://docs.python.org/3/library/shutil.html?highlight=shutil#rmtree-example
+                    def remove_readonly(func, path, _):
+                        os.chmod(path, stat.S_IWRITE)
+                        func(path)
+                    shutil.rmtree(self._tmp_dir.name, onerror=remove_readonly)
 
     @staticmethod
     def _get_repo_name_from_url(url: str) -> str:

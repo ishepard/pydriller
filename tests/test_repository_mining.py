@@ -257,12 +257,8 @@ def test_projectname_multiple_repos_remote():
 
 
 def test_deletion_remotes():
-    repos = ['https://github.com/ishepard/pydriller',
-             'https://github.com/ishepard/pydriller']
+    path = ''
+    for commit in RepositoryMining(path_to_repo='https://github.com/ishepard/pydriller').traverse_commits():
+        path = commit.project_path
 
-    paths = set()
-    for commit in RepositoryMining(path_to_repo=repos).traverse_commits():
-        paths.add(commit.project_path)
-
-    for path in paths:
-        assert os.path.exists(path) is False
+    assert os.path.exists(path) is False

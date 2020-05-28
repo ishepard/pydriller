@@ -4,6 +4,13 @@
 API Reference
 =============
 
+Version
+--------
+.. py:data:: pydriller.__version__
+
+   Current Pydriller version.
+
+
 GitRepository
 -------------
 

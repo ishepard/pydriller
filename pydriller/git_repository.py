@@ -42,7 +42,7 @@ class GitRepository:
 
         :param str path: path to the repository
         """
-        self.path = Path(path)
+        self.path = Path(path).expanduser().resolve()
         self.project_name = self.path.name
         self.lock = Lock()
         self._git = None

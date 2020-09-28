@@ -107,17 +107,20 @@ def test_get_first_commit(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/files/'])
 def test_files(repo):
-    all = repo.files()
+    files = repo.files()
+    assert len(files) == 8
 
-    assert len(all) == 8
-    assert str(Path('test-repos/files/tmp1.py')) in all
-    assert str(Path('test-repos/files/tmp2.py')) in all
-    assert str(Path('test-repos/files/fold1/tmp3.py')) in all
-    assert str(Path('test-repos/files/fold1/tmp4.py')) in all
-    assert str(Path('test-repos/files/fold2/tmp5.py')) in all
-    assert str(Path('test-repos/files/fold2/tmp6.py')) in all
-    assert str(Path('test-repos/files/fold2/fold3/tmp7.py')) in all
-    assert str(Path('test-repos/files/fold2/fold3/tmp8.py')) in all
+    expected_files = (str(Path('test-repos/files/tmp1.py')),
+                      str(Path('test-repos/files/tmp2.py')),
+                      str(Path('test-repos/files/fold1/tmp3.py')),
+                      str(Path('test-repos/files/fold1/tmp4.py')),
+                      str(Path('test-repos/files/fold2/tmp5.py')),
+                      str(Path('test-repos/files/fold2/tmp6.py')),
+                      str(Path('test-repos/files/fold2/fold3/tmp7.py')),
+                      str(Path('test-repos/files/fold2/fold3/tmp8.py')),
+                      )
+    for file in files:
+        assert file.endswith(expected_files)
 
 
 @pytest.mark.parametrize('path', ['test-repos/small_repo/'])
@@ -339,7 +342,6 @@ def test_tags(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_simple(repo):
-
     buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit('e6d3b38a9ef683e8184eac10a0471075c2808bbd'))
 
     assert len(buggy_commits) == 1
@@ -349,7 +351,6 @@ def test_get_commits_last_modified_lines_simple(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_multiple(repo):
-
     buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit('9942ee9dcdd1103e5808d544a84e6bc8cade0e54'))
 
     assert len(buggy_commits) == 1
@@ -363,7 +364,6 @@ def test_get_commits_last_modified_lines_multiple(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_rename_simple(repo):
-
     buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit('45ba0a61ccc448625bce0fea0301cf0c1ab32696'))
 
     assert len(buggy_commits) == 1
@@ -381,7 +381,6 @@ def test_get_commits_last_modified_lines_multiple_rename(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_rename_simple_more_commits(repo):
-
     buggy_commits = repo.get_commits_last_modified_lines(
         repo.get_commit('04fadd3e68c58281db6cf15119f9769880ac1cbc'))
 
@@ -394,7 +393,6 @@ def test_get_commits_last_modified_lines_rename_simple_more_commits(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_useless_lines(repo):
-
     buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit('3bc7295c16b7dfc15d5f82eb6962a2774e1b8420'))
     assert len(buggy_commits) == 1
     assert 'c7fc2e870ce03b0b8dc29ed0eeb26d14e235ea3b' in buggy_commits[
@@ -403,14 +401,12 @@ def test_get_commits_last_modified_lines_useless_lines(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_useless_lines2(repo):
-
     buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit('4155c421ee5cbb3c34feee7b68aa78a2ee1bbeae'))
     assert len(buggy_commits) == 0
 
 
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_for_single_file(repo):
-
     commit = repo.get_commit('0f726924f96621e4965039123098ba83e39ffba6')
     buggy_commits = None
     for mod in commit.modifications:
@@ -424,7 +420,6 @@ def test_get_commits_last_modified_lines_for_single_file(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_with_more_modification(repo):
-
     buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit('c7002fb321a8ba32a28fac200538f7c2ba76f175'))
     assert len(buggy_commits) == 1
     assert '5cb9e9ae44a0949ec91d06a955975289be766f34' in buggy_commits[
@@ -433,7 +428,6 @@ def test_get_commits_last_modified_lines_with_more_modification(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/small_repo/'])
 def test_get_commits_modified_file(repo):
-
     commits = repo.get_commits_modified_file('file2.java')
 
     assert len(commits) == 3
@@ -444,7 +438,6 @@ def test_get_commits_modified_file(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/small_repo/'])
 def test_get_commits_modified_file_missing_file(repo):
-
     commits = repo.get_commits_modified_file('non-existing-file.java')
 
     assert len(commits) == 0
@@ -452,7 +445,6 @@ def test_get_commits_modified_file_missing_file(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/tags'])
 def test_get_tagged_commits(repo):
-
     tagged_commits = repo.get_tagged_commits()
 
     assert len(tagged_commits) == 3
@@ -463,7 +455,6 @@ def test_get_tagged_commits(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/different_files'])
 def test_get_tagged_commits_wo_tags(repo):
-
     tagged_commits = repo.get_tagged_commits()
 
     assert len(tagged_commits) == 0
@@ -471,7 +462,6 @@ def test_get_tagged_commits_wo_tags(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_hyper_blame(repo):
-
     buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit(
         'e6d3b38a9ef683e8184eac10a0471075c2808bbd'))
 
@@ -513,7 +503,6 @@ def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(tmp_path, repo)
 
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_hyper_blame_with_renaming(repo):
-
     buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit(
         'be0772cbaa2eba32bf97aae885199d1a357ddc93'))
 

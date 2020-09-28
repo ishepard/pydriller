@@ -169,13 +169,16 @@ class RepositoryMining:
             if self._is_remote(path_repo):
                 local_path_repo = self._clone_remote_repo(self._clone_folder(), path_repo)
 
-            git_repo = GitRepository(local_path_repo, self._conf)
-            # saving the GitRepository object for further use
-            self._conf.set_value("git_repo", git_repo)
+            # Get absolute path
+            local_path_repo = str(Path(local_path_repo).expanduser().resolve())
 
             # when multiple repos are given in input, this variable will serve as a reminder
             # of which one we are currently analyzing
             self._conf.set_value('path_to_repo', local_path_repo)
+
+            git_repo = GitRepository(local_path_repo, self._conf)
+            # saving the GitRepository object for further use
+            self._conf.set_value("git_repo", git_repo)
 
             # checking that the filters are set correctly
             self._conf.sanity_check_filters()

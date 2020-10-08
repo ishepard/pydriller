@@ -161,7 +161,7 @@ class RepositoryMining:
         return clone_folder
 
     @contextmanager
-    def _prep_repo(self, path_repo: str) -> GitRepository:
+    def _prep_repo(self, path_repo: str) -> Generator[GitRepository, None, None]:
         local_path_repo = path_repo
         if self._is_remote(path_repo):
             local_path_repo = self._clone_remote_repo(self._clone_folder(), path_repo)

@@ -21,6 +21,7 @@ import os
 import shutil
 import stat
 import tempfile
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import List, Generator, Union
@@ -159,74 +160,77 @@ class RepositoryMining:
             clone_folder = self._tmp_dir.name
         return clone_folder
 
+    @contextmanager
+    def _prep_repo(self, path_repo: str) -> Generator[GitRepository, None, None]:
+        local_path_repo = path_repo
+        if self._is_remote(path_repo):
+            local_path_repo = self._clone_remote_repo(self._clone_folder(), path_repo)
+        local_path_repo = str(Path(local_path_repo).expanduser().resolve())
+
+        # when multiple repos are given in input, this variable will serve as a reminder
+        # of which one we are currently analyzing
+        self._conf.set_value('path_to_repo', local_path_repo)
+
+        git_repo = GitRepository(local_path_repo, self._conf)
+        # saving the GitRepository object for further use
+        self._conf.set_value("git_repo", git_repo)
+
+        # checking that the filters are set correctly
+        self._conf.sanity_check_filters()
+        yield git_repo
+
+        # cleaning, this is necessary since GitPython issues on memory leaks
+        self._conf.set_value("git_repo", None)
+        git_repo.clear()
+
+        # delete the temporary directory if created
+        if self._is_remote(path_repo) and self._cleanup is True:
+            assert self._tmp_dir is not None
+            try:
+                self._tmp_dir.cleanup()
+            except PermissionError:
+                # on Windows, Python 3.5, 3.6, 3.7 are not able to delete
+                # git directories because of read-only files. This is now fixed
+                # in python 3.8. In this case, we need to use an
+                # onerror callback to clear the read-only bit.
+                # see https://docs.python.org/3/library/shutil.html?highlight=shutil#rmtree-example
+                def _remove_readonly(func, path, _):
+                    os.chmod(path, stat.S_IWRITE)
+                    func(path)
+
+                shutil.rmtree(self._tmp_dir.name, onerror=_remove_readonly)
+
     def traverse_commits(self) -> Generator[Commit, None, None]:
         """
         Analyze all the specified commits (all of them by default), returning
         a generator of commits.
         """
         for path_repo in self._conf.get('path_to_repos'):
-            local_path_repo = path_repo
-            if self._is_remote(path_repo):
-                local_path_repo = self._clone_remote_repo(self._clone_folder(), path_repo)
+            with self._prep_repo(path_repo=path_repo) as git_repo:
+                logger.info('Analyzing git repository in %s', git_repo.path)
 
-            # Get absolute path
-            local_path_repo = str(Path(local_path_repo).expanduser().resolve())
+                # Get the commits that modified the filepath. In this case, we can not use
+                # git rev-list since it doesn't have the option --follow, necessary to follow
+                # the renames. Hence, we manually call git log instead
+                if self._conf.get('filepath') is not None:
+                    self._conf.set_value('filepath_commits', git_repo.get_commits_modified_file(self._conf.get('filepath')))
 
-            # when multiple repos are given in input, this variable will serve as a reminder
-            # of which one we are currently analyzing
-            self._conf.set_value('path_to_repo', local_path_repo)
+                # Gets only the commits that are tagged
+                if self._conf.get('only_releases'):
+                    self._conf.set_value('tagged_commits', git_repo.get_tagged_commits())
 
-            git_repo = GitRepository(local_path_repo, self._conf)
-            # saving the GitRepository object for further use
-            self._conf.set_value("git_repo", git_repo)
+                # Build the arguments to pass to git rev-list.
+                rev, kwargs = self._conf.build_args()
 
-            # checking that the filters are set correctly
-            self._conf.sanity_check_filters()
+                # Iterate over all the commits returned by git rev-list
+                for commit in git_repo.get_list_commits(rev, **kwargs):
+                    logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
 
-            logger.info('Analyzing git repository in %s', git_repo.path)
+                    if self._conf.is_commit_filtered(commit):
+                        logger.info('Commit #%s filtered', commit.hash)
+                        continue
 
-            # Get the commits that modified the filepath. In this case, we can not use
-            # git rev-list since it doesn't have the option --follow, necessary to follow
-            # the renames. Hence, we manually call git log instead
-            if self._conf.get('filepath') is not None:
-                self._conf.set_value('filepath_commits', git_repo.get_commits_modified_file(self._conf.get('filepath')))
-
-            # Gets only the commits that are tagged
-            if self._conf.get('only_releases'):
-                self._conf.set_value('tagged_commits', git_repo.get_tagged_commits())
-
-            # Build the arguments to pass to git rev-list.
-            rev, kwargs = self._conf.build_args()
-
-            # Iterate over all the commits returned by git rev-list
-            for commit in git_repo.get_list_commits(rev, **kwargs):
-                logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
-
-                if self._conf.is_commit_filtered(commit):
-                    logger.info('Commit #%s filtered', commit.hash)
-                    continue
-
-                yield commit
-
-            # cleaning, this is necessary since GitPython issues on memory leaks
-            self._conf.set_value("git_repo", None)
-            git_repo.clear()
-
-            # delete the temporary directory if created
-            if self._is_remote(path_repo) and self._cleanup is True:
-                assert self._tmp_dir is not None
-                try:
-                    self._tmp_dir.cleanup()
-                except PermissionError:
-                    # on Windows, Python 3.5, 3.6, 3.7 are not able to delete
-                    # git directories because of read-only files. This is now fixed
-                    # in python 3.8. In this case, we need to use an
-                    # onerror callback to clear the read-only bit.
-                    # see https://docs.python.org/3/library/shutil.html?highlight=shutil#rmtree-example
-                    def remove_readonly(func, path, _):
-                        os.chmod(path, stat.S_IWRITE)
-                        func(path)
-                    shutil.rmtree(self._tmp_dir.name, onerror=remove_readonly)
+                    yield commit
 
     @staticmethod
     def _get_repo_name_from_url(url: str) -> str:

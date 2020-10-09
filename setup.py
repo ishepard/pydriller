@@ -38,7 +38,7 @@ setup(
     package_dir={'pydriller': 'pydriller'},
     python_requires='>=3.5',
     install_requires=requirements,
-    test_requirements=requirements + test_requirements,
+    tests_require=requirements + test_requirements,
     classifiers=[
             # How mature is this project? Common values are
             #   3 - Alpha

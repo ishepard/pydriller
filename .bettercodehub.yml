@@ -1,6 +1,0 @@
-component_depth: 2
-languages:
-- python
-exclude:
-- /docs/.*
-- /setup.py

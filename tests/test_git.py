@@ -18,7 +18,7 @@ import pytest
 from git import Git as GGitPython
 
 from pydriller.domain.commit import ModificationType
-from pydriller.git_repository import Git
+from pydriller.git import Git
 
 
 @pytest.fixture

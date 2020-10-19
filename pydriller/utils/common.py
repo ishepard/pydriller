@@ -91,7 +91,7 @@ def open_folder(path_repo: str, conf: Conf, cleanup: bool) -> Generator[str, Non
     """
     Function responsible of preparing the folder with the reposutory
     and cleaning it after Pydriller finish the study.
-    
+
     :param path_repo:
     :param conf:
     :param cleanup:

@@ -14,10 +14,11 @@
 
 import logging
 from datetime import datetime, timezone, timedelta
-from pydriller.repository_mining import Repository
-from git import Repo
 
 import pytest
+from git import Repo
+
+from pydriller.repository import Repository
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -149,15 +150,15 @@ def test_only_commits():
 
     lc = list(Repository('test-repos/complex_repo',
                          only_commits=["953737b199de233896f00b4d87a0bc2794317253",
-                                             "ffccf1e7497eb8136fd66ed5e42bef29677c4b71"]).traverse_commits())
+                                       "ffccf1e7497eb8136fd66ed5e42bef29677c4b71"]).traverse_commits())
     assert len(lc) == 2
     assert lc[0].hash == "ffccf1e7497eb8136fd66ed5e42bef29677c4b71"
     assert lc[1].hash == "953737b199de233896f00b4d87a0bc2794317253"
 
     lc = list(Repository('test-repos/complex_repo',
                          only_commits=["866e997a9e44cb4ddd9e00efe49361420aff2559",
-                                             "57dbd017d1a744b949e7ca0b1c1a3b3dd4c1cbc1",
-                                             "e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2"]).traverse_commits())
+                                       "57dbd017d1a744b949e7ca0b1c1a3b3dd4c1cbc1",
+                                       "e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2"]).traverse_commits())
     assert len(lc) == 3
     assert lc[0].hash == "866e997a9e44cb4ddd9e00efe49361420aff2559"
     assert lc[1].hash == "57dbd017d1a744b949e7ca0b1c1a3b3dd4c1cbc1"

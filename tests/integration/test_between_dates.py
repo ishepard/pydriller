@@ -15,7 +15,7 @@
 import logging
 from datetime import datetime, timezone, timedelta
 
-from pydriller.repository_mining import Repository
+from pydriller.repository import Repository
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)

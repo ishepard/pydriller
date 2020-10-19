@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import List, Generator, Union
 
 from pydriller.domain.commit import Commit
-from pydriller.git_repository import Git
+from pydriller.git import Git
 from pydriller.utils.common import open_folder
 from pydriller.utils.conf import Conf
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pydriller.repository_mining import Repository
+from pydriller.repository import Repository
 from datetime import datetime, timezone, timedelta
 import logging
 import pytest

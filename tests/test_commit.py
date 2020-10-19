@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pydriller.git_repository import Git
-from pathlib import Path
-import pytest
 import logging
+from pathlib import Path
+
+import pytest
 
 from pydriller.domain.commit import Modification, ModificationType
+from pydriller.git import Git
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)

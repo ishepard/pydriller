@@ -49,9 +49,9 @@ Example usage
 
 Collecting DMM values from a git repository is  straightforward::
 
-	from pydriller import RepositoryMining
+	from pydriller import Repository
 
-	rm = RepositoryMining("https://github.com/avandeursen/dmm-test-repo")
+	rm = Repository("https://github.com/avandeursen/dmm-test-repo")
 	for commit in rm.traverse_commits():
 		print("| {} | {} | {} | {} |".format(
 			commit.msg,

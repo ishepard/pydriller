@@ -22,7 +22,7 @@ from pathlib import Path
 from threading import Lock
 from typing import List, Dict, Set, Generator
 
-from git import Git, Repo, GitCommandError, Commit as GitCommit
+from git import Git as GGitPython, Repo, GitCommandError, Commit as GitCommit
 
 from pydriller.domain.commit import Commit, ModificationType, Modification
 from pydriller.utils.conf import Conf
@@ -38,7 +38,7 @@ class GitRepository:
 
     def __init__(self, path: str, conf=None):
         """
-        Init the Git RepositoryMining.
+        Init the Git Repository.
 
         :param str path: path to the repository
         """
@@ -82,7 +82,7 @@ class GitRepository:
         return self._repo
 
     def _open_git(self):
-        self._git = Git(str(self.path))
+        self._git = GGitPython(str(self.path))
 
     def clear(self):
         """

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pydriller.repository_mining import RepositoryMining
+from pydriller.repository_mining import Repository
 import logging
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -22,9 +22,9 @@ def test_between_revisions():
     from_tag = 'tag1'
     to_tag = 'tag3'
 
-    lc = list(RepositoryMining('test-repos/tags',
-                               from_tag=from_tag,
-                               to_tag=to_tag).traverse_commits())
+    lc = list(Repository('test-repos/tags',
+                         from_tag=from_tag,
+                         to_tag=to_tag).traverse_commits())
 
     assert len(lc) == 5
     assert '6bb9e2c6a8080e6b5b34e6e316c894b2ddbf7fcd' == lc[0].hash
@@ -42,7 +42,7 @@ def test_multiple_repos_with_tags():
         'test-repos/tags',
         'test-repos/tags'
     ]
-    lc = list(RepositoryMining(path_to_repo=repos,
-                               from_tag=from_tag,
-                               to_tag=to_tag).traverse_commits())
+    lc = list(Repository(path_to_repo=repos,
+                         from_tag=from_tag,
+                         to_tag=to_tag).traverse_commits())
     assert len(lc) == 9

@@ -20,7 +20,7 @@ GitRepository
    :special-members:
    :exclude-members: __dict__, __weakref__, __eq__, __str__, __hash__
 
-RepositoryMining
+Repository
 ----------------
 
 .. automodule:: pydriller.repository_mining

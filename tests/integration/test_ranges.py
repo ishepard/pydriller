@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from pydriller.repository_mining import RepositoryMining
+from pydriller.repository_mining import Repository
 from datetime import datetime, timezone, timedelta
 import logging
 import pytest
@@ -65,24 +65,24 @@ def to_tag():
 
 @pytest.fixture
 def repository_mining_st(path, since, to):
-    return list(RepositoryMining(path, since=since, to=to).traverse_commits())
+    return list(Repository(path, since=since, to=to).traverse_commits())
 
 
 @pytest.fixture
 def repository_mining_cc(path, from_commit, to_commit):
-    return list(RepositoryMining(path, from_commit=from_commit, to_commit=to_commit).traverse_commits())
+    return list(Repository(path, from_commit=from_commit, to_commit=to_commit).traverse_commits())
 
 
 @pytest.fixture
 def repository_mining_tt(path, from_tag, to_tag):
-    return list(RepositoryMining(path, from_tag=from_tag, to_tag=to_tag).traverse_commits())
+    return list(Repository(path, from_tag=from_tag, to_tag=to_tag).traverse_commits())
 
 
 @pytest.fixture
 def repository_mining_complex_tags(path, from_tag, to_tag):
-    return list(RepositoryMining('test-repos/tags',
-                                 from_tag=from_tag,
-                                 to_tag=to_tag).traverse_commits())
+    return list(Repository('test-repos/tags',
+                           from_tag=from_tag,
+                           to_tag=to_tag).traverse_commits())
 
 
 @pytest.mark.parametrize('to,expected_commits', [
@@ -148,9 +148,9 @@ def test_from_and_to_commit(repository_mining_cc, expected_commits):
 
 
 def test_from_and_to_commit_with_merge_commit():
-    commits = RepositoryMining('test-repos/pydriller',
-                               from_commit="015f7144641a418f6a9fae4d024286ec17fd7ce8",
-                               to_commit="01d2f2fbeb6980cc5568825d008017ca8ca767d6").traverse_commits()
+    commits = Repository('test-repos/pydriller',
+                         from_commit="015f7144641a418f6a9fae4d024286ec17fd7ce8",
+                         to_commit="01d2f2fbeb6980cc5568825d008017ca8ca767d6").traverse_commits()
     assert len(list(commits)) == 3
 
 
@@ -183,40 +183,40 @@ def test_multiple_filters_exceptions():
     from_tag = 'v1.4'
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/small_repo/',
-                                       since=dt1,
-                                       from_commit=from_commit
-                                       ).traverse_commits():
+        for commit in Repository('test-repos/small_repo/',
+                                 since=dt1,
+                                 from_commit=from_commit
+                                 ).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/small_repo/',
-                                       since=dt1,
-                                       from_tag=from_tag).traverse_commits():
+        for commit in Repository('test-repos/small_repo/',
+                                 since=dt1,
+                                 from_tag=from_tag).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/small_repo/',
-                                       from_commit=from_commit,
-                                       from_tag=from_tag).traverse_commits():
+        for commit in Repository('test-repos/small_repo/',
+                                 from_commit=from_commit,
+                                 from_tag=from_tag).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/small_repo/',
-                                       to=dt1,
-                                       to_commit=from_commit
-                                       ).traverse_commits():
+        for commit in Repository('test-repos/small_repo/',
+                                 to=dt1,
+                                 to_commit=from_commit
+                                 ).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/small_repo/',
-                                       to=dt1,
-                                       to_tag=from_tag).traverse_commits():
+        for commit in Repository('test-repos/small_repo/',
+                                 to=dt1,
+                                 to_tag=from_tag).traverse_commits():
             print(commit.hash)
 
     with pytest.raises(Exception):
-        for commit in RepositoryMining('test-repos/small_repo/',
-                                       single=from_commit,
-                                       to=dt1,
-                                       to_tag=from_tag).traverse_commits():
+        for commit in Repository('test-repos/small_repo/',
+                                 single=from_commit,
+                                 to=dt1,
+                                 to_tag=from_tag).traverse_commits():
             print(commit.hash)

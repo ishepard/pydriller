@@ -3,7 +3,7 @@ from datetime import datetime
 import os
 import pytest
 
-from pydriller import RepositoryMining, GitRepository
+from pydriller import Repository, GitRepository
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -21,12 +21,12 @@ def to():
 
 @pytest.fixture
 def repo(path):
-    return list(RepositoryMining(path_to_repo=path).traverse_commits())
+    return list(Repository(path_to_repo=path).traverse_commits())
 
 
 @pytest.fixture
 def repo_to(path, to):
-    return list(RepositoryMining(path_to_repo=path, to=to).traverse_commits())
+    return list(Repository(path_to_repo=path, to=to).traverse_commits())
 
 
 @pytest.fixture()
@@ -39,13 +39,13 @@ def git_repo(path):
 # It should fail when no URLs are specified
 def test_no_url():
     with pytest.raises(Exception):
-        list(RepositoryMining().traverse_commits())
+        list(Repository().traverse_commits())
 
 
 # It should fail when URL is not a string or a List
 def test_badly_formatted_repo_url():
     with pytest.raises(Exception):
-        list(RepositoryMining(path_to_repo=set('repo')).traverse_commits())
+        list(Repository(path_to_repo=set('repo')).traverse_commits())
 
 
 @pytest.mark.parametrize('path,expected', [
@@ -109,19 +109,19 @@ def test_both_local_and_remote_urls_list(repo_to, expected):
 
 def test_badly_formatted_url():
     with pytest.raises(Exception):
-        list(RepositoryMining(
+        list(Repository(
             path_to_repo='https://github.com/ishepard.git/test')
              .traverse_commits())
 
     with pytest.raises(Exception):
-        list(RepositoryMining(path_to_repo='test').traverse_commits())
+        list(Repository(path_to_repo='test').traverse_commits())
 
 
 @pytest.mark.parametrize('path', ["test-repos/histogram"])
 def test_diff_without_histogram(git_repo):
     # without histogram
-    commit = list(RepositoryMining('test-repos/histogram',
-                                   single="93df8676e6fab70d9677e94fd0f6b17db095e890").traverse_commits())[0]
+    commit = list(Repository('test-repos/histogram',
+                             single="93df8676e6fab70d9677e94fd0f6b17db095e890").traverse_commits())[0]
 
     diff = commit.modifications[0].diff_parsed
     assert len(diff['added']) == 11
@@ -150,9 +150,9 @@ def test_diff_without_histogram(git_repo):
 @pytest.mark.parametrize('path', ["test-repos/histogram"])
 def test_diff_with_histogram(git_repo):
     # with histogram
-    commit = list(RepositoryMining('test-repos/histogram',
-                                   single="93df8676e6fab70d9677e94fd0f6b17db095e890",
-                                   histogram_diff=True).traverse_commits())[0]
+    commit = list(Repository('test-repos/histogram',
+                             single="93df8676e6fab70d9677e94fd0f6b17db095e890",
+                             histogram_diff=True).traverse_commits())[0]
     diff = commit.modifications[0].diff_parsed
     assert (4, '    {') in diff["added"]
     assert (5, '        log.error("Icon path is null");') in diff["added"]
@@ -174,24 +174,24 @@ def test_diff_with_histogram(git_repo):
 
 
 def test_ignore_add_whitespaces():
-    commit = list(RepositoryMining('test-repos/whitespace',
-                                   single="338a74ceae164784e216555d930210371279ba8e").traverse_commits())[0]
+    commit = list(Repository('test-repos/whitespace',
+                             single="338a74ceae164784e216555d930210371279ba8e").traverse_commits())[0]
     assert len(commit.modifications) == 1
-    commit = list(RepositoryMining('test-repos/whitespace',
-                                   skip_whitespaces=True,
-                                   single="338a74ceae164784e216555d930210371279ba8e").traverse_commits())[0]
+    commit = list(Repository('test-repos/whitespace',
+                             skip_whitespaces=True,
+                             single="338a74ceae164784e216555d930210371279ba8e").traverse_commits())[0]
     assert len(commit.modifications) == 0
 
 
 @pytest.mark.parametrize('path', ["test-repos/whitespace"])
 def test_ignore_add_whitespaces_and_modified_normal_line(git_repo):
-    commit = list(RepositoryMining('test-repos/whitespace',
-                                   single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
+    commit = list(Repository('test-repos/whitespace',
+                             single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
     assert len(commit.modifications) == 1
     parsed_normal_diff = commit.modifications[0].diff_parsed
-    commit = list(RepositoryMining('test-repos/whitespace',
-                                   skip_whitespaces=True,
-                                   single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
+    commit = list(Repository('test-repos/whitespace',
+                             skip_whitespaces=True,
+                             single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
     assert len(commit.modifications) == 1
     parsed_wo_whitespaces_diff = commit.modifications[0].diff_parsed
     assert len(parsed_normal_diff['added']) == 2
@@ -202,29 +202,29 @@ def test_ignore_add_whitespaces_and_modified_normal_line(git_repo):
 
 
 def test_ignore_deleted_whitespaces():
-    commit = list(RepositoryMining('test-repos/whitespace',
-                                   single="e6e429f6b485e18fb856019d9953370fd5420b20").traverse_commits())[0]
+    commit = list(Repository('test-repos/whitespace',
+                             single="e6e429f6b485e18fb856019d9953370fd5420b20").traverse_commits())[0]
     assert len(commit.modifications) == 1
-    commit = list(RepositoryMining('test-repos/whitespace',
-                                   skip_whitespaces=True,
-                                   single="e6e429f6b485e18fb856019d9953370fd5420b20").traverse_commits())[0]
+    commit = list(Repository('test-repos/whitespace',
+                             skip_whitespaces=True,
+                             single="e6e429f6b485e18fb856019d9953370fd5420b20").traverse_commits())[0]
     assert len(commit.modifications) == 0
 
 
 def test_ignore_add_whitespaces_and_changed_file():
-    commit = list(RepositoryMining('test-repos/whitespace',
-                                   single="532068e9d64b8a86e07eea93de3a57bf9e5b4ae0").traverse_commits())[0]
+    commit = list(Repository('test-repos/whitespace',
+                             single="532068e9d64b8a86e07eea93de3a57bf9e5b4ae0").traverse_commits())[0]
     assert len(commit.modifications) == 2
-    commit = list(RepositoryMining('test-repos/whitespace',
-                                   skip_whitespaces=True,
-                                   single="532068e9d64b8a86e07eea93de3a57bf9e5b4ae0").traverse_commits())[0]
+    commit = list(Repository('test-repos/whitespace',
+                             skip_whitespaces=True,
+                             single="532068e9d64b8a86e07eea93de3a57bf9e5b4ae0").traverse_commits())[0]
     assert len(commit.modifications) == 1
 
 
 def test_clone_repo_to(tmp_path):
     dt2 = datetime(2018, 10, 20)
     url = "https://github.com/ishepard/pydriller.git"
-    assert len(list(RepositoryMining(
+    assert len(list(Repository(
         path_to_repo=url,
         to=dt2,
         clone_repo_to=str(tmp_path)).traverse_commits())) == 159
@@ -233,8 +233,8 @@ def test_clone_repo_to(tmp_path):
 
 def test_clone_repo_to_not_existing():
     with pytest.raises(Exception):
-        list(RepositoryMining("https://github.com/ishepard/pydriller",
-                              clone_repo_to="NOTEXISTINGDIR").traverse_commits())
+        list(Repository("https://github.com/ishepard/pydriller",
+                        clone_repo_to="NOTEXISTINGDIR").traverse_commits())
 
 
 def test_projectname_multiple_repos():
@@ -243,7 +243,7 @@ def test_projectname_multiple_repos():
         'test-repos/files_in_directories',
         'test-repos/files_in_directories'
     ]
-    for commit in RepositoryMining(path_to_repo=repos).traverse_commits():
+    for commit in Repository(path_to_repo=repos).traverse_commits():
         assert commit.project_name == 'files_in_directories'
 
 
@@ -252,7 +252,7 @@ def test_projectname_multiple_repos_remote():
         'https://github.com/ishepard/pydriller',
         'test-repos/pydriller'
     ]
-    for commit in RepositoryMining(path_to_repo=repos).traverse_commits():
+    for commit in Repository(path_to_repo=repos).traverse_commits():
         assert commit.project_name == 'pydriller'
 
 
@@ -262,7 +262,7 @@ def test_deletion_remotes():
         'https://github.com/ishepard/pydriller'
     ]
     paths = set()
-    for commit in RepositoryMining(path_to_repo=repos).traverse_commits():
+    for commit in Repository(path_to_repo=repos).traverse_commits():
         paths.add(commit.project_path)
 
     for path in paths:

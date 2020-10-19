@@ -171,7 +171,7 @@ class RepositoryMining:
         # of which one we are currently analyzing
         self._conf.set_value('path_to_repo', local_path_repo)
 
-        self.git_repo: GitRepository = GitRepository(local_path_repo, self._conf)
+        self.git_repo = GitRepository(local_path_repo, self._conf)
         # saving the GitRepository object for further use
         self._conf.set_value("git_repo", self.git_repo)
 

@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pydriller.git_repository import GitRepository
+from pydriller.git_repository import Git
 from pathlib import Path
 import pytest
 import logging
@@ -29,7 +29,7 @@ def path():
 
 @pytest.fixture()
 def repo(path):
-    gr = GitRepository(path)
+    gr = Git(path)
     yield gr
     gr.clear()
 
@@ -90,7 +90,7 @@ def test_metrics_python():
 
 def test_changed_methods():
 
-    gr = GitRepository("test-repos/diff")
+    gr = Git("test-repos/diff")
 
     # add a new method
     mod = gr.get_commit(

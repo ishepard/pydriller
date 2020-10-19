@@ -29,7 +29,7 @@ from typing import List, Generator, Union
 from git import Repo
 
 from pydriller.domain.commit import Commit
-from pydriller.git_repository import GitRepository
+from pydriller.git_repository import Git
 from pydriller.utils.conf import Conf
 
 logger = logging.getLogger(__name__)
@@ -161,7 +161,7 @@ class Repository:
         return clone_folder
 
     @contextmanager
-    def _prep_repo(self, path_repo: str) -> Generator[GitRepository, None, None]:
+    def _prep_repo(self, path_repo: str) -> Generator[Git, None, None]:
         local_path_repo = path_repo
         if self._is_remote(path_repo):
             local_path_repo = self._clone_remote_repo(self._clone_folder(), path_repo)
@@ -171,8 +171,8 @@ class Repository:
         # of which one we are currently analyzing
         self._conf.set_value('path_to_repo', local_path_repo)
 
-        self.git_repo = GitRepository(local_path_repo, self._conf)
-        # saving the GitRepository object for further use
+        self.git_repo = Git(local_path_repo, self._conf)
+        # saving the Git object for further use
         self._conf.set_value("git_repo", self.git_repo)
 
         # checking that the filters are set correctly

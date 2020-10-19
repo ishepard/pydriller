@@ -13,7 +13,7 @@
 # limitations under the License.
 import pytest
 
-from pydriller import GitRepository
+from pydriller import Git
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def commit():
 
 @pytest.fixture()
 def modification(commit):
-    gr = GitRepository("test-repos/diff")
+    gr = Git("test-repos/diff")
     yield gr.get_commit(commit).modifications[0]
     gr.clear()
 
@@ -81,7 +81,7 @@ def test_diff_no_newline():
         \\ No newline at end of file
     in diffs. This test asserts these additional lines are parsed correctly.
     """
-    gr = GitRepository('test-repos/no_newline')
+    gr = Git('test-repos/no_newline')
 
     mod = gr.get_commit('52a78c1ee5d100528eccba0a3d67371dbd22d898').modifications[0]
     added = mod.diff_parsed['added']

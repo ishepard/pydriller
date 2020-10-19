@@ -11,7 +11,7 @@ Version
    Current Pydriller version.
 
 
-GitRepository
+Git
 -------------
 
 .. automodule:: pydriller.git_repository

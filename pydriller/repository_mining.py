@@ -106,6 +106,8 @@ class RepositoryMining:
             else set(only_commits)
             )
 
+        self.git_repo = None
+
         options = {
             "git_repo": None,
             "path_to_repo": path_to_repo,
@@ -171,17 +173,18 @@ class RepositoryMining:
         # of which one we are currently analyzing
         self._conf.set_value('path_to_repo', local_path_repo)
 
-        git_repo = GitRepository(local_path_repo, self._conf)
+        self.git_repo = GitRepository(local_path_repo, self._conf)
         # saving the GitRepository object for further use
-        self._conf.set_value("git_repo", git_repo)
+        self._conf.set_value("git_repo", self.git_repo)
 
         # checking that the filters are set correctly
         self._conf.sanity_check_filters()
-        yield git_repo
+        yield self.git_repo
 
         # cleaning, this is necessary since GitPython issues on memory leaks
         self._conf.set_value("git_repo", None)
-        git_repo.clear()
+        self.git_repo.clear()
+        self.git_repo = None
 
         # delete the temporary directory if created
         if self._is_remote(path_repo) and self._cleanup is True:

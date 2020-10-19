@@ -18,14 +18,13 @@ This module includes 1 class, Git, representing a repository in Git.
 
 import logging
 from pathlib import Path
-from threading import Lock
 from typing import List, Dict, Set, Generator
 
 from git import Git as GGitPython, Repo, GitCommandError, Commit as GitCommit
 
 from pydriller.domain.commit import Commit, ModificationType, Modification
-from pydriller.utils.conf import Conf
 from pydriller.utils.common import get_files
+from pydriller.utils.conf import Conf
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +43,6 @@ class Git:
         """
         self.path = Path(path).expanduser().resolve()
         self.project_name = self.path.name
-        self.lock = Lock()
         self._git = None
         self._repo = None
 
@@ -162,9 +160,8 @@ class Git:
 
         :param _hash: commit hash to checkout
         """
-        with self.lock:
-            self._delete_tmp_branch()
-            self.git.checkout('-f', _hash, b='_PD')
+        self._delete_tmp_branch()
+        self.git.checkout('-f', _hash, b='_PD')
 
     def _delete_tmp_branch(self) -> None:
         try:
@@ -184,7 +181,6 @@ class Git:
         """
         return get_files(str(self.path))
 
-
     def reset(self) -> None:
         """
         Reset the state of the repo, checking out the main branch and
@@ -192,9 +188,8 @@ class Git:
         local changes (-f option).
 
         """
-        with self.lock:
-            self.git.checkout('-f', self._conf.get("main_branch"))
-            self._delete_tmp_branch()
+        self.git.checkout('-f', self._conf.get("main_branch"))
+        self._delete_tmp_branch()
 
     def total_commits(self) -> int:
         """

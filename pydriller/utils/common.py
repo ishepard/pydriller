@@ -15,14 +15,16 @@
 This module includes common functions.
 """
 import logging
-from typing import List, Generator
-import tempfile
+import os
 import shutil
 import stat
+import tempfile
 from contextlib import contextmanager
-import os
-from git import Repo
 from pathlib import Path
+from typing import List, Generator
+
+from git import Repo
+
 from pydriller.utils.conf import Conf
 
 logger = logging.getLogger(__name__)
@@ -44,10 +46,22 @@ def get_files(path: str) -> List[str]:
 
 
 def is_remote(repo: str) -> bool:
+    """
+    Return true if the repo is remote
+
+    :param repo: string of the repo
+    :return: bool
+    """
     return repo.startswith("git@") or repo.startswith("https://")
 
 
 def clone_remote_repo(tmp_folder: str, repo: str) -> str:
+    """
+    Clone the repository when it is remote.
+    :param tmp_folder:
+    :param repo:
+    :return:
+    """
     repo_folder = os.path.join(tmp_folder, get_repo_name_from_url(repo))
     logger.info("Cloning %s in temporary folder %s", repo, repo_folder)
     Repo.clone_from(url=repo, to_path=repo_folder)
@@ -56,6 +70,11 @@ def clone_remote_repo(tmp_folder: str, repo: str) -> str:
 
 
 def get_repo_name_from_url(url: str) -> str:
+    """
+    Return the name of the repository, that is "pydriller" in "https://github.com/ishepard/pydriller"
+    :param url: url of the repository
+    :return:
+    """
     last_slash_index = url.rfind("/")
     last_suffix_index = url.rfind(".git")
     if last_suffix_index < 0:
@@ -69,6 +88,15 @@ def get_repo_name_from_url(url: str) -> str:
 
 @contextmanager
 def open_folder(path_repo: str, conf: Conf, cleanup: bool) -> Generator[str, None, None]:
+    """
+    Function responsible of preparing the folder with the reposutory
+    and cleaning it after Pydriller finish the study.
+    
+    :param path_repo:
+    :param conf:
+    :param cleanup:
+    :return:
+    """
     local_path_repo = path_repo
     tmp_dir = None
 

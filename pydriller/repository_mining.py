@@ -17,19 +17,14 @@ This module includes 1 class, Repository, main class of PyDriller.
 """
 
 import logging
-import os
-import shutil
-import stat
-import tempfile
 from contextlib import contextmanager
 from datetime import datetime
-from pathlib import Path
 from typing import List, Generator, Union
 
 from pydriller.domain.commit import Commit
 from pydriller.git_repository import Git
+from pydriller.utils.common import open_folder
 from pydriller.utils.conf import Conf
-from pydriller.utils.common import is_remote, clone_remote_repo, open_folder
 
 logger = logging.getLogger(__name__)
 

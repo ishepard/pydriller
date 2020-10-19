@@ -26,11 +26,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Generator, Union
 
-from git import Repo
-
 from pydriller.domain.commit import Commit
 from pydriller.git_repository import Git
 from pydriller.utils.conf import Conf
+from pydriller.utils.common import is_remote, clone_remote_repo, open_folder
 
 logger = logging.getLogger(__name__)
 
@@ -138,68 +137,27 @@ class Repository:
         # make sure we do not delete the directory after the study completes
         self._cleanup = False if clone_repo_to is not None else True
 
-    @staticmethod
-    def _is_remote(repo: str) -> bool:
-        return repo.startswith("git@") or repo.startswith("https://")
-
-    def _clone_remote_repo(self, tmp_folder: str, repo: str) -> str:
-        repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
-        logger.info("Cloning %s in temporary folder %s", repo, repo_folder)
-        Repo.clone_from(url=repo, to_path=repo_folder)
-
-        return repo_folder
-
-    def _clone_folder(self) -> str:
-        if self._conf.get('clone_repo_to'):
-            clone_folder = str(Path(self._conf.get('clone_repo_to')))
-            if not os.path.isdir(clone_folder):
-                raise Exception("Not a directory: {0}".format(clone_folder))
-        else:
-            # Save the temporary directory so we can clean it up later
-            self._tmp_dir = tempfile.TemporaryDirectory()
-            clone_folder = self._tmp_dir.name
-        return clone_folder
-
     @contextmanager
     def _prep_repo(self, path_repo: str) -> Generator[Git, None, None]:
-        local_path_repo = path_repo
-        if self._is_remote(path_repo):
-            local_path_repo = self._clone_remote_repo(self._clone_folder(), path_repo)
-        local_path_repo = str(Path(local_path_repo).expanduser().resolve())
+        with open_folder(path_repo=path_repo,
+                         conf=self._conf,
+                         cleanup=self._cleanup) as local_path_repo:
+            # when multiple repos are given in input, this variable will serve as a reminder
+            # of which one we are currently analyzing
+            self._conf.set_value('path_to_repo', local_path_repo)
 
-        # when multiple repos are given in input, this variable will serve as a reminder
-        # of which one we are currently analyzing
-        self._conf.set_value('path_to_repo', local_path_repo)
+            self.git_repo = Git(local_path_repo, self._conf)
+            # saving the Git object for further use
+            self._conf.set_value("git_repo", self.git_repo)
 
-        self.git_repo = Git(local_path_repo, self._conf)
-        # saving the Git object for further use
-        self._conf.set_value("git_repo", self.git_repo)
+            # checking that the filters are set correctly
+            self._conf.sanity_check_filters()
+            yield self.git_repo
 
-        # checking that the filters are set correctly
-        self._conf.sanity_check_filters()
-        yield self.git_repo
-
-        # cleaning, this is necessary since GitPython issues on memory leaks
-        self._conf.set_value("git_repo", None)
-        self.git_repo.clear()
-        self.git_repo = None  # type: ignore
-
-        # delete the temporary directory if created
-        if self._is_remote(path_repo) and self._cleanup is True:
-            assert self._tmp_dir is not None
-            try:
-                self._tmp_dir.cleanup()
-            except PermissionError:
-                # on Windows, Python 3.5, 3.6, 3.7 are not able to delete
-                # git directories because of read-only files. This is now fixed
-                # in python 3.8. In this case, we need to use an
-                # onerror callback to clear the read-only bit.
-                # see https://docs.python.org/3/library/shutil.html?highlight=shutil#rmtree-example
-                def _remove_readonly(func, path, _):
-                    os.chmod(path, stat.S_IWRITE)
-                    func(path)
-
-                shutil.rmtree(self._tmp_dir.name, onerror=_remove_readonly)
+            # cleaning, this is necessary since GitPython issues on memory leaks
+            self._conf.set_value("git_repo", None)
+            self.git_repo.clear()
+            del self.git_repo
 
     def traverse_commits(self) -> Generator[Commit, None, None]:
         """
@@ -232,15 +190,3 @@ class Repository:
                         continue
 
                     yield commit
-
-    @staticmethod
-    def _get_repo_name_from_url(url: str) -> str:
-        last_slash_index = url.rfind("/")
-        last_suffix_index = url.rfind(".git")
-        if last_suffix_index < 0:
-            last_suffix_index = len(url)
-
-        if last_slash_index < 0 or last_suffix_index <= last_slash_index:
-            raise Exception("Badly formatted url {}".format(url))
-
-        return url[last_slash_index + 1:last_suffix_index]

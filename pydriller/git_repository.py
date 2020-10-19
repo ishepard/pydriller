@@ -17,7 +17,6 @@ This module includes 1 class, Git, representing a repository in Git.
 """
 
 import logging
-import os
 from pathlib import Path
 from threading import Lock
 from typing import List, Dict, Set, Generator
@@ -26,6 +25,7 @@ from git import Git as GGitPython, Repo, GitCommandError, Commit as GitCommit
 
 from pydriller.domain.commit import Commit, ModificationType, Modification
 from pydriller.utils.conf import Conf
+from pydriller.utils.common import get_files
 
 logger = logging.getLogger(__name__)
 
@@ -182,13 +182,8 @@ class Git:
 
         :return: List[str], the list of the files
         """
-        _all = []
-        for path, _, files in os.walk(str(self.path)):
-            if '.git' in path:
-                continue
-            for name in files:
-                _all.append(os.path.join(path, name))
-        return _all
+        return get_files(str(self.path))
+
 
     def reset(self) -> None:
         """

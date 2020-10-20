@@ -89,8 +89,8 @@ def get_repo_name_from_url(url: str) -> str:
 @contextmanager
 def open_folder(path_repo: str, conf: Conf, cleanup: bool) -> Generator[str, None, None]:
     """
-    Function responsible of preparing the folder with the reposutory
-    and cleaning it after Pydriller finish the study.
+    Function responsible of preparing the folder with the repository
+    and cleaning it after Pydriller finishes the study.
 
     :param path_repo:
     :param conf:
@@ -122,7 +122,7 @@ def open_folder(path_repo: str, conf: Conf, cleanup: bool) -> Generator[str, Non
         except PermissionError:
             # on Windows, Python 3.5, 3.6, 3.7 are not able to delete
             # git directories because of read-only files. This is now fixed
-            # in python 3.8. In this case, we need to use an
+            # in python 3.8. Anyway, we need to use an
             # onerror callback to clear the read-only bit.
             # see https://docs.python.org/3/library/shutil.html?highlight=shutil#rmtree-example
             def _remove_readonly(func, path, _):

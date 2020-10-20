@@ -138,8 +138,8 @@ class Git:
         :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
-        gp_commit = self.repo.commit(commit_id)
-        return Commit(gp_commit, self._conf)
+        return Commit(self.repo.commit(commit_id),
+                      self._conf)
 
     def get_commit_from_gitpython(self, commit: GitCommit) -> Commit:
         """

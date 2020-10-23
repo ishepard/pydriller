@@ -4,7 +4,7 @@
 Commit Object
 =============
 
-A Commit object has all the information of a GitPython commit, and much more. More specifically:
+A Commit object has all the information of a GitGP commit, and much more. More specifically:
 
 * **hash** *(str)*: hash of the commit
 * **msg** *(str)*: commit message

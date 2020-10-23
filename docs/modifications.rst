@@ -10,7 +10,7 @@ You can get the list of modified files, as well as their diffs and current sourc
 * **new_path**: new path of the file (can be _None_ if the file is deleted)
 * **filename**: return only the filename (e.g., given a path-like-string such as "/Users/dspadini/pydriller/myfile.py" returns “myfile.py”)
 * **change_type**: type of the change: can be Added, Deleted, Modified, or Renamed.
-* **diff**: diff of the file as GitPython presents it (e.g., starting with @@ xx,xx @@).
+* **diff**: diff of the file as GitGP presents it (e.g., starting with @@ xx,xx @@).
 * **diff_parsed**: diff parsed in a dictionary containing the added and deleted lines. The dictionary has 2 keys: “added” and “deleted”, each containing a list of Tuple (int, str) corresponding to (number of line in the file, actual line).
 * **added**: number of lines added
 * **removed**: number of lines removed

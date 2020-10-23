@@ -6,7 +6,7 @@
 
 # PyDriller
 
-PyDriller is a Python framework that helps developers in analyzing GitPython repositories. With PyDriller you can easily extract information such as commits, developers, modifications, diffs, and source codes. 
+PyDriller is a Python framework that helps developers in analyzing GitGP repositories. With PyDriller you can easily extract information such as commits, developers, modifications, diffs, and source codes. 
 
 ![Alt Text](https://ishepard.github.io/images/mygif.gif)
 
@@ -41,7 +41,7 @@ PyDriller is a Python framework that helps developers in analyzing GitPython rep
 Very few! Just:
 
 - Python3
-- GitPython
+- GitGP
 
 The list of dependencies is shown in `./requirements.txt`, however the installer takes care of installing them for you.
 

@@ -1,15 +1,11 @@
 import logging
 from _datetime import datetime
-from enum import Enum
-from pathlib import Path
-from typing import List, Set, Dict, Tuple, Optional
+from typing import List, Set, Tuple, Optional
 
-import lizard
-import lizard_languages
 from git import Diff, Git, Commit as GitCommit, NULL_TREE
 
 from pydriller.domain.developer import Developer
-from pydriller.domain.commit import Commit
+from pydriller.domain.commit import Commit, Modification, ModificationType, DMMProperty
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +20,7 @@ class CommitGP(Commit):
         """
         Create a commit object.
 
-        :param commit: GitPython Commit object
+        :param commit: GitGP Commit object
         :param conf: Configuration class
         """
 
@@ -58,24 +54,6 @@ class CommitGP(Commit):
         """
         return Developer(self._c_object.committer.name,
                          self._c_object.committer.email)
-
-    @property
-    def project_name(self) -> str:
-        """
-        Return the project name.
-
-        :return: project name
-        """
-        return Path(self._conf.get('path_to_repo')).name
-
-    @property
-    def project_path(self) -> str:
-        """
-        Return the absolute path of the project.
-
-        :return: project path
-        """
-        return str(Path(self._conf.get('path_to_repo')))
 
     @property
     def author_date(self) -> datetime:
@@ -180,7 +158,7 @@ class CommitGP(Commit):
             # returns the list of conflicts) is challenging: so, right now,
             # I will return an empty array, in the meanwhile I will try to
             # find a way to parse the output.
-            # c_git = GitPython(str(self.project_path))
+            # c_git = GitGP(str(self.project_path))
             # d = c_git.diff_tree("--cc", commit.hexsha, '-r', '--abbrev=40',
             #                     '--full-index', '-M', '-p', '--no-color')
             diff_index = []

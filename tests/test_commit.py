@@ -17,7 +17,7 @@ from pathlib import Path
 import pytest
 
 from pydriller.domain.commit import Modification, ModificationType
-from pydriller.git_gp import GitPython
+from pydriller.git_gp import GitGP
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -30,7 +30,7 @@ def path():
 
 @pytest.fixture()
 def repo(path):
-    gr = GitPython(path)
+    gr = GitGP(path)
     yield gr
     gr.clear()
 
@@ -91,7 +91,7 @@ def test_metrics_python():
 
 def test_changed_methods():
 
-    gr = GitPython("test-repos/diff")
+    gr = GitGP("test-repos/diff")
 
     # add a new method
     mod = gr.get_commit(

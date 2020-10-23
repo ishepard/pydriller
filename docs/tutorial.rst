@@ -32,7 +32,7 @@ Let's make another example: print all the modified files for every commit. This 
 
 That's it!
 
-Behind the scenes, PyDriller opens the GitPython repository and extracts all the necessary information. Then, the framework returns a generator that can iterate over the commits.
+Behind the scenes, PyDriller opens the GitGP repository and extracts all the necessary information. Then, the framework returns a generator that can iterate over the commits.
 
 Furthermore, PyDriller can calculate structural metrics of every file changed in a commit. To calculate these metrics, Pydriller relies on `Lizard <https://github.com/terryyin/lizard>`_, a powerful tool that can analyze source code of many different programming languages, both at class and method level! ::
 

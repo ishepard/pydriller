@@ -3,7 +3,7 @@ from datetime import datetime
 import os
 import pytest
 
-from pydriller import Repository, GitPython
+from pydriller import Repository, GitGP
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -31,7 +31,7 @@ def repo_to(path, to):
 
 @pytest.fixture()
 def git_repo(path):
-    gr = GitPython(path)
+    gr = GitGP(path)
     yield gr
     gr.clear()
 

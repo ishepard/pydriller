@@ -100,7 +100,7 @@ PyDriller comes with a set of common commit filters that you can apply:
 * **only\_no\_merge** *(bool)*: only analyses commits that are not merge commits.
 * **only\_authors** *(List[str])*: only analyses commits that are made by these authors. The check is made on the username, NOT the email.
 * **only\_commits** *(List[str])*: only these commits will be analyzed.
-* **only_releases** *(bool)*: only commits that are tagged ("release" is a term of GitHub, does not actually exist in GitPython)
+* **only_releases** *(bool)*: only commits that are tagged ("release" is a term of GitHub, does not actually exist in GitGP)
 * **filepath** *(str)*: only commits that modified this file will be analyzed.
 * **only\_modifications\_with\_file\_types** *(List[str])*: only analyses commits in which **at least** one modification was done in that file type, e.g., if you pass ".java", it will visit only commits in which at least one Java file was modified; clearly, it will skip other commits (e.g., commits that did not modify Java files).
 
@@ -138,10 +138,10 @@ that can be used within pydriller.
 
 .. _git-diff-algorithms:
 
-GitPython Diff Algorithms
+GitGP Diff Algorithms
 ===================
 
-GitPython offers four different algorithms in :code:`git diff`:
+GitGP offers four different algorithms in :code:`git diff`:
 
 * Myers (default)
 * Minimal (improved Myers)

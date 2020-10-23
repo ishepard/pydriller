@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import List, Generator, Union
 
 from pydriller.domain.commit import Commit
-from pydriller.git_gp import GitPython
+from pydriller.git_gp import GitGP
 from pydriller.utils.common import open_folder
 from pydriller.utils.conf import Conf
 
@@ -133,7 +133,7 @@ class Repository:
         self._cleanup = False if clone_repo_to is not None else True
 
     @contextmanager
-    def _prep_repo(self, path_repo: str) -> Generator[GitPython, None, None]:
+    def _prep_repo(self, path_repo: str) -> Generator[GitGP, None, None]:
         with open_folder(path_repo=path_repo,
                          conf=self._conf,
                          cleanup=self._cleanup) as local_path_repo:
@@ -141,15 +141,15 @@ class Repository:
             # of which one we are currently analyzing
             self._conf.set_value('path_to_repo', local_path_repo)
 
-            self.git_repo = GitPython(local_path_repo, self._conf)
-            # saving the GitPython object for further use
+            self.git_repo = GitGP(local_path_repo, self._conf)
+            # saving the GitGP object for further use
             self._conf.set_value("git_repo", self.git_repo)
 
             # checking that the filters are set correctly
             self._conf.sanity_check_filters()
             yield self.git_repo
 
-            # cleaning, this is necessary since GitPython issues on memory leaks
+            # cleaning, this is necessary since GitGP issues on memory leaks
             self._conf.set_value("git_repo", None)
             self.git_repo.clear()
             del self.git_repo

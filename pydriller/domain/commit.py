@@ -26,7 +26,6 @@ from typing import List, Set, Dict, Tuple, Optional
 
 import lizard
 import lizard_languages
-from git import Diff, Git, Commit as GitCommit, NULL_TREE
 
 from pydriller.domain.developer import Developer
 
@@ -422,17 +421,17 @@ class Modification:
         return self.__dict__ == other.__dict__
 
 
-class Commit:
+class Commit(ABC):
     """
     Class representing a Commit. Contains all the important information such
     as hash, author, dates, and modified files.
     """
 
-    def __init__(self, commit: GitCommit, conf) -> None:
+    def __init__(self, commit, conf) -> None:
         """
         Create a commit object.
 
-        :param commit: GitPython Commit object
+        :param commit: GitGP Commit object
         :param conf: Configuration class
         """
         self._c_object = commit
@@ -459,8 +458,7 @@ class Commit:
 
         :return: author
         """
-        return Developer(self._c_object.author.name,
-                         self._c_object.author.email)
+        pass
 
     @property
     @abstractmethod
@@ -470,11 +468,9 @@ class Commit:
 
         :return: committer
         """
-        return Developer(self._c_object.committer.name,
-                         self._c_object.committer.email)
+        pass
 
     @property
-    @abstractmethod
     def project_name(self) -> str:
         """
         Return the project name.
@@ -484,7 +480,6 @@ class Commit:
         return Path(self._conf.get('path_to_repo')).name
 
     @property
-    @abstractmethod
     def project_path(self) -> str:
         """
         Return the absolute path of the project.
@@ -501,7 +496,7 @@ class Commit:
 
         :return: datetime author_datetime
         """
-        return self._c_object.authored_datetime
+        pass
 
     @property
     @abstractmethod
@@ -511,7 +506,7 @@ class Commit:
 
         :return: datetime committer_datetime
         """
-        return self._c_object.committed_datetime
+        pass
 
     @property
     @abstractmethod
@@ -521,7 +516,7 @@ class Commit:
 
         :return: int timezone
         """
-        return self._c_object.author_tz_offset
+        pass
 
     @property
     @abstractmethod
@@ -531,7 +526,7 @@ class Commit:
 
         :return: int timezone
         """
-        return self._c_object.committer_tz_offset
+        pass
 
     @property
     @abstractmethod
@@ -541,7 +536,7 @@ class Commit:
 
         :return: str commit_message
         """
-        return self._c_object.message.strip()
+        pass
 
     @property
     @abstractmethod
@@ -551,10 +546,7 @@ class Commit:
 
         :return: List[str] parents
         """
-        parents = []
-        for p in self._c_object.parents:
-            parents.append(p.hexsha)
-        return parents
+        pass
 
     @property
     @abstractmethod
@@ -564,7 +556,7 @@ class Commit:
 
         :return: bool merge
         """
-        return len(self._c_object.parents) > 1
+        pass
 
     @property
     @abstractmethod
@@ -577,81 +569,7 @@ class Commit:
 
         :return: List[Modification] modifications
         """
-        if self._modifications is None:
-            self._modifications = self._get_modifications()
-
-        assert self._modifications is not None
-        return self._modifications
-
-    def _get_modifications(self):
-        options = {}
-        if self._conf.get('histogram'):
-            options['histogram'] = True
-
-        if self._conf.get('skip_whitespaces'):
-            options['w'] = True
-
-        if len(self.parents) == 1:
-            # the commit has a parent
-            diff_index = self._c_object.parents[0].diff(self._c_object,
-                                                        create_patch=True,
-                                                        **options)
-        elif len(self.parents) > 1:
-            # if it's a merge commit, the modified files of the commit are the
-            # conflicts. This because if the file is not in conflict,
-            # pydriller will visit the modification in one of the previous
-            # commits. However, parsing the output of a combined diff (that
-            # returns the list of conflicts) is challenging: so, right now,
-            # I will return an empty array, in the meanwhile I will try to
-            # find a way to parse the output.
-            # c_git = GitPython(str(self.project_path))
-            # d = c_git.diff_tree("--cc", commit.hexsha, '-r', '--abbrev=40',
-            #                     '--full-index', '-M', '-p', '--no-color')
-            diff_index = []
-        else:
-            # this is the first commit of the repo. Comparing it with git
-            # NULL TREE
-            diff_index = self._c_object.diff(NULL_TREE,
-                                             create_patch=True,
-                                             **options)
-
-        return self._parse_diff(diff_index)
-
-    def _parse_diff(self, diff_index) -> List[Modification]:
-        modifications_list = []
-        for diff in diff_index:
-            old_path = diff.a_path
-            new_path = diff.b_path
-            change_type = self._from_change_to_modification_type(diff)
-
-            diff_and_sc = {
-                'diff': self._get_decoded_str(diff.diff),
-                'source_code_before': self._get_decoded_sc_str(
-                    diff.a_blob),
-                'source_code': self._get_decoded_sc_str(
-                    diff.b_blob)
-            }
-
-            modifications_list.append(Modification(old_path, new_path,
-                                                   change_type, diff_and_sc))
-
-        return modifications_list
-
-    def _get_decoded_str(self, diff):
-        try:
-            return diff.decode('utf-8', 'ignore')
-        except (UnicodeDecodeError, AttributeError, ValueError):
-            logger.debug('Could not load the diff of a '
-                         'file in commit %s', self._c_object.hexsha)
-            return None
-
-    def _get_decoded_sc_str(self, diff):
-        try:
-            return diff.data_stream.read().decode('utf-8', 'ignore')
-        except (UnicodeDecodeError, AttributeError, ValueError):
-            logger.debug('Could not load source code of a '
-                         'file in commit %s', self._c_object.hexsha)
-            return None
+        pass
 
     @property
     @abstractmethod
@@ -671,18 +589,7 @@ class Commit:
 
         :return: set(str) branches
         """
-        if self._branches is None:
-            self._branches = self._get_branches()
-
-        assert self._branches is not None
-        return self._branches
-
-    def _get_branches(self):
-        c_git = Git(str(self._conf.get('path_to_repo')))
-        branches = set()
-        for branch in set(c_git.branch('--contains', self.hash).split('\n')):
-            branches.add(branch.strip().replace('* ', ''))
-        return branches
+        pass
 
     @property
     def dmm_unit_size(self) -> Optional[float]:
@@ -803,7 +710,7 @@ class Commit:
         return proportion
 
     @staticmethod
-    def _from_change_to_modification_type(diff: Diff):
+    def _from_change_to_modification_type(diff):
         if diff.new_file:
             return ModificationType.ADD
         if diff.deleted_file:

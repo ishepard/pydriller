@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-This module includes 1 class, GitPython, representing a repository in GitPython.
+This module includes 1 class, GitGP, representing a repository in GitGP.
 """
 
 import logging
@@ -32,13 +32,13 @@ logger = logging.getLogger(__name__)
 
 class Git(ABC):
     """
-    Class representing a repository in GitPython. It contains most of the logic of
+    Class representing a repository in GitGP. It contains most of the logic of
     PyDriller: obtaining the list of commits, checkout, reset, etc.
     """
 
     def __init__(self, path: str, conf=None):
         """
-        Init the GitPython Repository.
+        Init the GitGP Repository.
 
         :param str path: path to the repository
         """

@@ -10,7 +10,7 @@ with open('test-requirements.txt') as reqs_file:
 # Get the long description from the relevant file
 long_description = 'PyDriller is a Python framework that helps developers on ' \
                    'mining software repositories. With PyDriller' \
-                   ' you can easily extract information from any GitPython ' \
+                   ' you can easily extract information from any GitGP ' \
                    'repository, such as commits, developers, ' \
                    'modifications, diffs, and source codes, and ' \
                    'quickly export CSV files.'

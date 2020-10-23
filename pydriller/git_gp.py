@@ -13,32 +13,32 @@
 # limitations under the License.
 
 """
-This module includes 1 class, GitPython, representing a repository in GitPython.
+This module includes 1 class, GitGP, representing a repository in GitGP.
 """
 
 import logging
 from pathlib import Path
-from typing import List, Dict, Set, Generator
+from typing import List, Generator
 
 from git import Git as GGitPython, Repo, GitCommandError, Commit as GitCommit
 
-from pydriller.domain.commit import Commit, ModificationType, Modification
+from pydriller.domain.commit import Commit
+from pydriller.domain.commit_gp import CommitGP
 from pydriller.git import Git
 from pydriller.utils.common import get_files
-from pydriller.utils.conf import Conf
 
 logger = logging.getLogger(__name__)
 
 
-class GitPython(Git):
+class GitGP(Git):
     """
-    Class representing a repository in GitPython. It contains most of the logic of
+    Class representing a repository in GitGP. It contains most of the logic of
     PyDriller: obtaining the list of commits, checkout, reset, etc.
     """
 
     def __init__(self, path: str, conf=None):
         """
-        Init the GitPython Repository.
+        Init the GitGP Repository.
 
         :param str path: path to the repository
         """
@@ -47,9 +47,9 @@ class GitPython(Git):
     @property
     def git(self):
         """
-        GitPython object GitPython.
+        GitGP object GitGP.
 
-        :return: GitPython
+        :return: GitGP
         """
         if self._git is None:
             self._open_git()
@@ -58,7 +58,7 @@ class GitPython(Git):
     @property
     def repo(self):
         """
-        GitPython object Repo.
+        GitGP object Repo.
 
         :return: Repo
         """
@@ -71,7 +71,7 @@ class GitPython(Git):
 
     def clear(self):
         """
-        According to GitPython's documentation, sometimes it leaks resources.
+        According to GitGP's documentation, sometimes it leaks resources.
         This holds especially for Windows users. Hence, we need to clear the
         cache manually.
         """
@@ -102,7 +102,7 @@ class GitPython(Git):
         :return: Commit of the head commit
         """
         head_commit = self.repo.head.commit
-        return Commit(head_commit, self._conf)
+        return CommitGP(head_commit, self._conf)
 
     def get_list_commits(self, rev='HEAD', **kwargs) -> Generator[Commit, None, None]:
         """
@@ -125,19 +125,18 @@ class GitPython(Git):
         :param str commit_id: hash of the commit to analyze
         :return: Commit
         """
-        return Commit(self.repo.commit(commit_id),
-                      self._conf)
+        return CommitGP(self.repo.commit(commit_id), self._conf)
 
     def get_commit_from_gitpython(self, commit: GitCommit) -> Commit:
         """
-        Build a PyDriller commit object from a GitPython commit object.
+        Build a PyDriller commit object from a GitGP commit object.
         This is internal of PyDriller, I don't think users generally will need
         it.
 
-        :param GitCommit commit: GitPython commit
+        :param GitCommit commit: GitGP commit
         :return: Commit commit: PyDriller commit
         """
-        return Commit(commit, self._conf)
+        return CommitGP(commit, self._conf)
 
     def checkout(self, _hash: str) -> None:
         """

@@ -18,6 +18,7 @@ Commit, Modification,
 ModificationType and Method.
 """
 import logging
+from abc import ABC, abstractmethod
 from _datetime import datetime
 from enum import Enum
 from pathlib import Path
@@ -441,15 +442,17 @@ class Commit:
         self._conf = conf
 
     @property
+    @abstractmethod
     def hash(self) -> str:
         """
         Return the SHA of the commit.
 
         :return: str hash
         """
-        return self._c_object.hexsha
+        pass
 
     @property
+    @abstractmethod
     def author(self) -> Developer:
         """
         Return the author of the commit as a Developer object.
@@ -460,6 +463,7 @@ class Commit:
                          self._c_object.author.email)
 
     @property
+    @abstractmethod
     def committer(self) -> Developer:
         """
         Return the committer of the commit as a Developer object.
@@ -470,6 +474,7 @@ class Commit:
                          self._c_object.committer.email)
 
     @property
+    @abstractmethod
     def project_name(self) -> str:
         """
         Return the project name.
@@ -479,6 +484,7 @@ class Commit:
         return Path(self._conf.get('path_to_repo')).name
 
     @property
+    @abstractmethod
     def project_path(self) -> str:
         """
         Return the absolute path of the project.
@@ -488,6 +494,7 @@ class Commit:
         return str(Path(self._conf.get('path_to_repo')))
 
     @property
+    @abstractmethod
     def author_date(self) -> datetime:
         """
         Return the authored datetime.
@@ -497,6 +504,7 @@ class Commit:
         return self._c_object.authored_datetime
 
     @property
+    @abstractmethod
     def committer_date(self) -> datetime:
         """
         Return the committed datetime.
@@ -506,6 +514,7 @@ class Commit:
         return self._c_object.committed_datetime
 
     @property
+    @abstractmethod
     def author_timezone(self) -> int:
         """
         Author timezone expressed in seconds from epoch.
@@ -515,6 +524,7 @@ class Commit:
         return self._c_object.author_tz_offset
 
     @property
+    @abstractmethod
     def committer_timezone(self) -> int:
         """
         Author timezone expressed in seconds from epoch.
@@ -524,6 +534,7 @@ class Commit:
         return self._c_object.committer_tz_offset
 
     @property
+    @abstractmethod
     def msg(self) -> str:
         """
         Return commit message.
@@ -533,6 +544,7 @@ class Commit:
         return self._c_object.message.strip()
 
     @property
+    @abstractmethod
     def parents(self) -> List[str]:
         """
         Return the list of parents SHAs.
@@ -545,6 +557,7 @@ class Commit:
         return parents
 
     @property
+    @abstractmethod
     def merge(self) -> bool:
         """
         Return True if the commit is a merge, False otherwise.
@@ -554,6 +567,7 @@ class Commit:
         return len(self._c_object.parents) > 1
 
     @property
+    @abstractmethod
     def modifications(self) -> List[Modification]:
         """
         Return a list of modified files. The list is empty if the commit is
@@ -590,7 +604,7 @@ class Commit:
             # returns the list of conflicts) is challenging: so, right now,
             # I will return an empty array, in the meanwhile I will try to
             # find a way to parse the output.
-            # c_git = Git(str(self.project_path))
+            # c_git = GitPython(str(self.project_path))
             # d = c_git.diff_tree("--cc", commit.hexsha, '-r', '--abbrev=40',
             #                     '--full-index', '-M', '-p', '--no-color')
             diff_index = []
@@ -640,6 +654,7 @@ class Commit:
             return None
 
     @property
+    @abstractmethod
     def in_main_branch(self) -> bool:
         """
         Return True if the commit is in the main branch, False otherwise.
@@ -649,6 +664,7 @@ class Commit:
         return self._conf.get('main_branch') in self.branches
 
     @property
+    @abstractmethod
     def branches(self) -> Set[str]:
         """
         Return the set of branches that contain the commit.

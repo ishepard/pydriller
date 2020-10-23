@@ -18,7 +18,7 @@ import pytest
 from git import Git as GGitPython
 
 from pydriller.domain.commit import ModificationType
-from pydriller.git import Git
+from pydriller.git_gp import GitPython
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def path():
 
 @pytest.fixture
 def repo(path):
-    gr = Git(path)
+    gr = GitPython(path)
     yield gr
     gr.clear()
 
@@ -225,7 +225,7 @@ def test_commit_in_master_branch(repo):
 
     repo.checkout('8986af2a679759e5a15794f6d56e6d46c3f302f1')
 
-    git_to_change_head = Git('test-repos/branches_merged')
+    git_to_change_head = GitPython('test-repos/branches_merged')
     commit = git_to_change_head.get_commit('8169f76a3d7add54b4fc7bca7160d1f1eede6eda')
     assert commit.in_main_branch is False
 

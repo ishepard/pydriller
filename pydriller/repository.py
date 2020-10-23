@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import List, Generator, Union
 
 from pydriller.domain.commit import Commit
-from pydriller.git import Git
+from pydriller.git_gp import GitPython
 from pydriller.utils.common import open_folder
 from pydriller.utils.conf import Conf
 
@@ -133,7 +133,7 @@ class Repository:
         self._cleanup = False if clone_repo_to is not None else True
 
     @contextmanager
-    def _prep_repo(self, path_repo: str) -> Generator[Git, None, None]:
+    def _prep_repo(self, path_repo: str) -> Generator[GitPython, None, None]:
         with open_folder(path_repo=path_repo,
                          conf=self._conf,
                          cleanup=self._cleanup) as local_path_repo:
@@ -141,8 +141,8 @@ class Repository:
             # of which one we are currently analyzing
             self._conf.set_value('path_to_repo', local_path_repo)
 
-            self.git_repo = Git(local_path_repo, self._conf)
-            # saving the Git object for further use
+            self.git_repo = GitPython(local_path_repo, self._conf)
+            # saving the GitPython object for further use
             self._conf.set_value("git_repo", self.git_repo)
 
             # checking that the filters are set correctly

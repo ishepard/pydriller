@@ -125,8 +125,12 @@ def open_folder(path_repo: str, conf: Conf, cleanup: bool) -> Generator[str, Non
             # in python 3.8. Anyway, we need to use an
             # onerror callback to clear the read-only bit.
             # see https://docs.python.org/3/library/shutil.html?highlight=shutil#rmtree-example
-            def _remove_readonly(func, path, _):
-                os.chmod(path, stat.S_IWRITE)
-                func(path)
+            def handleRemoveReadonly(func, path, exc):
+                excvalue = exc[1]
+                if func in (os.rmdir, os.remove) and excvalue.errno == errno.EACCES:
+                    os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  # 0777
+                    func(path)
+                else:
+                    raise
 
-            shutil.rmtree(tmp_dir.name, onerror=_remove_readonly)
+            shutil.rmtree(tmp_dir.name, ignore_errors=False, onerror=handleRemoveReadonly)

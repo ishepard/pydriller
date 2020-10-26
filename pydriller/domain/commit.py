@@ -18,407 +18,19 @@ Commit, Modification,
 ModificationType and Method.
 """
 import logging
-from abc import ABC, abstractmethod
 from _datetime import datetime
-from enum import Enum
+from abc import ABC, abstractmethod
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
-from typing import List, Set, Dict, Tuple, Optional
+from typing import List, Set, Tuple, Optional
 
-import lizard
-import lizard_languages
+from git import Diff, Git, Commit as GitPyCommit, NULL_TREE
+from pygit2 import Commit as PyGit2Commit
 
 from pydriller.domain.developer import Developer
+from pydriller.domain.modification import Modification, ModificationType, DMMProperty
 
 logger = logging.getLogger(__name__)
-
-
-class ModificationType(Enum):
-    """
-    Type of Modification. Can be ADD, COPY, RENAME, DELETE, MODIFY or UNKNOWN.
-    """
-
-    ADD = 1
-    COPY = 2
-    RENAME = 3
-    DELETE = 4
-    MODIFY = 5
-    UNKNOWN = 6
-
-
-class DMMProperty(Enum):
-    """
-    Maintainability properties of the Delta Maintainability Model.
-    """
-    UNIT_SIZE = 1
-    UNIT_COMPLEXITY = 2
-    UNIT_INTERFACING = 3
-
-
-class Method:
-    """
-    This class represents a method in a class. Contains various information
-    extracted through Lizard.
-    """
-
-    def __init__(self, func):
-        """
-        Initialize a method object. This is calculated using Lizard: it parses
-        the source code of all the modifications in a commit, extracting
-        information of the methods contained in the file (if the file is a
-        source code written in one of the supported programming languages).
-        """
-
-        self.name = func.name
-        self.long_name = func.long_name
-        self.filename = func.filename
-        self.nloc = func.nloc
-        self.complexity = func.cyclomatic_complexity
-        self.token_count = func.token_count
-        self.parameters = func.parameters
-        self.start_line = func.start_line
-        self.end_line = func.end_line
-        self.fan_in = func.fan_in
-        self.fan_out = func.fan_out
-        self.general_fan_out = func.general_fan_out
-        self.length = func.length
-        self.top_nesting_level = func.top_nesting_level
-
-    def __eq__(self, other):
-        return self.name == other.name and self.parameters == other.parameters
-
-    def __hash__(self):
-        # parameters are used in hashing in order to
-        # prevent collisions when overloading method names
-        return hash(('name', self.name,
-                     'long_name', self.long_name,
-                     'params', (x for x in self.parameters)))
-
-    UNIT_SIZE_LOW_RISK_THRESHOLD = 15
-    """
-    Threshold used in the Delta Maintainability Model to establish whether a method
-    is low risk in terms of its size.
-    The procedure to obtain the threshold is described in the
-    :ref:`PyDriller documentation <Properties>`.
-    """
-
-    UNIT_COMPLEXITY_LOW_RISK_THRESHOLD = 5
-    """
-    Threshold used in the Delta Maintainability Model to establish whether a method
-    is low risk in terms of its cyclomatic complexity.
-    The procedure to obtain the threshold is described in the
-    :ref:`PyDriller documentation <Properties>`.
-    """
-
-    UNIT_INTERFACING_LOW_RISK_THRESHOLD = 2
-    """
-    Threshold used in the Delta Maintainability Model to establish whether a method
-    is low risk in terms of its interface.
-    The procedure to obtain the threshold is described in the
-    :ref:`PyDriller documentation <Properties>`.
-    """
-
-    def is_low_risk(self, dmm_prop: DMMProperty) -> bool:
-        """
-        Predicate indicating whether this method is low risk in terms of
-        the given property.
-
-        :param dmm_prop: Property according to which this method is considered risky.
-        :return: True if and only if the method is considered low-risk w.r.t. this property.
-        """
-        if dmm_prop is DMMProperty.UNIT_SIZE:
-            return self.nloc <= Method.UNIT_SIZE_LOW_RISK_THRESHOLD
-        if dmm_prop is DMMProperty.UNIT_COMPLEXITY:
-            return self.complexity <= Method.UNIT_COMPLEXITY_LOW_RISK_THRESHOLD
-        assert dmm_prop is DMMProperty.UNIT_INTERFACING
-        return len(self.parameters) <= Method.UNIT_INTERFACING_LOW_RISK_THRESHOLD
-
-
-class Modification:
-    """
-    This class contains information regarding a modified file in a commit.
-    """
-
-    def __init__(self, old_path: str, new_path: str,
-                 change_type: ModificationType,
-                 diff_and_sc: Dict[str, str]):
-        """
-        Initialize a modification. A modification carries on information
-        regarding the changed file. Normally, you shouldn't initialize a new
-        one.
-        """
-        self._old_path = Path(old_path) if old_path is not None else None
-        self._new_path = Path(new_path) if new_path is not None else None
-        self.change_type = change_type
-        self.diff = diff_and_sc['diff']
-        self.source_code = diff_and_sc['source_code']
-        self.source_code_before = diff_and_sc['source_code_before']
-
-        self._nloc = None
-        self._complexity = None
-        self._token_count = None
-        self._function_list = []  # type: List[Method]
-        self._function_list_before = []  # type: List[Method]
-
-    @property
-    def added(self) -> int:
-        """
-        Return the total number of added lines in the file.
-
-        :return: int lines_added
-        """
-        added = 0
-        for line in self.diff.replace('\r', '').split("\n"):
-            if line.startswith('+') and not line.startswith('+++'):
-                added += 1
-        return added
-
-    @property
-    def removed(self):
-        """
-        Return the total number of deleted lines in the file.
-
-        :return: int lines_deleted
-        """
-        removed = 0
-        for line in self.diff.replace('\r', '').split("\n"):
-            if line.startswith('-') and not line.startswith('---'):
-                removed += 1
-        return removed
-
-    @property
-    def old_path(self):
-        """
-        Old path of the file. Can be None if the file is added.
-
-        :return: str old_path
-        """
-        if self._old_path is not None:
-            return str(self._old_path)
-        return None
-
-    @property
-    def new_path(self):
-        """
-        New path of the file. Can be None if the file is deleted.
-
-        :return: str new_path
-        """
-        if self._new_path is not None:
-            return str(self._new_path)
-        return None
-
-    @property
-    def filename(self) -> str:
-        """
-        Return the filename. Given a path-like-string (e.g.
-        "/Users/dspadini/pydriller/myfile.py") returns only the filename
-        (e.g. "myfile.py")
-
-        :return: str filename
-        """
-        if self._new_path is not None and str(self._new_path) != "/dev/null":
-            path = self._new_path
-        else:
-            path = self._old_path
-
-        return path.name
-
-    @property
-    def language_supported(self) -> bool:
-        """
-        Return whether the language used in the modification can be analyzed by Pydriller.
-        Languages are derived from the file  extension.
-        Supported languages are those supported by Lizard.
-
-        :return: True iff language of this Modification can be analyzed.
-        """
-        return lizard_languages.get_reader_for(self.filename) is not None
-
-    @property
-    def nloc(self) -> Optional[int]:
-        """
-        Calculate the LOC of the file.
-
-        :return: LOC of the file
-        """
-        self._calculate_metrics()
-        return self._nloc
-
-    @property
-    def complexity(self) -> Optional[int]:
-        """
-        Calculate the Cyclomatic Complexity of the file.
-
-        :return: Cyclomatic Complexity of the file
-        """
-        self._calculate_metrics()
-        return self._complexity
-
-    @property
-    def token_count(self) -> Optional[int]:
-        """
-        Calculate the token count of functions.
-
-        :return: token count
-        """
-        self._calculate_metrics()
-        return self._token_count
-
-    @property
-    def diff_parsed(self) -> Dict[str, List[Tuple[int, str]]]:
-        """
-        Returns a dictionary with the added and deleted lines.
-        The dictionary has 2 keys: "added" and "deleted", each containing the
-        corresponding added or deleted lines. For both keys, the value is a
-        list of Tuple (int, str), corresponding to (number of line in the file,
-        actual line).
-
-        :return: Dictionary
-        """
-        lines = self.diff.split('\n')
-        modified_lines = {'added': [], 'deleted': []}  # type: Dict[str, List[Tuple[int, str]]]
-
-        count_deletions = 0
-        count_additions = 0
-
-        for line in lines:
-            line = line.rstrip()
-            count_deletions += 1
-            count_additions += 1
-
-            if line.startswith('@@'):
-                count_deletions, count_additions = self._get_line_numbers(line)
-
-            if line.startswith('-'):
-                modified_lines['deleted'].append((count_deletions, line[1:]))
-                count_additions -= 1
-
-            if line.startswith('+'):
-                modified_lines['added'].append((count_additions, line[1:]))
-                count_deletions -= 1
-
-            if line == r'\ No newline at end of file':
-                count_deletions -= 1
-                count_additions -= 1
-
-        return modified_lines
-
-    @staticmethod
-    def _get_line_numbers(line):
-        token = line.split(" ")
-        numbers_old_file = token[1]
-        numbers_new_file = token[2]
-        delete_line_number = int(numbers_old_file.split(",")[0].replace("-", "")) - 1
-        additions_line_number = int(numbers_new_file.split(",")[0]) - 1
-        return delete_line_number, additions_line_number
-
-    @property
-    def methods(self) -> List[Method]:
-        """
-        Return the list of methods in the file. Every method
-        contains various information like complexity, loc, name,
-        number of parameters, etc.
-
-        :return: list of methods
-        """
-        self._calculate_metrics()
-        return self._function_list
-
-    @property
-    def methods_before(self) -> List[Method]:
-        """
-        Return the list of methods in the file before the
-        change happened. Each method will have all specific
-        info, e.g. complexity, loc, name, etc.
-
-        :return: list of methods
-        """
-        self._calculate_metrics(include_before=True)
-        return self._function_list_before
-
-    @property
-    def changed_methods(self) -> List[Method]:
-        """
-        Return the list of methods that were changed. This analysis
-        is more complex because Lizard runs twice: for methods before
-        and after the change
-
-        :return: list of methods
-        """
-        new_methods = self.methods
-        old_methods = self.methods_before
-        added = self.diff_parsed['added']
-        deleted = self.diff_parsed['deleted']
-
-        methods_changed_new = {y for x in added for y in new_methods if
-                               y.start_line <= x[0] <= y.end_line}
-        methods_changed_old = {y for x in deleted for y in old_methods if
-                               y.start_line <= x[0] <= y.end_line}
-
-        return list(methods_changed_new.union(methods_changed_old))
-
-    @staticmethod
-    def _risk_profile(methods: List[Method], dmm_prop: DMMProperty) -> Tuple[int, int]:
-        """
-        Return the risk profile of the set of methods, with two bins: risky, or non risky.
-        The risk profile is a pair (v_low, v_high), where
-        v_low is the volume of the low risk methods in the list, and
-        v_high is the volume of the high risk methods in the list.
-
-        :param methods: List of methods for which risk profile is to be determined
-        :param dmm_prop: Property indicating the type of risk
-        :return: total risk profile for methods according to property.
-        """
-        low = sum([m.nloc for m in methods if m.is_low_risk(dmm_prop)])
-        high = sum([m.nloc for m in methods if not m.is_low_risk(dmm_prop)])
-        return low, high
-
-    def _delta_risk_profile(self, dmm_prop: DMMProperty) -> Tuple[int, int]:
-        """
-        Return the delta risk profile of this commit, which a pair (dv1, dv2), where
-        dv1 is the total change in volume (lines of code) of low risk methods, and
-        dv2 is the total change in volume of the high risk methods.
-
-        :param dmm_prop: Property indicating the type of risk
-        :return: total delta risk profile for this property.
-        """
-        assert self.language_supported
-        low_before, high_before = self._risk_profile(self.methods_before, dmm_prop)
-        low_after, high_after = self._risk_profile(self.methods, dmm_prop)
-        return low_after - low_before, high_after - high_before
-
-    def _calculate_metrics(self, include_before=False):
-        """
-        :param include_before: either to compute the metrics
-        for source_code_before, i.e. before the change happened
-        """
-        if not self.language_supported:
-            return
-
-        if self.source_code and self._nloc is None:
-            analysis = lizard.analyze_file.analyze_source_code(self.filename,
-                                                               self.source_code)
-            self._nloc = analysis.nloc
-            self._complexity = analysis.CCN
-            self._token_count = analysis.token_count
-
-            for func in analysis.function_list:
-                self._function_list.append(Method(func))
-
-        if include_before and self.source_code_before and \
-                not self._function_list_before:
-            anal = lizard.analyze_file.analyze_source_code(
-                self.filename, self.source_code_before)
-
-            self._function_list_before = [
-                Method(x) for x in anal.function_list]
-
-    def __eq__(self, other):
-        if not isinstance(other, Modification):
-            return NotImplemented
-        if self is other:
-            return True
-        return self.__dict__ == other.__dict__
 
 
 class Commit(ABC):
@@ -426,7 +38,6 @@ class Commit(ABC):
     Class representing a Commit. Contains all the important information such
     as hash, author, dates, and modified files.
     """
-
     def __init__(self, commit, conf) -> None:
         """
         Create a commit object.
@@ -571,8 +182,15 @@ class Commit(ABC):
         """
         pass
 
+    def _get_decoded_str(self, str_to_decode):
+        try:
+            return str_to_decode.decode('utf-8', 'ignore')
+        except (UnicodeDecodeError, AttributeError, ValueError):
+            logger.debug('Could not load the diff of a '
+                         'file in commit %s', self._c_object.hexsha)
+            return None
+
     @property
-    @abstractmethod
     def in_main_branch(self) -> bool:
         """
         Return True if the commit is in the main branch, False otherwise.
@@ -582,13 +200,21 @@ class Commit(ABC):
         return self._conf.get('main_branch') in self.branches
 
     @property
-    @abstractmethod
     def branches(self) -> Set[str]:
         """
         Return the set of branches that contain the commit.
 
         :return: set(str) branches
         """
+        if self._branches is None:
+            self._branches = self._get_branches()
+
+        assert self._branches is not None
+        return self._branches
+
+    @property
+    @abstractmethod
+    def _get_branches(self):
         pass
 
     @property
@@ -709,8 +335,204 @@ class Commit(ABC):
 
         return proportion
 
-    @staticmethod
-    def _from_change_to_modification_type(diff):
+
+class CommitGP(Commit):
+    """
+    Class representing a Commit. Contains all the important information such
+    as hash, author, dates, and modified files.
+    """
+
+    def __init__(self, commit: GitPyCommit, conf) -> None:
+        """
+        Create a commit object.
+
+        :param commit: GitGP Commit object
+        :param conf: Configuration class
+        """
+
+        super().__init__(commit, conf)
+
+    @property
+    def hash(self) -> str:
+        """
+        Return the SHA of the commit.
+
+        :return: str hash
+        """
+        return self._c_object.hexsha
+
+    @property
+    def author(self) -> Developer:
+        """
+        Return the author of the commit as a Developer object.
+
+        :return: author
+        """
+        return Developer(self._c_object.author.name,
+                         self._c_object.author.email)
+
+    @property
+    def committer(self) -> Developer:
+        """
+        Return the committer of the commit as a Developer object.
+
+        :return: committer
+        """
+        return Developer(self._c_object.committer.name,
+                         self._c_object.committer.email)
+
+    @property
+    def author_date(self) -> datetime:
+        """
+        Return the authored datetime.
+
+        :return: datetime author_datetime
+        """
+        return self._c_object.authored_datetime
+
+    @property
+    def committer_date(self) -> datetime:
+        """
+        Return the committed datetime.
+
+        :return: datetime committer_datetime
+        """
+        return self._c_object.committed_datetime
+
+    @property
+    def author_timezone(self) -> int:
+        """
+        Author timezone expressed in seconds from epoch.
+
+        :return: int timezone
+        """
+        return self._c_object.author_tz_offset
+
+    @property
+    def committer_timezone(self) -> int:
+        """
+        Author timezone expressed in seconds from epoch.
+
+        :return: int timezone
+        """
+        return self._c_object.committer_tz_offset
+
+    @property
+    def msg(self) -> str:
+        """
+        Return commit message.
+
+        :return: str commit_message
+        """
+        return self._c_object.message.strip()
+
+    @property
+    def parents(self) -> List[str]:
+        """
+        Return the list of parents SHAs.
+
+        :return: List[str] parents
+        """
+        parents = []
+        for p in self._c_object.parents:
+            parents.append(p.hexsha)
+        return parents
+
+    @property
+    def merge(self) -> bool:
+        """
+        Return True if the commit is a merge, False otherwise.
+
+        :return: bool merge
+        """
+        return len(self._c_object.parents) > 1
+
+    @property
+    def modifications(self) -> List[Modification]:
+        """
+        Return a list of modified files. The list is empty if the commit is
+        a merge commit. For more info on this, see
+        https://haacked.com/archive/2014/02/21/reviewing-merge-commits/ or
+        https://github.com/ishepard/pydriller/issues/89#issuecomment-590243707
+
+        :return: List[Modification] modifications
+        """
+        if self._modifications is None:
+            self._modifications = self._get_modifications()
+
+        assert self._modifications is not None
+        return self._modifications
+
+    def _get_modifications(self):
+        options = {}
+        if self._conf.get('histogram'):
+            options['histogram'] = True
+
+        if self._conf.get('skip_whitespaces'):
+            options['w'] = True
+
+        if len(self.parents) == 1:
+            # the commit has a parent
+            diff_index = self._c_object.parents[0].diff(self._c_object,
+                                                        create_patch=True,
+                                                        **options)
+        elif len(self.parents) > 1:
+            # if it's a merge commit, the modified files of the commit are the
+            # conflicts. This because if the file is not in conflict,
+            # pydriller will visit the modification in one of the previous
+            # commits. However, parsing the output of a combined diff (that
+            # returns the list of conflicts) is challenging: so, right now,
+            # I will return an empty array, in the meanwhile I will try to
+            # find a way to parse the output.
+            # c_git = GitGP(str(self.project_path))
+            # d = c_git.diff_tree("--cc", commit.hexsha, '-r', '--abbrev=40',
+            #                     '--full-index', '-M', '-p', '--no-color')
+            diff_index = []
+        else:
+            # this is the first commit of the repo. Comparing it with git
+            # NULL TREE
+            diff_index = self._c_object.diff(NULL_TREE,
+                                             create_patch=True,
+                                             **options)
+
+        return self._parse_diff(diff_index)
+
+    def _parse_diff(self, diff_index) -> List[Modification]:
+        modifications_list = []
+        for diff in diff_index:
+            old_path = diff.a_path
+            new_path = diff.b_path
+            change_type = self._from_change_to_modification_type(diff)
+
+            diff_and_sc = {
+                'diff': self._get_decoded_str(diff.diff),
+                'source_code_before': self._get_decoded_sc_str(
+                    diff.a_blob),
+                'source_code': self._get_decoded_sc_str(
+                    diff.b_blob)
+            }
+
+            modifications_list.append(Modification(old_path, new_path,
+                                                   change_type, diff_and_sc))
+
+        return modifications_list
+
+    def _get_decoded_sc_str(self, diff):
+        try:
+            return diff.data_stream.read().decode('utf-8', 'ignore')
+        except (UnicodeDecodeError, AttributeError, ValueError):
+            logger.debug('Could not load source code of a '
+                         'file in commit %s', self._c_object.hexsha)
+            return None
+
+    def _get_branches(self):
+        c_git = Git(str(self._conf.get('path_to_repo')))
+        branches = set()
+        for branch in set(c_git.branch('--contains', self.hash).split('\n')):
+            branches.add(branch.strip().replace('* ', ''))
+        return branches
+
+    def _from_change_to_modification_type(self, diff: Diff):
         if diff.new_file:
             return ModificationType.ADD
         if diff.deleted_file:
@@ -721,6 +543,209 @@ class Commit(ABC):
             return ModificationType.MODIFY
 
         return ModificationType.UNKNOWN
+
+    def __eq__(self, other):
+        if not isinstance(other, Commit):
+            return NotImplemented
+        if self is other:
+            return True
+
+        return self.__dict__ == other.__dict__
+
+
+class CommitPG2(Commit):
+    """
+    Class representing a Commit. Contains all the important information such
+    as hash, author, dates, and modified files.
+    """
+
+    def __init__(self, commit: PyGit2Commit, conf) -> None:
+        """
+        Create a commit object.
+
+        :param commit: GitGP Commit object
+            of a remote repository)
+        """
+        super().__init__(commit, conf)
+
+    @property
+    def hash(self) -> str:
+        """
+        Return the SHA of the commit.
+
+        :return: str hash
+        """
+        return self._c_object.hex
+
+    @property
+    def author(self) -> Developer:
+        """
+        Return the author of the commit as a Developer object.
+
+        :return: author
+        """
+        return Developer(self._c_object.author.name,
+                         self._c_object.author.email)
+
+    @property
+    def author_date(self) -> datetime:
+        """
+        Return the authored datetime.
+
+        :return: datetime author_datetime
+        """
+        offset = self._c_object.author.offset * 60
+        dt = datetime.utcfromtimestamp(self._c_object.author.time) + timedelta(seconds=offset)
+        return dt.replace(tzinfo=timezone(timedelta(seconds=offset)))
+
+    @property
+    def author_timezone(self) -> int:
+        """
+        Author timezone expressed in seconds from epoch.
+
+        :return: int timezone
+        """
+        return self._c_object.author.offset
+
+    @property
+    def committer(self) -> Developer:
+        """
+        Return the committer of the commit as a Developer object.
+
+        :return: committer
+        """
+        return Developer(self._c_object.committer.name,
+                         self._c_object.committer.email)
+
+    @property
+    def committer_date(self) -> datetime:
+        """
+        Return the committed datetime.
+
+        :return: datetime committer_datetime
+        """
+        offset = self._c_object.commit_time_offset * 60
+        dt = datetime.utcfromtimestamp(self._c_object.commit_time) + timedelta(seconds=offset)
+        return dt.replace(tzinfo=timezone(timedelta(seconds=offset)))
+
+    @property
+    def committer_timezone(self) -> int:
+        """
+        Author timezone expressed in seconds from epoch.
+
+        :return: int timezone
+        """
+        return self._c_object.commit_time_offset
+
+    @property
+    def msg(self) -> str:
+        """
+        Return commit message.
+
+        :return: str commit_message
+        """
+        return self._c_object.message.strip()
+
+    @property
+    def parents(self):
+        """
+        Return a generator with the parents' commits.
+
+        :return: List[str] parents
+        """
+        parents = []
+        for parent in self._c_object.parents:
+            parents.append(parent.hex)
+
+        return parents
+
+    @property
+    def merge(self) -> bool:
+        """
+        Return True if the commit is a merge, False otherwise.
+
+        :return: bool merge
+        """
+        return len(self._c_object.parents) > 1
+
+    @property
+    def modifications(self) -> List[Modification]:
+        """
+        Return a generator of modified files.
+
+        :return: Generator[Modification, None, None] modifications
+        """
+        repo = self._conf.get("git_repo").repo
+        num_parents = len(self.parents)
+        if num_parents == 1:
+            # the commit has a parent
+            diff = repo.diff(self._c_object.parents[0].hex, self._c_object.hex)
+            diff.find_similar()
+        elif num_parents > 1:
+            # if it's a merge commit, the modified files of the commit are the
+            # conflicts. This because if the file is not in conflict,
+            # pydriller will visit the modification in one of the previous
+            # commits. However, parsing the output of a combined diff (that
+            # returns the list of conflicts) is challenging: so, right now,
+            # I will return an empty array, in the meanwhile I will try to
+            # find a way to parse the output.
+            # c_git = Git(str(self.project_path))
+            # d = c_git.diff_tree("--cc", commit.hexsha, '-r', '--abbrev=40',
+            #                     '--full-index', '-M', '-p', '--no-color')
+            diff = []
+        else:
+            # this is the first commit of the repo. Comparing it with git
+            # NULL TREE
+            diff = self._c_object.tree.diff_to_tree(swap=True)
+            diff.find_similar()
+
+        return self._parse_diff(diff)
+
+    def _parse_diff(self, diff):
+        modifications_list = []
+        for patch in diff:
+            delta = patch.delta
+            change_type = self._from_change_to_modification_type(delta.status_char())
+            old_path = delta.old_file.path if change_type != ModificationType.ADD else None
+            new_path = delta.new_file.path if change_type != ModificationType.DELETE else None
+
+            diff = self._get_decoded_str(patch.data).split("\n")
+
+            # Pygit2 includes some lines before the diff, such as the name
+            # of the files. I need to remove that so it is the same to GitPython
+            i = 0
+            while i < len(diff) and not diff[i].startswith("@@"):
+                i += 1
+            parsed_diff = diff[i:len(diff)]
+
+            diff_and_sc = {
+                'diff': '\n'.join(parsed_diff),
+                'source_code_before': self._get_decoded_str(
+                    self._conf.get("git_repo").repo[self._c_object.parents[0].tree[old_path].id].data
+                ) if change_type != ModificationType.ADD else None,
+                'source_code': self._get_decoded_str(
+                    self._conf.get("git_repo").repo[self._c_object.tree[new_path].id].data
+                ) if change_type != ModificationType.DELETE else None
+            }
+            modifications_list.append(Modification(old_path, new_path,
+                                                   change_type, diff_and_sc))
+
+        return modifications_list
+
+    def _from_change_to_modification_type(self, diff_char: str) -> ModificationType:
+        if diff_char == 'A':
+            return ModificationType.ADD
+        if diff_char == 'D':
+            return ModificationType.DELETE
+        if diff_char == 'R':
+            return ModificationType.RENAME
+        if diff_char == 'M':
+            return ModificationType.MODIFY
+
+        return ModificationType.UNKNOWN
+
+    def _get_branches(self):
+        return list(self._conf.get("git_repo").repo.branches.with_commit(self.hash))
 
     def __eq__(self, other):
         if not isinstance(other, Commit):

@@ -18,7 +18,7 @@ import pytest
 from git import Git as GGitPython
 
 from pydriller.domain.commit import ModificationType
-from pydriller.git_gp import GitGP
+from pydriller.git import GitGP, GitPG2
 
 
 @pytest.fixture
@@ -28,9 +28,9 @@ def path():
 
 @pytest.fixture
 def repo(path):
-    gr = GitGP(path)
-    yield gr
-    gr.clear()
+    pg2 = GitPG2(path)
+    yield pg2
+    # gp.clear()
 
 
 @pytest.mark.parametrize('path', ['test-repos/small_repo/'])
@@ -41,7 +41,6 @@ def test_projectname(repo):
 @pytest.mark.parametrize('path', ['test-repos/small_repo/'])
 def test_get_head(repo):
     assert repo is not None
-    print(repo.get_head().hash)
     cs = repo.get_head()
     assert cs is not None
 
@@ -143,17 +142,17 @@ def test_list_files_in_commit(repo):
     repo.checkout('a7053a4dcd627f5f4f213dc9aa002eb1caf926f8')
     files1 = repo.files()
     assert len(files1) == 3
-    repo.reset()
+    repo.checkout("master")
 
     repo.checkout('f0dd1308bd904a9b108a6a40865166ee962af3d4')
     files2 = repo.files()
     assert len(files2) == 2
-    repo.reset()
+    repo.checkout("master")
 
     repo.checkout('9e71dd5726d775fb4a5f08506a539216e878adbb')
     files3 = repo.files()
     assert len(files3) == 3
-    repo.reset()
+    repo.checkout("master")
 
 
 @pytest.mark.parametrize('path', ['test-repos/complex_repo'])
@@ -163,7 +162,7 @@ def test_checkout_consecutive_commits(repo):
     repo.checkout('9e71dd5726d775fb4a5f08506a539216e878adbb')
     files3 = repo.files()
     assert len(files3) == 3
-    repo.reset()
+    repo.checkout("master")
 
 
 @pytest.mark.parametrize('path', ['test-repos/branches_without_files'])
@@ -172,7 +171,7 @@ def test_checkout_with_commit_not_fully_merged_to_master(repo):
     files1 = repo.files()
     assert len(files1) == 2
 
-    repo.reset()
+    repo.checkout("master")
     assert 4, "temp branch should be cleared." == len(repo.repo.branches)
     files2 = repo.files()
     assert len(files2) == 1
@@ -180,7 +179,7 @@ def test_checkout_with_commit_not_fully_merged_to_master(repo):
     repo.checkout('developing')
     files1 = repo.files()
     assert len(files1) == 2
-    repo.reset()
+    repo.checkout("master")
 
 
 @pytest.mark.parametrize('path', ['test-repos/complex_repo'])
@@ -218,23 +217,6 @@ def test_other_branches_with_merge(repo):
 
     commit = repo.get_commit('e51421e0beae6a3c20bdcdfc21066e05db675e03')
     assert commit.in_main_branch is True
-
-
-@pytest.mark.parametrize('path', ['test-repos/branches_merged'])
-def test_commit_in_master_branch(repo):
-    assert repo.get_head().hash == '29e929fbc5dc6a2e9c620069b24e2a143af4285f'
-
-    repo.checkout('8986af2a679759e5a15794f6d56e6d46c3f302f1')
-
-    git_to_change_head = GitGP('test-repos/branches_merged')
-    commit = git_to_change_head.get_commit('8169f76a3d7add54b4fc7bca7160d1f1eede6eda')
-    assert commit.in_main_branch is False
-
-    commit = git_to_change_head.get_commit('168b3aab057ed61a769acf336a4ef5e64f76c9fd')
-    assert commit.in_main_branch is True
-
-    repo.reset()
-    assert repo.get_head().hash == '29e929fbc5dc6a2e9c620069b24e2a143af4285f'
 
 
 @pytest.mark.parametrize('path', ['test-repos/complex_repo'])
@@ -374,8 +356,6 @@ def test_get_commits_last_modified_lines_rename_simple(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_multiple_rename(repo):
-    # in this case the algorithm doesn't work because the file has been renamed 2 times!
-
     buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit('9e858753b3d69f560cf72aaaa297f2608145ebcf'))
     assert len(buggy_commits) == 0
 
@@ -471,8 +451,6 @@ def test_get_commits_last_modified_lines_hyper_blame(repo):
         'B.java']
 
 
-@pytest.mark.skipif(GGitPython().version_info < (2, 23),
-                    reason="requires 2.23 or higher")
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_hyper_blame_unblamable(tmp_path,
                                                                 repo):
@@ -486,8 +464,8 @@ def test_get_commits_last_modified_lines_hyper_blame_unblamable(tmp_path,
     assert len(buggy_commits) == 0
 
 
-@pytest.mark.skipif(GGitPython().version_info < (2, 23),
-                    reason="requires git 2.23 or higher")
+# @pytest.mark.skipif(GGitPython().version_info < (2, 23),
+#                     reason="requires git 2.23 or higher")
 @pytest.mark.parametrize('path', ['test-repos/szz/'])
 def test_get_commits_last_modified_lines_hyper_blame_ignore_hash(tmp_path, repo):
     p = tmp_path / "ignore.txt"

@@ -255,7 +255,6 @@ def test_eq_modifications(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/complex_repo'])
 def test_tzoffset_minus_hours(repo):
-    c = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2')
     tz1 = repo.get_commit(
         'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2').author_timezone
     tz2 = repo.get_commit(

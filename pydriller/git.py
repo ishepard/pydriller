@@ -175,7 +175,7 @@ class Git(ABC):
                             path = mod.new_path
 
                         commits.setdefault(path, set()).add(self.get_commit(buggy_commit).hash)
-            except (GitCommandError, subprocess.CalledProcessError) as e:
+            except (GitCommandError, subprocess.CalledProcessError):
                 logger.debug(
                     "Could not found file %s in commit %s. Probably a double "
                     "rename!", mod.filename, commit.hash)

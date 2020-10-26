@@ -17,7 +17,6 @@ This module includes common functions.
 import logging
 import os
 import shutil
-import stat
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path

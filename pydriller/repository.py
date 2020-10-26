@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import List, Generator, Union
 
 from pydriller.domain.commit import Commit
-from pydriller.git import GitGP, GitPG2
+from pydriller.git import Git, GitGP, GitPG2
 from pydriller.utils.common import open_folder
 from pydriller.utils.conf import Conf
 
@@ -101,6 +101,8 @@ class Repository:
             else set(only_commits)
             )
 
+        self._use_pygit2 = use_pygit2
+
         options = {
             "git_repo": None,
             "path_to_repo": path_to_repo,
@@ -135,7 +137,7 @@ class Repository:
         self._cleanup = False if clone_repo_to is not None else True
 
     @contextmanager
-    def _prep_repo(self, path_repo: str) -> Generator[GitGP, None, None]:
+    def _prep_repo(self, path_repo: str) -> Generator[Git, None, None]:
         with open_folder(path_repo=path_repo,
                          conf=self._conf,
                          cleanup=self._cleanup) as local_path_repo:
@@ -143,10 +145,10 @@ class Repository:
             # of which one we are currently analyzing
             self._conf.set_value('path_to_repo', local_path_repo)
 
-            if self._conf.get("use_pygit2"):
+            if self._use_pygit2:
                 self.git_repo = GitPG2(local_path_repo, self._conf)
             else:
-                self.git_repo = GitGP(local_path_repo, self._conf)
+                self.git_repo = GitGP(local_path_repo, self._conf)  # type: ignore
 
             # saving the Git object for further use
             self._conf.set_value("git_repo", self.git_repo)
@@ -157,8 +159,8 @@ class Repository:
 
             # cleaning, this is necessary since GitGP issues on memory leaks
             self._conf.set_value("git_repo", None)
-            if not self._conf.get("use_pygit2"):
-                self.git_repo.clear()
+            if not self._use_pygit2:
+                self.git_repo.clear()  # type: ignore
             del self.git_repo
 
     def traverse_commits(self) -> Generator[Commit, None, None]:

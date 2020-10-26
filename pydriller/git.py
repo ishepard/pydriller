@@ -417,9 +417,7 @@ class GitPG2(Git):
         head_commit = self.repo[self.repo.head.target]
         return CommitPG2(head_commit, self._conf)
 
-    def get_list_commits(self, branch: str = None,
-                         reverse_order: bool = True) \
-            -> Generator[Commit, None, None]:
+    def get_list_commits(self, rev='HEAD', **kwargs) -> Generator[Commit, None, None]:
         """
         Return a generator of commits of all the commits in the repo.
 
@@ -427,11 +425,11 @@ class GitPG2(Git):
             repo
         """
         sort = GIT_SORT_REVERSE
-        if not reverse_order:
+        if 'reverse' in kwargs:
             sort = GIT_SORT_NONE
 
-        if branch:
-            target = self.repo.branches[branch].target
+        if rev != "HEAD":
+            target = self.repo[rev].target
         else:
             target = self.repo.head.target
 

@@ -15,7 +15,7 @@
 import logging
 import pytest
 
-from pydriller.git_gp import GitGP
+from pydriller.git import GitGP
 from pydriller.domain.commit import Commit, DMMProperty
 
 

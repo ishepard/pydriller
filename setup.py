@@ -36,7 +36,7 @@ setup(
     url='https://github.com/ishepard/pydriller',
     license='Apache License',
     package_dir={'pydriller': 'pydriller'},
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     install_requires=requirements,
     tests_require=requirements + test_requirements,
     classifiers=[
@@ -49,7 +49,6 @@ setup(
             'Intended Audience :: Developers',
             'Intended Audience :: Science/Research',
             'License :: OSI Approved :: Apache Software License',
-            'Programming Language :: Python :: 3.5',
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: 3.8',

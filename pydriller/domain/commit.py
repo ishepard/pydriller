@@ -335,13 +335,20 @@ class Commit(ABC):
 
         return proportion
 
+    def __eq__(self, other):
+        if not isinstance(other, Commit):
+            return False
+        if self is other:
+            return True
+
+        return self.__dict__ == other.__dict__
+
 
 class CommitGP(Commit):
     """
     Class representing a Commit. Contains all the important information such
     as hash, author, dates, and modified files.
     """
-
     def __init__(self, commit: GitPyCommit, conf) -> None:
         """
         Create a commit object.
@@ -544,21 +551,12 @@ class CommitGP(Commit):
 
         return ModificationType.UNKNOWN
 
-    def __eq__(self, other):
-        if not isinstance(other, Commit):
-            return NotImplemented
-        if self is other:
-            return True
-
-        return self.__dict__ == other.__dict__
-
 
 class CommitPG2(Commit):
     """
     Class representing a Commit. Contains all the important information such
     as hash, author, dates, and modified files.
     """
-
     def __init__(self, commit: PyGit2Commit, conf) -> None:
         """
         Create a commit object.
@@ -605,7 +603,7 @@ class CommitPG2(Commit):
 
         :return: int timezone
         """
-        return self._c_object.author.offset
+        return self._c_object.author.offset * -60
 
     @property
     def committer(self) -> Developer:
@@ -635,7 +633,7 @@ class CommitPG2(Commit):
 
         :return: int timezone
         """
-        return self._c_object.commit_time_offset
+        return self._c_object.commit_time_offset * -60
 
     @property
     def msg(self) -> str:
@@ -653,11 +651,7 @@ class CommitPG2(Commit):
 
         :return: List[str] parents
         """
-        parents = []
-        for parent in self._c_object.parents:
-            parents.append(parent.hex)
-
-        return parents
+        return [str(id) for id in self._c_object.parent_ids]
 
     @property
     def merge(self) -> bool:
@@ -746,11 +740,3 @@ class CommitPG2(Commit):
 
     def _get_branches(self):
         return list(self._conf.get("git_repo").repo.branches.with_commit(self.hash))
-
-    def __eq__(self, other):
-        if not isinstance(other, Commit):
-            return NotImplemented
-        if self is other:
-            return True
-
-        return self.__dict__ == other.__dict__

@@ -17,7 +17,7 @@ from pathlib import Path
 import pytest
 
 from pydriller.domain.commit import Modification, ModificationType
-from pydriller.git_gp import GitGP
+from pydriller.git import GitPG2
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -30,9 +30,8 @@ def path():
 
 @pytest.fixture()
 def repo(path):
-    gr = GitGP(path)
+    gr = GitPG2(path)
     yield gr
-    gr.clear()
 
 
 @pytest.mark.parametrize('path', ['test-repos/complex_repo'])
@@ -90,12 +89,9 @@ def test_metrics_python():
 
 
 def test_changed_methods():
-
-    gr = GitGP("test-repos/diff")
-
+    gr = GitPG2("test-repos/diff")
     # add a new method
-    mod = gr.get_commit(
-        'ea95227e0fd128aa69c7ab6a8ac485f72251b3ed').modifications[0]
+    mod = gr.get_commit('ea95227e0fd128aa69c7ab6a8ac485f72251b3ed').modifications[0]
     assert len(mod.changed_methods) == 1
     assert mod.changed_methods[0].name == 'GitRepository::singleProjectThirdMethod'
 
@@ -218,15 +214,6 @@ def test_projectname(repo):
     assert c.project_name == 'files_in_directories'
 
 
-@pytest.mark.parametrize('path', ['test-repos/unknown_modification'])
-def test_modification_type_unknown(repo):
-    c = repo.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
-
-    mod0 = c.modifications[0]
-
-    assert mod0.change_type.name == 'UNKNOWN'
-
-
 @pytest.mark.parametrize('path', ['test-repos/empty_modifications'])
 def test_modification_with_more_parents(repo):
     c = repo.get_commit('ce6bcd987a6a53cc55da7cef9f8bb128adf68741')
@@ -268,6 +255,7 @@ def test_eq_modifications(repo):
 
 @pytest.mark.parametrize('path', ['test-repos/complex_repo'])
 def test_tzoffset_minus_hours(repo):
+    c = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2')
     tz1 = repo.get_commit(
         'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2').author_timezone
     tz2 = repo.get_commit(

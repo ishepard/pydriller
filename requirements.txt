@@ -1,3 +1,4 @@
 gitpython
 pytz
 lizard
+pygit2

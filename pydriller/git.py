@@ -236,7 +236,7 @@ class GitGP(Git):
 
     def clear(self):
         """
-        According to GitGP's documentation, sometimes it leaks resources.
+        According to GitPython's documentation, sometimes it leaks resources.
         This holds especially for Windows users. Hence, we need to clear the
         cache manually.
         """

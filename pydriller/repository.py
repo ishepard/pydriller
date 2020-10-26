@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import List, Generator, Union
 
 from pydriller.domain.commit import Commit
-from pydriller.git import GitGP
+from pydriller.git import GitGP, GitPG2
 from pydriller.utils.common import open_folder
 from pydriller.utils.conf import Conf
 
@@ -51,7 +51,8 @@ class Repository:
                  histogram_diff: bool = False,
                  skip_whitespaces: bool = False,
                  clone_repo_to: str = None,
-                 order: str = None):
+                 order: str = None,
+                 use_pygit2: bool = False):
         """
         Init a repository mining. The only required parameter is
         "path_to_repo": to analyze a single repo, pass the absolute path to
@@ -124,7 +125,8 @@ class Repository:
             "tagged_commits": None,
             "histogram": histogram_diff,
             "clone_repo_to": clone_repo_to,
-            "order": order
+            "order": order,
+            "use_pygit2": use_pygit2
         }
         self._conf = Conf(options)
 
@@ -141,8 +143,12 @@ class Repository:
             # of which one we are currently analyzing
             self._conf.set_value('path_to_repo', local_path_repo)
 
-            self.git_repo = GitGP(local_path_repo, self._conf)
-            # saving the GitGP object for further use
+            if self._conf.get("use_pygit2"):
+                self.git_repo = GitPG2(local_path_repo, self._conf)
+            else:
+                self.git_repo = GitGP(local_path_repo, self._conf)
+
+            # saving the Git object for further use
             self._conf.set_value("git_repo", self.git_repo)
 
             # checking that the filters are set correctly
@@ -151,7 +157,8 @@ class Repository:
 
             # cleaning, this is necessary since GitGP issues on memory leaks
             self._conf.set_value("git_repo", None)
-            self.git_repo.clear()
+            if not self._conf.get("use_pygit2"):
+                self.git_repo.clear()
             del self.git_repo
 
     def traverse_commits(self) -> Generator[Commit, None, None]:

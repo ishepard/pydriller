@@ -429,7 +429,7 @@ class GitPG2(Git):
             sort = GIT_SORT_NONE
 
         if rev != "HEAD":
-            target = self.repo[rev].target
+            target = self.repo[rev].hex
         else:
             target = self.repo.head.target
 

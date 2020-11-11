@@ -11,28 +11,19 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
 
 
 @pytest.fixture
-def path():
-    return None
+def repo(request):
+    return list(RepositoryMining(path_to_repo=request.param).traverse_commits())
 
 
 @pytest.fixture
-def to():
-    return None
-
-
-@pytest.fixture
-def repo(path):
-    return list(RepositoryMining(path_to_repo=path).traverse_commits())
-
-
-@pytest.fixture
-def repo_to(path, to):
+def repo_to(request):
+    path, to = request.param
     return list(RepositoryMining(path_to_repo=path, to=to).traverse_commits())
 
 
 @pytest.fixture()
-def git_repo(path):
-    gr = GitRepository(path)
+def git_repo(request):
+    gr = GitRepository(request.param)
     yield gr
     gr.clear()
 
@@ -49,61 +40,58 @@ def test_badly_formatted_repo_url():
         list(RepositoryMining(path_to_repo=set('repo')).traverse_commits())
 
 
-@pytest.mark.parametrize('path,expected', [
+@pytest.mark.parametrize('repo,expected', [
     ("test-repos/small_repo", 5)
-])
+], indirect=['repo'])
 def test_simple_url(repo, expected):
     assert len(repo) == expected
 
 
-@pytest.mark.parametrize('path,expected', [
-    (["test-repos/small_repo", "test-repos/branches_merged"], 9)
-])
+@pytest.mark.parametrize('repo,expected', [
+    ((["test-repos/small_repo", "test-repos/branches_merged"]), 9)
+], indirect=['repo'])
 def test_two_local_urls(repo, expected):
     assert len(repo) == expected
 
 
-@pytest.mark.parametrize('path,to,expected', [
-    ("https://github.com/ishepard/pydriller.git",
-     datetime(2018, 10, 20),
-     159)
-])
+@pytest.mark.parametrize('repo_to,expected', [
+    (("https://github.com/ishepard/pydriller.git", datetime(2018, 10, 20)), 159)
+], indirect=['repo_to'])
 def test_simple_remote_url(repo_to, expected):
     assert len(repo_to) == expected
 
 
-@pytest.mark.parametrize('path,to,expected', [
-    (["https://github.com/mauricioaniche/repodriller.git",
-      "https://github.com/ishepard/pydriller"],
-     datetime(2018, 10, 20),
+@pytest.mark.parametrize('repo_to,expected', [
+    ((["https://github.com/mauricioaniche/repodriller.git",
+      "https://github.com/ishepard/pydriller"], datetime(2018, 10, 20)),
      518)
-])
+], indirect=['repo_to'])
 def test_two_remote_urls(repo_to, expected):
     assert len(repo_to) == expected
 
 
-@pytest.mark.parametrize('path,expected', [
-    (["test-repos/small_repo", "test-repos/small_repo"], 10)
-])
+@pytest.mark.parametrize('repo,expected', [
+    ((["test-repos/small_repo", "test-repos/small_repo"]), 10)
+], indirect=['repo'])
 def test_2_identical_local_urls(repo, expected):
     assert len(repo) == expected
 
 
-@pytest.mark.parametrize('path,to,expected', [
-    (["test-repos/small_repo", "https://github.com/ishepard/pydriller.git"],
-     datetime(2018, 10, 20),
+@pytest.mark.parametrize('repo_to,expected', [
+    ((["test-repos/small_repo", "https://github.com/ishepard/pydriller.git"],
+     datetime(2018, 10, 20)),
      164)
-])
+], indirect=['repo_to'])
 def test_both_local_and_remote_urls(repo_to, expected):
     assert len(repo_to) == expected
 
 
-@pytest.mark.parametrize('path,to,expected', [
-    (["test-repos/small_repo", "https://github.com/mauricioaniche/repodriller.git",
+@pytest.mark.parametrize('repo_to,expected', [
+    ((["test-repos/small_repo", "https://github.com/mauricioaniche/repodriller.git",
       "test-repos/branches_merged", "https://github.com/ishepard/pydriller.git"],
-     datetime(2018, 10, 20),
+     datetime(2018, 10, 20)),
      527)
-])
+], indirect=['repo_to'])
 def test_both_local_and_remote_urls_list(repo_to, expected):
     assert len(repo_to) == expected
 
@@ -118,7 +106,7 @@ def test_badly_formatted_url():
         list(RepositoryMining(path_to_repo='test').traverse_commits())
 
 
-@pytest.mark.parametrize('path', ["test-repos/histogram"])
+@pytest.mark.parametrize('git_repo', ["test-repos/histogram"], indirect=True)
 def test_diff_without_histogram(git_repo):
     # without histogram
     commit = list(RepositoryMining('test-repos/histogram',
@@ -148,7 +136,7 @@ def test_diff_without_histogram(git_repo):
     assert (13, '    return null;') in diff['deleted']
 
 
-@pytest.mark.parametrize('path', ["test-repos/histogram"])
+@pytest.mark.parametrize('git_repo', ["test-repos/histogram"], indirect=True)
 def test_diff_with_histogram(git_repo):
     # with histogram
     commit = list(RepositoryMining('test-repos/histogram',
@@ -184,7 +172,7 @@ def test_ignore_add_whitespaces():
     assert len(commit.modifications) == 0
 
 
-@pytest.mark.parametrize('path', ["test-repos/whitespace"])
+@pytest.mark.parametrize('git_repo', ["test-repos/whitespace"], indirect=True)
 def test_ignore_add_whitespaces_and_modified_normal_line(git_repo):
     commit = list(RepositoryMining('test-repos/whitespace',
                                    single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
@@ -257,7 +245,7 @@ def test_projectname_multiple_repos_remote():
         assert commit.project_name == 'pydriller'
 
 
-@pytest.mark.skipif(sys.version_info < (3, 8) and sys.platform == "win32", reason="requires Python3.8 or greater")
+@pytest.mark.skipif(sys.version_info < (3, 8) and sys.platform == "win32", reason="requires Python3.8 or greater on Windows")
 def test_deletion_remotes():
     repos = [
         'https://github.com/ishepard/pydriller',

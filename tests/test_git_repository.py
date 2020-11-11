@@ -21,7 +21,6 @@ from pydriller.domain.commit import ModificationType
 from pydriller.git_repository import GitRepository
 
 
-
 @pytest.fixture
 def repo(request):
     gr = GitRepository(request.param)
@@ -29,7 +28,7 @@ def repo(request):
     gr.clear()
 
 
-@pytest.mark.parametrize('repo', ['test-repos/small_repo/'],indirect=True)
+@pytest.mark.parametrize('repo', ['test-repos/small_repo/'], indirect=True)
 def test_projectname(repo: GitRepository):
     assert repo.project_name == "small_repo"
 
@@ -408,6 +407,8 @@ def test_get_commits_last_modified_lines_for_single_file(repo: GitRepository):
     for mod in commit.modifications:
         if mod.filename == 'A.java':
             buggy_commits = repo.get_commits_last_modified_lines(commit, mod)
+    
+    assert buggy_commits
 
     assert len(buggy_commits) == 1
     assert 'e2ed043eb96c05ebde653a44ae733ded9ef90750' in buggy_commits['A.java']

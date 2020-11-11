@@ -92,4 +92,3 @@ def test_diff_no_newline(modification: Modification):
     assert (1, 'test1') in deleted  # is considered as deleted as a 'newline' command is added
     assert (1, 'test1') in added  # now with added 'newline'
     assert (2, 'test2') in added
-

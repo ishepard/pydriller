@@ -13,23 +13,21 @@
 # limitations under the License.
 import pytest
 
-from pydriller import GitRepository
-
-
-@pytest.fixture
-def commit():
-    return None
+from pydriller import GitRepository, Modification
 
 
 @pytest.fixture()
-def modification(commit):
-    gr = GitRepository("test-repos/diff")
+def modification(request):
+    path, commit = request.param
+    gr = GitRepository(path)
     yield gr.get_commit(commit).modifications[0]
     gr.clear()
 
 
-@pytest.mark.parametrize('commit', ["9a985d4a12a3a12f009ef39750fd9b2187b766d1"])
-def test_extract_line_number_and_content(modification):
+@pytest.mark.parametrize('modification',
+                         [("test-repos/diff", "9a985d4a12a3a12f009ef39750fd9b2187b766d1")],
+                         indirect=True)
+def test_extract_line_number_and_content(modification: Modification):
     added = modification.diff_parsed['added']
     deleted = modification.diff_parsed['deleted']
 
@@ -40,8 +38,10 @@ def test_extract_line_number_and_content(modification):
     assert (131, '            throw new RuntimeException("Changing this line " + path);') in added
 
 
-@pytest.mark.parametrize('commit', ["f45ee2f8976d5f018a1e4ec83eb4556a3df8b0a5"])
-def test_additions(modification):
+@pytest.mark.parametrize('modification',
+                         [("test-repos/diff", "f45ee2f8976d5f018a1e4ec83eb4556a3df8b0a5")],
+                         indirect=True)
+def test_additions(modification: Modification):
     added = modification.diff_parsed['added']
     deleted = modification.diff_parsed['deleted']
 
@@ -54,8 +54,10 @@ def test_additions(modification):
     assert len(added) == 5
 
 
-@pytest.mark.parametrize('commit', ["147c7ce9f725a0e259d63f0bf4e6c8ac085ff8c8"])
-def test_deletions(modification):
+@pytest.mark.parametrize('modification',
+                         [("test-repos/diff", "147c7ce9f725a0e259d63f0bf4e6c8ac085ff8c8")],
+                         indirect=True)
+def test_deletions(modification: Modification):
     added = modification.diff_parsed['added']
     deleted = modification.diff_parsed['deleted']
 
@@ -75,20 +77,19 @@ def test_deletions(modification):
     assert len(added) == 0
 
 
-def test_diff_no_newline():
+@pytest.mark.parametrize('modification',
+                         [("test-repos/no_newline", "52a78c1ee5d100528eccba0a3d67371dbd22d898")],
+                         indirect=True)
+def test_diff_no_newline(modification: Modification):
     """
     If a file ends without a newline git represents this with the additional line
         \\ No newline at end of file
     in diffs. This test asserts these additional lines are parsed correctly.
     """
-    gr = GitRepository('test-repos/no_newline')
-
-    mod = gr.get_commit('52a78c1ee5d100528eccba0a3d67371dbd22d898').modifications[0]
-    added = mod.diff_parsed['added']
-    deleted = mod.diff_parsed['deleted']
+    added = modification.diff_parsed['added']
+    deleted = modification.diff_parsed['deleted']
 
     assert (1, 'test1') in deleted  # is considered as deleted as a 'newline' command is added
     assert (1, 'test1') in added  # now with added 'newline'
     assert (2, 'test2') in added
 
-    gr.clear()

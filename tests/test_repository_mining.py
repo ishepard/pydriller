@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 import os
 import pytest
+import sys
 
 from pydriller import RepositoryMining, GitRepository
 
@@ -256,6 +257,7 @@ def test_projectname_multiple_repos_remote():
         assert commit.project_name == 'pydriller'
 
 
+@pytest.mark.skipif(sys.version_info < (3, 8) and sys.platform == "win32", reason="requires Python3.8 or greater")
 def test_deletion_remotes():
     repos = [
         'https://github.com/ishepard/pydriller',

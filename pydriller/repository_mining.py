@@ -191,15 +191,9 @@ class RepositoryMining:
                 self._tmp_dir.cleanup()
             except PermissionError:
                 # on Windows, Python 3.5, 3.6, 3.7 are not able to delete
-                # git directories because of read-only files. This is now fixed
-                # in python 3.8. In this case, we need to use an
-                # onerror callback to clear the read-only bit.
-                # see https://docs.python.org/3/library/shutil.html?highlight=shutil#rmtree-example
-                def _remove_readonly(func, path, _):
-                    os.chmod(path, stat.S_IWRITE)
-                    func(path)
-
-                shutil.rmtree(self._tmp_dir.name, onerror=_remove_readonly)
+                # git directories because of read-only files.
+                # In this case, just ignore the errors.
+                shutil.rmtree(self._tmp_dir.name, ignore_errors=True)
 
     def traverse_commits(self) -> Generator[Commit, None, None]:
         """

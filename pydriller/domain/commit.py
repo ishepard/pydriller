@@ -664,7 +664,12 @@ class Commit:
     def _get_branches(self):
         c_git = Git(str(self._conf.get('path_to_repo')))
         branches = set()
-        for branch in set(c_git.branch('--contains', self.hash).split('\n')):
+        args = ['--contains', self.hash]
+        if self._conf.get("include_remotes"):
+            args = ["-r"] + args
+        if self._conf.get("include_refs"):
+            args = ["-a"] + args
+        for branch in set(c_git.branch(*args).split('\n')):
             branches.add(branch.strip().replace('* ', ''))
         return branches
 

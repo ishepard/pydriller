@@ -23,19 +23,14 @@ logging.basicConfig(
 
 
 @pytest.fixture
-def path():
-    return None
-
-
-@pytest.fixture()
-def repo(path):
-    gr = GitRepository(path)
+def repo(request):
+    gr = GitRepository(request.param)
     yield gr
     gr.clear()
 
 
-@pytest.mark.parametrize('path', ['test-repos/complex_repo'])
-def test_equal(repo):
+@pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
+def test_equal(repo: GitRepository):
     c1 = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2')
     c2 = repo.get_commit(c1.parents[0])
     c3 = repo.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58')
@@ -199,8 +194,8 @@ def test_metrics_not_supported_file():
     assert m1.nloc is None
 
 
-@pytest.mark.parametrize('path', ['test-repos/files_in_directories'])
-def test_filepahs(repo):
+@pytest.mark.parametrize('repo', ['test-repos/files_in_directories'], indirect=True)
+def test_filepahs(repo: GitRepository):
     c = repo.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
     mod0 = c.modifications[0]
@@ -210,15 +205,15 @@ def test_filepahs(repo):
     assert mod0.old_path == str(Path('dir2/a.java'))
 
 
-@pytest.mark.parametrize('path', ['test-repos/files_in_directories'])
-def test_projectname(repo):
+@pytest.mark.parametrize('repo', ['test-repos/files_in_directories'], indirect=True)
+def test_projectname(repo: GitRepository):
     c = repo.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
     assert c.project_name == 'files_in_directories'
 
 
-@pytest.mark.parametrize('path', ['test-repos/unknown_modification'])
-def test_modification_type_unknown(repo):
+@pytest.mark.parametrize('repo', ['test-repos/unknown_modification'], indirect=True)
+def test_modification_type_unknown(repo: GitRepository):
     c = repo.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
 
     mod0 = c.modifications[0]
@@ -226,8 +221,8 @@ def test_modification_type_unknown(repo):
     assert mod0.change_type.name == 'UNKNOWN'
 
 
-@pytest.mark.parametrize('path', ['test-repos/empty_modifications'])
-def test_modification_with_more_parents(repo):
+@pytest.mark.parametrize('repo', ['test-repos/empty_modifications'], indirect=True)
+def test_modification_with_more_parents(repo: GitRepository):
     c = repo.get_commit('ce6bcd987a6a53cc55da7cef9f8bb128adf68741')
     assert len(c.modifications) == 0
 
@@ -235,8 +230,8 @@ def test_modification_with_more_parents(repo):
     assert len(c.modifications) == 0
 
 
-@pytest.mark.parametrize('path', ['test-repos/small_repo'])
-def test_eq_commit(repo):
+@pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
+def test_eq_commit(repo: GitRepository):
     c1 = repo.get_commit('6411e3096dd2070438a17b225f44475136e54e3a')
     c2 = repo.get_commit('09f6182cef737db02a085e1d018963c7a29bde5a')
     c3 = repo.get_commit('6411e3096dd2070438a17b225f44475136e54e3a')
@@ -249,8 +244,8 @@ def test_eq_commit(repo):
     assert c3 != c4
 
 
-@pytest.mark.parametrize('path', ['test-repos/complex_repo'])
-def test_eq_modifications(repo):
+@pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
+def test_eq_modifications(repo: GitRepository):
     m1 = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
                          '').modifications[0]
     m2 = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
@@ -265,8 +260,8 @@ def test_eq_modifications(repo):
     assert m1 != c1
 
 
-@pytest.mark.parametrize('path', ['test-repos/complex_repo'])
-def test_tzoffset_minus_hours(repo):
+@pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
+def test_tzoffset_minus_hours(repo: GitRepository):
     tz1 = repo.get_commit(
         'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2').author_timezone
     tz2 = repo.get_commit(
@@ -275,8 +270,8 @@ def test_tzoffset_minus_hours(repo):
     assert tz2 == 10800  # -3 hours
 
 
-@pytest.mark.parametrize('path', ['test-repos/small_repo'])
-def test_tzoffset_plus_hours(repo):
+@pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
+def test_tzoffset_plus_hours(repo: GitRepository):
     tz1 = repo.get_commit(
         'da39b1326dbc2edfe518b90672734a08f3c13458').author_timezone
     tz2 = repo.get_commit(
@@ -285,8 +280,8 @@ def test_tzoffset_plus_hours(repo):
     assert tz2 == -7200  # +2 hours
 
 
-@pytest.mark.parametrize('path', ['test-repos/complex_repo'])
-def test_source_code_before(repo):
+@pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
+def test_source_code_before(repo: GitRepository):
     m1 = repo.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71'
                          '').modifications[0]
 
@@ -294,8 +289,8 @@ def test_source_code_before(repo):
     assert m1.source_code_before is not None
 
 
-@pytest.mark.parametrize('path', ['test-repos/source_code_before_commit'])
-def test_source_code_before_complete(repo):
+@pytest.mark.parametrize('repo', ['test-repos/source_code_before_commit'], indirect=True)
+def test_source_code_before_complete(repo: GitRepository):
     m1 = repo.get_commit(
         'ca1f75455f064410360bc56218d0418221cf9484').modifications[0]
 

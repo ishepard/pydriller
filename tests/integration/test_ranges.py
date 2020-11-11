@@ -29,120 +29,89 @@ dt3 = datetime(2018, 3, 27, 17, 20, 3, tzinfo=to_zone)
 
 
 @pytest.fixture
-def path():
-    return 'test-repos/small_repo/'
+def repository_mining_st(request):
+    since, to = request.param
+    return list(RepositoryMining('test-repos/small_repo/', since=since, to=to).traverse_commits())
 
 
 @pytest.fixture
-def since():
-    return None
+def repository_mining_cc(request):
+    from_commit, to_commit = request.param
+    return list(RepositoryMining('test-repos/small_repo/', from_commit=from_commit, to_commit=to_commit).traverse_commits())
 
 
 @pytest.fixture
-def to():
-    return None
+def repository_mining_tt(request):
+    from_tag, to_tag = request.param
+    return list(RepositoryMining('test-repos/small_repo/', from_tag=from_tag, to_tag=to_tag).traverse_commits())
 
 
 @pytest.fixture
-def from_commit():
-    return None
-
-
-@pytest.fixture
-def to_commit():
-    return None
-
-
-@pytest.fixture
-def from_tag():
-    return None
-
-
-@pytest.fixture
-def to_tag():
-    return None
-
-
-@pytest.fixture
-def repository_mining_st(path, since, to):
-    return list(RepositoryMining(path, since=since, to=to).traverse_commits())
-
-
-@pytest.fixture
-def repository_mining_cc(path, from_commit, to_commit):
-    return list(RepositoryMining(path, from_commit=from_commit, to_commit=to_commit).traverse_commits())
-
-
-@pytest.fixture
-def repository_mining_tt(path, from_tag, to_tag):
-    return list(RepositoryMining(path, from_tag=from_tag, to_tag=to_tag).traverse_commits())
-
-
-@pytest.fixture
-def repository_mining_complex_tags(path, from_tag, to_tag):
+def repository_mining_complex_tags(request):
+    from_tag, to_tag = request.param
     return list(RepositoryMining('test-repos/tags',
                                  from_tag=from_tag,
                                  to_tag=to_tag).traverse_commits())
 
 
-@pytest.mark.parametrize('to,expected_commits', [
-    (None, 5),
-    (dt, 1),
-    (dt1, 1),
-    (dt2, 3),
-    (dt3, 4),
-])
+@pytest.mark.parametrize('repository_mining_st,expected_commits', [
+    ((None, None), 5),
+    ((None, dt), 1),
+    ((None, dt1), 1),
+    ((None, dt2), 3),
+    ((None, dt3), 4),
+], indirect=['repository_mining_st'])
 def test_to_filter(repository_mining_st, expected_commits):
     assert len(repository_mining_st) == expected_commits
 
 
-@pytest.mark.parametrize('since,expected_commits', [
-    (None, 5),
-    (dt, 4),
-    (dt1, 4),
-    (dt2, 3),
-    (dt3, 1),
-])
+@pytest.mark.parametrize('repository_mining_st,expected_commits', [
+    ((None, None), 5),
+    ((dt, None), 4),
+    ((dt1, None), 4),
+    ((dt2, None), 3),
+    ((dt3, None), 1),
+], indirect=['repository_mining_st'])
 def test_since_filter(repository_mining_st, expected_commits):
     assert len(repository_mining_st) == expected_commits
 
 
-@pytest.mark.parametrize('since,to,expected_commits', [
-    (dt1, dt3, 3),
-    (dt, dt3, 3),
-    (dt2, dt3, 2),
-])
+@pytest.mark.parametrize('repository_mining_st,expected_commits', [
+    ((dt1, dt3), 3),
+    ((dt, dt3), 3),
+    ((dt2, dt3), 2),
+], indirect=['repository_mining_st'])
 def test_since_and_to_filters(repository_mining_st, expected_commits):
     assert len(repository_mining_st) == expected_commits
 
 
 # FROM AND TO COMMIT
-@pytest.mark.parametrize('to_commit,expected_commits', [
-    ('6411e3096dd2070438a17b225f44475136e54e3a', 2),
-    ('09f6182cef737db02a085e1d018963c7a29bde5a', 3),
-    ('1f99848edadfffa903b8ba1286a935f1b92b2845', 4),
-    ('HEAD', 5),
-])
+@pytest.mark.parametrize('repository_mining_cc,expected_commits', [
+    ((None, '6411e3096dd2070438a17b225f44475136e54e3a'), 2),
+    ((None, '09f6182cef737db02a085e1d018963c7a29bde5a'), 3),
+    ((None, '1f99848edadfffa903b8ba1286a935f1b92b2845'), 4),
+    ((None, 'HEAD'), 5),
+], indirect=['repository_mining_cc'])
 def test_to_commit_filter(repository_mining_cc, expected_commits):
     assert len(repository_mining_cc) == expected_commits
 
 
-@pytest.mark.parametrize('from_commit,expected_commits', [
-    ('6411e3096dd2070438a17b225f44475136e54e3a', 4),
-    ('09f6182cef737db02a085e1d018963c7a29bde5a', 3),
-    ('1f99848edadfffa903b8ba1286a935f1b92b2845', 2),
-    ('HEAD', 1)
-])
+@pytest.mark.parametrize('repository_mining_cc,expected_commits', [
+    (('6411e3096dd2070438a17b225f44475136e54e3a', None), 4),
+    (('09f6182cef737db02a085e1d018963c7a29bde5a', None), 3),
+    (('1f99848edadfffa903b8ba1286a935f1b92b2845', None), 2),
+    (('HEAD', None), 1)
+], indirect=['repository_mining_cc'])
 def test_from_commit_filter(repository_mining_cc, expected_commits):
     assert len(repository_mining_cc) == expected_commits
 
 
-@pytest.mark.parametrize('from_commit,to_commit,expected_commits', [
-    ('6411e3096dd2070438a17b225f44475136e54e3a', '09f6182cef737db02a085e1d018963c7a29bde5a', 2),
-    ('09f6182cef737db02a085e1d018963c7a29bde5a', '6411e3096dd2070438a17b225f44475136e54e3a', 2),
-    ('6411e3096dd2070438a17b225f44475136e54e3a', 'HEAD', 4),
-    ('09f6182cef737db02a085e1d018963c7a29bde5a', 'HEAD', 3),
-])
+@pytest.mark.parametrize('repository_mining_cc,expected_commits', [
+    (('6411e3096dd2070438a17b225f44475136e54e3a', '09f6182cef737db02a085e1d018963c7a29bde5a'), 2),
+    (('09f6182cef737db02a085e1d018963c7a29bde5a', '6411e3096dd2070438a17b225f44475136e54e3a'), 2),
+    (('6411e3096dd2070438a17b225f44475136e54e3a', 'HEAD'), 4),
+    (('09f6182cef737db02a085e1d018963c7a29bde5a', 'HEAD'), 3),
+], indirect=['repository_mining_cc'])
 def test_from_and_to_commit(repository_mining_cc, expected_commits):
     assert len(repository_mining_cc) == expected_commits
 
@@ -155,25 +124,25 @@ def test_from_and_to_commit_with_merge_commit():
 
 
 # FROM AND TO TAG
-@pytest.mark.parametrize('to_tag,expected_commits', [
-    ('v1.4', 3),
-])
+@pytest.mark.parametrize('repository_mining_tt,expected_commits', [
+    ((None, 'v1.4'), 3),
+], indirect=['repository_mining_tt'])
 def test_to_tag_filter_new(repository_mining_tt, expected_commits):
     assert len(repository_mining_tt) == expected_commits
 
 
-@pytest.mark.parametrize('from_tag,expected_commits', [
-    ('v1.4', 3),
-])
+@pytest.mark.parametrize('repository_mining_tt,expected_commits', [
+    (('v1.4', None), 3),
+], indirect=['repository_mining_tt'])
 def test_from_tag_filter(repository_mining_tt, expected_commits):
     assert len(repository_mining_tt) == expected_commits
 
 
-@pytest.mark.parametrize('from_tag,to_tag,expected_commits', [
-    ('tag1', 'tag2', 3),
-    ('tag1', 'tag3', 5),
-    ('tag2', 'tag3', 3),
-])
+@pytest.mark.parametrize('repository_mining_complex_tags,expected_commits', [
+    (('tag1', 'tag2'), 3),
+    (('tag1', 'tag3'), 5),
+    (('tag2', 'tag3'), 3),
+], indirect=['repository_mining_complex_tags'])
 def test_from_and_to_tag(repository_mining_complex_tags, expected_commits):
     assert len(repository_mining_complex_tags) == expected_commits
 

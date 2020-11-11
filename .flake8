@@ -3,4 +3,4 @@ show-source = True
 count = True
 statistics = True
 max-line-length = 150
-exclude = .github,venv,build,dist,docs,test-repos,.venv
+exclude = .github,venv,build,dist,docs,test-repos,.venv,tmp.py

@@ -212,6 +212,13 @@ def test_projectname(repo: GitRepository):
     assert c.project_name == 'files_in_directories'
 
 
+@pytest.mark.parametrize('repo', ['test-repos/files_in_directories'], indirect=True)
+def test_projectpath(repo: GitRepository):
+    c = repo.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
+
+    assert c.project_path.endswith('files_in_directories') is True
+
+
 @pytest.mark.parametrize('repo', ['test-repos/unknown_modification'], indirect=True)
 def test_modification_type_unknown(repo: GitRepository):
     c = repo.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')

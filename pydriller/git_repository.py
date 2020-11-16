@@ -259,7 +259,8 @@ class GitRepository:
         :param Modification modification: single modification to analyze
         :param str hashes_to_ignore_path: path to a file containing hashes of
                commits to ignore.
-        :return: the set containing all the bug inducing commits
+        :return: Dict commits: a dictionary having as keys the files of the commit,
+                 and as values the commits that last touched those files.
         """
         if modification is not None:
             modifications = [modification]
@@ -274,7 +275,7 @@ class GitRepository:
                                 hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
 
-        commits = {}  # type: Dict[str, Set[str]]
+        commits: Dict[str, Set[str]] = {}
 
         for mod in modifications:
             path = mod.new_path

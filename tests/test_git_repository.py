@@ -372,7 +372,7 @@ def test_get_commits_last_modified_lines_rename(repo: GitRepository):
 
     assert len(buggy_commits) == 1
     assert '00e61714fd76ff110d8da953aa1179809591f5aa' in buggy_commits[
-        'myfolder/Z.java']
+        str(Path('myfolder/Z.java'))]
 
 
 @pytest.mark.parametrize('repo', ['test-repos/szz/'], indirect=True)

@@ -358,32 +358,21 @@ def test_get_commits_last_modified_lines_multiple(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/szz/'], indirect=True)
-def test_get_commits_last_modified_lines_rename_simple(repo: GitRepository):
-    buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit('45ba0a61ccc448625bce0fea0301cf0c1ab32696'))
+def test_get_commits_last_modified_lines_rename_and_fix(repo: GitRepository):
+    buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit('4e287ab8e6dba110219404fb8a43993f3dda674c'))
 
     assert len(buggy_commits) == 1
-    assert 'e358878a00e78aca8366264d61a7319d00dd8186' in buggy_commits[
-        'C.java']
+    assert '06b9ff31cd3475d9fd9ef668cc0844ab169da726' in buggy_commits[
+        'H.java']
 
 
 @pytest.mark.parametrize('repo', ['test-repos/szz/'], indirect=True)
-def test_get_commits_last_modified_lines_multiple_rename(repo: GitRepository):
-    # in this case the algorithm doesn't work because the file has been renamed 2 times!
+def test_get_commits_last_modified_lines_rename(repo: GitRepository):
+    buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit('2f2d0dec7cd06de4c2ed11ed010727a54af8ebf8'))
 
-    buggy_commits = repo.get_commits_last_modified_lines(repo.get_commit('9e858753b3d69f560cf72aaaa297f2608145ebcf'))
-    assert len(buggy_commits) == 0
-
-
-@pytest.mark.parametrize('repo', ['test-repos/szz/'], indirect=True)
-def test_get_commits_last_modified_lines_rename_simple_more_commits(repo: GitRepository):
-    buggy_commits = repo.get_commits_last_modified_lines(
-        repo.get_commit('04fadd3e68c58281db6cf15119f9769880ac1cbc'))
-
-    assert len(buggy_commits) == 2
-    assert '9b373199c270f9b24c37fee70f9e2b3ee9b816e3' in buggy_commits[
-        'A.java']
-    assert '9b373199c270f9b24c37fee70f9e2b3ee9b816e3' in buggy_commits[
-        'B.java']
+    assert len(buggy_commits) == 1
+    assert '00e61714fd76ff110d8da953aa1179809591f5aa' in buggy_commits[
+        'myfolder/Z.java']
 
 
 @pytest.mark.parametrize('repo', ['test-repos/szz/'], indirect=True)

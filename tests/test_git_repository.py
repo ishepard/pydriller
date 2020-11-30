@@ -224,9 +224,6 @@ def test_commit_in_master_branch(repo: GitRepository):
     commit = git_to_change_head.get_commit('8169f76a3d7add54b4fc7bca7160d1f1eede6eda')
     assert commit.in_main_branch is False
 
-    commit = git_to_change_head.get_commit('168b3aab057ed61a769acf336a4ef5e64f76c9fd')
-    assert commit.in_main_branch is True
-
     repo.reset()
     assert repo.get_head().hash == '29e929fbc5dc6a2e9c620069b24e2a143af4285f'
 

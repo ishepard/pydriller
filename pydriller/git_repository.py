@@ -19,10 +19,9 @@ This module includes 1 class, GitRepository, representing a repository in Git.
 import logging
 import os
 from pathlib import Path
-from threading import Lock
 from typing import List, Dict, Set, Generator
 
-from git import Git, Repo, GitCommandError, Commit as GitCommit
+from git import Repo, GitCommandError, Commit as GitCommit
 
 from pydriller.domain.commit import Commit, ModificationType, Modification
 from pydriller.utils.conf import Conf
@@ -44,8 +43,6 @@ class GitRepository:
         """
         self.path = Path(path).expanduser().resolve()
         self.project_name = self.path.name
-        self.lock = Lock()
-        self._git = None
         self._repo = None
 
         # if no configuration is passed, then creates a new "emtpy" one
@@ -60,18 +57,7 @@ class GitRepository:
         self._conf.set_value("main_branch", None)  # init main_branch to None
 
     @property
-    def git(self):
-        """
-        GitPython object Git.
-
-        :return: Git
-        """
-        if self._git is None:
-            self._open_git()
-        return self._git
-
-    @property
-    def repo(self):
+    def repo(self) -> Repo:
         """
         GitPython object Repo.
 
@@ -81,17 +67,12 @@ class GitRepository:
             self._open_repository()
         return self._repo
 
-    def _open_git(self):
-        self._git = Git(str(self.path))
-
     def clear(self):
         """
         According to GitPython's documentation, sometimes it leaks resources.
         This holds especially for Windows users. Hence, we need to clear the
         cache manually.
         """
-        if self._git:
-            self.git.clear_cache()
         if self._repo:
             self.repo.git.clear_cache()
 
@@ -162,19 +143,7 @@ class GitRepository:
 
         :param _hash: commit hash to checkout
         """
-        with self.lock:
-            self._delete_tmp_branch()
-            self.git.checkout('-f', _hash, b='_PD')
-
-    def _delete_tmp_branch(self) -> None:
-        try:
-            # we are already in _PD, so checkout the master branch before
-            # deleting it
-            if self.repo.active_branch.name == '_PD':
-                self.git.checkout('-f', self._conf.get("main_branch"))
-            self.repo.delete_head('_PD', force=True)
-        except GitCommandError:
-            logger.debug("Branch _PD not found")
+        self.repo.git.checkout('-f', _hash)
 
     def files(self) -> List[str]:
         """
@@ -197,9 +166,7 @@ class GitRepository:
         local changes (-f option).
 
         """
-        with self.lock:
-            self.git.checkout('-f', self._conf.get("main_branch"))
-            self._delete_tmp_branch()
+        self.repo.git.checkout('-f', self._conf.get("main_branch"))
 
     def total_commits(self) -> int:
         """
@@ -307,11 +274,11 @@ class GitRepository:
     def _get_blame(self, commit_hash: str, path: str, hashes_to_ignore_path: str = None):
         args = ['-w', commit_hash + '^']
         if hashes_to_ignore_path is not None:
-            if self.git.version_info >= (2, 23):
+            if self.repo.git.version_info >= (2, 23):
                 args += ["--ignore-revs-file", hashes_to_ignore_path]
             else:
                 logger.info("'--ignore-revs-file' is only available from git v2.23")
-        return self.git.blame(*args, '--', path).split('\n')
+        return self.repo.git.blame(*args, '--', path).split('\n')
 
     @staticmethod
     def _useless_line(line: str):
@@ -337,7 +304,7 @@ class GitRepository:
 
         commits = []
         try:
-            commits = self.git.log("--follow", "--format=%H", path).split('\n')
+            commits = self.repo.git.log("--follow", "--format=%H", path).split('\n')
         except GitCommandError:
             logger.debug("Could not find information of file %s", path)
 

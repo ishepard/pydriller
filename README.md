@@ -84,6 +84,7 @@ Install pydriller and the requirements:
 to run the tests (using pytest):
 
 ```
+> pip install -r test-requirements.txt
 > unzip test-repos.zip
 > pytest
 ```

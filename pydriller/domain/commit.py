@@ -554,6 +554,33 @@ class Commit:
         return len(self._c_object.parents) > 1
 
     @property
+    def insertions(self) -> str:
+        """
+        Return the insertion lines of the commit.
+
+        :return: str insertion lines
+        """
+        return self._c_object.stats.total["insertions"]
+
+    @property
+    def deletions(self) -> str:
+        """
+        Return the deletion lines of the commit.
+
+        :return: str deletion lines
+        """
+        return self._c_object.stats.total["deletions"]
+
+    @property
+    def lines(self) -> str:
+        """
+        Return the deletion lines of the commit.
+
+        :return: str insertion + deletion lines
+        """
+        return self._c_object.stats.total["lines"]
+
+    @property
     def modifications(self) -> List[Modification]:
         """
         Return a list of modified files. The list is empty if the commit is

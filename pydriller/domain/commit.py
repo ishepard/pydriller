@@ -574,7 +574,7 @@ class Commit:
     @property
     def lines(self) -> int:
         """
-        Return the deletion lines of the commit.
+        Return the total lines of the commit.
 
         :return: int insertion + deletion lines
         """
@@ -583,9 +583,9 @@ class Commit:
     @property
     def files(self) -> int:
         """
-        Return the deletion lines of the commit.
+        Return the modified files of the commit.
 
-        :return: str insertion + deletion lines
+        :return: int modified files number
         """
         return len(self._c_object.stats.files)
 

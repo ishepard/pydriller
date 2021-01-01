@@ -581,6 +581,15 @@ class Commit:
         return self._c_object.stats.total["lines"]
 
     @property
+    def files(self) -> int:
+        """
+        Return the deletion lines of the commit.
+
+        :return: str insertion + deletion lines
+        """
+        return len(self._c_object.stats.files)
+
+    @property
     def modifications(self) -> List[Modification]:
         """
         Return a list of modified files. The list is empty if the commit is

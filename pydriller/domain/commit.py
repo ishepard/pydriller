@@ -554,29 +554,29 @@ class Commit:
         return len(self._c_object.parents) > 1
 
     @property
-    def insertions(self) -> str:
+    def insertions(self) -> int:
         """
         Return the insertion lines of the commit.
 
-        :return: str insertion lines
+        :return: int insertion lines
         """
         return self._c_object.stats.total["insertions"]
 
     @property
-    def deletions(self) -> str:
+    def deletions(self) -> int:
         """
         Return the deletion lines of the commit.
 
-        :return: str deletion lines
+        :return: int deletion lines
         """
         return self._c_object.stats.total["deletions"]
 
     @property
-    def lines(self) -> str:
+    def lines(self) -> int:
         """
         Return the deletion lines of the commit.
 
-        :return: str insertion + deletion lines
+        :return: int insertion + deletion lines
         """
         return self._c_object.stats.total["lines"]
 

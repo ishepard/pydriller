@@ -587,7 +587,7 @@ class Commit:
 
         :return: int modified files number
         """
-        return len(self._c_object.stats.files)
+        return self._c_object.stats.total["files"]
 
     @property
     def modifications(self) -> List[Modification]:

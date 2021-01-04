@@ -72,6 +72,10 @@ def test_get_commit(repo: GitRepository):
     assert len(c.modifications) == 1
     assert c.msg == 'Ooops file2'
     assert c.in_main_branch is True
+    assert c.insertions == 4
+    assert c.deletions == 0
+    assert c.lines == 4
+    assert c.files == 1
 
 
 @pytest.mark.parametrize('repo', ['test-repos/detached_head/'], indirect=True)

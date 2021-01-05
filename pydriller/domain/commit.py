@@ -138,7 +138,7 @@ class Modification:
     This class contains information regarding a modified file in a commit.
     """
 
-    def __init__(self, old_path: str, new_path: str,
+    def __init__(self, old_path: Optional[str], new_path: Optional[str],
                  change_type: ModificationType,
                  diff_and_sc: Dict[str, str]):
         """
@@ -219,6 +219,7 @@ class Modification:
         if self._new_path is not None and str(self._new_path) != "/dev/null":
             path = self._new_path
         else:
+            assert self._old_path
             path = self._old_path
 
         return path.name

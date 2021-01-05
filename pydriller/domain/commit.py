@@ -556,7 +556,7 @@ class Commit:
     @property
     def insertions(self) -> int:
         """
-        Return the insertion lines of the commit.
+        Return the number of added lines in the commit (as shown from --shortstat).
 
         :return: int insertion lines
         """
@@ -565,7 +565,7 @@ class Commit:
     @property
     def deletions(self) -> int:
         """
-        Return the deletion lines of the commit.
+        Return the number of deleted lines in the commit (as shown from --shortstat).
 
         :return: int deletion lines
         """
@@ -574,7 +574,7 @@ class Commit:
     @property
     def lines(self) -> int:
         """
-        Return the total lines of the commit.
+        Return the number of modified lines in the commit (as shown from --shortstat).
 
         :return: int insertion + deletion lines
         """
@@ -583,7 +583,7 @@ class Commit:
     @property
     def files(self) -> int:
         """
-        Return the modified files of the commit.
+        Return the number of modified files of the commit (as shown from --shortstat).
 
         :return: int modified files number
         """

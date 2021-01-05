@@ -326,3 +326,43 @@ def test_source_code_before_complete(repo: GitRepository):
 
     assert m1.source_code is None
     assert m1.source_code_before == old_sc
+
+
+@pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
+def test_shortstats_all_additions(repo: GitRepository):
+    c1 = repo.get_commit('a88c84ddf42066611e76e6cb690144e5357d132c')
+
+    assert c1.insertions == 191
+    assert c1.lines == 191
+    assert c1.files == 2
+    assert c1.deletions == 0
+
+
+@pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
+def test_shortstats_all_deletions(repo: GitRepository):
+    c1 = repo.get_commit('6411e3096dd2070438a17b225f44475136e54e3a')
+
+    assert c1.insertions == 0
+    assert c1.lines == 4
+    assert c1.files == 1
+    assert c1.deletions == 4
+
+
+@pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
+def test_shortstats_rename(repo: GitRepository):
+    c1 = repo.get_commit('da39b1326dbc2edfe518b90672734a08f3c13458')
+
+    assert c1.insertions == 0
+    assert c1.lines == 3
+    assert c1.files == 1
+    assert c1.deletions == 3
+
+
+@pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
+def test_shortstats_add_and_del(repo: GitRepository):
+    c1 = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2')
+
+    assert c1.insertions == 1
+    assert c1.lines == 2
+    assert c1.files == 1
+    assert c1.deletions == 1

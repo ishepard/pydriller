@@ -1,7 +1,7 @@
 .. _commit_toplevel:
 
 =============
-Commit Object
+Commit 
 =============
 
 A Commit object has all the information of a Git commit, and much more. More specifically:

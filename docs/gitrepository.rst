@@ -38,7 +38,7 @@ Let's see an example::
     
     gr = GitRepository('test-repos/test5')
     
-    commit = gr.getcommit('lmn')
+    commit = gr.get_commit('lmn')
     buggy_commits = gr.get_commits_last_modified_lines(commit)
     print(buggy_commits)      # result: (abc, def)
 

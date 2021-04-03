@@ -222,14 +222,18 @@ class RepositoryMining:
 
                 commits_list = list(git_repo.get_list_commits(rev, **kwargs))
 
+                if not commits_list:
+                    return
+
                 chunks = self._split_in_chunks(commits_list, self._conf.get("num_workers"))
                 with concurrent.futures.ThreadPoolExecutor(max_workers=self._conf.get("num_workers")) as executor:
                     jobs = {executor.submit(self._iter_commits, chunk): chunk for chunk in chunks}
 
                     for job in concurrent.futures.as_completed(jobs):
-                        return job.result()
+                        for commit in job.result():
+                            yield commit
 
-    def _iter_commits(self, commits_list: List[Commit]) -> Commit:
+    def _iter_commits(self, commits_list: List[Commit]) -> Generator[Commit, None, None]:
         for commit in commits_list:
             logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
 

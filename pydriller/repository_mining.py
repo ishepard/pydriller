@@ -226,13 +226,8 @@ class RepositoryMining:
                 with concurrent.futures.ThreadPoolExecutor(max_workers=self._conf.get("num_workers")) as executor:
                     jobs = {executor.submit(self._iter_commits, chunk): chunk for chunk in chunks}
 
-                    parallel_results = []
                     for job in concurrent.futures.as_completed(jobs):
-                        result = job.result()
-                        parallel_results.append(result)
-
-                    for result in parallel_results:
-                        return result
+                        return job.result()
 
     def _iter_commits(self, commits_list: List[Commit]) -> Commit:
         for commit in commits_list:

@@ -224,7 +224,7 @@ class RepositoryMining:
 
                 chunks = self._split_in_chunks(commits_list, self._conf.get("num_workers"))
                 with concurrent.futures.ThreadPoolExecutor(max_workers=self._conf.get("num_workers")) as executor:
-                    jobs = {executor.submit(self.iter_commits, chunk): chunk for chunk in chunks}
+                    jobs = {executor.submit(self._iter_commits, chunk): chunk for chunk in chunks}
 
                     parallel_results = []
                     for job in concurrent.futures.as_completed(jobs):
@@ -234,7 +234,7 @@ class RepositoryMining:
                     for result in parallel_results:
                         return result
 
-    def iter_commits(self, commits_list: List[Commit]) -> Commit:
+    def _iter_commits(self, commits_list: List[Commit]) -> Commit:
         for commit in commits_list:
             logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
 
@@ -244,7 +244,8 @@ class RepositoryMining:
 
             yield commit
 
-    def _split_in_chunks(self, full_list: List[Commit], num_workers: int) -> List[List[Commit]]:
+    @staticmethod
+    def _split_in_chunks(full_list: List[Commit], num_workers: int) -> List[List[Commit]]:
         """
         Given the list of commits return chunks of commits based on the number of workers.
 

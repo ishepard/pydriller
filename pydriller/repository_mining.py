@@ -17,9 +17,11 @@ This module includes 1 class, RepositoryMining, main class of PyDriller.
 """
 
 import logging
+import math
 import os
 import shutil
 import tempfile
+import concurrent.futures
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
@@ -216,15 +218,31 @@ class RepositoryMining:
                 # Build the arguments to pass to git rev-list.
                 rev, kwargs = self._conf.build_args()
 
-                # Iterate over all the commits returned by git rev-list
-                for commit in git_repo.get_list_commits(rev, **kwargs):
-                    logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
+                commits_list = list(git_repo.get_list_commits(rev, **kwargs))
+                num_chunks = math.ceil(len(commits_list) / 8)
+                chunks = [commits_list[i:i + num_chunks] for i in range(0, len(commits_list), num_chunks)]
+                with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+                    jobs = {executor.submit(self.iter_commits, chunk): chunk for chunk in chunks}
 
-                    if self._conf.is_commit_filtered(commit):
-                        logger.info('Commit #%s filtered', commit.hash)
-                        continue
+                    parallel_results = []
+                    for job in concurrent.futures.as_completed(jobs):
+                        # Read result from future
+                        result = job.result()
+                        # Append to the list of results
+                        parallel_results.append(result)
 
-                    yield commit
+                    for result in parallel_results:
+                        return result
+
+    def iter_commits(self, commits_list: List[Commit]) -> Commit:
+        for commit in commits_list:
+            logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
+
+            if self._conf.is_commit_filtered(commit):
+                logger.info('Commit #%s filtered', commit.hash)
+                continue
+
+            yield commit
 
     @staticmethod
     def _get_repo_name_from_url(url: str) -> str:

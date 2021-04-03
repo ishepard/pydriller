@@ -56,6 +56,9 @@ class GitRepository:
         self._conf = conf
         self._conf.set_value("main_branch", None)  # init main_branch to None
 
+        # Initialize repository
+        self._open_repository()
+
     @property
     def repo(self) -> Repo:
         """

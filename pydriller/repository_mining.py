@@ -48,6 +48,7 @@ class RepositoryMining:
                  from_tag: str = None, to_tag: str = None,
                  include_refs: bool = False,
                  include_remotes: bool = False,
+                 num_workers: int = 1,
                  only_in_branch: str = None,
                  only_modifications_with_file_types: List[str] = None,
                  only_no_merge: bool = False,
@@ -119,6 +120,7 @@ class RepositoryMining:
             "single": single,
             "include_refs": include_refs,
             "include_remotes": include_remotes,
+            "num_workers": num_workers,
             "only_in_branch": only_in_branch,
             "only_modifications_with_file_types": file_modification_set,
             "only_no_merge": only_no_merge,
@@ -219,16 +221,14 @@ class RepositoryMining:
                 rev, kwargs = self._conf.build_args()
 
                 commits_list = list(git_repo.get_list_commits(rev, **kwargs))
-                num_chunks = math.ceil(len(commits_list) / 8)
-                chunks = [commits_list[i:i + num_chunks] for i in range(0, len(commits_list), num_chunks)]
-                with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+
+                chunks = self._split_in_chunks(commits_list, self._conf.get("num_workers"))
+                with concurrent.futures.ThreadPoolExecutor(max_workers=self._conf.get("num_workers")) as executor:
                     jobs = {executor.submit(self.iter_commits, chunk): chunk for chunk in chunks}
 
                     parallel_results = []
                     for job in concurrent.futures.as_completed(jobs):
-                        # Read result from future
                         result = job.result()
-                        # Append to the list of results
                         parallel_results.append(result)
 
                     for result in parallel_results:
@@ -243,6 +243,21 @@ class RepositoryMining:
                 continue
 
             yield commit
+
+    def _split_in_chunks(self, full_list: List[Commit], num_workers: int) -> List[List[Commit]]:
+        """
+        Given the list of commits return chunks of commits based on the number of workers.
+
+        :param List[Commit] full_list: full list of commits
+        :param int num_workers: number of workers (i.e., threads)
+        :return: Chunks of commits
+        """
+        num_chunks = math.ceil(len(full_list) / num_workers)
+        chunks = []
+        for i in range(0, len(full_list), num_chunks):
+            chunks.append(full_list[i:i + num_chunks])
+
+        return chunks
 
     @staticmethod
     def _get_repo_name_from_url(url: str) -> str:

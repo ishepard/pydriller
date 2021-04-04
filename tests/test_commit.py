@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from pydriller.git_repository import GitRepository
+from pydriller.git import Git
 from pathlib import Path
 import pytest
 import logging
@@ -24,13 +24,13 @@ logging.basicConfig(
 
 @pytest.fixture
 def repo(request):
-    gr = GitRepository(request.param)
+    gr = Git(request.param)
     yield gr
     gr.clear()
 
 
 @pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
-def test_equal(repo: GitRepository):
+def test_equal(repo: Git):
     c1 = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2')
     c2 = repo.get_commit(c1.parents[0])
     c3 = repo.get_commit('a4ece0762e797d2e2dcbd471115108dd6e05ff58')
@@ -85,7 +85,7 @@ def test_metrics_python():
 
 def test_changed_methods():
 
-    gr = GitRepository("test-repos/diff")
+    gr = Git("test-repos/diff")
 
     # add a new method
     mod = gr.get_commit(
@@ -195,7 +195,7 @@ def test_metrics_not_supported_file():
 
 
 @pytest.mark.parametrize('repo', ['test-repos/files_in_directories'], indirect=True)
-def test_filepahs(repo: GitRepository):
+def test_filepahs(repo: Git):
     c = repo.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
     mod0 = c.modifications[0]
@@ -206,21 +206,21 @@ def test_filepahs(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/files_in_directories'], indirect=True)
-def test_projectname(repo: GitRepository):
+def test_projectname(repo: Git):
     c = repo.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
     assert c.project_name == 'files_in_directories'
 
 
 @pytest.mark.parametrize('repo', ['test-repos/files_in_directories'], indirect=True)
-def test_projectpath(repo: GitRepository):
+def test_projectpath(repo: Git):
     c = repo.get_commit('f0f8aea2db50ed9f16332d86af3629ff7780583e')
 
     assert c.project_path.endswith('files_in_directories') is True
 
 
 @pytest.mark.parametrize('repo', ['test-repos/unknown_modification'], indirect=True)
-def test_modification_type_unknown(repo: GitRepository):
+def test_modification_type_unknown(repo: Git):
     c = repo.get_commit('1734d6da01378bad3aade12b52bb4aa8954835dc')
 
     mod0 = c.modifications[0]
@@ -229,7 +229,7 @@ def test_modification_type_unknown(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/empty_modifications'], indirect=True)
-def test_modification_with_more_parents(repo: GitRepository):
+def test_modification_with_more_parents(repo: Git):
     c = repo.get_commit('ce6bcd987a6a53cc55da7cef9f8bb128adf68741')
     assert len(c.modifications) == 0
 
@@ -238,7 +238,7 @@ def test_modification_with_more_parents(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
-def test_eq_commit(repo: GitRepository):
+def test_eq_commit(repo: Git):
     c1 = repo.get_commit('6411e3096dd2070438a17b225f44475136e54e3a')
     c2 = repo.get_commit('09f6182cef737db02a085e1d018963c7a29bde5a')
     c3 = repo.get_commit('6411e3096dd2070438a17b225f44475136e54e3a')
@@ -252,7 +252,7 @@ def test_eq_commit(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
-def test_eq_modifications(repo: GitRepository):
+def test_eq_modifications(repo: Git):
     m1 = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
                          '').modifications[0]
     m2 = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2'
@@ -268,7 +268,7 @@ def test_eq_modifications(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
-def test_tzoffset_minus_hours(repo: GitRepository):
+def test_tzoffset_minus_hours(repo: Git):
     tz1 = repo.get_commit(
         'e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2').author_timezone
     tz2 = repo.get_commit(
@@ -278,7 +278,7 @@ def test_tzoffset_minus_hours(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
-def test_tzoffset_plus_hours(repo: GitRepository):
+def test_tzoffset_plus_hours(repo: Git):
     tz1 = repo.get_commit(
         'da39b1326dbc2edfe518b90672734a08f3c13458').author_timezone
     tz2 = repo.get_commit(
@@ -288,7 +288,7 @@ def test_tzoffset_plus_hours(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
-def test_source_code_before(repo: GitRepository):
+def test_source_code_before(repo: Git):
     m1 = repo.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71'
                          '').modifications[0]
 
@@ -297,7 +297,7 @@ def test_source_code_before(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/source_code_before_commit'], indirect=True)
-def test_source_code_before_complete(repo: GitRepository):
+def test_source_code_before_complete(repo: Git):
     m1 = repo.get_commit(
         'ca1f75455f064410360bc56218d0418221cf9484').modifications[0]
 
@@ -329,7 +329,7 @@ def test_source_code_before_complete(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
-def test_shortstats_all_additions(repo: GitRepository):
+def test_shortstats_all_additions(repo: Git):
     c1 = repo.get_commit('a88c84ddf42066611e76e6cb690144e5357d132c')
 
     assert c1.insertions == 191
@@ -339,7 +339,7 @@ def test_shortstats_all_additions(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
-def test_shortstats_all_deletions(repo: GitRepository):
+def test_shortstats_all_deletions(repo: Git):
     c1 = repo.get_commit('6411e3096dd2070438a17b225f44475136e54e3a')
 
     assert c1.insertions == 0
@@ -349,7 +349,7 @@ def test_shortstats_all_deletions(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
-def test_shortstats_rename(repo: GitRepository):
+def test_shortstats_rename(repo: Git):
     c1 = repo.get_commit('da39b1326dbc2edfe518b90672734a08f3c13458')
 
     assert c1.insertions == 0
@@ -359,7 +359,7 @@ def test_shortstats_rename(repo: GitRepository):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
-def test_shortstats_add_and_del(repo: GitRepository):
+def test_shortstats_add_and_del(repo: Git):
     c1 = repo.get_commit('e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2')
 
     assert c1.insertions == 1

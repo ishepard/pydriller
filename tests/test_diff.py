@@ -13,13 +13,13 @@
 # limitations under the License.
 import pytest
 
-from pydriller import GitRepository, Modification
+from pydriller import Git, Modification
 
 
 @pytest.fixture()
 def modification(request):
     path, commit = request.param
-    gr = GitRepository(path)
+    gr = Git(path)
     yield gr.get_commit(commit).modifications[0]
     gr.clear()
 

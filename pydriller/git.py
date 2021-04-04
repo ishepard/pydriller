@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-This module includes 1 class, GitRepository, representing a repository in Git.
+This module includes 1 class, Git, representing a repository in Git.
 """
 
 import logging
@@ -29,7 +29,7 @@ from pydriller.utils.conf import Conf
 logger = logging.getLogger(__name__)
 
 
-class GitRepository:
+class Git:
     """
     Class representing a repository in Git. It contains most of the logic of
     PyDriller: obtaining the list of commits, checkout, reset, etc.
@@ -37,7 +37,7 @@ class GitRepository:
 
     def __init__(self, path: str, conf=None):
         """
-        Init the Git RepositoryMining.
+        Init the Git Repository.
 
         :param str path: path to the repository
         """

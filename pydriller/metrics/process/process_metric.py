@@ -3,7 +3,7 @@ This module contains the abstract class to implement process metrics.
 """
 
 from datetime import datetime
-from pydriller import RepositoryMining
+from pydriller import Repository
 
 
 class ProcessMetric:
@@ -35,15 +35,15 @@ class ProcessMetric:
             raise TypeError('You must pass one between to and to_commit')
 
         if from_commit and to_commit and from_commit == to_commit:  # Use 'single' param to avoid Warning
-            self.repo_miner = RepositoryMining(path_to_repo, single=from_commit)
+            self.repo_miner = Repository(path_to_repo, single=from_commit)
 
         else:
-            self.repo_miner = RepositoryMining(path_to_repo=path_to_repo,
-                                               since=since,
-                                               to=to,
-                                               from_commit=from_commit,
-                                               to_commit=to_commit,
-                                               order='reverse')
+            self.repo_miner = Repository(path_to_repo=path_to_repo,
+                                         since=since,
+                                         to=to,
+                                         from_commit=from_commit,
+                                         to_commit=to_commit,
+                                         order='reverse')
 
     def count(self):
         """

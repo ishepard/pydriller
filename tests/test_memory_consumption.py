@@ -17,7 +17,7 @@ import os
 import platform
 import sys
 import psutil
-from pydriller import RepositoryMining
+from pydriller import Repository
 from datetime import datetime
 
 logging.basicConfig(level=logging.WARNING)
@@ -114,9 +114,9 @@ def mine(_type):
     all_commits = []
 
     start = datetime.now()
-    for commit in RepositoryMining('test-repos-hadoop/hadoop',
-                                   since=dt1,
-                                   to=dt2).traverse_commits():
+    for commit in Repository('test-repos-hadoop/hadoop',
+                             since=dt1,
+                             to=dt2).traverse_commits():
         memory = p.memory_info()[0] / (2 ** 20)
         all_commits.append(memory)
 

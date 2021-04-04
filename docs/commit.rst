@@ -32,7 +32,7 @@ A Commit object has all the information of a Git commit, and much more. More spe
 
 Example::
 
-    for commit in RepositoryMining('path/to/the/repo').traverse_commits():
+    for commit in Repository('path/to/the/repo').traverse_commits():
         print(
             'The commit {} has been modified by {}, '
             'committed by {} in date {}'.format(

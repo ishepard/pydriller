@@ -133,7 +133,7 @@ Contributors Experience
 
 This metric measures the percetage of the lines authored by the highest contributor of a file.
 
-The class ``ContriutorExperience`` has one method:
+The class ``ContributorExperience`` has one method:
 
 * ``count()`` to count the number of lines authored by the highest contributor of a file;
 

@@ -183,9 +183,9 @@ class Modification:
         :return: str hash
         """
         string = " ".join(
-            self.change_type.name, self.new_path, self.source_code
+            [self.change_type.name, self.new_path, self.source_code]
         )
-        return hashlib.sha256(string.encode("utf-8")).hexdigest()
+        return hash(hashlib.sha256(string.encode("utf-8")).hexdigest())
 
     def __eq__(self, other):
         """
@@ -506,7 +506,11 @@ class Commit:
 
         :return: str hash
         """
-        return self._c_object.hexsha
+        # Unfortunately, the Git hash cannot be used for the Python object
+        # directly. The documentation says it "should" return an integer
+        # https://docs.python.org/3/reference/datamodel.html#object.__hash__
+        # but I just learned it **has** to return one.
+        return hash(self._c_object.hexsha)
 
     def __eq__(self, other):
         """

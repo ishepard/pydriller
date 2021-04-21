@@ -180,7 +180,7 @@ class Modification:
         Implements hashing similar as Git would do it. Alternatively, if the
         object had the hash of th Git Blob, one could use that directly.
 
-        :return: str hash
+        :return: int hash
         """
         string = " ".join(
             [self.change_type.name, self.new_path, self.source_code]
@@ -504,7 +504,7 @@ class Commit:
         Since already used in Git for identification use the SHA of the commit
         as hash value.
 
-        :return: str hash
+        :return: int hash
         """
         # Unfortunately, the Git hash cannot be used for the Python object
         # directly. The documentation says it "should" return an integer

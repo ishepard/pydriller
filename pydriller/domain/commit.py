@@ -23,6 +23,8 @@ from enum import Enum
 from pathlib import Path
 from typing import List, Set, Dict, Tuple, Optional
 
+import hashlib
+
 import lizard
 import lizard_languages
 from git import Diff, Git, Commit as GitCommit, NULL_TREE
@@ -49,6 +51,7 @@ class DMMProperty(Enum):
     """
     Maintainability properties of the Delta Maintainability Model.
     """
+
     UNIT_SIZE = 1
     UNIT_COMPLEXITY = 2
     UNIT_INTERFACING = 3
@@ -89,9 +92,16 @@ class Method:
     def __hash__(self):
         # parameters are used in hashing in order to
         # prevent collisions when overloading method names
-        return hash(('name', self.name,
-                     'long_name', self.long_name,
-                     'params', (x for x in self.parameters)))
+        return hash(
+            (
+                "name",
+                self.name,
+                "long_name",
+                self.long_name,
+                "params",
+                (x for x in self.parameters),
+            )
+        )
 
     UNIT_SIZE_LOW_RISK_THRESHOLD = 15
     """
@@ -130,7 +140,9 @@ class Method:
         if dmm_prop is DMMProperty.UNIT_COMPLEXITY:
             return self.complexity <= Method.UNIT_COMPLEXITY_LOW_RISK_THRESHOLD
         assert dmm_prop is DMMProperty.UNIT_INTERFACING
-        return len(self.parameters) <= Method.UNIT_INTERFACING_LOW_RISK_THRESHOLD
+        return (
+            len(self.parameters) <= Method.UNIT_INTERFACING_LOW_RISK_THRESHOLD
+        )
 
 
 class Modification:
@@ -138,9 +150,13 @@ class Modification:
     This class contains information regarding a modified file in a commit.
     """
 
-    def __init__(self, old_path: Optional[str], new_path: Optional[str],
-                 change_type: ModificationType,
-                 diff_and_sc: Dict[str, str]):
+    def __init__(
+        self,
+        old_path: Optional[str],
+        new_path: Optional[str],
+        change_type: ModificationType,
+        diff_and_sc: Dict[str, str],
+    ):
         """
         Initialize a modification. A modification carries on information
         regarding the changed file. Normally, you shouldn't initialize a new
@@ -149,15 +165,36 @@ class Modification:
         self._old_path = Path(old_path) if old_path is not None else None
         self._new_path = Path(new_path) if new_path is not None else None
         self.change_type = change_type
-        self.diff = diff_and_sc['diff']
-        self.source_code = diff_and_sc['source_code']
-        self.source_code_before = diff_and_sc['source_code_before']
+        self.diff = diff_and_sc["diff"]
+        self.source_code = diff_and_sc["source_code"]
+        self.source_code_before = diff_and_sc["source_code_before"]
 
         self._nloc = None
         self._complexity = None
         self._token_count = None
         self._function_list = []  # type: List[Method]
         self._function_list_before = []  # type: List[Method]
+
+    def __hash__(self):
+        """
+        Implements hashing similar as Git would do it. Alternatively, if the
+        object had the hash of th Git Blob, one could use that directly.
+
+        :return: int hash
+        """
+        string = " ".join(
+            [self.change_type.name, self.new_path, self.source_code]
+        )
+        return hash(hashlib.sha256(string.encode("utf-8")).hexdigest())
+
+    def __eq__(self, other):
+        """
+        Compare this modification object with another one.
+        Needed for hashing implementation.
+
+        :param other: Modification object
+        """
+        return self.__class__ == other.__class__ and self.x == other.x
 
     @property
     def added(self) -> int:
@@ -167,8 +204,8 @@ class Modification:
         :return: int lines_added
         """
         added = 0
-        for line in self.diff.replace('\r', '').split("\n"):
-            if line.startswith('+') and not line.startswith('+++'):
+        for line in self.diff.replace("\r", "").split("\n"):
+            if line.startswith("+") and not line.startswith("+++"):
                 added += 1
         return added
 
@@ -180,8 +217,8 @@ class Modification:
         :return: int lines_deleted
         """
         removed = 0
-        for line in self.diff.replace('\r', '').split("\n"):
-            if line.startswith('-') and not line.startswith('---'):
+        for line in self.diff.replace("\r", "").split("\n"):
+            if line.startswith("-") and not line.startswith("---"):
                 removed += 1
         return removed
 
@@ -276,8 +313,11 @@ class Modification:
 
         :return: Dictionary
         """
-        lines = self.diff.split('\n')
-        modified_lines = {'added': [], 'deleted': []}  # type: Dict[str, List[Tuple[int, str]]]
+        lines = self.diff.split("\n")
+        modified_lines = {
+            "added": [],
+            "deleted": [],
+        }  # type: Dict[str, List[Tuple[int, str]]]
 
         count_deletions = 0
         count_additions = 0
@@ -287,18 +327,18 @@ class Modification:
             count_deletions += 1
             count_additions += 1
 
-            if line.startswith('@@'):
+            if line.startswith("@@"):
                 count_deletions, count_additions = self._get_line_numbers(line)
 
-            if line.startswith('-'):
-                modified_lines['deleted'].append((count_deletions, line[1:]))
+            if line.startswith("-"):
+                modified_lines["deleted"].append((count_deletions, line[1:]))
                 count_additions -= 1
 
-            if line.startswith('+'):
-                modified_lines['added'].append((count_additions, line[1:]))
+            if line.startswith("+"):
+                modified_lines["added"].append((count_additions, line[1:]))
                 count_deletions -= 1
 
-            if line == r'\ No newline at end of file':
+            if line == r"\ No newline at end of file":
                 count_deletions -= 1
                 count_additions -= 1
 
@@ -309,7 +349,9 @@ class Modification:
         token = line.split(" ")
         numbers_old_file = token[1]
         numbers_new_file = token[2]
-        delete_line_number = int(numbers_old_file.split(",")[0].replace("-", "")) - 1
+        delete_line_number = (
+            int(numbers_old_file.split(",")[0].replace("-", "")) - 1
+        )
         additions_line_number = int(numbers_new_file.split(",")[0]) - 1
         return delete_line_number, additions_line_number
 
@@ -348,18 +390,28 @@ class Modification:
         """
         new_methods = self.methods
         old_methods = self.methods_before
-        added = self.diff_parsed['added']
-        deleted = self.diff_parsed['deleted']
+        added = self.diff_parsed["added"]
+        deleted = self.diff_parsed["deleted"]
 
-        methods_changed_new = {y for x in added for y in new_methods if
-                               y.start_line <= x[0] <= y.end_line}
-        methods_changed_old = {y for x in deleted for y in old_methods if
-                               y.start_line <= x[0] <= y.end_line}
+        methods_changed_new = {
+            y
+            for x in added
+            for y in new_methods
+            if y.start_line <= x[0] <= y.end_line
+        }
+        methods_changed_old = {
+            y
+            for x in deleted
+            for y in old_methods
+            if y.start_line <= x[0] <= y.end_line
+        }
 
         return list(methods_changed_new.union(methods_changed_old))
 
     @staticmethod
-    def _risk_profile(methods: List[Method], dmm_prop: DMMProperty) -> Tuple[int, int]:
+    def _risk_profile(
+        methods: List[Method], dmm_prop: DMMProperty
+    ) -> Tuple[int, int]:
         """
         Return the risk profile of the set of methods, with two bins: risky, or non risky.
         The risk profile is a pair (v_low, v_high), where
@@ -384,7 +436,9 @@ class Modification:
         :return: total delta risk profile for this property.
         """
         assert self.language_supported
-        low_before, high_before = self._risk_profile(self.methods_before, dmm_prop)
+        low_before, high_before = self._risk_profile(
+            self.methods_before, dmm_prop
+        )
         low_after, high_after = self._risk_profile(self.methods, dmm_prop)
         return low_after - low_before, high_after - high_before
 
@@ -397,8 +451,9 @@ class Modification:
             return
 
         if self.source_code and self._nloc is None:
-            analysis = lizard.analyze_file.analyze_source_code(self.filename,
-                                                               self.source_code)
+            analysis = lizard.analyze_file.analyze_source_code(
+                self.filename, self.source_code
+            )
             self._nloc = analysis.nloc
             self._complexity = analysis.CCN
             self._token_count = analysis.token_count
@@ -406,13 +461,16 @@ class Modification:
             for func in analysis.function_list:
                 self._function_list.append(Method(func))
 
-        if include_before and self.source_code_before and \
-                not self._function_list_before:
+        if (
+            include_before
+            and self.source_code_before
+            and not self._function_list_before
+        ):
             anal = lizard.analyze_file.analyze_source_code(
-                self.filename, self.source_code_before)
+                self.filename, self.source_code_before
+            )
 
-            self._function_list_before = [
-                Method(x) for x in anal.function_list]
+            self._function_list_before = [Method(x) for x in anal.function_list]
 
     def __eq__(self, other):
         if not isinstance(other, Modification):
@@ -441,6 +499,28 @@ class Commit:
         self._branches = None
         self._conf = conf
 
+    def __hash__(self):
+        """
+        Since already used in Git for identification use the SHA of the commit
+        as hash value.
+
+        :return: int hash
+        """
+        # Unfortunately, the Git hash cannot be used for the Python object
+        # directly. The documentation says it "should" return an integer
+        # https://docs.python.org/3/reference/datamodel.html#object.__hash__
+        # but I just learned it **has** to return one.
+        return hash(self._c_object.hexsha)
+
+    def __eq__(self, other):
+        """
+        Compare this commit object with another one.
+        Needed for hashing implementation
+
+        :param other: Commit object
+        """
+        return self.__class__ == other.__class__ and self.x == other.x
+
     @property
     def hash(self) -> str:
         """
@@ -457,8 +537,9 @@ class Commit:
 
         :return: author
         """
-        return Developer(self._c_object.author.name,
-                         self._c_object.author.email)
+        return Developer(
+            self._c_object.author.name, self._c_object.author.email
+        )
 
     @property
     def committer(self) -> Developer:
@@ -467,8 +548,9 @@ class Commit:
 
         :return: committer
         """
-        return Developer(self._c_object.committer.name,
-                         self._c_object.committer.email)
+        return Developer(
+            self._c_object.committer.name, self._c_object.committer.email
+        )
 
     @property
     def project_name(self) -> str:
@@ -477,7 +559,7 @@ class Commit:
 
         :return: project name
         """
-        return Path(self._conf.get('path_to_repo')).name
+        return Path(self._conf.get("path_to_repo")).name
 
     @property
     def project_path(self) -> str:
@@ -486,7 +568,7 @@ class Commit:
 
         :return: project path
         """
-        return str(Path(self._conf.get('path_to_repo')))
+        return str(Path(self._conf.get("path_to_repo")))
 
     @property
     def author_date(self) -> datetime:
@@ -608,17 +690,17 @@ class Commit:
 
     def _get_modifications(self):
         options = {}
-        if self._conf.get('histogram'):
-            options['histogram'] = True
+        if self._conf.get("histogram"):
+            options["histogram"] = True
 
-        if self._conf.get('skip_whitespaces'):
-            options['w'] = True
+        if self._conf.get("skip_whitespaces"):
+            options["w"] = True
 
         if len(self.parents) == 1:
             # the commit has a parent
-            diff_index = self._c_object.parents[0].diff(self._c_object,
-                                                        create_patch=True,
-                                                        **options)
+            diff_index = self._c_object.parents[0].diff(
+                self._c_object, create_patch=True, **options
+            )
         elif len(self.parents) > 1:
             # if it's a merge commit, the modified files of the commit are the
             # conflicts. This because if the file is not in conflict,
@@ -634,9 +716,9 @@ class Commit:
         else:
             # this is the first commit of the repo. Comparing it with git
             # NULL TREE
-            diff_index = self._c_object.diff(NULL_TREE,
-                                             create_patch=True,
-                                             **options)
+            diff_index = self._c_object.diff(
+                NULL_TREE, create_patch=True, **options
+            )
 
         return self._parse_diff(diff_index)
 
@@ -648,32 +730,35 @@ class Commit:
             change_type = self._from_change_to_modification_type(diff)
 
             diff_and_sc = {
-                'diff': self._get_decoded_str(diff.diff),
-                'source_code_before': self._get_decoded_sc_str(
-                    diff.a_blob),
-                'source_code': self._get_decoded_sc_str(
-                    diff.b_blob)
+                "diff": self._get_decoded_str(diff.diff),
+                "source_code_before": self._get_decoded_sc_str(diff.a_blob),
+                "source_code": self._get_decoded_sc_str(diff.b_blob),
             }
 
-            modifications_list.append(Modification(old_path, new_path,
-                                                   change_type, diff_and_sc))
+            modifications_list.append(
+                Modification(old_path, new_path, change_type, diff_and_sc)
+            )
 
         return modifications_list
 
     def _get_decoded_str(self, diff):
         try:
-            return diff.decode('utf-8', 'ignore')
+            return diff.decode("utf-8", "ignore")
         except (UnicodeDecodeError, AttributeError, ValueError):
-            logger.debug('Could not load the diff of a '
-                         'file in commit %s', self._c_object.hexsha)
+            logger.debug(
+                "Could not load the diff of a " "file in commit %s",
+                self._c_object.hexsha,
+            )
             return None
 
     def _get_decoded_sc_str(self, diff):
         try:
-            return diff.data_stream.read().decode('utf-8', 'ignore')
+            return diff.data_stream.read().decode("utf-8", "ignore")
         except (UnicodeDecodeError, AttributeError, ValueError):
-            logger.debug('Could not load source code of a '
-                         'file in commit %s', self._c_object.hexsha)
+            logger.debug(
+                "Could not load source code of a " "file in commit %s",
+                self._c_object.hexsha,
+            )
             return None
 
     @property
@@ -683,7 +768,7 @@ class Commit:
 
         :return: bool in_main_branch
         """
-        return self._conf.get('main_branch') in self.branches
+        return self._conf.get("main_branch") in self.branches
 
     @property
     def branches(self) -> Set[str]:
@@ -699,15 +784,15 @@ class Commit:
         return self._branches
 
     def _get_branches(self):
-        c_git = Git(str(self._conf.get('path_to_repo')))
+        c_git = Git(str(self._conf.get("path_to_repo")))
         branches = set()
-        args = ['--contains', self.hash]
+        args = ["--contains", self.hash]
         if self._conf.get("include_remotes"):
             args = ["-r"] + args
         if self._conf.get("include_refs"):
             args = ["-a"] + args
-        for branch in set(c_git.branch(*args).split('\n')):
-            branches.add(branch.strip().replace('* ', ''))
+        for branch in set(c_git.branch(*args).split("\n")):
+            branches.add(branch.strip().replace("* ", ""))
         return branches
 
     @property
@@ -761,7 +846,7 @@ class Commit:
 
         :return: The dmm value (between 0.0 and 1.0) for method interfacing in this commit.
                   or None if none of the programming languages in the commit are supported.
-       """
+        """
         return self._delta_maintainability(DMMProperty.UNIT_INTERFACING)
 
     def _delta_maintainability(self, dmm_prop: DMMProperty) -> Optional[float]:
@@ -780,7 +865,9 @@ class Commit:
             return self._good_change_proportion(delta_low, delta_high)
         return None
 
-    def _delta_risk_profile(self, dmm_prop: DMMProperty) -> Optional[Tuple[int, int]]:
+    def _delta_risk_profile(
+        self, dmm_prop: DMMProperty
+    ) -> Optional[Tuple[int, int]]:
         """
         Return the delta risk profile of this commit, which a pair (dv1, dv2), where
         dv1 is the total change in volume (lines of code) of low risk methods, and
@@ -789,16 +876,23 @@ class Commit:
         :param dmm_prop: Property indicating the type of risk
         :return: total delta risk profile for this commit.
         """
-        supported_modifications = [mod for mod in self.modifications if mod.language_supported]
+        supported_modifications = [
+            mod for mod in self.modifications if mod.language_supported
+        ]
         if supported_modifications:
-            deltas = [mod._delta_risk_profile(dmm_prop) for mod in supported_modifications]
+            deltas = [
+                mod._delta_risk_profile(dmm_prop)
+                for mod in supported_modifications
+            ]
             delta_low = sum(dlow for (dlow, dhigh) in deltas)
             delta_high = sum(dhigh for (dlow, dhigh) in deltas)
             return delta_low, delta_high
         return None
 
     @staticmethod
-    def _good_change_proportion(low_risk_delta: int, high_risk_delta: int) -> Optional[float]:
+    def _good_change_proportion(
+        low_risk_delta: int, high_risk_delta: int
+    ) -> Optional[float]:
         """
         Given a delta risk profile, compute the proportion of "good" change in the total change.
         Increasing low risk code, or decreasing high risk code, is considered good.

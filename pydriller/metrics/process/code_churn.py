@@ -42,7 +42,7 @@ class CodeChurn(ProcessMetric):
                 if modified_file.change_type == ModificationType.RENAME:
                     renamed_files[modified_file.old_path] = filepath
 
-                churn = modified_file.added - modified_file.removed
+                churn = modified_file.added_lines - modified_file.deleted_lines
                 self.files.setdefault(filepath, []).append(churn)
 
     def count(self):

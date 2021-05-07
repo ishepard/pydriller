@@ -35,7 +35,7 @@ class ContributorsExperience(ProcessMetric):
                     renamed_files[modified_file.old_path] = filepath
 
                 author = commit.author.email.strip()
-                lines_authored = modified_file.added + modified_file.removed
+                lines_authored = modified_file.added_lines + modified_file.deleted_lines
 
                 files[filepath] = files.get(filepath, {})
                 files[filepath][author] = files[filepath].get(author, 0) + \

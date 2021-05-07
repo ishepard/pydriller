@@ -61,7 +61,7 @@ class Repository:
                  clone_repo_to: str = None,
                  order: str = None):
         """
-        Init a repository mining. The only required parameter is
+        Init a repository. The only required parameter is
         "path_to_repo": to analyze a single repo, pass the absolute path to
         the repo; if you need to analyze more repos, pass a list of absolute
         paths.

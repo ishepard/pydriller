@@ -59,8 +59,8 @@ class LinesCount(ProcessMetric):
                 if modified_file.change_type == ModificationType.RENAME:
                     renamed_files[modified_file.old_path] = filepath
 
-                self.lines_added.setdefault(filepath, []).append(modified_file.added)
-                self.lines_removed.setdefault(filepath, []).append(modified_file.removed)
+                self.lines_added.setdefault(filepath, []).append(modified_file.added_lines)
+                self.lines_removed.setdefault(filepath, []).append(modified_file.deleted_lines)
 
     def count(self):
         """

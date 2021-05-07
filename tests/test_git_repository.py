@@ -262,12 +262,12 @@ def test_merge_commits(repo: Git):
 @pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
 def test_number_of_modifications(repo: Git):
     commit = repo.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
-    assert commit.modifications[0].added == 62
-    assert commit.modifications[0].removed == 0
+    assert commit.modifications[0].added_lines == 62
+    assert commit.modifications[0].deleted_lines == 0
 
     commit = repo.get_commit('d11dd6734ff4e60cac3a7b58d9267f138c9e05c7')
-    assert commit.modifications[0].added == 1
-    assert commit.modifications[0].removed == 1
+    assert commit.modifications[0].added_lines == 1
+    assert commit.modifications[0].deleted_lines == 1
 
 
 @pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
@@ -293,12 +293,12 @@ def test_diffs(repo: Git):
 
     for mod in commit.modifications:
         if mod.filename == 'file4.java':
-            assert mod.removed == 8
-            assert mod.added == 0
+            assert mod.deleted_lines == 8
+            assert mod.added_lines == 0
 
         if mod.filename == 'file2.java':
-            assert mod.removed == 12
-            assert mod.added == 0
+            assert mod.deleted_lines == 12
+            assert mod.added_lines == 0
 
 
 @pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)

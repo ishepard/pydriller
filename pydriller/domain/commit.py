@@ -197,30 +197,30 @@ class Modification:
         return self.__class__ == other.__class__ and self.x == other.x
 
     @property
-    def added(self) -> int:
+    def added_lines(self) -> int:
         """
         Return the total number of added lines in the file.
 
         :return: int lines_added
         """
-        added = 0
+        added_lines = 0
         for line in self.diff.replace("\r", "").split("\n"):
             if line.startswith("+") and not line.startswith("+++"):
-                added += 1
-        return added
+                added_lines += 1
+        return added_lines
 
     @property
-    def removed(self):
+    def deleted_lines(self):
         """
         Return the total number of deleted lines in the file.
 
         :return: int lines_deleted
         """
-        removed = 0
+        deleted_lines = 0
         for line in self.diff.replace("\r", "").split("\n"):
             if line.startswith("-") and not line.startswith("---"):
-                removed += 1
-        return removed
+                deleted_lines += 1
+        return deleted_lines
 
     @property
     def old_path(self):

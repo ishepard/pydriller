@@ -46,7 +46,7 @@ class ContributorsCount(ProcessMetric):
                     renamed_files[modified_file.old_path] = filepath
 
                 author = commit.author.email.strip()
-                lines_authored = modified_file.added + modified_file.removed
+                lines_authored = modified_file.added_lines + modified_file.deleted_lines
 
                 self.contributors[filepath] = self.contributors.get(filepath, {})
                 self.contributors[filepath][author] = self.contributors[filepath].get(author, 0) + lines_authored

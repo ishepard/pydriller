@@ -30,8 +30,8 @@ class ContributorsCount(ProcessMetric):
 
     def _initialize(self):
 
-        self.contributors = dict()
-        self.minor_contributors = dict()
+        self.contributors = {}
+        self.minor_contributors = {}
 
         renamed_files = {}
 

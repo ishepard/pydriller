@@ -726,7 +726,7 @@ class Commit:
     def _get_decoded_str(self, diff):
         try:
             return diff.decode("utf-8", "ignore")
-        except (UnicodeDecodeError, AttributeError, ValueError):
+        except (AttributeError, ValueError):
             logger.debug(
                 "Could not load the diff of a " "file in commit %s",
                 self._c_object.hexsha,
@@ -736,7 +736,7 @@ class Commit:
     def _get_decoded_sc_str(self, diff):
         try:
             return diff.data_stream.read().decode("utf-8", "ignore")
-        except (UnicodeDecodeError, AttributeError, ValueError):
+        except (AttributeError, ValueError):
             logger.debug(
                 "Could not load source code of a " "file in commit %s",
                 self._c_object.hexsha,

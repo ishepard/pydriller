@@ -1,9 +1,6 @@
 from pydriller.git import Git
-from pathlib import Path
 import pytest
 import logging
-
-from pydriller.domain.commit import Modification, ModificationType
 
 logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO

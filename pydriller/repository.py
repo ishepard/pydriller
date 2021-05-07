@@ -109,7 +109,7 @@ class Repository:
             )
 
         options = {
-            "git_repo": None,
+            "git": None,
             "path_to_repo": path_to_repo,
             "from_commit": from_commit,
             "to_commit": to_commit,
@@ -174,18 +174,18 @@ class Repository:
         # of which one we are currently analyzing
         self._conf.set_value('path_to_repo', local_path_repo)
 
-        self.git_repo = Git(local_path_repo, self._conf)
+        self.git = Git(local_path_repo, self._conf)
         # saving the Git object for further use
-        self._conf.set_value("git_repo", self.git_repo)
+        self._conf.set_value("git", self.git)
 
         # checking that the filters are set correctly
         self._conf.sanity_check_filters()
-        yield self.git_repo
+        yield self.git
 
         # cleaning, this is necessary since GitPython issues on memory leaks
-        self._conf.set_value("git_repo", None)
-        self.git_repo.clear()
-        self.git_repo = None  # type: ignore
+        self._conf.set_value("git", None)
+        self.git.clear()
+        self.git = None  # type: ignore
 
         # delete the temporary directory if created
         if self._is_remote(path_repo) and self._cleanup is True:
@@ -204,23 +204,23 @@ class Repository:
         a generator of commits.
         """
         for path_repo in self._conf.get('path_to_repos'):
-            with self._prep_repo(path_repo=path_repo) as git_repo:
-                logger.info('Analyzing git repository in %s', git_repo.path)
+            with self._prep_repo(path_repo=path_repo) as git:
+                logger.info('Analyzing git repository in %s', git.path)
 
                 # Get the commits that modified the filepath. In this case, we can not use
                 # git rev-list since it doesn't have the option --follow, necessary to follow
                 # the renames. Hence, we manually call git log instead
                 if self._conf.get('filepath') is not None:
-                    self._conf.set_value('filepath_commits', git_repo.get_commits_modified_file(self._conf.get('filepath')))
+                    self._conf.set_value('filepath_commits', git.get_commits_modified_file(self._conf.get('filepath')))
 
                 # Gets only the commits that are tagged
                 if self._conf.get('only_releases'):
-                    self._conf.set_value('tagged_commits', git_repo.get_tagged_commits())
+                    self._conf.set_value('tagged_commits', git.get_tagged_commits())
 
                 # Build the arguments to pass to git rev-list.
                 rev, kwargs = self._conf.build_args()
 
-                commits_list = list(git_repo.get_list_commits(rev, **kwargs))
+                commits_list = list(git.get_list_commits(rev, **kwargs))
 
                 if not commits_list:
                     return

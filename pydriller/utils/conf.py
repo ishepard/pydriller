@@ -105,7 +105,7 @@ class Conf:
                 raise Exception('You can not specify a single commit with '
                                 'other filters')
             try:
-                self.set_value('single', self.get("git_repo").get_commit(self.get('single')).hash)
+                self.set_value('single', self.get("git").get_commit(self.get('single')).hash)
             except BadName:
                 raise Exception("The commit {} defined in "
                                 "the 'single' filtered does "
@@ -117,8 +117,8 @@ class Conf:
         """
         if self.get('from_commit') and self.get('to_commit'):
             chronological_order = self._is_commit_before(
-                self.get('git_repo').get_commit(self.get('from_commit')),
-                self.get('git_repo').get_commit(self.get('to_commit')))
+                self.get('git').get_commit(self.get('from_commit')),
+                self.get('git').get_commit(self.get('to_commit')))
 
             if not chronological_order:
                 self._swap_commit_fiters()
@@ -147,11 +147,11 @@ class Conf:
         from_tag = self.get('from_tag')
         from_commit = self.get('from_commit')
         if from_tag is not None:
-            tagged_commit = self.get("git_repo").get_commit_from_tag(from_tag)
+            tagged_commit = self.get("git").get_commit_from_tag(from_tag)
             from_commit = tagged_commit.hash
         if from_commit is not None:
             try:
-                commit = self.get("git_repo").get_commit(from_commit)
+                commit = self.get("git").get_commit(from_commit)
                 if len(commit.parents) == 0:
                     return [commit.hash]
                 elif len(commit.parents) == 1:
@@ -169,11 +169,11 @@ class Conf:
         to_tag = self.get('to_tag')
         to_commit = self.get('to_commit')
         if to_tag is not None:
-            tagged_commit = self.get("git_repo").get_commit_from_tag(to_tag)
+            tagged_commit = self.get("git").get_commit_from_tag(to_tag)
             to_commit = tagged_commit.hash
         if to_commit is not None:
             try:
-                return self.get("git_repo").get_commit(to_commit).hash
+                return self.get("git").get_commit(to_commit).hash
             except Exception:
                 raise Exception("The commit {} defined in the 'to_tag' or 'to_commit' filter does "
                                 "not exist".format(self.get('to_commit')))

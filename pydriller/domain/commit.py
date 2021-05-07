@@ -187,15 +187,6 @@ class Modification:
         )
         return hash(hashlib.sha256(string.encode("utf-8")).hexdigest())
 
-    def __eq__(self, other):
-        """
-        Compare this modification object with another one.
-        Needed for hashing implementation.
-
-        :param other: Modification object
-        """
-        return self.__class__ == other.__class__ and self.x == other.x
-
     @property
     def added_lines(self) -> int:
         """
@@ -511,15 +502,6 @@ class Commit:
         # https://docs.python.org/3/reference/datamodel.html#object.__hash__
         # but I just learned it **has** to return one.
         return hash(self._c_object.hexsha)
-
-    def __eq__(self, other):
-        """
-        Compare this commit object with another one.
-        Needed for hashing implementation
-
-        :param other: Commit object
-        """
-        return self.__class__ == other.__class__ and self.x == other.x
 
     @property
     def hash(self) -> str:

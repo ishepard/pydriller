@@ -50,7 +50,7 @@ class Git:
         if conf is None:
             conf = Conf({
                 "path_to_repo": str(self.path),
-                "git_repo": self
+                "git": self
             })
 
         self._conf = conf

@@ -112,7 +112,7 @@ def test_diff_without_histogram(git_repo):
     commit = list(Repository('test-repos/histogram',
                              single="93df8676e6fab70d9677e94fd0f6b17db095e890").traverse_commits())[0]
 
-    diff = commit.modifications[0].diff_parsed
+    diff = commit.modified_files[0].diff_parsed
     assert len(diff['added']) == 11
     assert (3, '    if (path == null)') in diff['added']
     assert (5, '        log.error("Icon path is null");') in diff['added']
@@ -142,7 +142,7 @@ def test_diff_with_histogram(git_repo):
     commit = list(Repository('test-repos/histogram',
                              single="93df8676e6fab70d9677e94fd0f6b17db095e890",
                              histogram_diff=True).traverse_commits())[0]
-    diff = commit.modifications[0].diff_parsed
+    diff = commit.modified_files[0].diff_parsed
     assert (4, '    {') in diff["added"]
     assert (5, '        log.error("Icon path is null");') in diff["added"]
     assert (6, '        return null;') in diff["added"]
@@ -165,24 +165,24 @@ def test_diff_with_histogram(git_repo):
 def test_ignore_add_whitespaces():
     commit = list(Repository('test-repos/whitespace',
                              single="338a74ceae164784e216555d930210371279ba8e").traverse_commits())[0]
-    assert len(commit.modifications) == 1
+    assert len(commit.modified_files) == 1
     commit = list(Repository('test-repos/whitespace',
                              skip_whitespaces=True,
                              single="338a74ceae164784e216555d930210371279ba8e").traverse_commits())[0]
-    assert len(commit.modifications) == 0
+    assert len(commit.modified_files) == 0
 
 
 @pytest.mark.parametrize('git_repo', ["test-repos/whitespace"], indirect=True)
 def test_ignore_add_whitespaces_and_modified_normal_line(git_repo):
     commit = list(Repository('test-repos/whitespace',
                              single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
-    assert len(commit.modifications) == 1
-    parsed_normal_diff = commit.modifications[0].diff_parsed
+    assert len(commit.modified_files) == 1
+    parsed_normal_diff = commit.modified_files[0].diff_parsed
     commit = list(Repository('test-repos/whitespace',
                              skip_whitespaces=True,
                              single="52716ef1f11e07308b5df1b313aec5496d5e91ce").traverse_commits())[0]
-    assert len(commit.modifications) == 1
-    parsed_wo_whitespaces_diff = commit.modifications[0].diff_parsed
+    assert len(commit.modified_files) == 1
+    parsed_wo_whitespaces_diff = commit.modified_files[0].diff_parsed
     assert len(parsed_normal_diff['added']) == 2
     assert len(parsed_wo_whitespaces_diff['added']) == 1
 
@@ -193,21 +193,21 @@ def test_ignore_add_whitespaces_and_modified_normal_line(git_repo):
 def test_ignore_deleted_whitespaces():
     commit = list(Repository('test-repos/whitespace',
                              single="e6e429f6b485e18fb856019d9953370fd5420b20").traverse_commits())[0]
-    assert len(commit.modifications) == 1
+    assert len(commit.modified_files) == 1
     commit = list(Repository('test-repos/whitespace',
                              skip_whitespaces=True,
                              single="e6e429f6b485e18fb856019d9953370fd5420b20").traverse_commits())[0]
-    assert len(commit.modifications) == 0
+    assert len(commit.modified_files) == 0
 
 
 def test_ignore_add_whitespaces_and_changed_file():
     commit = list(Repository('test-repos/whitespace',
                              single="532068e9d64b8a86e07eea93de3a57bf9e5b4ae0").traverse_commits())[0]
-    assert len(commit.modifications) == 2
+    assert len(commit.modified_files) == 2
     commit = list(Repository('test-repos/whitespace',
                              skip_whitespaces=True,
                              single="532068e9d64b8a86e07eea93de3a57bf9e5b4ae0").traverse_commits())[0]
-    assert len(commit.modifications) == 1
+    assert len(commit.modified_files) == 1
 
 
 def test_clone_repo_to(tmp_path):

@@ -35,7 +35,7 @@ class CodeChurn(ProcessMetric):
 
         for commit in self.repo_miner.traverse_commits():
 
-            for modified_file in commit.modifications:
+            for modified_file in commit.modified_files:
 
                 filepath = renamed_files.get(modified_file.new_path, modified_file.new_path)
 

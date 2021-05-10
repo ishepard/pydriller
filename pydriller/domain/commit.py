@@ -145,7 +145,7 @@ class Method:
         )
 
 
-class Modification:
+class ModifiedFile:
     """
     This class contains information regarding a modified file in a commit.
     """
@@ -158,7 +158,7 @@ class Modification:
         diff_and_sc: Dict[str, str],
     ):
         """
-        Initialize a modification. A modification carries on information
+        Initialize a modified file. A modified file carries on information
         regarding the changed file. Normally, you shouldn't initialize a new
         one.
         """
@@ -464,7 +464,7 @@ class Modification:
             self._function_list_before = [Method(x) for x in anal.function_list]
 
     def __eq__(self, other):
-        if not isinstance(other, Modification):
+        if not isinstance(other, ModifiedFile):
             return NotImplemented
         if self is other:
             return True
@@ -655,7 +655,7 @@ class Commit:
         return self._c_object.stats.total["files"]
 
     @property
-    def modifications(self) -> List[Modification]:
+    def modified_files(self) -> List[ModifiedFile]:
         """
         Return a list of modified files. The list is empty if the commit is
         a merge commit. For more info on this, see
@@ -704,7 +704,7 @@ class Commit:
 
         return self._parse_diff(diff_index)
 
-    def _parse_diff(self, diff_index) -> List[Modification]:
+    def _parse_diff(self, diff_index) -> List[ModifiedFile]:
         modifications_list = []
         for diff in diff_index:
             old_path = diff.a_path
@@ -718,7 +718,7 @@ class Commit:
             }
 
             modifications_list.append(
-                Modification(old_path, new_path, change_type, diff_and_sc)
+                ModifiedFile(old_path, new_path, change_type, diff_and_sc)
             )
 
         return modifications_list
@@ -859,7 +859,7 @@ class Commit:
         :return: total delta risk profile for this commit.
         """
         supported_modifications = [
-            mod for mod in self.modifications if mod.language_supported
+            mod for mod in self.modified_files if mod.language_supported
         ]
         if supported_modifications:
             deltas = [

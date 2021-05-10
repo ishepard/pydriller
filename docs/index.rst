@@ -13,7 +13,7 @@ PyDriller documentation!
    tutorial
    repository
    commit
-   modifications
+   modifiedfile
    git
    deltamaintainability
    processmetrics

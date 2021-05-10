@@ -125,7 +125,7 @@ def mine(_type):
         if _type == 0:
             continue
 
-        for mod in commit.modifications:
+        for mod in commit.modified_files:
             dd = mod.diff  # noqa
 
             if _type == 1:

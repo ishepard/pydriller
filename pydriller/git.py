@@ -23,7 +23,7 @@ from typing import List, Dict, Set, Generator
 
 from git import Repo, GitCommandError, Commit as GitCommit
 
-from pydriller.domain.commit import Commit, ModificationType, Modification
+from pydriller.domain.commit import Commit, ModificationType, ModifiedFile
 from pydriller.utils.conf import Conf
 
 logger = logging.getLogger(__name__)
@@ -206,7 +206,7 @@ class Git:
         return tags
 
     def get_commits_last_modified_lines(self, commit: Commit,
-                                        modification: Modification = None,
+                                        modification: ModifiedFile = None,
                                         hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
         """
@@ -235,13 +235,13 @@ class Git:
         if modification is not None:
             modifications = [modification]
         else:
-            modifications = commit.modifications
+            modifications = commit.modified_files
 
         return self._calculate_last_commits(commit, modifications,
                                             hashes_to_ignore_path)
 
     def _calculate_last_commits(self, commit: Commit,
-                                modifications: List[Modification],
+                                modifications: List[ModifiedFile],
                                 hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
 

@@ -279,7 +279,7 @@ class Conf:
         return False
 
     def _has_modification_with_file_type(self, commit):
-        for mod in commit.modifications:
+        for mod in commit.modified_files:
             if mod.filename.endswith(tuple(self.get('only_modifications_with_file_types'))):
                 return True
         return False

@@ -69,7 +69,7 @@ def test_get_commit(repo: Git):
     assert c.committer.name == 'ishepard'
     assert c.author_date.timestamp() == datetime(2018, 3, 22, 10, 42, 3,
                                                  tzinfo=to_zone).timestamp()
-    assert len(c.modifications) == 1
+    assert len(c.modified_files) == 1
     assert c.msg == 'Ooops file2'
     assert c.in_main_branch is True
     assert c.insertions == 4
@@ -96,12 +96,12 @@ def test_get_first_commit(repo: Git):
                                                  tzinfo=to_zone).timestamp()
     assert c.committer_date.timestamp() == datetime(2018, 3, 22, 10, 41, 11,
                                                     tzinfo=to_zone).timestamp()
-    assert len(c.modifications) == 2
+    assert len(c.modified_files) == 2
     assert c.msg == 'First commit adding 2 files'
     assert c.in_main_branch is True
 
-    assert c.modifications[0].change_type == ModificationType.ADD
-    assert c.modifications[1].change_type == ModificationType.ADD
+    assert c.modified_files[0].change_type == ModificationType.ADD
+    assert c.modified_files[1].change_type == ModificationType.ADD
 
 
 @pytest.mark.parametrize('repo', ['test-repos/files/'], indirect=True)
@@ -240,11 +240,11 @@ def test_should_detail_a_commit(repo: Git):
     assert commit.author.email == "mauricioaniche@gmail.com"
 
     assert commit.msg == "Matricula adicionada"
-    assert len(commit.modifications) == 1
+    assert len(commit.modified_files) == 1
 
-    assert commit.modifications[0].new_path == "Matricula.java"
-    assert commit.modifications[0].diff.startswith("@@ -0,0 +1,62 @@\n+package model;") is True
-    assert commit.modifications[0].source_code.startswith("package model;") is True
+    assert commit.modified_files[0].new_path == "Matricula.java"
+    assert commit.modified_files[0].diff.startswith("@@ -0,0 +1,62 @@\n+package model;") is True
+    assert commit.modified_files[0].source_code.startswith("package model;") is True
 
 
 @pytest.mark.parametrize('repo', ['test-repos/branches_merged'], indirect=True)
@@ -260,38 +260,38 @@ def test_merge_commits(repo: Git):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
-def test_number_of_modifications(repo: Git):
+def test_number_of_modified_files(repo: Git):
     commit = repo.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
-    assert commit.modifications[0].added_lines == 62
-    assert commit.modifications[0].deleted_lines == 0
+    assert commit.modified_files[0].added_lines == 62
+    assert commit.modified_files[0].deleted_lines == 0
 
     commit = repo.get_commit('d11dd6734ff4e60cac3a7b58d9267f138c9e05c7')
-    assert commit.modifications[0].added_lines == 1
-    assert commit.modifications[0].deleted_lines == 1
+    assert commit.modified_files[0].added_lines == 1
+    assert commit.modified_files[0].deleted_lines == 1
 
 
 @pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
 def test_modification_status(repo: Git):
     commit = repo.get_commit('866e997a9e44cb4ddd9e00efe49361420aff2559')
-    assert commit.modifications[0].change_type == ModificationType.ADD
-    assert commit.modifications[0].old_path is None
+    assert commit.modified_files[0].change_type == ModificationType.ADD
+    assert commit.modified_files[0].old_path is None
 
     commit = repo.get_commit('57dbd017d1a744b949e7ca0b1c1a3b3dd4c1cbc1')
-    assert commit.modifications[0].change_type == ModificationType.MODIFY
-    assert commit.modifications[0].new_path == commit.modifications[0].old_path
+    assert commit.modified_files[0].change_type == ModificationType.MODIFY
+    assert commit.modified_files[0].new_path == commit.modified_files[0].old_path
 
     commit = repo.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71')
-    assert commit.modifications[0].change_type == ModificationType.DELETE
-    assert commit.modifications[0].new_path is None
+    assert commit.modified_files[0].change_type == ModificationType.DELETE
+    assert commit.modified_files[0].new_path is None
 
 
 @pytest.mark.parametrize('repo', ['test-repos/two_modifications/'], indirect=True)
 def test_diffs(repo: Git):
     commit = repo.get_commit('93b4b18673ca6fb5d563bbf930c45cd1198e979b')
 
-    assert len(commit.modifications) == 2
+    assert len(commit.modified_files) == 2
 
-    for mod in commit.modifications:
+    for mod in commit.modified_files:
         if mod.filename == 'file4.java':
             assert mod.deleted_lines == 8
             assert mod.added_lines == 0
@@ -308,8 +308,8 @@ def test_detail_rename(repo: Git):
     assert commit.author.name == "Maurício Aniche"
     assert commit.author.email == "mauricioaniche@gmail.com"
 
-    assert commit.modifications[0].new_path == "Matricula.javax"
-    assert commit.modifications[0].old_path == "Matricula.java"
+    assert commit.modified_files[0].new_path == "Matricula.javax"
+    assert commit.modified_files[0].old_path == "Matricula.java"
 
 
 @pytest.mark.parametrize('repo', ['test-repos/branches_merged'], indirect=True)
@@ -394,7 +394,7 @@ def test_get_commits_last_modified_lines_useless_lines2(repo: Git):
 def test_get_commits_last_modified_lines_for_single_file(repo: Git):
     commit = repo.get_commit('0f726924f96621e4965039123098ba83e39ffba6')
     buggy_commits = None
-    for mod in commit.modifications:
+    for mod in commit.modified_files:
         if mod.filename == 'A.java':
             buggy_commits = repo.get_commits_last_modified_lines(commit, mod)
 

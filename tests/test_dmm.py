@@ -134,16 +134,16 @@ def test_mixin_unsupported_language(repo: Git):
 
 def test_delta_profile_modification(repo: Git):
     commit = commit_by_msg(repo, 'Increase unit size to risky')
-    mod = commit.modifications[0]
+    mod = commit.modified_files[0]
     assert mod._delta_risk_profile(DMMProperty.UNIT_SIZE) == (-15, 16)
 
 
 def test_delta_profile_commit(repo: Git):
     commit = commit_by_msg(repo, 'Increase in one, decrease in other file')
 
-    m0 = commit.modifications[0]
+    m0 = commit.modified_files[0]
     assert m0._delta_risk_profile(DMMProperty.UNIT_SIZE) == (0, 1)
-    m1 = commit.modifications[1]
+    m1 = commit.modified_files[1]
     assert m1._delta_risk_profile(DMMProperty.UNIT_SIZE) == (3, 0)
 
     assert commit._delta_risk_profile(DMMProperty.UNIT_SIZE) == (3, 1)
@@ -152,7 +152,7 @@ def test_delta_profile_commit(repo: Git):
 def test_supported_languages(repo: Git):
     # Add .md file that cannot be analyzed by Lizard
     commit = commit_by_msg(repo, 'Offer README explaining the repo purpose')
-    mod = commit.modifications[0]
+    mod = commit.modified_files[0]
     assert not mod.language_supported
 
 

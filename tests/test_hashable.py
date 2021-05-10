@@ -39,8 +39,8 @@ def test_modification_dictset(repo: Git):
     c1 = repo.get_commit("e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2")
     c2 = repo.get_commit(c1.parents[0])
 
-    m1 = c1.modifications[0]
-    m2s = c2.modifications
+    m1 = c1.modified_files[0]
+    m2s = c2.modified_files
 
     mod_dict = {m1: c1, m2s[0]: c2, m2s[1]: c2}
 

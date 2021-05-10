@@ -13,21 +13,21 @@
 # limitations under the License.
 import pytest
 
-from pydriller import GitRepository, Modification
+from pydriller import Git, ModifiedFile
 
 
 @pytest.fixture()
 def modification(request):
     path, commit = request.param
-    gr = GitRepository(path)
-    yield gr.get_commit(commit).modifications[0]
+    gr = Git(path)
+    yield gr.get_commit(commit).modified_files[0]
     gr.clear()
 
 
 @pytest.mark.parametrize('modification',
                          [("test-repos/diff", "9a985d4a12a3a12f009ef39750fd9b2187b766d1")],
                          indirect=True)
-def test_extract_line_number_and_content(modification: Modification):
+def test_extract_line_number_and_content(modification: ModifiedFile):
     added = modification.diff_parsed['added']
     deleted = modification.diff_parsed['deleted']
 
@@ -41,7 +41,7 @@ def test_extract_line_number_and_content(modification: Modification):
 @pytest.mark.parametrize('modification',
                          [("test-repos/diff", "f45ee2f8976d5f018a1e4ec83eb4556a3df8b0a5")],
                          indirect=True)
-def test_additions(modification: Modification):
+def test_additions(modification: ModifiedFile):
     added = modification.diff_parsed['added']
     deleted = modification.diff_parsed['deleted']
 
@@ -57,7 +57,7 @@ def test_additions(modification: Modification):
 @pytest.mark.parametrize('modification',
                          [("test-repos/diff", "147c7ce9f725a0e259d63f0bf4e6c8ac085ff8c8")],
                          indirect=True)
-def test_deletions(modification: Modification):
+def test_deletions(modification: ModifiedFile):
     added = modification.diff_parsed['added']
     deleted = modification.diff_parsed['deleted']
 
@@ -80,7 +80,7 @@ def test_deletions(modification: Modification):
 @pytest.mark.parametrize('modification',
                          [("test-repos/no_newline", "52a78c1ee5d100528eccba0a3d67371dbd22d898")],
                          indirect=True)
-def test_diff_no_newline(modification: Modification):
+def test_diff_no_newline(modification: ModifiedFile):
     """
     If a file ends without a newline git represents this with the additional line
         \\ No newline at end of file

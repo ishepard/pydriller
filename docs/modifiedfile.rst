@@ -1,7 +1,7 @@
-.. _modifications_toplevel:
+.. _modifiedfile_toplevel:
 
 =============
-Modifications
+ModifiedFile
 =============
 
 You can get the list of modified files, as well as their diffs and current source code. To that, all you have to do is to get the list of *Modifications* that exists inside Commit. A modification object has the following fields:
@@ -28,7 +28,7 @@ You can get the list of modified files, as well as their diffs and current sourc
 
 For example::
 
-    for commit in RepositoryMining('path/to/the/repo').traverse_commits():
+    for commit in Repository('path/to/the/repo').traverse_commits():
         for m in commit.modifications:
             print(
                 "Author {}".format(commit.author.name),

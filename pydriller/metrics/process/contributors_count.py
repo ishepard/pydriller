@@ -30,14 +30,14 @@ class ContributorsCount(ProcessMetric):
 
     def _initialize(self):
 
-        self.contributors = dict()
-        self.minor_contributors = dict()
+        self.contributors = {}
+        self.minor_contributors = {}
 
         renamed_files = {}
 
         for commit in self.repo_miner.traverse_commits():
 
-            for modified_file in commit.modifications:
+            for modified_file in commit.modified_files:
 
                 filepath = renamed_files.get(modified_file.new_path,
                                              modified_file.new_path)
@@ -46,7 +46,7 @@ class ContributorsCount(ProcessMetric):
                     renamed_files[modified_file.old_path] = filepath
 
                 author = commit.author.email.strip()
-                lines_authored = modified_file.added + modified_file.removed
+                lines_authored = modified_file.added_lines + modified_file.deleted_lines
 
                 self.contributors[filepath] = self.contributors.get(filepath, {})
                 self.contributors[filepath][author] = self.contributors[filepath].get(author, 0) + lines_authored

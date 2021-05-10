@@ -35,14 +35,14 @@ class CodeChurn(ProcessMetric):
 
         for commit in self.repo_miner.traverse_commits():
 
-            for modified_file in commit.modifications:
+            for modified_file in commit.modified_files:
 
                 filepath = renamed_files.get(modified_file.new_path, modified_file.new_path)
 
                 if modified_file.change_type == ModificationType.RENAME:
                     renamed_files[modified_file.old_path] = filepath
 
-                churn = modified_file.added - modified_file.removed
+                churn = modified_file.added_lines - modified_file.deleted_lines
                 self.files.setdefault(filepath, []).append(churn)
 
     def count(self):
@@ -51,7 +51,7 @@ class CodeChurn(ProcessMetric):
 
         :return: int number of churns
         """
-        count = dict()
+        count = {}
         for path, churns in self.files.items():
             count[path] = sum(churns)
 
@@ -63,7 +63,7 @@ class CodeChurn(ProcessMetric):
 
         :return: int max number of churns
         """
-        max_count = dict()
+        max_count = {}
         for path, churns in self.files.items():
             max_count[path] = max(churns)
 
@@ -75,7 +75,7 @@ class CodeChurn(ProcessMetric):
 
         :return: int avg number of churns rounded off to the nearest integer
         """
-        avg_count = dict()
+        avg_count = {}
         for path, churns in self.files.items():
             avg_count[path] = round(statistics.mean(churns))
 

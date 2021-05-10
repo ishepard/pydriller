@@ -13,13 +13,15 @@
 # limitations under the License.
 
 """
-This module includes 1 class, RepositoryMining, main class of PyDriller.
+This module includes 1 class, Repository, main class of PyDriller.
 """
 
 import logging
+import math
 import os
 import shutil
 import tempfile
+import concurrent.futures
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
@@ -28,13 +30,13 @@ from typing import List, Generator, Union
 from git import Repo
 
 from pydriller.domain.commit import Commit
-from pydriller.git_repository import GitRepository
+from pydriller.git import Git
 from pydriller.utils.conf import Conf
 
 logger = logging.getLogger(__name__)
 
 
-class RepositoryMining:
+class Repository:
     """
     This is the main class of PyDriller, responsible for running the study.
     """
@@ -46,6 +48,7 @@ class RepositoryMining:
                  from_tag: str = None, to_tag: str = None,
                  include_refs: bool = False,
                  include_remotes: bool = False,
+                 num_workers: int = 1,
                  only_in_branch: str = None,
                  only_modifications_with_file_types: List[str] = None,
                  only_no_merge: bool = False,
@@ -58,7 +61,7 @@ class RepositoryMining:
                  clone_repo_to: str = None,
                  order: str = None):
         """
-        Init a repository mining. The only required parameter is
+        Init a repository. The only required parameter is
         "path_to_repo": to analyze a single repo, pass the absolute path to
         the repo; if you need to analyze more repos, pass a list of absolute
         paths.
@@ -106,7 +109,7 @@ class RepositoryMining:
             )
 
         options = {
-            "git_repo": None,
+            "git": None,
             "path_to_repo": path_to_repo,
             "from_commit": from_commit,
             "to_commit": to_commit,
@@ -117,6 +120,7 @@ class RepositoryMining:
             "single": single,
             "include_refs": include_refs,
             "include_remotes": include_remotes,
+            "num_workers": num_workers,
             "only_in_branch": only_in_branch,
             "only_modifications_with_file_types": file_modification_set,
             "only_no_merge": only_no_merge,
@@ -160,7 +164,7 @@ class RepositoryMining:
         return clone_folder
 
     @contextmanager
-    def _prep_repo(self, path_repo: str) -> Generator[GitRepository, None, None]:
+    def _prep_repo(self, path_repo: str) -> Generator[Git, None, None]:
         local_path_repo = path_repo
         if self._is_remote(path_repo):
             local_path_repo = self._clone_remote_repo(self._clone_folder(), path_repo)
@@ -170,18 +174,18 @@ class RepositoryMining:
         # of which one we are currently analyzing
         self._conf.set_value('path_to_repo', local_path_repo)
 
-        self.git_repo = GitRepository(local_path_repo, self._conf)
-        # saving the GitRepository object for further use
-        self._conf.set_value("git_repo", self.git_repo)
+        self.git = Git(local_path_repo, self._conf)
+        # saving the Git object for further use
+        self._conf.set_value("git", self.git)
 
         # checking that the filters are set correctly
         self._conf.sanity_check_filters()
-        yield self.git_repo
+        yield self.git
 
         # cleaning, this is necessary since GitPython issues on memory leaks
-        self._conf.set_value("git_repo", None)
-        self.git_repo.clear()
-        self.git_repo = None  # type: ignore
+        self._conf.set_value("git", None)
+        self.git.clear()
+        self.git = None  # type: ignore
 
         # delete the temporary directory if created
         if self._is_remote(path_repo) and self._cleanup is True:
@@ -200,31 +204,60 @@ class RepositoryMining:
         a generator of commits.
         """
         for path_repo in self._conf.get('path_to_repos'):
-            with self._prep_repo(path_repo=path_repo) as git_repo:
-                logger.info('Analyzing git repository in %s', git_repo.path)
+            with self._prep_repo(path_repo=path_repo) as git:
+                logger.info('Analyzing git repository in %s', git.path)
 
                 # Get the commits that modified the filepath. In this case, we can not use
                 # git rev-list since it doesn't have the option --follow, necessary to follow
                 # the renames. Hence, we manually call git log instead
                 if self._conf.get('filepath') is not None:
-                    self._conf.set_value('filepath_commits', git_repo.get_commits_modified_file(self._conf.get('filepath')))
+                    self._conf.set_value('filepath_commits', git.get_commits_modified_file(self._conf.get('filepath')))
 
                 # Gets only the commits that are tagged
                 if self._conf.get('only_releases'):
-                    self._conf.set_value('tagged_commits', git_repo.get_tagged_commits())
+                    self._conf.set_value('tagged_commits', git.get_tagged_commits())
 
                 # Build the arguments to pass to git rev-list.
                 rev, kwargs = self._conf.build_args()
 
-                # Iterate over all the commits returned by git rev-list
-                for commit in git_repo.get_list_commits(rev, **kwargs):
-                    logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
+                commits_list = list(git.get_list_commits(rev, **kwargs))
 
-                    if self._conf.is_commit_filtered(commit):
-                        logger.info('Commit #%s filtered', commit.hash)
-                        continue
+                if not commits_list:
+                    return
 
-                    yield commit
+                chunks = self._split_in_chunks(commits_list, self._conf.get("num_workers"))
+                with concurrent.futures.ThreadPoolExecutor(max_workers=self._conf.get("num_workers")) as executor:
+                    jobs = {executor.submit(self._iter_commits, chunk): chunk for chunk in chunks}
+
+                    for job in concurrent.futures.as_completed(jobs):
+                        for commit in job.result():
+                            yield commit
+
+    def _iter_commits(self, commits_list: List[Commit]) -> Generator[Commit, None, None]:
+        for commit in commits_list:
+            logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
+
+            if self._conf.is_commit_filtered(commit):
+                logger.info('Commit #%s filtered', commit.hash)
+                continue
+
+            yield commit
+
+    @staticmethod
+    def _split_in_chunks(full_list: List[Commit], num_workers: int) -> List[List[Commit]]:
+        """
+        Given the list of commits return chunks of commits based on the number of workers.
+
+        :param List[Commit] full_list: full list of commits
+        :param int num_workers: number of workers (i.e., threads)
+        :return: Chunks of commits
+        """
+        num_chunks = math.ceil(len(full_list) / num_workers)
+        chunks = []
+        for i in range(0, len(full_list), num_chunks):
+            chunks.append(full_list[i:i + num_chunks])
+
+        return chunks
 
     @staticmethod
     def _get_repo_name_from_url(url: str) -> str:

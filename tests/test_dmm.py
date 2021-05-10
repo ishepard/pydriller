@@ -15,7 +15,7 @@
 import logging
 import pytest
 
-from pydriller.git_repository import GitRepository
+from pydriller.git import Git
 from pydriller.domain.commit import Commit, DMMProperty
 
 
@@ -26,7 +26,7 @@ logging.basicConfig(
 @pytest.fixture()
 def repo():
     path = "test-repos/dmm-test-repo"
-    gr = GitRepository(path)
+    gr = Git(path)
     yield gr
     gr.clear()
 
@@ -95,7 +95,7 @@ UNIT_INTERFACING_TEST_DATA = [
 ]
 
 
-def commit_by_msg(repo: GitRepository, msg: str) -> Commit:
+def commit_by_msg(repo: Git, msg: str) -> Commit:
     for commit in repo.get_list_commits():
         if commit.msg == msg:
             return commit
@@ -103,56 +103,56 @@ def commit_by_msg(repo: GitRepository, msg: str) -> Commit:
 
 
 @pytest.mark.parametrize('msg,dmm', UNIT_SIZE_TEST_DATA)
-def test_dmm_unit_size(repo: GitRepository, msg: str, dmm: float):
+def test_dmm_unit_size(repo: Git, msg: str, dmm: float):
     commit = commit_by_msg(repo, msg)
     assert commit.dmm_unit_size == dmm
 
 
 @pytest.mark.parametrize('msg,dmm', UNIT_COMPLEXITY_TEST_DATA)
-def test_dmm_unit_complexity(repo: GitRepository, msg: str, dmm: float):
+def test_dmm_unit_complexity(repo: Git, msg: str, dmm: float):
     commit = commit_by_msg(repo, msg)
     assert commit.dmm_unit_complexity == dmm
 
 
 @pytest.mark.parametrize('msg,dmm', UNIT_INTERFACING_TEST_DATA)
-def test_dmm_unit_interfacing(repo: GitRepository, msg: str, dmm: float):
+def test_dmm_unit_interfacing(repo: Git, msg: str, dmm: float):
     commit = commit_by_msg(repo, msg)
     assert commit.dmm_unit_interfacing == dmm
 
 
-def test_unsupported_language(repo: GitRepository):
+def test_unsupported_language(repo: Git):
     # Add .md file that cannot be analyzed by Lizard
     commit = commit_by_msg(repo, 'Offer README explaining the repo purpose')
     assert commit.dmm_unit_size is None
 
 
-def test_mixin_unsupported_language(repo: GitRepository):
+def test_mixin_unsupported_language(repo: Git):
     # Add .txt file and update (comments in) .java files
     commit = commit_by_msg(repo, 'Release under Apache 2 license')
     assert commit.dmm_unit_size is None
 
 
-def test_delta_profile_modification(repo: GitRepository):
+def test_delta_profile_modification(repo: Git):
     commit = commit_by_msg(repo, 'Increase unit size to risky')
-    mod = commit.modifications[0]
+    mod = commit.modified_files[0]
     assert mod._delta_risk_profile(DMMProperty.UNIT_SIZE) == (-15, 16)
 
 
-def test_delta_profile_commit(repo: GitRepository):
+def test_delta_profile_commit(repo: Git):
     commit = commit_by_msg(repo, 'Increase in one, decrease in other file')
 
-    m0 = commit.modifications[0]
+    m0 = commit.modified_files[0]
     assert m0._delta_risk_profile(DMMProperty.UNIT_SIZE) == (0, 1)
-    m1 = commit.modifications[1]
+    m1 = commit.modified_files[1]
     assert m1._delta_risk_profile(DMMProperty.UNIT_SIZE) == (3, 0)
 
     assert commit._delta_risk_profile(DMMProperty.UNIT_SIZE) == (3, 1)
 
 
-def test_supported_languages(repo: GitRepository):
+def test_supported_languages(repo: Git):
     # Add .md file that cannot be analyzed by Lizard
     commit = commit_by_msg(repo, 'Offer README explaining the repo purpose')
-    mod = commit.modifications[0]
+    mod = commit.modified_files[0]
     assert not mod.language_supported
 
 

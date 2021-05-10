@@ -46,14 +46,14 @@ class HistoryComplexity(ProcessMetric):
 
         for commit in self.repo_miner.traverse_commits():
 
-            for modified_file in commit.modifications:
+            for modified_file in commit.modified_files:
                 filepath = renamed_files.get(modified_file.new_path,
                                              modified_file.new_path)
 
                 if modified_file.change_type == ModificationType.RENAME:
                     renamed_files[modified_file.old_path] = filepath
 
-                modifications = modified_file.added + modified_file.removed
+                modifications = modified_file.added_lines + modified_file.deleted_lines
                 if modifications:
                     files[filepath] = files.get(filepath, 0) + modifications
 

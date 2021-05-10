@@ -29,7 +29,7 @@ class ChangeSet(ProcessMetric):
         self.committed_together = []
 
         for commit in self.repo_miner.traverse_commits():
-            self.committed_together.append(len(commit.modifications))
+            self.committed_together.append(len(commit.modified_files))
 
     def max(self):
         """

@@ -11,19 +11,19 @@ Version
    Current Pydriller version.
 
 
-GitRepository
+Git
 -------------
 
-.. automodule:: pydriller.git_repository
+.. automodule:: pydriller.git
    :members:
    :undoc-members:
    :special-members:
    :exclude-members: __dict__, __weakref__, __eq__, __str__, __hash__
 
-RepositoryMining
+Repository
 ----------------
 
-.. automodule:: pydriller.repository_mining
+.. automodule:: pydriller.repository
    :members:
    :undoc-members:
    :special-members:

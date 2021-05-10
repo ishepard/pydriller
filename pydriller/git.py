@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-This module includes 1 class, GitRepository, representing a repository in Git.
+This module includes 1 class, Git, representing a repository in Git.
 """
 
 import logging
@@ -23,13 +23,13 @@ from typing import List, Dict, Set, Generator
 
 from git import Repo, GitCommandError, Commit as GitCommit
 
-from pydriller.domain.commit import Commit, ModificationType, Modification
+from pydriller.domain.commit import Commit, ModificationType, ModifiedFile
 from pydriller.utils.conf import Conf
 
 logger = logging.getLogger(__name__)
 
 
-class GitRepository:
+class Git:
     """
     Class representing a repository in Git. It contains most of the logic of
     PyDriller: obtaining the list of commits, checkout, reset, etc.
@@ -37,7 +37,7 @@ class GitRepository:
 
     def __init__(self, path: str, conf=None):
         """
-        Init the Git RepositoryMining.
+        Init the Git Repository.
 
         :param str path: path to the repository
         """
@@ -50,11 +50,14 @@ class GitRepository:
         if conf is None:
             conf = Conf({
                 "path_to_repo": str(self.path),
-                "git_repo": self
+                "git": self
             })
 
         self._conf = conf
         self._conf.set_value("main_branch", None)  # init main_branch to None
+
+        # Initialize repository
+        self._open_repository()
 
     @property
     def repo(self) -> Repo:
@@ -203,7 +206,7 @@ class GitRepository:
         return tags
 
     def get_commits_last_modified_lines(self, commit: Commit,
-                                        modification: Modification = None,
+                                        modification: ModifiedFile = None,
                                         hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
         """
@@ -232,13 +235,13 @@ class GitRepository:
         if modification is not None:
             modifications = [modification]
         else:
-            modifications = commit.modifications
+            modifications = commit.modified_files
 
         return self._calculate_last_commits(commit, modifications,
                                             hashes_to_ignore_path)
 
     def _calculate_last_commits(self, commit: Commit,
-                                modifications: List[Modification],
+                                modifications: List[ModifiedFile],
                                 hashes_to_ignore_path: str = None) \
             -> Dict[str, Set[str]]:
 

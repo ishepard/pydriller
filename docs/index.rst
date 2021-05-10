@@ -11,10 +11,10 @@ PyDriller documentation!
    
    intro
    tutorial
-   repositorymining
+   repository
    commit
-   modifications
-   gitrepository
+   modifiedfile
+   git
    deltamaintainability
    processmetrics
    reference

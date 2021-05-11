@@ -5,17 +5,14 @@
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/ishepard/pydriller.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ishepard/pydriller/context:python)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-
 # PyDriller
 
 PyDriller is a Python framework that helps developers in analyzing Git repositories. With PyDriller you can easily extract information about but not limited to **commits**, **developers**, **modified files**, **diffs**, **source code**, and **process metrics**. 
 
 ## Install
-
 ```
 pip install pydriller
 ```
-
 
 ## Quick usage
 
@@ -29,13 +26,12 @@ for commit in Repository('https://github.com/ishepard/pydriller').traverse_commi
     print(commit.author.name)
 
     for file in commit.modified_files:
-        print(file.filename, 'is changed')
+        print(file.filename, ' has changed')
 
 ```
 
 Read the [docs](http://pydriller.readthedocs.io) for more usage examples.
 Furthermore, a video is available on [Youtube](https://www.youtube.com/watch?v=7Oui4bP9eN8).
-
 
 ## How to cite PyDriller
 
@@ -55,8 +51,6 @@ Furthermore, a video is available on [Youtube](https://www.youtube.com/watch?v=7
 }
 ```
 
-
-
 ## How to contribute
 Clone the repository and install dependencies as follows:
 
@@ -73,8 +67,6 @@ virtualenv -p python3 venv
 source venv/bin/activate
 ```
 
-
-
 **(Important)** I tend to not accept Pull Requests without tests, so:
 
 - unzip the `test-repos.zip` zip file
@@ -85,9 +77,9 @@ To run the tests (using pytest):
 
 ```
 unzip test-repos.zip
+pip install -r test-requirements.txt
 pytest
 ```
-
 
 ## Acknowledgements
 

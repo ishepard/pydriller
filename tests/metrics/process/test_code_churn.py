@@ -71,5 +71,3 @@ def test_with_flag():
     assert len(code_churns) == 7
     assert str(Path('domain/__init__.py')) not in code_churns
     assert code_churns[str(Path('domain/commit.py'))] == 0
-
-

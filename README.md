@@ -52,19 +52,19 @@ Furthermore, a video is available on [Youtube](https://www.youtube.com/watch?v=7
 ```
 
 ## How to contribute
-Clone the repository and install dependencies as follows:
-
+First clone the repository:
 ```
 git clone https://github.com/ishepard/pydriller.git
 cd pydriller
-pip install -r requirements.txt
 ```
-
 **(Optional)** It is suggested to make use of `virtualenv`. Therefore, before installing the requirements run:
-
 ```
-virtualenv -p python3 venv
+python3 -m venv venv
 source venv/bin/activate
+```
+Then, install the requirements:
+```
+pip install -r requirements.txt
 ```
 
 **(Important)** I tend to not accept Pull Requests without tests, so:

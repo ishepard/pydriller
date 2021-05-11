@@ -45,3 +45,31 @@ def test_with_dates(path_to_repo, filepath, since, to, expected_count, expected_
     assert actual_count[filepath] == expected_count
     assert actual_max[filepath] == expected_max
     assert actual_avg[filepath] == expected_avg
+
+
+def test_without_flag():
+    metric = CodeChurn(path_to_repo='test-repos/pydriller',
+                       from_commit='ab36bf45859a210b0eae14e17683f31d19eea041',
+                       to_commit='fdf671856b260aca058e6595a96a7a0fba05454b',
+                       ignore_added_files=False)
+
+    code_churns = metric.count()
+
+    assert len(code_churns) == 18
+    assert str(Path('domain/__init__.py')) in code_churns
+    assert code_churns[str(Path('domain/commit.py'))] == 34
+
+
+def test_with_flag():
+    metric = CodeChurn(path_to_repo='test-repos/pydriller',
+                       from_commit='ab36bf45859a210b0eae14e17683f31d19eea041',
+                       to_commit='fdf671856b260aca058e6595a96a7a0fba05454b',
+                       ignore_added_files=True)
+
+    code_churns = metric.count()
+
+    assert len(code_churns) == 7
+    assert str(Path('domain/__init__.py')) not in code_churns
+    assert code_churns[str(Path('domain/commit.py'))] == 0
+
+

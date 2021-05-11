@@ -23,9 +23,14 @@ class CodeChurn(ProcessMetric):
                  since=None,
                  to=None,
                  from_commit: str = None,
-                 to_commit: str = None):
+                 to_commit: str = None,
+                 ignore_added_files=False):
+        """
+        :ignore_added_files: if True, do not count churns for files when created
+        """
 
         super().__init__(path_to_repo, since=since, to=to, from_commit=from_commit, to_commit=to_commit)
+        self.ignore_added_files = ignore_added_files
         self._initialize()
 
     def _initialize(self):
@@ -41,6 +46,9 @@ class CodeChurn(ProcessMetric):
 
                 if modified_file.change_type == ModificationType.RENAME:
                     renamed_files[modified_file.old_path] = filepath
+
+                if self.ignore_added_files and modified_file.change_type == ModificationType.ADD:
+                    continue
 
                 churn = modified_file.added_lines - modified_file.deleted_lines
                 self.files.setdefault(filepath, []).append(churn)

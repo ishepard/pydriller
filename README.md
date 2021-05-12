@@ -1,7 +1,7 @@
 [![Build Status](https://github.com/ishepard/pydriller/workflows/Pydriller%20workflow/badge.svg?event=push&branch=master)](https://github.com/ishepard/pydriller/actions)
 [![Documentation Status](https://readthedocs.org/projects/pydriller/badge/?version=latest)](https://pydriller.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/ishepard/pydriller/branch/master/graph/badge.svg)](https://codecov.io/gh/ishepard/pydriller)
-[![Downloads](https://pepy.tech/badge/pydriller/month)](https://pepy.tech/project/pydriller/month)
+[![Downloads](https://pepy.tech/badge/pydriller/month)](https://pepy.tech/project/pydriller)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/ishepard/pydriller.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ishepard/pydriller/context:python)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 

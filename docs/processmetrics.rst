@@ -59,7 +59,13 @@ Code Churn
 ==========
 
 This metric measures the code churns of a file.
-A code churn is the sum of (added lines - removed lines) across the analyzed commits.
+
+Depending on the parametrization, a code churn is the sum of either 
+    
+    (a) (added lines - removed lines) or 
+    (b) (added lines + removed lines)
+    
+across the analyzed commits.
 
 The class ``CodeChurn`` has three methods:
 
@@ -81,6 +87,10 @@ For example::
     print('Average code churn for each file: {}'.format(files_avg))
 
 will print the total, maximum and average number of code churn for each modified file in the evolution period ``[from_commit, to_commit]``. 
+
+The calculation variant (a) or (b) can be configured by setting the ``CodeChurn`` init parameter:
+
+* ``add_deleted_lines_to_churn``
 
 
 Commits Count

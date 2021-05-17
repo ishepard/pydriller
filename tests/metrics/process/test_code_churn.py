@@ -71,3 +71,17 @@ def test_with_flag():
     assert len(code_churns) == 7
     assert str(Path('domain/__init__.py')) not in code_churns
     assert code_churns[str(Path('domain/commit.py'))] == 0
+
+    
+def test_with_add_deleted_lines_flag():
+    metric = CodeChurn(path_to_repo='test-repos/pydriller',
+                       from_commit='ab36bf45859a210b0eae14e17683f31d19eea041',
+                       to_commit='fdf671856b260aca058e6595a96a7a0fba05454b',
+                       ignore_added_files=False,
+                       add_deleted_lines_to_churn=True)
+
+    code_churns = metric.count()
+
+    assert len(code_churns) == 18
+    assert str(Path('domain/__init__.py')) in code_churns
+    assert code_churns[str(Path('domain/commit.py'))] == 40

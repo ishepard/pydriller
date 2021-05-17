@@ -7,7 +7,7 @@
 
 # PyDriller
 
-PyDriller is a Python framework that helps developers in analyzing Git repositories. With PyDriller you can easily extract information about but not limited to **commits**, **developers**, **modified files**, **diffs**, **source code**, and **process metrics**. 
+PyDriller is a Python framework that helps developers in analyzing Git repositories. With PyDriller you can easily extract information about **commits**, **developers**, **modified files**, **diffs**, and **source code**. 
 
 ## Install
 ```

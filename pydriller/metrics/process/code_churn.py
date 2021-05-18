@@ -10,8 +10,8 @@ from pydriller.metrics.process.process_metric import ProcessMetric
 class CodeChurn(ProcessMetric):
     """
     This class is responsible to implement the Code Churn metric for a file.
-    Depending on the parametrization of this class, a code churn is the sum of either 
-    (added lines - removed lines) or 
+    Depending on the parametrization of this class, a code churn is the sum of either
+    (added lines - removed lines) or
     (added lines + removed lines)
     across the analyzed commits. It allows to count for the:
     * total number of code churns - count();
@@ -52,12 +52,12 @@ class CodeChurn(ProcessMetric):
 
                 if self.ignore_added_files and modified_file.change_type == ModificationType.ADD:
                     continue
-                
+
                 if self.add_deleted_lines_to_churn:
                     churn = modified_file.added_lines + modified_file.deleted_lines
                 else:
                     churn = modified_file.added_lines - modified_file.deleted_lines
-                    
+
                 self.files.setdefault(filepath, []).append(churn)
 
     def count(self):

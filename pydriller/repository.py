@@ -146,7 +146,7 @@ class Repository:
         return repo.startswith("git@") or repo.startswith("https://")
 
     def _clone_remote_repo(self, tmp_folder: str, repo: str) -> str:
-        repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))       
+        repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
         if os.path.isdir(repo_folder):
             logger.info("Reusing folder %s for %s", repo_folder, repo)
         else:

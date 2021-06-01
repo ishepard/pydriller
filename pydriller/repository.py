@@ -146,9 +146,12 @@ class Repository:
         return repo.startswith("git@") or repo.startswith("https://")
 
     def _clone_remote_repo(self, tmp_folder: str, repo: str) -> str:
-        repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
-        logger.info("Cloning %s in temporary folder %s", repo, repo_folder)
-        Repo.clone_from(url=repo, to_path=repo_folder)
+        repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))       
+        if os.path.isdir(repo_folder):
+            logger.info("Reusing folder %s for %s", repo_folder, repo)
+        else:
+            logger.info("Cloning %s in temporary folder %s", repo, repo_folder)
+            Repo.clone_from(url=repo, to_path=repo_folder)
 
         return repo_folder
 
@@ -168,17 +171,7 @@ class Repository:
         local_path_repo = path_repo
         if self._is_remote(path_repo):
             clone_folder = self._clone_folder()
-            repo_folder = os.path.join(
-                clone_folder, self._get_repo_name_from_url(path_repo)
-            )
-            if os.path.isdir(repo_folder):
-                # In case a remote repository was cloned already earlier, then
-                # re-use this local repository
-                local_path_repo = repo_folder
-            else:
-                local_path_repo = self._clone_remote_repo(
-                    clone_folder, path_repo
-                )
+            local_path_repo = self._clone_remote_repo(clone_folder, path_repo)
         local_path_repo = str(Path(local_path_repo).expanduser().resolve())
 
         # when multiple repos are given in input, this variable will serve as a reminder

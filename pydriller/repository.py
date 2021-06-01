@@ -167,8 +167,20 @@ class Repository:
     def _prep_repo(self, path_repo: str) -> Generator[Git, None, None]:
         local_path_repo = path_repo
         if self._is_remote(path_repo):
-            local_path_repo = self._clone_remote_repo(self._clone_folder(), path_repo)
+            clone_folder = self._clone_folder()
+            repo_folder = os.path.join(
+                clone_folder, self._get_repo_name_from_url(path_repo)
+            )
+            if os.path.isdir(repo_folder):
+                # In case a remote repository was cloned already earlier, then 
+                # re-use this local repository
+                local_path_repo = repo_folder
+            else:
+                local_path_repo = self._clone_remote_repo(
+                    clone_folder, path_repo
+                )
         local_path_repo = str(Path(local_path_repo).expanduser().resolve())
+
 
         # when multiple repos are given in input, this variable will serve as a reminder
         # of which one we are currently analyzing

@@ -148,8 +148,11 @@ class Repository:
 
     def _clone_remote_repo(self, tmp_folder: str, repo: str) -> str:
         repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
-        logger.info("Cloning %s in temporary folder %s", repo, repo_folder)
-        Repo.clone_from(url=repo, to_path=repo_folder)
+        if os.path.isdir(repo_folder):
+            logger.info("Reusing folder %s for %s", repo_folder, repo)
+        else:
+            logger.info("Cloning %s in temporary folder %s", repo, repo_folder)
+            Repo.clone_from(url=repo, to_path=repo_folder)
 
         return repo_folder
 

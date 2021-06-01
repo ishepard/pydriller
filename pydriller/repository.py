@@ -181,7 +181,6 @@ class Repository:
                 )
         local_path_repo = str(Path(local_path_repo).expanduser().resolve())
 
-
         # when multiple repos are given in input, this variable will serve as a reminder
         # of which one we are currently analyzing
         self._conf.set_value('path_to_repo', local_path_repo)

@@ -172,7 +172,7 @@ class Repository:
                 clone_folder, self._get_repo_name_from_url(path_repo)
             )
             if os.path.isdir(repo_folder):
-                # In case a remote repository was cloned already earlier, then 
+                # In case a remote repository was cloned already earlier, then
                 # re-use this local repository
                 local_path_repo = repo_folder
             else:

@@ -170,8 +170,7 @@ class Repository:
     def _prep_repo(self, path_repo: str) -> Generator[Git, None, None]:
         local_path_repo = path_repo
         if self._is_remote(path_repo):
-            clone_folder = self._clone_folder()
-            local_path_repo = self._clone_remote_repo(clone_folder, path_repo)
+            local_path_repo = self._clone_remote_repo(self._clone_folder(), path_repo)
         local_path_repo = str(Path(local_path_repo).expanduser().resolve())
 
         # when multiple repos are given in input, this variable will serve as a reminder

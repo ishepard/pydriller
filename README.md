@@ -18,7 +18,7 @@ pip install pydriller
 
 ```python
 
-from pydriller import repository
+from pydriller import Repository
 
 for commit in Repository('https://github.com/ishepard/pydriller').traverse_commits():
     print(commit.hash)

@@ -84,6 +84,7 @@ class Repository:
             `to` and `to_commit` are None)
         :param bool include_refs: whether to include refs and HEAD in commit analysis
         :param bool include_remotes: whether to include remote commits in analysis
+        :param int num_workers: number of workers (i.e., threads)
         :param str only_in_branch: only commits in this branch will be analyzed
         :param List[str] only_modifications_with_file_types: only
             modifications with that file types will be analyzed
@@ -147,8 +148,11 @@ class Repository:
 
     def _clone_remote_repo(self, tmp_folder: str, repo: str) -> str:
         repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
-        logger.info("Cloning %s in temporary folder %s", repo, repo_folder)
-        Repo.clone_from(url=repo, to_path=repo_folder)
+        if os.path.isdir(repo_folder):
+            logger.info("Reusing folder %s for %s", repo_folder, repo)
+        else:
+            logger.info("Cloning %s in temporary folder %s", repo, repo_folder)
+            Repo.clone_from(url=repo, to_path=repo_folder)
 
         return repo_folder
 

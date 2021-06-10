@@ -226,6 +226,23 @@ def test_clone_repo_to_not_existing():
                         clone_repo_to="NOTEXISTINGDIR").traverse_commits())
 
 
+def test_clone_repo_to_repeated():
+    import tempfile
+    tmp_path = tempfile.gettempdir()
+    dt2 = datetime(2018, 10, 20)
+    url = "https://github.com/ishepard/pydriller.git"
+    assert len(list(Repository(
+        path_to_repo=url,
+        to=dt2,
+        clone_repo_to=str(tmp_path)).traverse_commits())) == 159
+    assert os.path.isdir(os.path.join(tmp_path, "pydriller"))
+    assert len(list(Repository(
+        path_to_repo=url,
+        to=dt2,
+        clone_repo_to=str(tmp_path)).traverse_commits())) == 159
+    assert os.path.isdir(os.path.join(tmp_path, "pydriller"))
+
+
 def test_projectname_multiple_repos():
     repos = [
         'test-repos/files_in_directories',

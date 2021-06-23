@@ -486,7 +486,7 @@ class Commit:
         """
         self._c_object = commit
 
-        self._modifications = None
+        self._modified_files = None
         self._branches = None
         self._conf = conf
 
@@ -664,13 +664,13 @@ class Commit:
 
         :return: List[Modification] modifications
         """
-        if self._modifications is None:
-            self._modifications = self._get_modifications()
+        if self._modified_files is None:
+            self._modified_files = self._get_modified_files()
 
-        assert self._modifications is not None
-        return self._modifications
+        assert self._modified_files is not None
+        return self._modified_files
 
-    def _get_modifications(self):
+    def _get_modified_files(self):
         options = {}
         if self._conf.get("histogram"):
             options["histogram"] = True
@@ -705,7 +705,7 @@ class Commit:
         return self._parse_diff(diff_index)
 
     def _parse_diff(self, diff_index) -> List[ModifiedFile]:
-        modifications_list = []
+        modified_files_list = []
         for diff in diff_index:
             old_path = diff.a_path
             new_path = diff.b_path
@@ -717,11 +717,11 @@ class Commit:
                 "source_code": self._get_decoded_sc_str(diff.b_blob),
             }
 
-            modifications_list.append(
+            modified_files_list.append(
                 ModifiedFile(old_path, new_path, change_type, diff_and_sc)
             )
 
-        return modifications_list
+        return modified_files_list
 
     def _get_decoded_str(self, diff):
         try:

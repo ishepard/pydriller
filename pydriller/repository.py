@@ -271,6 +271,11 @@ class Repository:
             last_suffix_index = len(url)
 
         if last_slash_index < 0 or last_suffix_index <= last_slash_index:
-            raise Exception("Badly formatted url {}".format(url))
+            raise MalformedUrl("Badly formatted url {}".format(url))
 
         return url[last_slash_index + 1:last_suffix_index]
+
+
+class MalformedUrl(Exception):
+    def __init__(self, message):
+        super().__init__(message)

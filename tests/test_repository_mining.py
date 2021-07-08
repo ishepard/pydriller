@@ -5,6 +5,7 @@ import pytest
 import sys
 
 from pydriller import Repository, Git
+from pydriller.repository import MalformedUrl
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -38,6 +39,12 @@ def test_no_url():
 def test_badly_formatted_repo_url():
     with pytest.raises(Exception):
         list(Repository(path_to_repo=set('repo')).traverse_commits())
+
+
+# It should fail when URL is malformed
+def test_malformed_url():
+    with pytest.raises(MalformedUrl):
+        list(Repository("https://badurl.git/").traverse_commits())
 
 
 @pytest.mark.parametrize('repo,expected', [

@@ -12,8 +12,8 @@ You can get the list of modified files, as well as their diffs and current sourc
 * **change_type**: type of the change: can be Added, Deleted, Modified, or Renamed.
 * **diff**: diff of the file as Git presents it (e.g., starting with @@ xx,xx @@).
 * **diff_parsed**: diff parsed in a dictionary containing the added and deleted lines. The dictionary has 2 keys: “added” and “deleted”, each containing a list of Tuple (int, str) corresponding to (number of line in the file, actual line).
-* **added**: number of lines added
-* **removed**: number of lines removed
+* **added_lines**: number of lines added
+* **deleted_lines**: number of lines removed
 * **source_code**: source code of the file (can be _None_ if the file is deleted or only renamed)
 * **source_code_before**: source code of the file before the change (can be _None_ if the file is added or only renamed)
 * **methods**: list of methods of the file. The list might be empty if the programming language is not supported or if the file is not a source code file. These are the methods **after** the change.
@@ -29,7 +29,7 @@ You can get the list of modified files, as well as their diffs and current sourc
 For example::
 
     for commit in Repository('path/to/the/repo').traverse_commits():
-        for m in commit.modifications:
+        for m in commit.modified_files:
             print(
                 "Author {}".format(commit.author.name),
                 " modified {}".format(m.filename),

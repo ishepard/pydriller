@@ -17,7 +17,7 @@ A Commit object has all the information of a Git commit, and much more. More spe
 * **branches** *(List[str])*: List of branches that contain this commit
 * **in_main_branch** *(Bool)*: True if the commit is in the main branch
 * **merge** *(Bool)*: True if the commit is a merge commit
-* **modifications** *(List[Modifications])*: list of modified files in the commit (see :ref:`modifications_toplevel`)
+* **modified_files** *(List[ModifiedFile])*: list of modified files in the commit (see :ref:`modifications_toplevel`)
 * **parents** *(List[str])*: list of the commit parents
 * **project_name** *(str)*: project name 
 * **project_path** *(str)*: project path 

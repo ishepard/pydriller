@@ -173,8 +173,8 @@ class ModifiedFile:
         self._nloc = None
         self._complexity = None
         self._token_count = None
-        self._function_list = []  # type: List[Method]
-        self._function_list_before = []  # type: List[Method]
+        self._function_list: List[Method] = []
+        self._function_list_before: List[Method] = []
 
     def __hash__(self):
         """
@@ -183,9 +183,7 @@ class ModifiedFile:
 
         :return: int hash
         """
-        string = " ".join(
-            [self.change_type.name, self.new_path, self.source_code]
-        )
+        string = f"{self.change_type.name} {self.new_path} {self.source_code}"
         return hash(hashlib.sha256(string.encode("utf-8")).hexdigest())
 
     @property

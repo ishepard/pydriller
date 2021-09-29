@@ -149,9 +149,9 @@ class Repository:
     def _clone_remote_repo(self, tmp_folder: str, repo: str) -> str:
         repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
         if os.path.isdir(repo_folder):
-            logger.info("Reusing folder %s for %s", repo_folder, repo)
+            logger.info(f"Reusing folder {repo_folder} for {repo}")
         else:
-            logger.info("Cloning %s in temporary folder %s", repo, repo_folder)
+            logger.info(f"Cloning {repo} in temporary folder {repo_folder}")
             Repo.clone_from(url=repo, to_path=repo_folder)
 
         return repo_folder
@@ -209,7 +209,7 @@ class Repository:
         """
         for path_repo in self._conf.get('path_to_repos'):
             with self._prep_repo(path_repo=path_repo) as git:
-                logger.info('Analyzing git repository in %s', git.path)
+                logger.info(f'Analyzing git repository in {git.path}')
 
                 # Get the commits that modified the filepath. In this case, we can not use
                 # git rev-list since it doesn't have the option --follow, necessary to follow
@@ -239,10 +239,10 @@ class Repository:
 
     def _iter_commits(self, commits_list: List[Commit]) -> Generator[Commit, None, None]:
         for commit in commits_list:
-            logger.info('Commit #%s in %s from %s', commit.hash, commit.committer_date, commit.author.name)
+            logger.info(f'Commit #{commit.hash} in {commit.committer_date} from {commit.author.name}')
 
             if self._conf.is_commit_filtered(commit):
-                logger.info('Commit #%s filtered', commit.hash)
+                logger.info(f'Commit #{commit.hash} filtered')
                 continue
 
             yield commit
@@ -271,7 +271,7 @@ class Repository:
             last_suffix_index = len(url)
 
         if last_slash_index < 0 or last_suffix_index <= last_slash_index:
-            raise MalformedUrl("Badly formatted url {}".format(url))
+            raise MalformedUrl(f"Badly formatted url {url}")
 
         return url[last_slash_index + 1:last_suffix_index]
 

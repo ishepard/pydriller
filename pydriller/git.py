@@ -194,7 +194,7 @@ class Git:
             selected_tag = self.repo.tags[tag]
             return self.get_commit(selected_tag.commit.hexsha)
         except (IndexError, AttributeError):
-            logger.debug('Tag %s not found', tag)
+            logger.debug(f"Tag {tag} not found")
             raise
 
     def get_tagged_commits(self):
@@ -272,9 +272,7 @@ class Git:
 
                         commits.setdefault(path, set()).add(self.get_commit(buggy_commit).hash)
             except GitCommandError:
-                logger.debug(
-                    "Could not found file %s in commit %s. Probably a double "
-                    "rename!", mod.filename, commit.hash)
+                logger.debug(f"Could not found file {mod.filename} in commit {commit.hash}. Probably a double rename!")
 
         return commits
 
@@ -313,7 +311,7 @@ class Git:
         try:
             commits = self.repo.git.log("--follow", "--format=%H", path).split('\n')
         except GitCommandError:
-            logger.debug("Could not find information of file %s", path)
+            logger.debug(f"Could not find information of file {path}")
 
         return commits
 

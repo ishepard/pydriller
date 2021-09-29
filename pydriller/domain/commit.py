@@ -27,7 +27,8 @@ import hashlib
 
 import lizard
 import lizard_languages
-from git import Diff, Git, Commit as GitCommit, NULL_TREE
+from git import Diff, Git, NULL_TREE
+from git.objects import Commit as GitCommit
 
 from pydriller.domain.developer import Developer
 
@@ -577,7 +578,7 @@ class Commit:
 
         :return: int timezone
         """
-        return self._c_object.author_tz_offset
+        return int(self._c_object.author_tz_offset)
 
     @property
     def committer_timezone(self) -> int:
@@ -586,7 +587,7 @@ class Commit:
 
         :return: int timezone
         """
-        return self._c_object.committer_tz_offset
+        return int(self._c_object.committer_tz_offset)
 
     @property
     def msg(self) -> str:
@@ -595,7 +596,7 @@ class Commit:
 
         :return: str commit_message
         """
-        return self._c_object.message.strip()
+        return str(self._c_object.message.strip())
 
     @property
     def parents(self) -> List[str]:

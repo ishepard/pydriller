@@ -21,7 +21,8 @@ import os
 from pathlib import Path
 from typing import List, Dict, Set, Generator
 
-from git import Repo, GitCommandError, Commit as GitCommit
+from git import Repo, GitCommandError
+from git.objects import Commit as GitCommit
 
 from pydriller.domain.commit import Commit, ModificationType, ModifiedFile
 from pydriller.utils.conf import Conf
@@ -68,6 +69,9 @@ class Git:
         """
         if self._repo is None:
             self._open_repository()
+
+        assert self._repo
+
         return self._repo
 
     def clear(self):

@@ -171,7 +171,6 @@ def test_checkout_with_commit_not_fully_merged_to_master(repo: Git):
     assert len(files1) == 2
 
     repo.reset()
-    assert 4, "temp branch should be cleared." == len(repo.repo.branches)
     files2 = repo.files()
     assert len(files2) == 1
 

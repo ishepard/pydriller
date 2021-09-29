@@ -21,7 +21,7 @@ class Developer:
     This class represents a developer. We save the email and the name.
     """
 
-    def __init__(self, name: str, email: str):
+    def __init__(self, name: str = None, email: str = None):
         """
         Class to identify a developer.
 

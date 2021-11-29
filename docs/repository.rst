@@ -125,16 +125,17 @@ Examples::
     Repository('path/to/the/repo', only_modifications_with_file_types=['.java']).traverse_commits()
 
 
-Other Configurations
+Configurations
 =====================
 
-Some :code:`git` commands, such as :code:`git diff`, can be customized by the user. In this section, we report some of the customization
-that can be used within pydriller.
+Other than filtering commits or defining date ranges, Pydriller supports the following configurations:
 
-* **histogram** *(bool)*: uses :code:`git diff --histogram` instead of the normal git. See :ref:`git-diff-algorithms`.
 * **include_refs** *(bool)*: whether to include refs and HEAD in commit analysis (equivalent of adding the flag :code:`--all`).
 * **include_remotes** *(bool)*: whether to include remote commits in analysis (equivalent of adding the flag :code:`--remotes`).
 * **clone_repo_to** *(str)*: if the repository is a URL, Pydriller will clone it in this directory.
+* **num_workers** *(int)*: number of workers (i.e., threads). By default is 1. Please note, if num_workers > 1 the commits order is not maintained.
+* **histogram** *(bool)*: uses :code:`git diff --histogram` instead of the normal git. See :ref:`git-diff-algorithms`.
+* **skip_whitespaces** *(bool)*: add the "-w" option when asking for the diff.
 
 .. _git-diff-algorithms:
 

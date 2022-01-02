@@ -281,3 +281,12 @@ def test_deletion_remotes():
 
     for path in paths:
         assert os.path.exists(path) is False
+
+
+def test_deleted_files():
+    deleted_commits = list(
+        Repository('https://github.com/ishepard/pydriller',
+                   filepath='.bettercodehub.yml',
+                   include_deleted_files=True).traverse_commits()
+    )
+    assert len(deleted_commits) > 0

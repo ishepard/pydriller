@@ -144,7 +144,7 @@ class Repository:
 
     @staticmethod
     def _is_remote(repo: str) -> bool:
-        return repo.startswith("git@") or repo.startswith("https://")
+        return repo.startswith(("git@", "https://", "http://"))
 
     def _clone_remote_repo(self, tmp_folder: str, repo: str) -> str:
         repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))

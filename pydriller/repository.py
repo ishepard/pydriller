@@ -59,7 +59,8 @@ class Repository:
                  histogram_diff: bool = False,
                  skip_whitespaces: bool = False,
                  clone_repo_to: str = None,
-                 order: str = None):
+                 order: str = None,
+                 include_deleted_files: bool = False):
         """
         Init a repository. The only required parameter is
         "path_to_repo": to analyze a single repo, pass the absolute path to
@@ -99,15 +100,16 @@ class Repository:
         :param str filepath: only commits that modified this file will be analyzed
         :param str order: order of commits. It can be one of: 'date-order',
             'author-date-order', 'topo-order', or 'reverse'. Default is reverse.
+        :param bool include_deleted_files: if true will retrieve commits modifying a deleted file.
         """
         file_modification_set = (
             None if only_modifications_with_file_types is None
             else set(only_modifications_with_file_types)
-            )
+        )
         commit_set = (
             None if only_commits is None
             else set(only_commits)
-            )
+        )
 
         options = {
             "git": None,
@@ -134,7 +136,8 @@ class Repository:
             "tagged_commits": None,
             "histogram": histogram_diff,
             "clone_repo_to": clone_repo_to,
-            "order": order
+            "order": order,
+            "include_deleted_files": include_deleted_files
         }
         self._conf = Conf(options)
 
@@ -215,7 +218,9 @@ class Repository:
                 # git rev-list since it doesn't have the option --follow, necessary to follow
                 # the renames. Hence, we manually call git log instead
                 if self._conf.get('filepath') is not None:
-                    self._conf.set_value('filepath_commits', git.get_commits_modified_file(self._conf.get('filepath')))
+                    self._conf.set_value('filepath_commits', git.get_commits_modified_file(self._conf.get('filepath'),
+                                                                                           self._conf.get(
+                                                                                               'include_deleted_files')))
 
                 # Gets only the commits that are tagged
                 if self._conf.get('only_releases'):

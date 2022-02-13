@@ -297,19 +297,23 @@ class Git:
                line.startswith('"""') or \
                line.startswith("*")
 
-    def get_commits_modified_file(self, filepath: str) -> List[str]:
+    def get_commits_modified_file(self, filepath: str, include_deleted_files=False) -> List[str]:
         """
         Given a filepath, returns all the commits that modified this file
         (following renames).
 
         :param str filepath: path to the file
+        :param bool include_deleted_files: if True, include commits that modifies a deleted file
         :return: the list of commits' hash
         """
         path = str(Path(filepath))
 
         commits = []
         try:
-            commits = self.repo.git.log("--follow", "--format=%H", path).split('\n')
+            if include_deleted_files:
+                commits = self.repo.git.log("--follow", "--format=%H", "--", path).split('\n')
+            else:
+                commits = self.repo.git.log("--follow", "--format=%H", path).split('\n')
         except GitCommandError:
             logger.debug(f"Could not find information of file {path}")
 

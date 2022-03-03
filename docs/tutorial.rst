@@ -27,8 +27,8 @@ We can also pass a list of repositories (both local and remote), and PyDriller w
 Let's make another example: print all the modified files for every commit. This does the magic::
 
     for commit in Repository('path/to/the/repo').traverse_commits():
-        for modification in commit.modifications:
-            print('Author {} modified {} in commit {}'.format(commit.author.name, modification.filename, commit.hash))
+        for file in commit.modified_files:
+            print('Author {} modified {} in commit {}'.format(commit.author.name, file.filename, commit.hash))
 
 That's it!
 
@@ -37,6 +37,6 @@ Behind the scenes, PyDriller opens the Git repository and extracts all the neces
 Furthermore, PyDriller can calculate structural metrics of every file changed in a commit. To calculate these metrics, Pydriller relies on `Lizard <https://github.com/terryyin/lizard>`_, a powerful tool that can analyze source code of many different programming languages, both at class and method level! ::
 
     for commit in Repository('path/to/the/repo').traverse_commits():
-        for mod in commit.modifications:
+        for file in commit.modified_files:
             print('{} has complexity of {}, and it contains {} methods'.format(
-                  mod.filename, mod.complexity, len(mod.methods)))
+                  file.filename, file.complexity, len(file.methods)))

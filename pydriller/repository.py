@@ -100,7 +100,7 @@ class Repository:
         :param str filepath: only commits that modified this file will be analyzed
         :param bool include_deleted_files: include commits modifying a deleted file (useful when analyzing a deleted `filepath`)
         :param str order: order of commits. It can be one of: 'date-order',
-            'author-date-order', 'topo-order', or 'reverse'. Default is reverse.
+            'author-date-order', 'topo-order', or 'reverse'. If order=None, PyDriller returns the commits from the oldest to the newest.
         """
         file_modification_set = (
             None if only_modifications_with_file_types is None

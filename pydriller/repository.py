@@ -19,7 +19,6 @@ This module includes 1 class, Repository, main class of PyDriller.
 import logging
 import math
 import os
-import sys
 import shutil
 import tempfile
 import concurrent.futures
@@ -209,8 +208,6 @@ class Repository:
                 # On Windows there might be cleanup errors.
                 # Manually remove files
                 shutil.rmtree(self._tmp_dir.name, ignore_errors=True)
-                else:
-                    raise(e)
 
     def traverse_commits(self) -> Generator[Commit, None, None]:
         """

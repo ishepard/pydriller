@@ -19,6 +19,7 @@ This module includes 1 class, Repository, main class of PyDriller.
 import logging
 import math
 import os
+import sys
 import shutil
 import tempfile
 import concurrent.futures
@@ -204,6 +205,14 @@ class Repository:
                 # git directories because of read-only files.
                 # In this case, just ignore the errors.
                 shutil.rmtree(self._tmp_dir.name, ignore_errors=True)
+            except OSError as e:
+                # Another cleanup error happens on Windows with errno 145
+                # Manually remove files
+                # Otherwise, rethrow errors.
+                if sys.platform == "win32" and e.errno == 145:
+                    shutil.rmtree(self._tmp_dir.name, ignore_errors=True)
+                else:
+                    raise(e)
 
     def traverse_commits(self) -> Generator[Commit, None, None]:
         """

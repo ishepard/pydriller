@@ -209,7 +209,7 @@ class Repository:
                 # Another cleanup error happens on Windows with errno 145
                 # Manually remove files
                 # Otherwise, rethrow errors.
-                if sys.platform == "win32" and e.errno == 145:
+                if sys.platform == "win32" and e.winerror == 145:
                     shutil.rmtree(self._tmp_dir.name, ignore_errors=True)
                 else:
                     raise(e)

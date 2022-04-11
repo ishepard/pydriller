@@ -199,11 +199,6 @@ class Repository:
             assert self._tmp_dir is not None
             try:
                 self._tmp_dir.cleanup()
-            except PermissionError:
-                # on Windows, Python 3.5, 3.6, 3.7 are not able to delete
-                # git directories because of read-only files.
-                # In this case, just ignore the errors.
-                shutil.rmtree(self._tmp_dir.name, ignore_errors=True)
             except (PermissionError, OSError):
                 # On Windows there might be cleanup errors.
                 # Manually remove files

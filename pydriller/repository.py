@@ -205,12 +205,10 @@ class Repository:
                 # git directories because of read-only files.
                 # In this case, just ignore the errors.
                 shutil.rmtree(self._tmp_dir.name, ignore_errors=True)
-            except OSError as e:
-                # Another cleanup error happens on Windows with errno 145
+            except (PermissionError, OSError) as e:
+                # On Windows there might be cleanup errors.
                 # Manually remove files
-                # Otherwise, rethrow errors.
-                if sys.platform == "win32" and e.winerror == 145:
-                    shutil.rmtree(self._tmp_dir.name, ignore_errors=True)
+                shutil.rmtree(self._tmp_dir.name, ignore_errors=True)
                 else:
                     raise(e)
 

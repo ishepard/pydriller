@@ -13,13 +13,13 @@
 # limitations under the License.
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+from warnings import catch_warnings
 
 import pytest
 from git import Git as PyGit
 
 from pydriller.domain.commit import ModificationType
 from pydriller.git import Git
-
 
 @pytest.fixture
 def repo(request):
@@ -243,7 +243,12 @@ def test_should_detail_a_commit(repo: Git):
 
     assert commit.modified_files[0].new_path == "Matricula.java"
     assert commit.modified_files[0].diff.startswith("@@ -0,0 +1,62 @@\n+package model;") is True
-    assert commit.modified_files[0].source_code.startswith("package model;") is True
+    assert commit.modified_files[0].content.startswith("package model;") is True
+    
+    with catch_warnings(record=True) as w:
+        assert commit.modified_files[0].source_code.startswith("package model;") is True
+        assert len(w) == 1
+        assert issubclass(w[0].category, DeprecationWarning)
 
 
 @pytest.mark.parametrize('repo', ['test-repos/branches_merged'], indirect=True)

@@ -13,6 +13,7 @@
 # limitations under the License.
 from pydriller.git import Git
 from pathlib import Path
+from warnings import catch_warnings
 import pytest
 import logging
 
@@ -44,7 +45,9 @@ def test_filename():
     diff_and_sc = {
         'diff': '',
         'source_code': '',
-        'source_code_before': ''
+        'source_code_before': '',
+        'content': '',
+        'content_before': ''
     }
     m1 = ModifiedFile('dspadini/pydriller/myfile.py',
                       'dspadini/pydriller/mynewfile.py',
@@ -69,7 +72,9 @@ def test_metrics_python():
     diff_and_sc = {
         'diff': '',
         'source_code': sc,
-        'source_code_before': sc
+        'source_code_before': sc,
+        'content': sc,
+        'content_before': sc
     }
 
     m1 = ModifiedFile('test-repos/lizard/git_repository.py',
@@ -143,7 +148,9 @@ def test_metrics_cpp():
     diff_and_sc = {
         'diff': '',
         'source_code': sc,
-        'source_code_before': sc
+        'source_code_before': sc,
+        'content': sc,
+        'content_before': sc
     }
 
     m1 = ModifiedFile('test-repos/lizard/FileCPP.cpp',
@@ -164,7 +171,9 @@ def test_metrics_java():
     diff_and_sc = {
         'diff': '',
         'source_code': sc,
-        'source_code_before': sc
+        'source_code_before': sc,
+        'content': sc,
+        'content_before': sc
     }
 
     m1 = ModifiedFile('test-repos/lizard/FileJava.java',
@@ -184,7 +193,9 @@ def test_metrics_not_supported_file():
     diff_and_sc = {
         'diff': '',
         'source_code': sc,
-        'source_code_before': sc
+        'source_code_before': sc,
+        'content': sc,
+        'content_before': sc
     }
 
     m1 = ModifiedFile('test-repos/lizard/NotSupported.pdf',
@@ -281,11 +292,55 @@ def test_tzoffset_plus_hours(repo: Git):
 
 
 @pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
+def test_content_before(repo: Git):
+    m1 = repo.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71').modified_files[0]
+
+    assert m1.content is None
+    assert m1.content_before is not None
+
+
+@pytest.mark.parametrize('repo', ['test-repos/complex_repo'], indirect=True)
 def test_source_code_before(repo: Git):
     m1 = repo.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71').modified_files[0]
 
-    assert m1.source_code is None
-    assert m1.source_code_before is not None
+    with catch_warnings(record=True) as w:
+        assert m1.source_code is None
+        assert len(w) == 1
+        assert issubclass(w[0].category, DeprecationWarning)
+
+    with catch_warnings(record=True) as w:
+        assert m1.source_code_before is not None
+        assert len(w) == 1
+        assert issubclass(w[0].category, DeprecationWarning)
+
+
+@pytest.mark.parametrize('repo', ['test-repos/source_code_before_commit'], indirect=True)
+def test_content_before_complete(repo: Git):
+    m1 = repo.get_commit('ca1f75455f064410360bc56218d0418221cf9484').modified_files[0]
+
+    with open('test-repos/source_code_before_commit/'
+              'sc_A_ca1f75455f064410360bc56218d0418221cf9484.txt') as f:
+        sc = f.read()
+
+    assert m1.content == sc
+    assert m1.content_before is None
+
+    old_sc = sc
+    with open(
+            'test-repos/source_code_before_commit/'
+            'sc_A_022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0.txt') as f:
+        sc = f.read()
+
+    m1 = repo.get_commit('022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0').modified_files[0]
+
+    assert m1.content == sc
+    assert m1.content_before == old_sc
+
+    old_sc = sc
+    m1 = repo.get_commit('ecd6780457835a2fc85c532338a29f2c98a6cfeb').modified_files[0]
+
+    assert m1.content is None
+    assert m1.content_before == old_sc
 
 
 @pytest.mark.parametrize('repo', ['test-repos/source_code_before_commit'], indirect=True)
@@ -296,8 +351,15 @@ def test_source_code_before_complete(repo: Git):
               'sc_A_ca1f75455f064410360bc56218d0418221cf9484.txt') as f:
         sc = f.read()
 
-    assert m1.source_code == sc
-    assert m1.source_code_before is None
+    with catch_warnings(record=True) as w:
+        assert m1.source_code == sc
+        assert len(w) == 1
+        assert issubclass(w[0].category, DeprecationWarning)
+
+    with catch_warnings(record=True) as w:
+        assert m1.source_code_before is None
+        assert len(w) == 1
+        assert issubclass(w[0].category, DeprecationWarning)
 
     old_sc = sc
     with open(
@@ -307,14 +369,28 @@ def test_source_code_before_complete(repo: Git):
 
     m1 = repo.get_commit('022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0').modified_files[0]
 
-    assert m1.source_code == sc
-    assert m1.source_code_before == old_sc
+    with catch_warnings(record=True) as w:
+        assert m1.source_code == sc
+        assert len(w) == 1
+        assert issubclass(w[0].category, DeprecationWarning)
+
+    with catch_warnings(record=True) as w:
+        assert m1.source_code_before == old_sc
+        assert len(w) == 1
+        assert issubclass(w[0].category, DeprecationWarning)
 
     old_sc = sc
     m1 = repo.get_commit('ecd6780457835a2fc85c532338a29f2c98a6cfeb').modified_files[0]
 
-    assert m1.source_code is None
-    assert m1.source_code_before == old_sc
+    with catch_warnings(record=True) as w:
+        assert m1.source_code is None
+        assert len(w) == 1
+        assert issubclass(w[0].category, DeprecationWarning)
+
+    with catch_warnings(record=True) as w:
+        assert m1.source_code_before == old_sc
+        assert len(w) == 1
+        assert issubclass(w[0].category, DeprecationWarning)
 
 
 @pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)

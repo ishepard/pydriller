@@ -22,6 +22,7 @@ from _datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import List, Set, Dict, Tuple, Optional
+from warnings import warn
 
 import hashlib
 
@@ -142,7 +143,7 @@ class Method:
             return self.complexity <= Method.UNIT_COMPLEXITY_LOW_RISK_THRESHOLD
         assert dmm_prop is DMMProperty.UNIT_INTERFACING
         return (
-            len(self.parameters) <= Method.UNIT_INTERFACING_LOW_RISK_THRESHOLD
+                len(self.parameters) <= Method.UNIT_INTERFACING_LOW_RISK_THRESHOLD
         )
 
 
@@ -152,11 +153,11 @@ class ModifiedFile:
     """
 
     def __init__(
-        self,
-        old_path: Optional[str],
-        new_path: Optional[str],
-        change_type: ModificationType,
-        diff_and_sc: Dict[str, str],
+            self,
+            old_path: Optional[str],
+            new_path: Optional[str],
+            change_type: ModificationType,
+            diff_and_sc: Dict[str, str],
     ):
         """
         Initialize a modified file. A modified file carries on information
@@ -167,8 +168,10 @@ class ModifiedFile:
         self._new_path = Path(new_path) if new_path is not None else None
         self.change_type = change_type
         self.diff = diff_and_sc["diff"]
-        self.source_code = diff_and_sc["source_code"]
-        self.source_code_before = diff_and_sc["source_code_before"]
+        self.__source_code = diff_and_sc["source_code"]
+        self.__source_code_before = diff_and_sc["source_code_before"]
+        self.content = diff_and_sc["content"]
+        self.content_before = diff_and_sc["content_before"]
 
         self._nloc = None
         self._complexity = None
@@ -183,8 +186,26 @@ class ModifiedFile:
 
         :return: int hash
         """
-        string = f"{self.change_type.name} {self.new_path} {self.source_code}"
+        string = f"{self.change_type.name} {self.new_path} {self.content}"
         return hash(hashlib.sha256(string.encode("utf-8")).hexdigest())
+
+    @property
+    def source_code(self):
+        warn('The use of `source_code` is deprecated. Use `content` instead.', DeprecationWarning, stacklevel=2)
+        return self.__source_code
+
+    @source_code.setter
+    def source_code(self, value: str):
+        self.__source_code = value
+
+    @property
+    def source_code_before(self):
+        warn('The use of `source_code_before` is deprecated. Use `content_before` instead.', DeprecationWarning, stacklevel=2)
+        return self.__source_code_before
+
+    @source_code_before.setter
+    def source_code_before(self, value: str):
+        self.__source_code_before = value
 
     @property
     def added_lines(self) -> int:
@@ -340,7 +361,7 @@ class ModifiedFile:
         numbers_old_file = token[1]
         numbers_new_file = token[2]
         delete_line_number = (
-            int(numbers_old_file.split(",")[0].replace("-", "")) - 1
+                int(numbers_old_file.split(",")[0].replace("-", "")) - 1
         )
         additions_line_number = int(numbers_new_file.split(",")[0]) - 1
         return delete_line_number, additions_line_number
@@ -400,7 +421,7 @@ class ModifiedFile:
 
     @staticmethod
     def _risk_profile(
-        methods: List[Method], dmm_prop: DMMProperty
+            methods: List[Method], dmm_prop: DMMProperty
     ) -> Tuple[int, int]:
         """
         Return the risk profile of the set of methods, with two bins: risky, or non risky.
@@ -452,9 +473,9 @@ class ModifiedFile:
                 self._function_list.append(Method(func))
 
         if (
-            include_before
-            and self.source_code_before
-            and not self._function_list_before
+                include_before
+                and self.source_code_before
+                and not self._function_list_before
         ):
             anal = lizard.analyze_file.analyze_source_code(
                 self.filename, self.source_code_before
@@ -714,6 +735,8 @@ class Commit:
                 "diff": self._get_decoded_str(diff.diff),
                 "source_code_before": self._get_decoded_sc_str(diff.a_blob),
                 "source_code": self._get_decoded_sc_str(diff.b_blob),
+                "content_before": self._get_decoded_sc_str(diff.a_blob),
+                "content": self._get_decoded_sc_str(diff.b_blob),
             }
 
             modified_files_list.append(
@@ -847,7 +870,7 @@ class Commit:
         return None
 
     def _delta_risk_profile(
-        self, dmm_prop: DMMProperty
+            self, dmm_prop: DMMProperty
     ) -> Optional[Tuple[int, int]]:
         """
         Return the delta risk profile of this commit, which a pair (dv1, dv2), where
@@ -872,7 +895,7 @@ class Commit:
 
     @staticmethod
     def _good_change_proportion(
-        low_risk_delta: int, high_risk_delta: int
+            low_risk_delta: int, high_risk_delta: int
     ) -> Optional[float]:
         """
         Given a delta risk profile, compute the proportion of "good" change in the total change.

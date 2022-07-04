@@ -194,18 +194,10 @@ class ModifiedFile:
         warn('The use of `source_code` is deprecated. Use `content` instead.', DeprecationWarning, stacklevel=2)
         return self.__source_code
 
-    @source_code.setter
-    def source_code(self, value: str):
-        self.__source_code = value
-
     @property
     def source_code_before(self):
         warn('The use of `source_code_before` is deprecated. Use `content_before` instead.', DeprecationWarning, stacklevel=2)
         return self.__source_code_before
-
-    @source_code_before.setter
-    def source_code_before(self, value: str):
-        self.__source_code_before = value
 
     @property
     def added_lines(self) -> int:

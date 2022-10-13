@@ -727,8 +727,8 @@ class Commit:
                 "diff": self._get_decoded_str(diff.diff),
                 "source_code_before": self._get_decoded_sc_str(diff.a_blob),
                 "source_code": self._get_decoded_sc_str(diff.b_blob),
-                "content_before": self._get_decoded_sc_str(diff.a_blob),
-                "content": self._get_decoded_sc_str(diff.b_blob),
+                "content_before": self._get_undecoded_str(diff.a_blob),
+                "content": self._get_undecoded_str(diff.b_blob),
             }
 
             modified_files_list.append(
@@ -756,6 +756,9 @@ class Commit:
                 self._c_object.hexsha,
             )
             return None
+
+    def _get_undecoded_str(self, diff):
+        return diff.data_stream.read() if diff is not None else None
 
     @property
     def in_main_branch(self) -> bool:

@@ -322,7 +322,7 @@ def test_content_before_complete(repo: Git):
               'sc_A_ca1f75455f064410360bc56218d0418221cf9484.txt') as f:
         sc = f.read()
 
-    assert m1.content == sc
+    assert m1.content.decode() == sc
     assert m1.content_before is None
 
     old_sc = sc
@@ -333,14 +333,14 @@ def test_content_before_complete(repo: Git):
 
     m1 = repo.get_commit('022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0').modified_files[0]
 
-    assert m1.content == sc
-    assert m1.content_before == old_sc
+    assert m1.content.decode() == sc
+    assert m1.content_before.decode() == old_sc
 
     old_sc = sc
     m1 = repo.get_commit('ecd6780457835a2fc85c532338a29f2c98a6cfeb').modified_files[0]
 
     assert m1.content is None
-    assert m1.content_before == old_sc
+    assert m1.content_before.decode() == old_sc
 
 
 @pytest.mark.parametrize('repo', ['test-repos/source_code_before_commit'], indirect=True)

@@ -192,7 +192,7 @@ class ModifiedFile:
         warn('The use of `source_code` is deprecated. Use `content` instead.', DeprecationWarning, stacklevel=2)
         if self.language_supported and type(self.content) == bytes:
             return self.content.decode("utf-8", "ignore")
-        
+
         return None
 
     @property
@@ -200,7 +200,7 @@ class ModifiedFile:
         warn('The use of `source_code_before` is deprecated. Use `content_before` instead.', DeprecationWarning, stacklevel=2)
         if self.language_supported and type(self.content_before) == bytes:
             return self.content_before.decode("utf-8", "ignore")
-        
+
         return None
 
     @property
@@ -745,16 +745,6 @@ class Commit:
         except (AttributeError, ValueError):
             logger.debug(
                 "Could not load the diff of a " "file in commit %s",
-                self._c_object.hexsha,
-            )
-            return None
-
-    def _get_decoded_sc_str(self, diff):
-        try:
-            return diff.data_stream.read().decode("utf-8", "ignore")
-        except (AttributeError, ValueError):
-            logger.debug(
-                "Could not load source code of a " "file in commit %s",
                 self._c_object.hexsha,
             )
             return None

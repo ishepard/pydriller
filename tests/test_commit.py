@@ -137,7 +137,7 @@ def test_changed_methods():
     assert len(mod.changed_methods) == 3
 
 
-def test_metrics_cpp():    
+def test_metrics_cpp():
     with open('test-repos/lizard/FileCPP.cpp', 'rb') as f:
         content = f.read()
 

@@ -44,10 +44,8 @@ def test_equal(repo: Git):
 def test_filename():
     diff_and_sc = {
         'diff': '',
-        'source_code': '',
-        'source_code_before': '',
-        'content': '',
-        'content_before': ''
+        'content': b'',
+        'content_before': b''
     }
     m1 = ModifiedFile('dspadini/pydriller/myfile.py',
                       'dspadini/pydriller/mynewfile.py',
@@ -66,16 +64,11 @@ def test_filename():
 
 
 def test_metrics_python():
-    with open('test-repos/lizard/git_repository.py') as f:
-        sc = f.read()
-
     with open('test-repos/lizard/git_repository.py', 'rb') as f:
         content = f.read()
 
     diff_and_sc = {
         'diff': '',
-        'source_code': sc,
-        'source_code_before': sc,
         'content': content,
         'content_before': content
     }
@@ -144,17 +137,12 @@ def test_changed_methods():
     assert len(mod.changed_methods) == 3
 
 
-def test_metrics_cpp():
-    with open('test-repos/lizard/FileCPP.cpp') as f:
-        sc = f.read()
-    
+def test_metrics_cpp():    
     with open('test-repos/lizard/FileCPP.cpp', 'rb') as f:
         content = f.read()
 
     diff_and_sc = {
         'diff': '',
-        'source_code': sc,
-        'source_code_before': sc,
         'content': content,
         'content_before': content
     }
@@ -171,16 +159,11 @@ def test_metrics_cpp():
 
 
 def test_metrics_java():
-    with open('test-repos/lizard/FileJava.java') as f:
-        sc = f.read()
-
     with open('test-repos/lizard/FileJava.java', 'rb') as f:
         content = f.read()
 
     diff_and_sc = {
         'diff': '',
-        'source_code': sc,
-        'source_code_before': sc,
         'content': content,
         'content_before': content
     }
@@ -197,14 +180,12 @@ def test_metrics_java():
 
 
 def test_metrics_not_supported_file():
-    sc = 'asd !&%@*&^@\n jjdkj'
+    content = b'asd !&%@*&^@\n jjdkj'
 
     diff_and_sc = {
         'diff': '',
-        'source_code': sc,
-        'source_code_before': sc,
-        'content': sc,
-        'content_before': sc
+        'content': content,
+        'content_before': content
     }
 
     m1 = ModifiedFile('test-repos/lizard/NotSupported.pdf',

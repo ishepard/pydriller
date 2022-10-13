@@ -168,8 +168,6 @@ class ModifiedFile:
         self._new_path = Path(new_path) if new_path is not None else None
         self.change_type = change_type
         self.diff = diff_and_sc["diff"]
-        self.__source_code = diff_and_sc["source_code"]
-        self.__source_code_before = diff_and_sc["source_code_before"]
         self.content = diff_and_sc["content"]
         self.content_before = diff_and_sc["content_before"]
 
@@ -192,12 +190,18 @@ class ModifiedFile:
     @property
     def source_code(self):
         warn('The use of `source_code` is deprecated. Use `content` instead.', DeprecationWarning, stacklevel=2)
-        return self.__source_code
+        if self.language_supported and type(self.content) == bytes:
+            return self.content.decode("utf-8", "ignore")
+        
+        return None
 
     @property
     def source_code_before(self):
         warn('The use of `source_code_before` is deprecated. Use `content_before` instead.', DeprecationWarning, stacklevel=2)
-        return self.__source_code_before
+        if self.language_supported and type(self.content_before) == bytes:
+            return self.content_before.decode("utf-8", "ignore")
+        
+        return None
 
     @property
     def added_lines(self) -> int:
@@ -725,8 +729,6 @@ class Commit:
 
             diff_and_sc = {
                 "diff": self._get_decoded_str(diff.diff),
-                "source_code_before": self._get_decoded_sc_str(diff.a_blob),
-                "source_code": self._get_decoded_sc_str(diff.b_blob),
                 "content_before": self._get_undecoded_str(diff.a_blob),
                 "content": self._get_undecoded_str(diff.b_blob),
             }

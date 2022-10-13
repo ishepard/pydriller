@@ -69,12 +69,15 @@ def test_metrics_python():
     with open('test-repos/lizard/git_repository.py') as f:
         sc = f.read()
 
+    with open('test-repos/lizard/git_repository.py', 'rb') as f:
+        content = f.read()
+
     diff_and_sc = {
         'diff': '',
         'source_code': sc,
         'source_code_before': sc,
-        'content': sc,
-        'content_before': sc
+        'content': content,
+        'content_before': content
     }
 
     m1 = ModifiedFile('test-repos/lizard/git_repository.py',
@@ -144,13 +147,16 @@ def test_changed_methods():
 def test_metrics_cpp():
     with open('test-repos/lizard/FileCPP.cpp') as f:
         sc = f.read()
+    
+    with open('test-repos/lizard/FileCPP.cpp', 'rb') as f:
+        content = f.read()
 
     diff_and_sc = {
         'diff': '',
         'source_code': sc,
         'source_code_before': sc,
-        'content': sc,
-        'content_before': sc
+        'content': content,
+        'content_before': content
     }
 
     m1 = ModifiedFile('test-repos/lizard/FileCPP.cpp',
@@ -168,12 +174,15 @@ def test_metrics_java():
     with open('test-repos/lizard/FileJava.java') as f:
         sc = f.read()
 
+    with open('test-repos/lizard/FileJava.java', 'rb') as f:
+        content = f.read()
+
     diff_and_sc = {
         'diff': '',
         'source_code': sc,
         'source_code_before': sc,
-        'content': sc,
-        'content_before': sc
+        'content': content,
+        'content_before': content
     }
 
     m1 = ModifiedFile('test-repos/lizard/FileJava.java',

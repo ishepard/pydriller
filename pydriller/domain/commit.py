@@ -190,16 +190,16 @@ class ModifiedFile:
     @property
     def source_code(self):
         warn('The use of `source_code` is deprecated. Use `content` instead.', DeprecationWarning, stacklevel=2)
-        if self.language_supported and type(self.content) == bytes:
-            return self.content.decode("utf-8", "ignore")
+        if type(self.content) == bytes:
+            return self._get_decoded_content(self.content)
 
         return None
 
     @property
     def source_code_before(self):
         warn('The use of `source_code_before` is deprecated. Use `content_before` instead.', DeprecationWarning, stacklevel=2)
-        if self.language_supported and type(self.content_before) == bytes:
-            return self.content_before.decode("utf-8", "ignore")
+        if type(self.content_before) == bytes:
+            return self._get_decoded_content(self.content_before)
 
         return None
 
@@ -478,6 +478,13 @@ class ModifiedFile:
             )
 
             self._function_list_before = [Method(x) for x in anal.function_list]
+
+    def _get_decoded_content(self, content):
+        try:
+            return content.decode("utf-8", "ignore")
+        except (AttributeError, ValueError):
+            logger.debug("Could not load the content for file %s", self.filename)
+            return None
 
     def __eq__(self, other):
         if not isinstance(other, ModifiedFile):

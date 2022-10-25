@@ -746,7 +746,7 @@ class Commit:
 
         return modified_files_list
 
-    def _get_decoded_str(self, diff) -> Optional[str]:
+    def _get_decoded_str(self, diff):
         try:
             return diff.decode("utf-8", "ignore")
         except (AttributeError, ValueError):
@@ -756,7 +756,7 @@ class Commit:
             )
             return None
 
-    def _get_undecoded_content(self, diff) -> Optional[bytes]:
+    def _get_undecoded_content(self, diff):
         return diff.data_stream.read() if diff is not None else None
 
     @property

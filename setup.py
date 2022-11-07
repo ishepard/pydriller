@@ -32,7 +32,7 @@ setup(
     author='Davide Spadini',
     author_email='spadini.davide@gmail.com',
     version=get_version(),
-    packages=find_packages('.'),
+    packages=find_packages('.', exclude=['tests*']),
     url='https://github.com/ishepard/pydriller',
     license='Apache License',
     package_dir={'pydriller': 'pydriller'},

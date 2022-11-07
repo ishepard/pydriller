@@ -157,7 +157,7 @@ class ModifiedFile:
             old_path: Optional[str],
             new_path: Optional[str],
             change_type: ModificationType,
-            diff_and_sc: Dict[str, str],
+            diff_and_content: Dict[str, str],
     ):
         """
         Initialize a modified file. A modified file carries on information
@@ -167,11 +167,9 @@ class ModifiedFile:
         self._old_path = Path(old_path) if old_path is not None else None
         self._new_path = Path(new_path) if new_path is not None else None
         self.change_type = change_type
-        self.diff = diff_and_sc["diff"]
-        self.__source_code = diff_and_sc["source_code"]
-        self.__source_code_before = diff_and_sc["source_code_before"]
-        self.content = diff_and_sc["content"]
-        self.content_before = diff_and_sc["content_before"]
+        self.diff = diff_and_content["diff"]
+        self.content = diff_and_content["content"]
+        self.content_before = diff_and_content["content_before"]
 
         self._nloc = None
         self._complexity = None
@@ -192,12 +190,18 @@ class ModifiedFile:
     @property
     def source_code(self):
         warn('The use of `source_code` is deprecated. Use `content` instead.', DeprecationWarning, stacklevel=2)
-        return self.__source_code
+        if type(self.content) == bytes:
+            return self._get_decoded_content(self.content)
+
+        return None
 
     @property
     def source_code_before(self):
         warn('The use of `source_code_before` is deprecated. Use `content_before` instead.', DeprecationWarning, stacklevel=2)
-        return self.__source_code_before
+        if type(self.content_before) == bytes:
+            return self._get_decoded_content(self.content_before)
+
+        return None
 
     @property
     def added_lines(self) -> int:
@@ -475,6 +479,13 @@ class ModifiedFile:
 
             self._function_list_before = [Method(x) for x in anal.function_list]
 
+    def _get_decoded_content(self, content):
+        try:
+            return content.decode("utf-8", "ignore")
+        except (AttributeError, ValueError):
+            logger.debug("Could not load the content for file %s", self.filename)
+            return None
+
     def __eq__(self, other):
         if not isinstance(other, ModifiedFile):
             return NotImplemented
@@ -723,16 +734,14 @@ class Commit:
             new_path = diff.b_path
             change_type = self._from_change_to_modification_type(diff)
 
-            diff_and_sc = {
+            diff_and_content = {
                 "diff": self._get_decoded_str(diff.diff),
-                "source_code_before": self._get_decoded_sc_str(diff.a_blob),
-                "source_code": self._get_decoded_sc_str(diff.b_blob),
-                "content_before": self._get_decoded_sc_str(diff.a_blob),
-                "content": self._get_decoded_sc_str(diff.b_blob),
+                "content_before": self._get_undecoded_content(diff.a_blob),
+                "content": self._get_undecoded_content(diff.b_blob),
             }
 
             modified_files_list.append(
-                ModifiedFile(old_path, new_path, change_type, diff_and_sc)
+                ModifiedFile(old_path, new_path, change_type, diff_and_content)
             )
 
         return modified_files_list
@@ -747,15 +756,8 @@ class Commit:
             )
             return None
 
-    def _get_decoded_sc_str(self, diff):
-        try:
-            return diff.data_stream.read().decode("utf-8", "ignore")
-        except (AttributeError, ValueError):
-            logger.debug(
-                "Could not load source code of a " "file in commit %s",
-                self._c_object.hexsha,
-            )
-            return None
+    def _get_undecoded_content(self, diff):
+        return diff.data_stream.read() if diff is not None else None
 
     @property
     def in_main_branch(self) -> bool:

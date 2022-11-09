@@ -16,12 +16,15 @@ This module includes only 1 class, Developer, representing a developer.
 """
 
 
+from typing import Optional
+
+
 class Developer:
     """
     This class represents a developer. We save the email and the name.
     """
 
-    def __init__(self, name: str = None, email: str = None):
+    def __init__(self, name: Optional[str] = None, email: Optional[str] = None):
         """
         Class to identify a developer.
 

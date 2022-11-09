@@ -19,7 +19,7 @@ This module includes 1 class, Git, representing a repository in Git.
 import logging
 import os
 from pathlib import Path
-from typing import List, Dict, Set, Generator
+from typing import List, Dict, Optional, Set, Generator
 
 from git import Repo, GitCommandError
 from git.objects import Commit as GitCommit
@@ -210,8 +210,8 @@ class Git:
         return tags
 
     def get_commits_last_modified_lines(self, commit: Commit,
-                                        modification: ModifiedFile = None,
-                                        hashes_to_ignore_path: str = None) \
+                                        modification: Optional[ModifiedFile] = None,
+                                        hashes_to_ignore_path: Optional[str] = None) \
             -> Dict[str, Set[str]]:
         """
         Given the Commit object, returns the set of commits that last
@@ -246,7 +246,7 @@ class Git:
 
     def _calculate_last_commits(self, commit: Commit,
                                 modifications: List[ModifiedFile],
-                                hashes_to_ignore_path: str = None) \
+                                hashes_to_ignore_path: Optional[str] = None) \
             -> Dict[str, Set[str]]:
 
         commits: Dict[str, Set[str]] = {}
@@ -276,7 +276,7 @@ class Git:
 
         return commits
 
-    def _get_blame(self, commit_hash: str, path: str, hashes_to_ignore_path: str = None):
+    def _get_blame(self, commit_hash: str, path: str, hashes_to_ignore_path: Optional[str] = None):
         args = ['-w', commit_hash + '^']
         if hashes_to_ignore_path is not None:
             if self.repo.git.version_info >= (2, 23):

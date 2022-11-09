@@ -2,6 +2,7 @@
 Module that calculates the number of hunks made to a commit file.
 """
 import statistics
+from typing import Optional
 
 from pydriller import ModificationType
 from pydriller.metrics.process.process_metric import ProcessMetric
@@ -22,8 +23,8 @@ class CodeChurn(ProcessMetric):
     def __init__(self, path_to_repo: str,
                  since=None,
                  to=None,
-                 from_commit: str = None,
-                 to_commit: str = None,
+                 from_commit: Optional[str] = None,
+                 to_commit: Optional[str] = None,
                  ignore_added_files=False,
                  add_deleted_lines_to_churn=False):
         """

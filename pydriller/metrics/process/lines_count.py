@@ -3,6 +3,7 @@ Module that calculates the number of normalized added and deleted lines of a
 file.
 """
 import statistics
+from typing import Optional
 from pydriller import ModificationType
 from pydriller.metrics.process.process_metric import ProcessMetric
 
@@ -37,8 +38,8 @@ class LinesCount(ProcessMetric):
     def __init__(self, path_to_repo: str,
                  since=None,
                  to=None,
-                 from_commit: str = None,
-                 to_commit: str = None):
+                 from_commit: Optional[str] = None,
+                 to_commit: Optional[str] = None):
 
         super().__init__(path_to_repo, since=since, to=to, from_commit=from_commit, to_commit=to_commit)
         self._initialize()

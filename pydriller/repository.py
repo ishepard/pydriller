@@ -25,7 +25,7 @@ import concurrent.futures
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import List, Generator, Union
+from typing import List, Generator, Optional, Union
 
 from git import Repo
 
@@ -42,25 +42,25 @@ class Repository:
     """
 
     def __init__(self, path_to_repo: Union[str, List[str]],
-                 single: str = None,
-                 since: datetime = None, to: datetime = None,
-                 from_commit: str = None, to_commit: str = None,
-                 from_tag: str = None, to_tag: str = None,
+                 single: Optional[str] = None,
+                 since: Optional[datetime] = None, to: Optional[datetime] = None,
+                 from_commit: Optional[str] = None, to_commit: Optional[str] = None,
+                 from_tag: Optional[str] = None, to_tag: Optional[str] = None,
                  include_refs: bool = False,
                  include_remotes: bool = False,
                  num_workers: int = 1,
-                 only_in_branch: str = None,
-                 only_modifications_with_file_types: List[str] = None,
+                 only_in_branch: Optional[str] = None,
+                 only_modifications_with_file_types: Optional[List[str]] = None,
                  only_no_merge: bool = False,
-                 only_authors: List[str] = None,
-                 only_commits: List[str] = None,
+                 only_authors: Optional[List[str]] = None,
+                 only_commits: Optional[List[str]] = None,
                  only_releases: bool = False,
-                 filepath: str = None,
+                 filepath: Optional[str] = None,
                  include_deleted_files: bool = False,
                  histogram_diff: bool = False,
                  skip_whitespaces: bool = False,
-                 clone_repo_to: str = None,
-                 order: str = None):
+                 clone_repo_to: Optional[str] = None,
+                 order: Optional[str] = None):
         """
         Init a repository. The only required parameter is
         "path_to_repo": to analyze a single repo, pass the absolute path to

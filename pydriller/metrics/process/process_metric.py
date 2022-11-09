@@ -3,6 +3,7 @@ This module contains the abstract class to implement process metrics.
 """
 
 from datetime import datetime
+from typing import Optional
 from pydriller import Repository
 
 
@@ -12,10 +13,10 @@ class ProcessMetric:
     """
 
     def __init__(self, path_to_repo: str,
-                 since: datetime = None,
-                 to: datetime = None,
-                 from_commit: str = None,
-                 to_commit: str = None):
+                 since: Optional[datetime] = None,
+                 to: Optional[datetime] = None,
+                 from_commit: Optional[str] = None,
+                 to_commit: Optional[str] = None):
         """
         :path_to_repo: path to a single repo
 

@@ -274,8 +274,8 @@ class Repository:
         last_slash_index = url.rfind("/")
         len_url = len(url)
 
-        if  last_slash_index < 0 or last_slash_index >= len_url - 1:
-           raise MalformedUrl(f"Badly formatted url {url}")
+        if last_slash_index < 0 or last_slash_index >= len_url - 1:
+            raise MalformedUrl(f"Badly formatted url {url}")
         
         last_dot_index = url.rfind(".")
 

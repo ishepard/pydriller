@@ -276,7 +276,7 @@ class Repository:
 
         if last_slash_index < 0 or last_slash_index >= len_url - 1:
             raise MalformedUrl(f"Badly formatted url {url}")
-        
+
         last_dot_index = url.rfind(".")
 
         if url[last_dot_index:] == ".git":
@@ -284,7 +284,7 @@ class Repository:
         else:
             last_suffix_index = len_url
 
-        return url[last_slash_index + 1:last_suffix_index]
+        return url[last_slash_index + 1 : last_suffix_index]
 
 
 class MalformedUrl(Exception):

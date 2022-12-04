@@ -272,12 +272,17 @@ class Repository:
     @staticmethod
     def _get_repo_name_from_url(url: str) -> str:
         last_slash_index = url.rfind("/")
-        last_suffix_index = url.rfind(".git")
-        if last_suffix_index < 0:
-            last_suffix_index = len(url)
+        len_url = len(url)
 
-        if last_slash_index < 0 or last_suffix_index <= last_slash_index:
-            raise MalformedUrl(f"Badly formatted url {url}")
+        if  last_slash_index < 0 or last_slash_index >= len_url - 1:
+           raise MalformedUrl(f"Badly formatted url {url}")
+        
+        last_dot_index = url.rfind(".")
+
+        if url[last_dot_index:] == ".git":
+            last_suffix_index = last_dot_index
+        else:
+            last_suffix_index = len_url
 
         return url[last_slash_index + 1:last_suffix_index]
 

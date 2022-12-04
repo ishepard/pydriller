@@ -284,7 +284,7 @@ class Repository:
         else:
             last_suffix_index = len_url
 
-        return url[last_slash_index + 1 : last_suffix_index]
+        return url[last_slash_index + 1:last_suffix_index]
 
 
 class MalformedUrl(Exception):

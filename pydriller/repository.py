@@ -41,26 +41,32 @@ class Repository:
     This is the main class of PyDriller, responsible for running the study.
     """
 
-    def __init__(self, path_to_repo: Union[str, List[str]],
-                 single: Optional[str] = None,
-                 since: Optional[datetime] = None, to: Optional[datetime] = None,
-                 from_commit: Optional[str] = None, to_commit: Optional[str] = None,
-                 from_tag: Optional[str] = None, to_tag: Optional[str] = None,
-                 include_refs: bool = False,
-                 include_remotes: bool = False,
-                 num_workers: int = 1,
-                 only_in_branch: Optional[str] = None,
-                 only_modifications_with_file_types: Optional[List[str]] = None,
-                 only_no_merge: bool = False,
-                 only_authors: Optional[List[str]] = None,
-                 only_commits: Optional[List[str]] = None,
-                 only_releases: bool = False,
-                 filepath: Optional[str] = None,
-                 include_deleted_files: bool = False,
-                 histogram_diff: bool = False,
-                 skip_whitespaces: bool = False,
-                 clone_repo_to: Optional[str] = None,
-                 order: Optional[str] = None):
+    def __init__(
+        self,
+        path_to_repo: Union[str, List[str]],
+        single: Optional[str] = None,
+        since: Optional[datetime] = None,
+        to: Optional[datetime] = None,
+        from_commit: Optional[str] = None,
+        to_commit: Optional[str] = None,
+        from_tag: Optional[str] = None,
+        to_tag: Optional[str] = None,
+        include_refs: bool = False,
+        include_remotes: bool = False,
+        num_workers: int = 1,
+        only_in_branch: Optional[str] = None,
+        only_modifications_with_file_types: Optional[List[str]] = None,
+        only_no_merge: bool = False,
+        only_authors: Optional[List[str]] = None,
+        only_commits: Optional[List[str]] = None,
+        only_releases: bool = False,
+        filepath: Optional[str] = None,
+        include_deleted_files: bool = False,
+        histogram_diff: bool = False,
+        skip_whitespaces: bool = False,
+        clone_repo_to: Optional[str] = None,
+        order: Optional[str] = None,
+    ):
         """
         Init a repository. The only required parameter is
         "path_to_repo": to analyze a single repo, pass the absolute path to
@@ -103,13 +109,11 @@ class Repository:
             'author-date-order', 'topo-order', or 'reverse'. If order=None, PyDriller returns the commits from the oldest to the newest.
         """
         file_modification_set = (
-            None if only_modifications_with_file_types is None
+            None
+            if only_modifications_with_file_types is None
             else set(only_modifications_with_file_types)
-            )
-        commit_set = (
-            None if only_commits is None
-            else set(only_commits)
-            )
+        )
+        commit_set = None if only_commits is None else set(only_commits)
 
         options = {
             "git": None,
@@ -137,7 +141,7 @@ class Repository:
             "tagged_commits": None,
             "histogram": histogram_diff,
             "clone_repo_to": clone_repo_to,
-            "order": order
+            "order": order,
         }
         self._conf = Conf(options)
 
@@ -160,8 +164,8 @@ class Repository:
         return repo_folder
 
     def _clone_folder(self) -> str:
-        if self._conf.get('clone_repo_to'):
-            clone_folder = str(Path(self._conf.get('clone_repo_to')))
+        if self._conf.get("clone_repo_to"):
+            clone_folder = str(Path(self._conf.get("clone_repo_to")))
             if not os.path.isdir(clone_folder):
                 raise Exception("Not a directory: {0}".format(clone_folder))
         else:
@@ -179,7 +183,7 @@ class Repository:
 
         # when multiple repos are given in input, this variable will serve as a reminder
         # of which one we are currently analyzing
-        self._conf.set_value('path_to_repo', local_path_repo)
+        self._conf.set_value("path_to_repo", local_path_repo)
 
         self.git = Git(local_path_repo, self._conf)
         # saving the Git object for further use
@@ -209,23 +213,25 @@ class Repository:
         Analyze all the specified commits (all of them by default), returning
         a generator of commits.
         """
-        for path_repo in self._conf.get('path_to_repos'):
+        for path_repo in self._conf.get("path_to_repos"):
             with self._prep_repo(path_repo=path_repo) as git:
-                logger.info(f'Analyzing git repository in {git.path}')
+                logger.info(f"Analyzing git repository in {git.path}")
 
                 # Get the commits that modified the filepath. In this case, we can not use
                 # git rev-list since it doesn't have the option --follow, necessary to follow
                 # the renames. Hence, we manually call git log instead
-                if self._conf.get('filepath') is not None:
+                if self._conf.get("filepath") is not None:
                     self._conf.set_value(
-                        'filepath_commits',
-                        git.get_commits_modified_file(self._conf.get('filepath'),
-                                                      self._conf.get('include_deleted_files'))
+                        "filepath_commits",
+                        git.get_commits_modified_file(
+                            self._conf.get("filepath"),
+                            self._conf.get("include_deleted_files"),
+                        ),
                     )
 
                 # Gets only the commits that are tagged
-                if self._conf.get('only_releases'):
-                    self._conf.set_value('tagged_commits', git.get_tagged_commits())
+                if self._conf.get("only_releases"):
+                    self._conf.set_value("tagged_commits", git.get_tagged_commits())
 
                 # Build the arguments to pass to git rev-list.
                 rev, kwargs = self._conf.build_args()
@@ -235,26 +241,39 @@ class Repository:
                 if not commits_list:
                     return
 
-                chunks = self._split_in_chunks(commits_list, self._conf.get("num_workers"))
-                with concurrent.futures.ThreadPoolExecutor(max_workers=self._conf.get("num_workers")) as executor:
-                    jobs = {executor.submit(self._iter_commits, chunk): chunk for chunk in chunks}
+                chunks = self._split_in_chunks(
+                    commits_list, self._conf.get("num_workers")
+                )
+                with concurrent.futures.ThreadPoolExecutor(
+                    max_workers=self._conf.get("num_workers")
+                ) as executor:
+                    jobs = {
+                        executor.submit(self._iter_commits, chunk): chunk
+                        for chunk in chunks
+                    }
 
                     for job in concurrent.futures.as_completed(jobs):
                         for commit in job.result():
                             yield commit
 
-    def _iter_commits(self, commits_list: List[Commit]) -> Generator[Commit, None, None]:
+    def _iter_commits(
+        self, commits_list: List[Commit]
+    ) -> Generator[Commit, None, None]:
         for commit in commits_list:
-            logger.info(f'Commit #{commit.hash} in {commit.committer_date} from {commit.author.name}')
+            logger.info(
+                f"Commit #{commit.hash} in {commit.committer_date} from {commit.author.name}"
+            )
 
             if self._conf.is_commit_filtered(commit):
-                logger.info(f'Commit #{commit.hash} filtered')
+                logger.info(f"Commit #{commit.hash} filtered")
                 continue
 
             yield commit
 
     @staticmethod
-    def _split_in_chunks(full_list: List[Commit], num_workers: int) -> List[List[Commit]]:
+    def _split_in_chunks(
+        full_list: List[Commit], num_workers: int
+    ) -> List[List[Commit]]:
         """
         Given the list of commits return chunks of commits based on the number of workers.
 
@@ -265,7 +284,7 @@ class Repository:
         num_chunks = math.ceil(len(full_list) / num_workers)
         chunks = []
         for i in range(0, len(full_list), num_chunks):
-            chunks.append(full_list[i:i + num_chunks])
+            chunks.append(full_list[i : i + num_chunks])
 
         return chunks
 
@@ -276,7 +295,7 @@ class Repository:
 
         if last_slash_index < 0 or last_slash_index >= len_url - 1:
             raise MalformedUrl(f"Badly formatted url {url}")
-        
+
         last_dot_index = url.rfind(".")
 
         if url[last_dot_index:] == ".git":

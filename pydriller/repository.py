@@ -96,7 +96,7 @@ class Repository:
         :param bool only_releases: analyze only tagged commits
         :param bool histogram_diff: add the "--histogram" option when asking for the diff
         :param bool skip_whitespaces: add the "-w" option when asking for the diff
-        :param bool clone_repo_to: if the repo under analysis is remote, clone the repo to the specified directory
+        :param str clone_repo_to: if the repo under analysis is remote, clone the repo to the specified directory
         :param str filepath: only commits that modified this file will be analyzed
         :param bool include_deleted_files: include commits modifying a deleted file (useful when analyzing a deleted `filepath`)
         :param str order: order of commits. It can be one of: 'date-order',

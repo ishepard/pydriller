@@ -269,6 +269,25 @@ def test_projectname_multiple_repos_remote():
         assert commit.project_name == 'pydriller'
 
 
+def test_get_repo_name_from_url():
+    # with .git in the middle of the name
+    url_set_a = [
+        "https://github.com/academicpages/academicpages.github.io",
+        "https://github.com/academicpages/academicpages.github.io.git",
+    ]
+
+    url_set_b = [
+        "https://github.com/ishepard/pydriller",
+        "https://github.com/ishepard/pydriller.git",
+    ]
+
+    for url in url_set_a:
+        assert Repository(path_to_repo=url)._get_repo_name_from_url(url) == "academicpages.github.io"
+
+    for url in url_set_b:
+        assert Repository(path_to_repo=url)._get_repo_name_from_url(url) == "pydriller"
+
+
 @pytest.mark.skipif(sys.version_info < (3, 8) and sys.platform == "win32", reason="requires Python3.8 or greater on Windows")
 def test_deletion_remotes():
     repos = [

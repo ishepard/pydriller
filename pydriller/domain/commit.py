@@ -21,7 +21,7 @@ import logging
 from _datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import List, Set, Dict, Tuple, Optional
+from typing import Any, List, Set, Dict, Tuple, Optional, Union
 from warnings import warn
 
 import hashlib
@@ -65,7 +65,7 @@ class Method:
     extracted through Lizard.
     """
 
-    def __init__(self, func):
+    def __init__(self, func: Any) -> None:
         """
         Initialize a method object. This is calculated using Lizard: it parses
         the source code of all the modifications in a commit, extracting
@@ -88,7 +88,7 @@ class Method:
         self.length = func.length
         self.top_nesting_level = func.top_nesting_level
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.name == other.name and self.parameters == other.parameters
 
     def __hash__(self):
@@ -157,7 +157,7 @@ class ModifiedFile:
             old_path: Optional[str],
             new_path: Optional[str],
             change_type: ModificationType,
-            diff_and_content: Dict[str, str],
+            diff_and_content: Dict[str, Any],
     ):
         """
         Initialize a modified file. A modified file carries on information
@@ -167,9 +167,9 @@ class ModifiedFile:
         self._old_path = Path(old_path) if old_path is not None else None
         self._new_path = Path(new_path) if new_path is not None else None
         self.change_type = change_type
-        self.diff = diff_and_content["diff"]
-        self.content = diff_and_content["content"]
-        self.content_before = diff_and_content["content_before"]
+        self.diff: str = diff_and_content["diff"]
+        self.content: Optional[bytes] = diff_and_content["content"]
+        self.content_before: Optional[bytes] = diff_and_content["content_before"]
 
         self._nloc = None
         self._complexity = None
@@ -188,16 +188,14 @@ class ModifiedFile:
         return hash(hashlib.sha256(string.encode("utf-8")).hexdigest())
 
     @property
-    def source_code(self):
-        warn('The use of `source_code` is deprecated. Use `content` instead.', DeprecationWarning, stacklevel=2)
+    def source_code(self) -> Optional[str]:
         if type(self.content) == bytes:
             return self._get_decoded_content(self.content)
 
         return None
 
     @property
-    def source_code_before(self):
-        warn('The use of `source_code_before` is deprecated. Use `content_before` instead.', DeprecationWarning, stacklevel=2)
+    def source_code_before(self) -> Optional[str]:
         if type(self.content_before) == bytes:
             return self._get_decoded_content(self.content_before)
 
@@ -217,7 +215,7 @@ class ModifiedFile:
         return added_lines
 
     @property
-    def deleted_lines(self):
+    def deleted_lines(self) -> int:
         """
         Return the total number of deleted lines in the file.
 
@@ -230,7 +228,7 @@ class ModifiedFile:
         return deleted_lines
 
     @property
-    def old_path(self):
+    def old_path(self) -> Optional[str]:
         """
         Old path of the file. Can be None if the file is added.
 
@@ -241,7 +239,7 @@ class ModifiedFile:
         return None
 
     @property
-    def new_path(self):
+    def new_path(self) -> Optional[str]:
         """
         New path of the file. Can be None if the file is deleted.
 
@@ -352,7 +350,7 @@ class ModifiedFile:
         return modified_lines
 
     @staticmethod
-    def _get_line_numbers(line):
+    def _get_line_numbers(line) -> Tuple[int, int]:
         token = line.split(" ")
         numbers_old_file = token[1]
         numbers_new_file = token[2]
@@ -449,7 +447,7 @@ class ModifiedFile:
         low_after, high_after = self._risk_profile(self.methods, dmm_prop)
         return low_after - low_before, high_after - high_before
 
-    def _calculate_metrics(self, include_before=False):
+    def _calculate_metrics(self, include_before=False) -> None:
         """
         :param include_before: either to compute the metrics
         for source_code_before, i.e. before the change happened
@@ -479,14 +477,14 @@ class ModifiedFile:
 
             self._function_list_before = [Method(x) for x in anal.function_list]
 
-    def _get_decoded_content(self, content):
+    def _get_decoded_content(self, content) -> Optional[str]:
         try:
             return content.decode("utf-8", "ignore")
         except (AttributeError, ValueError):
             logger.debug("Could not load the content for file %s", self.filename)
             return None
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, ModifiedFile):
             return NotImplemented
         if self is other:
@@ -510,7 +508,7 @@ class Commit:
         self._c_object = commit
 
         self._modified_files = None
-        self._branches = None
+        self._branches: Set[str] = set()
         self._conf = conf
 
     def __hash__(self):
@@ -746,7 +744,7 @@ class Commit:
 
         return modified_files_list
 
-    def _get_decoded_str(self, diff):
+    def _get_decoded_str(self, diff) -> Optional[str]:
         try:
             return diff.decode("utf-8", "ignore")
         except (AttributeError, ValueError):
@@ -756,7 +754,7 @@ class Commit:
             )
             return None
 
-    def _get_undecoded_content(self, diff):
+    def _get_undecoded_content(self, diff) -> Optional[bytes]:
         return diff.data_stream.read() if diff is not None else None
 
     @property
@@ -775,13 +773,13 @@ class Commit:
 
         :return: set(str) branches
         """
-        if self._branches is None:
+        if not self._branches:
             self._branches = self._get_branches()
 
-        assert self._branches is not None
+        assert self._branches
         return self._branches
 
-    def _get_branches(self):
+    def _get_branches(self) -> Set[str]:
         c_git = Git(str(self._conf.get("path_to_repo")))
         branches = set()
         args = ["--contains", self.hash]
@@ -933,7 +931,7 @@ class Commit:
 
         return ModificationType.UNKNOWN
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Commit):
             return NotImplemented
         if self is other:

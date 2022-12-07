@@ -257,6 +257,8 @@ class Git:
                 path = mod.old_path
             deleted_lines = mod.diff_parsed['deleted']
 
+            assert path is not None, "We could not find the path to the file"
+
             try:
                 blame = self._get_blame(commit.hash, path, hashes_to_ignore_path)
                 for num_line, line in deleted_lines:
@@ -270,6 +272,7 @@ class Git:
                         if mod.change_type == ModificationType.RENAME:
                             path = mod.new_path
 
+                        assert path is not None, "We could not find the path to the file"
                         commits.setdefault(path, set()).add(self.get_commit(buggy_commit).hash)
             except GitCommandError:
                 logger.debug(f"Could not found file {mod.filename} in commit {commit.hash}. Probably a double rename!")

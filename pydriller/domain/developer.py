@@ -34,7 +34,7 @@ class Developer:
         self.name = name
         self.email = email
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Developer):
             return NotImplemented
         if self is other:

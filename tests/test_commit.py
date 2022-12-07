@@ -293,15 +293,8 @@ def test_content_before(repo: Git):
 def test_source_code_before(repo: Git):
     m1 = repo.get_commit('ffccf1e7497eb8136fd66ed5e42bef29677c4b71').modified_files[0]
 
-    with catch_warnings(record=True) as w:
-        assert m1.source_code is None
-        assert len(w) == 1
-        assert issubclass(w[0].category, DeprecationWarning)
-
-    with catch_warnings(record=True) as w:
-        assert m1.source_code_before is not None
-        assert len(w) == 1
-        assert issubclass(w[0].category, DeprecationWarning)
+    assert m1.source_code is None
+    assert m1.source_code_before is not None
 
 
 @pytest.mark.parametrize('repo', ['test-repos/source_code_before_commit'], indirect=True)
@@ -341,15 +334,10 @@ def test_source_code_before_complete(repo: Git):
               'sc_A_ca1f75455f064410360bc56218d0418221cf9484.txt') as f:
         sc = f.read()
 
-    with catch_warnings(record=True) as w:
-        assert m1.source_code == sc
-        assert len(w) == 1
-        assert issubclass(w[0].category, DeprecationWarning)
-
-    with catch_warnings(record=True) as w:
-        assert m1.source_code_before is None
-        assert len(w) == 1
-        assert issubclass(w[0].category, DeprecationWarning)
+    assert m1.source_code == sc
+    assert m1.content is not None
+    assert m1.content.decode("utf-8") == sc
+    assert m1.source_code_before is None
 
     old_sc = sc
     with open(
@@ -359,28 +347,21 @@ def test_source_code_before_complete(repo: Git):
 
     m1 = repo.get_commit('022ebf5fba835c6d95e99eaccc2d85b3db5a2ec0').modified_files[0]
 
-    with catch_warnings(record=True) as w:
-        assert m1.source_code == sc
-        assert len(w) == 1
-        assert issubclass(w[0].category, DeprecationWarning)
-
-    with catch_warnings(record=True) as w:
-        assert m1.source_code_before == old_sc
-        assert len(w) == 1
-        assert issubclass(w[0].category, DeprecationWarning)
+    assert m1.source_code == sc
+    assert m1.content is not None
+    assert m1.content.decode("utf-8") == sc
+    assert m1.source_code_before == old_sc
+    assert m1.content_before is not None
+    assert m1.content_before.decode("utf-8") == old_sc
 
     old_sc = sc
     m1 = repo.get_commit('ecd6780457835a2fc85c532338a29f2c98a6cfeb').modified_files[0]
 
-    with catch_warnings(record=True) as w:
-        assert m1.source_code is None
-        assert len(w) == 1
-        assert issubclass(w[0].category, DeprecationWarning)
-
-    with catch_warnings(record=True) as w:
-        assert m1.source_code_before == old_sc
-        assert len(w) == 1
-        assert issubclass(w[0].category, DeprecationWarning)
+    assert m1.source_code is None
+    assert m1.content is None
+    assert m1.source_code_before == old_sc
+    assert m1.content_before is not None
+    assert m1.content_before.decode("utf-8") == old_sc
 
 
 @pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
@@ -421,3 +402,45 @@ def test_shortstats_add_and_del(repo: Git):
     assert c1.lines == 2
     assert c1.files == 1
     assert c1.deletions == 1
+
+
+@pytest.mark.parametrize("repo", ["test-repos/complex_repo"], indirect=True)
+def test_commit_dictset(repo: Git):
+    c1 = repo.get_commit("e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2")
+    c2 = repo.get_commit(c1.parents[0])
+    c3 = repo.get_commit("a4ece0762e797d2e2dcbd471115108dd6e05ff58")
+
+    commit_dict = {c1: c1.hash, c2: c2.hash, c3: c3.hash}
+
+    assert type(commit_dict) == dict
+    assert commit_dict[c1] == "e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2"
+    assert commit_dict[c2] == c1.parents[0]
+    assert commit_dict[c3] == "a4ece0762e797d2e2dcbd471115108dd6e05ff58"
+    assert commit_dict[c1] != commit_dict[c2]
+
+    commit_set = {c1, c2, c3}
+    assert type(commit_set) == set
+    assert c1 in commit_set
+    assert commit_set - {c1} == {c2, c3}
+
+
+@pytest.mark.parametrize("repo", ["test-repos/complex_repo"], indirect=True)
+def test_modification_dictset(repo: Git):
+    c1 = repo.get_commit("e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2")
+    c2 = repo.get_commit(c1.parents[0])
+
+    m1 = c1.modified_files[0]
+    m2s = c2.modified_files
+
+    mod_dict = {m1: c1, m2s[0]: c2, m2s[1]: c2}
+
+    assert type(mod_dict) == dict
+    assert mod_dict[m1].hash == "e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2"
+    assert mod_dict[m2s[0]].hash == c1.parents[0]
+    assert mod_dict[m2s[1]].hash == c1.parents[0]
+    assert m1 != m2s[0]
+
+    mod_set = {m1}.union(set(m2s))
+    assert type(mod_set) == set
+    assert m1 in mod_set
+    assert mod_set - {m1} == set(m2s)

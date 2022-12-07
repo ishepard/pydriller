@@ -244,12 +244,11 @@ def test_should_detail_a_commit(repo: Git):
 
     assert commit.modified_files[0].new_path == "Matricula.java"
     assert commit.modified_files[0].diff.startswith("@@ -0,0 +1,62 @@\n+package model;") is True
-    assert commit.modified_files[0].content.decode().startswith("package model;") is True   # type: ignore[attr-defined]
+    assert commit.modified_files[0].content is not None
+    assert commit.modified_files[0].content.decode().startswith("package model;") is True
 
-    with catch_warnings(record=True) as w:
-        assert commit.modified_files[0].source_code.startswith("package model;") is True
-        assert len(w) == 1
-        assert issubclass(w[0].category, DeprecationWarning)
+    assert commit.modified_files[0].source_code is not None
+    assert commit.modified_files[0].source_code.startswith("package model;") is True
 
 
 @pytest.mark.parametrize('repo', ['test-repos/branches_merged'], indirect=True)

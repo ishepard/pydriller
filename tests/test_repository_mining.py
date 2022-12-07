@@ -282,10 +282,10 @@ def test_get_repo_name_from_url():
     ]
 
     for url in url_set_a:
-        assert Repository(path_to_repo=url)._get_repo_name_from_url(url) == "academicpages.github.io"
+        assert Repository._get_repo_name_from_url(url) == "academicpages.github.io"
 
     for url in url_set_b:
-        assert Repository(path_to_repo=url)._get_repo_name_from_url(url) == "pydriller"
+        assert Repository._get_repo_name_from_url(url) == "pydriller"
 
 
 @pytest.mark.skipif(sys.version_info < (3, 8) and sys.platform == "win32", reason="requires Python3.8 or greater on Windows")

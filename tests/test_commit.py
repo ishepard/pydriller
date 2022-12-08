@@ -13,7 +13,6 @@
 # limitations under the License.
 from pydriller.git import Git
 from pathlib import Path
-from warnings import catch_warnings
 import pytest
 import logging
 

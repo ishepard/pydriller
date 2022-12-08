@@ -13,7 +13,6 @@
 # limitations under the License.
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
-from warnings import catch_warnings
 
 import pytest
 from git import Git as PyGit

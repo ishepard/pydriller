@@ -14,7 +14,6 @@
 
 import logging
 import os
-from pathlib import Path
 import platform
 import sys
 import psutil

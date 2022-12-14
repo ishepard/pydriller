@@ -14,6 +14,7 @@
 
 import logging
 import os
+from pathlib import Path
 import platform
 import sys
 import psutil
@@ -27,21 +28,21 @@ PATH = os.getenv('GITHUB_WORKSPACE')
 def test_memory(caplog):
     if not PATH:
         return
-    path_to_pydriller = PATH + "/pydriller"
+    path_to_pydriller = Path(PATH) / "pydriller"
 
-    if not os.path.exists(path_to_pydriller):
+    if not path_to_pydriller.exists():
         return
 
     caplog.set_level(logging.WARNING)
-
+    logging.warning(f"Analyzing path {path_to_pydriller}")
     logging.warning("Starting with nothing...")
-    diff_with_nothing, all_commits_with_nothing = mine(path_to_pydriller, 0)
+    diff_with_nothing, all_commits_with_nothing = mine(str(path_to_pydriller), 0)
 
     logging.warning("Starting with everything...")
-    diff_with_everything, all_commits_with_everything = mine(path_to_pydriller, 1)
+    diff_with_everything, all_commits_with_everything = mine(str(path_to_pydriller), 1)
 
     logging.warning("Starting with metrics...")
-    diff_with_metrics, all_commits_with_metrics = mine(path_to_pydriller, 2)
+    diff_with_metrics, all_commits_with_metrics = mine(str(path_to_pydriller), 2)
 
     max_values = [max(all_commits_with_nothing),
                   max(all_commits_with_everything),

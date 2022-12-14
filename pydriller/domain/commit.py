@@ -506,9 +506,6 @@ class Commit:
         :param conf: Configuration class
         """
         self._c_object = commit
-
-        self._modified_files: List[ModifiedFile] = []
-        self._branches: Set[str] = set()
         self._conf = conf
 
     def __hash__(self) -> int:
@@ -685,13 +682,6 @@ class Commit:
 
         :return: List[Modification] modifications
         """
-        if not self._modified_files:
-            self._modified_files = self._get_modified_files()
-
-        assert self._modified_files is not None
-        return self._modified_files
-
-    def _get_modified_files(self) -> List[ModifiedFile]:
         options = {}
         if self._conf.get("histogram"):
             options["histogram"] = True
@@ -777,13 +767,6 @@ class Commit:
 
         :return: set(str) branches
         """
-        if not self._branches:
-            self._branches = self._get_branches()
-
-        assert self._branches
-        return self._branches
-
-    def _get_branches(self) -> Set[str]:
         c_git = Git(str(self._conf.get("path_to_repo")))
         branches = set()
         args = ["--contains", self.hash]

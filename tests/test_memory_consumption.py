@@ -21,7 +21,7 @@ from pydriller import Repository
 from datetime import datetime
 
 logging.basicConfig(level=logging.WARNING)
-skip_remote = False
+skip_remote = True
 
 
 def test_memory(caplog):

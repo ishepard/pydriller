@@ -21,7 +21,7 @@ from pydriller import Repository
 from datetime import datetime
 
 logging.basicConfig(level=logging.WARNING)
-skip_remote = True
+skip_remote = False
 
 
 def test_memory(caplog):
@@ -53,15 +53,15 @@ def test_memory(caplog):
             diff_with_nothing.seconds // 3600,
             (diff_with_nothing.seconds % 3600) // 60,
             diff_with_nothing.seconds % 60,
-            578 // diff_with_nothing.seconds if diff_with_nothing.seconds != 0 else 0,
+            1045 // diff_with_nothing.seconds if diff_with_nothing.seconds != 0 else 0,
             diff_with_everything.seconds // 3600,
             (diff_with_everything.seconds % 3600) // 60,
             diff_with_everything.seconds % 60,
-            578 // diff_with_everything.seconds,
+            1045 // diff_with_everything.seconds,
             diff_with_metrics.seconds // 3600,
             (diff_with_metrics.seconds % 3600) // 60,
             diff_with_metrics.seconds % 60,
-            578 // diff_with_metrics.seconds
+            1045 // diff_with_metrics.seconds
         )
     )
 
@@ -75,7 +75,7 @@ def test_memory(caplog):
             diff_with_everything, all_commits_with_everything,
             diff_with_metrics, all_commits_with_metrics)
 
-    assert 578 == len(all_commits_with_nothing) == len(all_commits_with_everything) == len(all_commits_with_metrics)
+    assert 1045 == len(all_commits_with_nothing) == len(all_commits_with_everything) == len(all_commits_with_metrics)
 
 
 def log(diff_with_nothing, all_commits_with_nothing,
@@ -110,7 +110,7 @@ def log(diff_with_nothing, all_commits_with_nothing,
 def mine(_type):
     p = psutil.Process(os.getpid())
     dt1 = datetime(2020, 1, 1)
-    dt2 = datetime(2020, 7, 1)
+    dt2 = datetime(2020, 12, 1)
     all_commits = []
 
     start = datetime.now()

@@ -236,7 +236,7 @@ class Repository:
                         for commit in job:
                             yield commit
 
-    def _iter_commits(self, commit: List[Commit]) -> Generator[Commit, None, None]:
+    def _iter_commits(self, commit: Commit) -> Generator[Commit, None, None]:
         logger.info(f'Commit #{commit.hash} in {commit.committer_date} from {commit.author.name}')
 
         if self._conf.is_commit_filtered(commit):

@@ -4,6 +4,7 @@ Configuration module.
 
 import logging
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pytz
 from gitdb.exc import BadName
@@ -21,7 +22,7 @@ class Conf:
     the user did not specify 2 starting commits).
     """
 
-    def __init__(self, options):
+    def __init__(self, options: Dict[str, Any]) -> None:
         # insert all the configurations in a local dictionary
         self._options = {}
         for key, val in options.items():
@@ -33,7 +34,7 @@ class Conf:
         else:
             self.set_value('path_to_repos', self.get('path_to_repo'))
 
-    def set_value(self, key, value):
+    def set_value(self, key: str, value: Any) -> None:
         """
         Save the value of a configuration.
 
@@ -42,7 +43,7 @@ class Conf:
         """
         self._options[key] = value
 
-    def get(self, key):
+    def get(self, key: str) -> Any:
         """
         Return the value of the configuration.
 
@@ -52,7 +53,7 @@ class Conf:
         return self._options.get(key, None)
 
     @staticmethod
-    def _sanity_check_repos(path_to_repo):
+    def _sanity_check_repos(path_to_repo: Union[str, List[str]]) -> None:
         """
         Checks if repo is of type str or list.
 
@@ -62,19 +63,19 @@ class Conf:
         if not isinstance(path_to_repo, str) and not isinstance(path_to_repo, list):
             raise Exception("The path to the repo has to be of type 'string' or 'list of strings'!")
 
-    def _check_only_one_from_commit(self):
+    def _check_only_one_from_commit(self) -> None:
         if not self.only_one_filter([self.get('since'),
                                      self.get('from_commit'),
                                      self.get('from_tag')]):
             raise Exception('You can only specify one filter between since, from_tag and from_commit')
 
-    def _check_only_one_to_commit(self):
+    def _check_only_one_to_commit(self) -> None:
         if not self.only_one_filter([self.get('to'),
                                      self.get('to_commit'),
                                      self.get('to_tag')]):
             raise Exception('You can only specify one between since, from_tag and from_commit')
 
-    def sanity_check_filters(self):
+    def sanity_check_filters(self) -> None:
         """
         Check if the values passed by the user are correct.
 
@@ -111,7 +112,7 @@ class Conf:
                                 "the 'single' filtered does "
                                 "not exist".format(self.get('single')))
 
-    def _check_correct_filters_order(self):
+    def _check_correct_filters_order(self) -> None:
         """
         Check that from_commit comes before to_commit
         """
@@ -123,7 +124,7 @@ class Conf:
             if not chronological_order:
                 self._swap_commit_fiters()
 
-    def _swap_commit_fiters(self):
+    def _swap_commit_fiters(self) -> None:
         # reverse from and to commit
         from_commit = self.get('from_commit')
         to_commit = self.get('to_commit')
@@ -131,7 +132,7 @@ class Conf:
         self.set_value('to_commit', from_commit)
 
     @staticmethod
-    def _is_commit_before(commit_before: Commit, commit_after: Commit):
+    def _is_commit_before(commit_before: Commit, commit_after: Commit) -> bool:
         if commit_before.committer_date < commit_after.committer_date:
             return True
         if commit_before.committer_date == commit_after.committer_date and \
@@ -139,7 +140,7 @@ class Conf:
             return True
         return False
 
-    def get_starting_commit(self):
+    def get_starting_commit(self) -> Optional[List[str]]:
         """
         Get the starting commit from the 'since', 'from_commit' or 'from_tag'
         filter.
@@ -161,8 +162,9 @@ class Conf:
             except Exception:
                 raise Exception("The commit {} defined in the 'from_tag' or 'from_commit' filter does "
                                 "not exist".format(self.get('from_commit')))
+        return None
 
-    def get_ending_commit(self):
+    def get_ending_commit(self) -> Optional[str]:
         """
         Get the ending commit from the 'to', 'to_commit' or 'to_tag' filter.
         """
@@ -177,9 +179,10 @@ class Conf:
             except Exception:
                 raise Exception("The commit {} defined in the 'to_tag' or 'to_commit' filter does "
                                 "not exist".format(self.get('to_commit')))
+        return None
 
     @staticmethod
-    def only_one_filter(arr):
+    def only_one_filter(arr: List[Any]) -> bool:
         """
         Return true if in 'arr' there is at most 1 filter to True.
 
@@ -188,13 +191,13 @@ class Conf:
         """
         return len([x for x in arr if x is not None]) <= 1
 
-    def build_args(self):
+    def build_args(self) -> Tuple[Union[str, List[str]], Dict[str, Any]]:
         """
         This function builds the argument for git rev-list.
 
         :return:
         """
-        single = self.get('single')
+        single: str = self.get('single')
         since = self.get('since')
         until = self.get('to')
         from_commit = self.get_starting_commit()
@@ -204,11 +207,11 @@ class Conf:
         branch = self.get('only_in_branch')
         authors = self.get('only_authors')
         order = self.get('order')
-        rev = []
+        rev: Union[List[str], str] = []
         kwargs = {}
 
         if single is not None:
-            rev = [single, '-n', 1]
+            rev = [single, '-n', '1']
         elif from_commit is not None or to_commit is not None:
             if from_commit is not None and to_commit is not None:
                 rev.extend(from_commit)
@@ -278,7 +281,7 @@ class Conf:
             return True
         return False
 
-    def _has_modification_with_file_type(self, commit):
+    def _has_modification_with_file_type(self, commit: Commit) -> bool:
         for mod in commit.modified_files:
             if mod.filename.endswith(tuple(self.get('only_modifications_with_file_types'))):
                 return True
@@ -291,7 +294,7 @@ class Conf:
             self.set_value('to', self._replace_timezone(self.get('to')))
 
     @staticmethod
-    def _replace_timezone(dt: datetime):
+    def _replace_timezone(dt: datetime) -> datetime:
         if dt.tzinfo is None or dt.tzinfo.utcoffset(dt) is None:
             dt = dt.replace(tzinfo=pytz.utc)
         return dt

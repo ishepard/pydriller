@@ -53,15 +53,15 @@ def test_memory(caplog):
             diff_with_nothing.seconds // 3600,
             (diff_with_nothing.seconds % 3600) // 60,
             diff_with_nothing.seconds % 60,
-            973 // diff_with_nothing.seconds if diff_with_nothing.seconds != 0 else 0,
+            578 // diff_with_nothing.seconds if diff_with_nothing.seconds != 0 else 0,
             diff_with_everything.seconds // 3600,
             (diff_with_everything.seconds % 3600) // 60,
             diff_with_everything.seconds % 60,
-            973 // diff_with_everything.seconds,
+            578 // diff_with_everything.seconds,
             diff_with_metrics.seconds // 3600,
             (diff_with_metrics.seconds % 3600) // 60,
             diff_with_metrics.seconds % 60,
-            973 // diff_with_metrics.seconds
+            578 // diff_with_metrics.seconds
         )
     )
 
@@ -75,7 +75,7 @@ def test_memory(caplog):
             diff_with_everything, all_commits_with_everything,
             diff_with_metrics, all_commits_with_metrics)
 
-    assert 973 == len(all_commits_with_nothing) == len(all_commits_with_everything) == len(all_commits_with_metrics)
+    assert 578 == len(all_commits_with_nothing) == len(all_commits_with_everything) == len(all_commits_with_metrics)
 
 
 def log(diff_with_nothing, all_commits_with_nothing,
@@ -101,7 +101,7 @@ def log(diff_with_nothing, all_commits_with_nothing,
         diff_with_everything.seconds % 60,
         diff_with_metrics.seconds // 3600, (diff_with_metrics.seconds % 3600) // 60, diff_with_metrics.seconds % 60,
         len(all_commits_with_nothing),
-        len(all_commits_with_nothing) / diff_with_nothing.seconds,
+        len(all_commits_with_nothing) / diff_with_nothing.seconds if diff_with_nothing.seconds > 0 else len(all_commits_with_nothing),
         len(all_commits_with_everything) / diff_with_everything.seconds,
         len(all_commits_with_metrics) / diff_with_metrics.seconds
     ))
@@ -109,14 +109,15 @@ def log(diff_with_nothing, all_commits_with_nothing,
 
 def mine(_type):
     p = psutil.Process(os.getpid())
-    dt1 = datetime(2017, 1, 1)
-    dt2 = datetime(2017, 7, 1)
+    dt1 = datetime(2020, 1, 1)
+    dt2 = datetime(2020, 7, 1)
     all_commits = []
 
     start = datetime.now()
-    for commit in Repository('test-repos-hadoop/hadoop',
+    for commit in Repository('test-repos/hadoop',
                              since=dt1,
-                             to=dt2).traverse_commits():
+                             to=dt2,
+                             num_workers=10).traverse_commits():
         memory = p.memory_info()[0] / (2 ** 20)
         all_commits.append(memory)
 

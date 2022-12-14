@@ -21,7 +21,7 @@ import logging
 from _datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, List, Set, Dict, Tuple, Optional
+from typing import Any, List, Set, Dict, Tuple, Optional, Union
 
 import hashlib
 
@@ -29,6 +29,7 @@ import lizard
 import lizard_languages
 from git import Diff, Git, NULL_TREE
 from git.objects import Commit as GitCommit
+from git.objects.base import IndexObject
 
 from pydriller.domain.developer import Developer
 
@@ -72,25 +73,25 @@ class Method:
         source code written in one of the supported programming languages).
         """
 
-        self.name = func.name
-        self.long_name = func.long_name
-        self.filename = func.filename
-        self.nloc = func.nloc
-        self.complexity = func.cyclomatic_complexity
-        self.token_count = func.token_count
-        self.parameters = func.parameters
-        self.start_line = func.start_line
-        self.end_line = func.end_line
-        self.fan_in = func.fan_in
-        self.fan_out = func.fan_out
-        self.general_fan_out = func.general_fan_out
-        self.length = func.length
-        self.top_nesting_level = func.top_nesting_level
+        self.name: str = func.name
+        self.long_name: str = func.long_name
+        self.filename: str = func.filename
+        self.nloc: int = func.nloc
+        self.complexity: int = func.cyclomatic_complexity
+        self.token_count: int = func.token_count
+        self.parameters: List[str] = func.parameters
+        self.start_line: int = func.start_line
+        self.end_line: int = func.end_line
+        self.fan_in: int = func.fan_in
+        self.fan_out: int = func.fan_out
+        self.general_fan_out: int = func.general_fan_out
+        self.length: int = func.length
+        self.top_nesting_level: int = func.top_nesting_level
 
     def __eq__(self, other) -> bool:
         return self.name == other.name and self.parameters == other.parameters
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         # parameters are used in hashing in order to
         # prevent collisions when overloading method names
         return hash(
@@ -176,26 +177,26 @@ class ModifiedFile:
         self._function_list: List[Method] = []
         self._function_list_before: List[Method] = []
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Implements hashing similar as Git would do it. Alternatively, if the
         object had the hash of th Git Blob, one could use that directly.
 
         :return: int hash
         """
-        string = f"{self.change_type.name} {self.new_path} {self.content}"
+        string = f"{self.change_type.name} {self.new_path} {self.content!r}"
         return hash(hashlib.sha256(string.encode("utf-8")).hexdigest())
 
     @property
     def source_code(self) -> Optional[str]:
-        if type(self.content) == bytes:
+        if self.content and type(self.content) == bytes:
             return self._get_decoded_content(self.content)
 
         return None
 
     @property
     def source_code_before(self) -> Optional[str]:
-        if type(self.content_before) == bytes:
+        if self.content_before and type(self.content_before) == bytes:
             return self._get_decoded_content(self.content_before)
 
         return None
@@ -349,7 +350,7 @@ class ModifiedFile:
         return modified_lines
 
     @staticmethod
-    def _get_line_numbers(line) -> Tuple[int, int]:
+    def _get_line_numbers(line: str) -> Tuple[int, int]:
         token = line.split(" ")
         numbers_old_file = token[1]
         numbers_new_file = token[2]
@@ -446,7 +447,7 @@ class ModifiedFile:
         low_after, high_after = self._risk_profile(self.methods, dmm_prop)
         return low_after - low_before, high_after - high_before
 
-    def _calculate_metrics(self, include_before=False) -> None:
+    def _calculate_metrics(self, include_before: bool = False) -> None:
         """
         :param include_before: either to compute the metrics
         for source_code_before, i.e. before the change happened
@@ -476,7 +477,7 @@ class ModifiedFile:
 
             self._function_list_before = [Method(x) for x in anal.function_list]
 
-    def _get_decoded_content(self, content) -> Optional[str]:
+    def _get_decoded_content(self, content: bytes) -> Optional[str]:
         try:
             return content.decode("utf-8", "ignore")
         except (AttributeError, ValueError):
@@ -506,11 +507,11 @@ class Commit:
         """
         self._c_object = commit
 
-        self._modified_files = None
+        self._modified_files: List[ModifiedFile] = []
         self._branches: Set[str] = set()
         self._conf = conf
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Since already used in Git for identification use the SHA of the commit
         as hash value.
@@ -684,13 +685,13 @@ class Commit:
 
         :return: List[Modification] modifications
         """
-        if self._modified_files is None:
+        if not self._modified_files:
             self._modified_files = self._get_modified_files()
 
         assert self._modified_files is not None
         return self._modified_files
 
-    def _get_modified_files(self):
+    def _get_modified_files(self) -> List[ModifiedFile]:
         options = {}
         if self._conf.get("histogram"):
             options["histogram"] = True
@@ -700,8 +701,8 @@ class Commit:
 
         if len(self.parents) == 1:
             # the commit has a parent
-            diff_index = self._c_object.parents[0].diff(
-                self._c_object, create_patch=True, **options
+            diff_index: Any = self._c_object.parents[0].diff(
+                other=self._c_object, paths=None, create_patch=True, **options
             )
         elif len(self.parents) > 1:
             # if it's a merge commit, the modified files of the commit are the
@@ -719,12 +720,12 @@ class Commit:
             # this is the first commit of the repo. Comparing it with git
             # NULL TREE
             diff_index = self._c_object.diff(
-                NULL_TREE, create_patch=True, **options
+                NULL_TREE, paths=None, create_patch=True, **options
             )
 
         return self._parse_diff(diff_index)
 
-    def _parse_diff(self, diff_index) -> List[ModifiedFile]:
+    def _parse_diff(self, diff_index: List[Diff]) -> List[ModifiedFile]:
         modified_files_list = []
         for diff in diff_index:
             old_path = diff.a_path
@@ -743,9 +744,13 @@ class Commit:
 
         return modified_files_list
 
-    def _get_decoded_str(self, diff) -> Optional[str]:
+    def _get_decoded_str(self, diff: Union[str, bytes, None]) -> Optional[str]:
         try:
-            return diff.decode("utf-8", "ignore")
+            if type(diff) == bytes:
+                return diff.decode("utf-8", "ignore")
+            if type(diff) == str:
+                return diff
+            return None
         except (AttributeError, ValueError):
             logger.debug(
                 "Could not load the diff of a " "file in commit %s",
@@ -753,8 +758,8 @@ class Commit:
             )
             return None
 
-    def _get_undecoded_content(self, diff) -> Optional[bytes]:
-        return diff.data_stream.read() if diff is not None else None
+    def _get_undecoded_content(self, blob: Optional[IndexObject]) -> Optional[bytes]:
+        return blob.data_stream.read() if blob is not None else None
 
     @property
     def in_main_branch(self) -> bool:
@@ -918,7 +923,7 @@ class Commit:
         return proportion
 
     @staticmethod
-    def _from_change_to_modification_type(diff: Diff):
+    def _from_change_to_modification_type(diff: Diff) -> ModificationType:
         if diff.new_file:
             return ModificationType.ADD
         if diff.deleted_file:

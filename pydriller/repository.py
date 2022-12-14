@@ -230,28 +230,20 @@ class Repository:
                 # Build the arguments to pass to git rev-list.
                 rev, kwargs = self._conf.build_args()
 
-                commits_list = list(git.get_list_commits(rev, **kwargs))
-
-                if not commits_list:
-                    return
-
-                chunks = self._split_in_chunks(commits_list, self._conf.get("num_workers"))
                 with concurrent.futures.ThreadPoolExecutor(max_workers=self._conf.get("num_workers")) as executor:
-                    jobs = {executor.submit(self._iter_commits, chunk): chunk for chunk in chunks}
+                    for job in executor.map(self._iter_commits, git.get_list_commits(rev, **kwargs)):
 
-                    for job in concurrent.futures.as_completed(jobs):
-                        for commit in job.result():
+                        for commit in job:
                             yield commit
 
-    def _iter_commits(self, commits_list: List[Commit]) -> Generator[Commit, None, None]:
-        for commit in commits_list:
-            logger.info(f'Commit #{commit.hash} in {commit.committer_date} from {commit.author.name}')
+    def _iter_commits(self, commit: Commit) -> Generator[Commit, None, None]:
+        logger.info(f'Commit #{commit.hash} in {commit.committer_date} from {commit.author.name}')
 
-            if self._conf.is_commit_filtered(commit):
-                logger.info(f'Commit #{commit.hash} filtered')
-                continue
+        if self._conf.is_commit_filtered(commit):
+            logger.info(f'Commit #{commit.hash} filtered')
+            return
 
-            yield commit
+        yield commit
 
     @staticmethod
     def _split_in_chunks(full_list: List[Commit], num_workers: int) -> List[List[Commit]]:

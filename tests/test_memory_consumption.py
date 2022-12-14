@@ -21,22 +21,27 @@ from pydriller import Repository
 from datetime import datetime
 
 logging.basicConfig(level=logging.WARNING)
-skip_remote = True
+PATH = os.getenv('GITHUB_WORKSPACE')
 
 
 def test_memory(caplog):
-    if skip_remote:
+    if not PATH:
         return
+    path_to_pydriller = PATH + "/pydriller"
+
+    if not os.path.exists(path_to_pydriller):
+        return
+
     caplog.set_level(logging.WARNING)
 
     logging.warning("Starting with nothing...")
-    diff_with_nothing, all_commits_with_nothing = mine(0)
+    diff_with_nothing, all_commits_with_nothing = mine(path_to_pydriller, 0)
 
     logging.warning("Starting with everything...")
-    diff_with_everything, all_commits_with_everything = mine(1)
+    diff_with_everything, all_commits_with_everything = mine(path_to_pydriller, 1)
 
     logging.warning("Starting with metrics...")
-    diff_with_metrics, all_commits_with_metrics = mine(2)
+    diff_with_metrics, all_commits_with_metrics = mine(path_to_pydriller, 2)
 
     max_values = [max(all_commits_with_nothing),
                   max(all_commits_with_everything),
@@ -53,29 +58,30 @@ def test_memory(caplog):
             diff_with_nothing.seconds // 3600,
             (diff_with_nothing.seconds % 3600) // 60,
             diff_with_nothing.seconds % 60,
-            1045 // diff_with_nothing.seconds if diff_with_nothing.seconds != 0 else 0,
+            704 // diff_with_nothing.seconds if diff_with_nothing.seconds != 0 else 0,
             diff_with_everything.seconds // 3600,
             (diff_with_everything.seconds % 3600) // 60,
             diff_with_everything.seconds % 60,
-            1045 // diff_with_everything.seconds,
+            704 // diff_with_everything.seconds,
             diff_with_metrics.seconds // 3600,
             (diff_with_metrics.seconds % 3600) // 60,
             diff_with_metrics.seconds % 60,
-            1045 // diff_with_metrics.seconds
+            704 // diff_with_metrics.seconds
         )
     )
 
     if any(val > 250 for val in max_values) or \
             minutes_with_everything >= 1 or \
-            minutes_with_metrics >= 7:
-        # if to analyze 1000 commits requires more than 250MB of RAM,
+            minutes_with_metrics >= 2:
+        # if to analyze ~1000 commits requires more than 250MB of RAM,
         # more than 1 minute without metrics or
-        # 7 minutes with metrics, print it
+        # 2 minutes with metrics, print it
         log(diff_with_nothing, all_commits_with_nothing,
             diff_with_everything, all_commits_with_everything,
             diff_with_metrics, all_commits_with_metrics)
+        raise Exception("Memory usage is too high, or it required too long to analyze all commits!")
 
-    assert 1045 == len(all_commits_with_nothing) == len(all_commits_with_everything) == len(all_commits_with_metrics)
+    assert 704 == len(all_commits_with_nothing) == len(all_commits_with_everything) == len(all_commits_with_metrics)
 
 
 def log(diff_with_nothing, all_commits_with_nothing,
@@ -107,17 +113,14 @@ def log(diff_with_nothing, all_commits_with_nothing,
     ))
 
 
-def mine(_type):
+def mine(path_to_pydriller, _type):
     p = psutil.Process(os.getpid())
-    dt1 = datetime(2020, 1, 1)
-    dt2 = datetime(2020, 12, 1)
+    dt2 = datetime(2021, 12, 1)
     all_commits = []
 
     start = datetime.now()
-    for commit in Repository('test-repos/hadoop',
-                             since=dt1,
-                             to=dt2,
-                             num_workers=10).traverse_commits():
+    for commit in Repository(path_to_pydriller,
+                             to=dt2).traverse_commits():
         memory = p.memory_info()[0] / (2 ** 20)
         all_commits.append(memory)
 
@@ -132,7 +135,7 @@ def mine(_type):
             if _type == 1:
                 continue
 
-            if mod.filename.endswith('.java'):
+            if mod.filename.endswith('.py'):
                 cc = mod.complexity  # noqa
 
     end = datetime.now()

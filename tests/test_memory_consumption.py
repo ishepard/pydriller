@@ -26,19 +26,20 @@ PATH = os.getenv('GITHUB_WORKSPACE')
 
 
 def test_memory(caplog):
-    if not PATH or not os.path.exists(PATH):
+    if not PATH:
+        # Check we are on GitHub
         return
 
     caplog.set_level(logging.WARNING)
-    logging.warning(f"Analyzing path {PATH}")
+
     logging.warning("Starting with nothing...")
-    diff_with_nothing, all_commits_with_nothing = mine(PATH, 0)
+    diff_with_nothing, all_commits_with_nothing = mine(0)
 
     logging.warning("Starting with everything...")
-    diff_with_everything, all_commits_with_everything = mine(PATH, 1)
+    diff_with_everything, all_commits_with_everything = mine(1)
 
     logging.warning("Starting with metrics...")
-    diff_with_metrics, all_commits_with_metrics = mine(PATH, 2)
+    diff_with_metrics, all_commits_with_metrics = mine(2)
 
     max_values = [max(all_commits_with_nothing),
                   max(all_commits_with_everything),
@@ -110,13 +111,13 @@ def log(diff_with_nothing, all_commits_with_nothing,
     ))
 
 
-def mine(path_to_pydriller, _type):
+def mine(_type):
     p = psutil.Process(os.getpid())
     dt2 = datetime(2021, 12, 1)
     all_commits = []
 
     start = datetime.now()
-    for commit in Repository(path_to_pydriller,
+    for commit in Repository("https://github.com/ishepard/pydriller.git",
                              to=dt2).traverse_commits():
         memory = p.memory_info()[0] / (2 ** 20)
         all_commits.append(memory)

@@ -101,7 +101,7 @@ class Method:
                 "long_name",
                 self.long_name,
                 "params",
-                (x for x in self.parameters),
+                tuple(x for x in self.parameters),
             )
         )
 

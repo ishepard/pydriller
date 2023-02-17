@@ -1,4 +1,4 @@
-gitpython
+gitpython==3.1.30
 pytz
 types-pytz
 lizard

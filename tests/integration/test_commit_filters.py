@@ -234,6 +234,18 @@ def test_filepath_with_since():
         since=since).traverse_commits())) == 11
 
 
+def test_since_as_filter():
+    since_as_filter = datetime(2018, 6, 6, 0, 0, 0, tzinfo=timezone.utc)
+
+    assert len(list(Repository(
+        path_to_repo='test-repos/since_as_filter',
+        since=since_as_filter).traverse_commits())) == 3
+
+    assert len(list(Repository(
+        path_to_repo='test-repos/since_as_filter',
+        since_as_filter=since_as_filter).traverse_commits())) == 16
+
+
 def test_filepath_with_rename():
     dt = datetime(2018, 6, 6)
     commits = list(Repository(

@@ -43,7 +43,7 @@ class Repository:
 
     def __init__(self, path_to_repo: Union[str, List[str]],
                  single: Optional[str] = None,
-                 since: Optional[datetime] = None, to: Optional[datetime] = None,
+                 since: Optional[datetime] = None, since_as_filter: Optional[datetime] = None, to: Optional[datetime] = None,
                  from_commit: Optional[str] = None, to_commit: Optional[str] = None,
                  from_tag: Optional[str] = None, to_tag: Optional[str] = None,
                  include_refs: bool = False,
@@ -76,6 +76,7 @@ class Repository:
             absolute paths) to the repository(ies) to analyze
         :param str single: hash of a single commit to analyze
         :param datetime since: starting date
+        :param datetime since_as_filter: starting date (scans all commits, does not stop at first commit with date < since_as_filter)
         :param datetime to: ending date
         :param str from_commit: starting commit (only if `since` is None)
         :param str to_commit: ending commit (only if `to` is None)
@@ -119,6 +120,7 @@ class Repository:
             "from_tag": from_tag,
             "to_tag": to_tag,
             "since": since,
+            "since_as_filter": since_as_filter,
             "to": to,
             "single": single,
             "include_refs": include_refs,

@@ -65,15 +65,16 @@ class Conf:
 
     def _check_only_one_from_commit(self) -> None:
         if not self.only_one_filter([self.get('since'),
+                                     self.get('since_as_filter'),
                                      self.get('from_commit'),
                                      self.get('from_tag')]):
-            raise Exception('You can only specify one filter between since, from_tag and from_commit')
+            raise Exception('You can only specify one filter between since, since_as_filter, from_tag and from_commit')
 
     def _check_only_one_to_commit(self) -> None:
         if not self.only_one_filter([self.get('to'),
                                      self.get('to_commit'),
                                      self.get('to_tag')]):
-            raise Exception('You can only specify one between since, from_tag and from_commit')
+            raise Exception('You can only specify one between to, to_tag and to_commit')
 
     def sanity_check_filters(self) -> None:
         """
@@ -98,6 +99,7 @@ class Conf:
 
         if self.get('single') is not None:
             if any([self.get('since'),
+                    self.get('since_as_filter'),
                     self.get('to'),
                     self.get('from_commit'),
                     self.get('to_commit'),
@@ -142,7 +144,7 @@ class Conf:
 
     def get_starting_commit(self) -> Optional[List[str]]:
         """
-        Get the starting commit from the 'since', 'from_commit' or 'from_tag'
+        Get the starting commit from the 'from_commit' or 'from_tag'
         filter.
         """
         from_tag = self.get('from_tag')
@@ -199,6 +201,7 @@ class Conf:
         """
         single: str = self.get('single')
         since = self.get('since')
+        since_as_filter = self.get('since_as_filter')
         until = self.get('to')
         from_commit = self.get_starting_commit()
         to_commit = self.get_ending_commit()
@@ -252,6 +255,9 @@ class Conf:
         if since is not None:
             kwargs['since'] = since
 
+        if since_as_filter is not None:
+            kwargs['since_as_filter'] = since_as_filter
+
         if until is not None:
             kwargs['until'] = until
 
@@ -290,6 +296,8 @@ class Conf:
     def _check_timezones(self):
         if self.get('since') is not None:
             self.set_value('since', self._replace_timezone(self.get('since')))
+        if self.get('since_as_filter') is not None:
+            self.set_value('since_as_filter', self._replace_timezone(self.get('since_as_filter')))
         if self.get('to') is not None:
             self.set_value('to', self._replace_timezone(self.get('to')))
 

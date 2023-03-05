@@ -4,7 +4,7 @@
 ModifiedFile
 =============
 
-You can get the list of modified files, as well as their diffs and current source code. To that, all you have to do is to get the list of *Modifications* that exists inside Commit. A modification object has the following fields:
+You can get a list of modified files as well as their diffs and current source code from each commit. All *Modifications* can be obtained by iterating over the ModifiedFile object. Each modification object references a modified file and has the following fields:
 
 * **old_path**: old path of the file (can be _None_ if the file is added)
 * **new_path**: new path of the file (can be _None_ if the file is deleted)
@@ -23,7 +23,7 @@ You can get the list of modified files, as well as their diffs and current sourc
 * **complexity**: Cyclomatic Complexity of the file
 * **token_count**: Number of Tokens of the file
 
-**NOTE**: the list of modifications might me empty if the commit is a merge commit. For more info on this, check out `this post <https://haacked
+**NOTE**: the list of modifications might be empty if the commit is a merge commit. For more info on this, check out `this post <https://haacked
 .com/archive/2014/02/21/reviewing-merge-commits/>`_.
 
 For example::

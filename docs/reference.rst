@@ -37,7 +37,16 @@ Commit
    :undoc-members:
    :special-members:
    :exclude-members: __dict__, __weakref__, __eq__, __str__, __hash__
+  
+Methods
+----------------
 
+.. automodule:: pydriller.domain.commit.Method
+   :members:
+   :undoc-members:
+   :special-members:
+   :exclude-members: __dict__, __weakref__, __eq__, __str__, __hash__
+   
 Developer
 ----------------
 

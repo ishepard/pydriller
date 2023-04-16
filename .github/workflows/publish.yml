@@ -1,8 +1,8 @@
 name: Publish Python 🐍 distributions 📦 to PyPI
 on:
   push:
-    branches:
-      - "master"
+    tags:        
+      - 2*
 
 jobs:
   publish:
@@ -20,7 +20,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r test-requirements.txt
-          pip install codecov pytest-cov
+          pip install pytest-cov
           unzip test-repos
       - name: Mypy
         run: |

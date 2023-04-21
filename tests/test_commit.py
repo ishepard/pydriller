@@ -43,8 +43,8 @@ def test_equal(repo: Git):
 
 @patch('git.diff.Diff')
 def test_filename(mocked_diff):
-    mocked_diff.a_path = 'dspadini/pydriller/myfile.py'
-    mocked_diff.b_path = 'dspadini/pydriller/mynewfile.py'
+    mocked_diff.a_path = Path('dspadini/pydriller/myfile.py')
+    mocked_diff.b_path = Path('dspadini/pydriller/mynewfile.py')
 
     m1 = ModifiedFile(mocked_diff)
 

@@ -43,15 +43,15 @@ def test_equal(repo: Git):
 
 @patch('git.diff.Diff')
 def test_filename(mocked_diff):
-    mocked_diff.a_path = Path('dspadini/pydriller/myfile.py')
-    mocked_diff.b_path = Path('dspadini/pydriller/mynewfile.py')
+    mocked_diff.a_path = 'dspadini/pydriller/myfile.py'
+    mocked_diff.b_path = 'dspadini/pydriller/mynewfile.py'
 
     m1 = ModifiedFile(mocked_diff)
 
     assert m1.filename == 'mynewfile.py'
 
-    assert m1.new_path == 'dspadini/pydriller/mynewfile.py'
-    assert m1.old_path == 'dspadini/pydriller/myfile.py'
+    assert m1.new_path == str(Path('dspadini/pydriller/mynewfile.py'))
+    assert m1.old_path == str(Path('dspadini/pydriller/myfile.py'))
 
 
 @patch('git.diff.Diff')

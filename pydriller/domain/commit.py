@@ -243,9 +243,6 @@ class ModifiedFile:
 
         :return: int lines_added
         """
-        if not self.diff:
-            return None
-        
         added_lines = 0
         for line in self.diff.replace("\r", "").split("\n"):
             if line.startswith("+") and not line.startswith("+++"):
@@ -259,9 +256,6 @@ class ModifiedFile:
 
         :return: int lines_deleted
         """
-        if not self.diff:
-            return None
-        
         deleted_lines = 0
         for line in self.diff.replace("\r", "").split("\n"):
             if line.startswith("-") and not line.startswith("---"):

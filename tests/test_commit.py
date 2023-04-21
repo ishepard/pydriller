@@ -13,6 +13,7 @@
 # limitations under the License.
 from pydriller.git import Git
 from pathlib import Path
+from mock import patch
 import pytest
 import logging
 
@@ -39,42 +40,28 @@ def test_equal(repo: Git):
     assert c3 == c2
     assert c1 != c3
 
+@patch('git.diff.Diff')
+def test_filename(mocked_diff):
+    mocked_diff.a_path = 'dspadini/pydriller/myfile.py'
+    mocked_diff.b_path = 'dspadini/pydriller/mynewfile.py'
 
-def test_filename():
-    diff_and_sc = {
-        'diff': '',
-        'content': b'',
-        'content_before': b''
-    }
-    m1 = ModifiedFile('dspadini/pydriller/myfile.py',
-                      'dspadini/pydriller/mynewfile.py',
-                      ModificationType.ADD, diff_and_sc)
-    m3 = ModifiedFile('dspadini/pydriller/myfile.py',
-                      'dspadini/pydriller/mynewfile.py',
-                      ModificationType.ADD, diff_and_sc)
-    m2 = ModifiedFile('dspadini/pydriller/myfile.py',
-                      None,
-                      ModificationType.ADD, diff_and_sc)
+    m1 = ModifiedFile(mocked_diff)
 
     assert m1.filename == 'mynewfile.py'
-    assert m2.filename == 'myfile.py'
-    assert m1 != m2
-    assert m3 == m1
 
+    assert m1.new_path == 'dspadini/pydriller/mynewfile.py'
+    assert m1.old_path == 'dspadini/pydriller/myfile.py'
 
-def test_metrics_python():
+@patch('git.diff.Diff')
+def test_metrics_python(mocked_diff):
     with open('test-repos/lizard/git_repository.py', 'rb') as f:
         content = f.read()
 
-    diff_and_sc = {
-        'diff': '',
-        'content': content,
-        'content_before': content
-    }
+    mocked_diff.a_path = 'test-repos/lizard/git_repository.py'
+    mocked_diff.b_path = "test-repos/lizard/git_repository.py"
+    mocked_diff.b_blob.data_stream.read.return_value = content
 
-    m1 = ModifiedFile('test-repos/lizard/git_repository.py',
-                      "test-repos/lizard/git_repository.py",
-                      ModificationType.MODIFY, diff_and_sc)
+    m1 = ModifiedFile(mocked_diff)
 
     assert m1.nloc == 196
     assert m1.token_count == 1009
@@ -134,21 +121,17 @@ def test_changed_methods():
     mod = gr.get_commit(
         '9f6ddc2aac740a257af59a76860590cb8a84c77b').modified_files[0]
     assert len(mod.changed_methods) == 3
-
-
-def test_metrics_cpp():
+        
+@patch('git.diff.Diff')
+def test_metrics_cpp(mocked_diff):
     with open('test-repos/lizard/FileCPP.cpp', 'rb') as f:
         content = f.read()
 
-    diff_and_sc = {
-        'diff': '',
-        'content': content,
-        'content_before': content
-    }
+    mocked_diff.a_path = 'test-repos/lizard/FileCPP.cpp'
+    mocked_diff.b_path = "test-repos/lizard/FileCPP.cpp"
+    mocked_diff.b_blob.data_stream.read.return_value = content
 
-    m1 = ModifiedFile('test-repos/lizard/FileCPP.cpp',
-                      "test-repos/lizard/FileCPP.cpp",
-                      ModificationType.MODIFY, diff_and_sc)
+    m1 = ModifiedFile(mocked_diff)
 
     assert m1.nloc == 793
     assert m1.token_count == 5564
@@ -156,20 +139,16 @@ def test_metrics_cpp():
 
     assert len(m1.methods) == 16
 
-
-def test_metrics_java():
+@patch('git.diff.Diff')
+def test_metrics_java(mocked_diff):
     with open('test-repos/lizard/FileJava.java', 'rb') as f:
         content = f.read()
 
-    diff_and_sc = {
-        'diff': '',
-        'content': content,
-        'content_before': content
-    }
+    mocked_diff.a_path = 'test-repos/lizard/FileJava.java'
+    mocked_diff.b_path = "test-repos/lizard/FileJava.java"
+    mocked_diff.b_blob.data_stream.read.return_value = content
 
-    m1 = ModifiedFile('test-repos/lizard/FileJava.java',
-                      "test-repos/lizard/FileJava.java",
-                      ModificationType.MODIFY, diff_and_sc)
+    m1 = ModifiedFile(mocked_diff)
 
     assert m1.nloc == 466
     assert m1.token_count == 3809
@@ -177,19 +156,13 @@ def test_metrics_java():
 
     assert len(m1.methods) == 46
 
-
-def test_metrics_not_supported_file():
+@patch('git.diff.Diff')
+def test_metrics_not_supported_file(mocked_diff):
     content = b'asd !&%@*&^@\n jjdkj'
 
-    diff_and_sc = {
-        'diff': '',
-        'content': content,
-        'content_before': content
-    }
+    mocked_diff.b_blob.data_stream.read.return_value = content
 
-    m1 = ModifiedFile('test-repos/lizard/NotSupported.pdf',
-                      "test-repos/lizard/NotSupported.pdf",
-                      ModificationType.MODIFY, diff_and_sc)
+    m1 = ModifiedFile(mocked_diff)
 
     assert m1.nloc is None
 

@@ -28,6 +28,7 @@ def modification(request):
                          [("test-repos/diff", "9a985d4a12a3a12f009ef39750fd9b2187b766d1")],
                          indirect=True)
 def test_extract_line_number_and_content(modification: ModifiedFile):
+    assert modification.diff_parsed
     added = modification.diff_parsed['added']
     deleted = modification.diff_parsed['deleted']
 
@@ -42,6 +43,7 @@ def test_extract_line_number_and_content(modification: ModifiedFile):
                          [("test-repos/diff", "f45ee2f8976d5f018a1e4ec83eb4556a3df8b0a5")],
                          indirect=True)
 def test_additions(modification: ModifiedFile):
+    assert modification.diff_parsed
     added = modification.diff_parsed['added']
     deleted = modification.diff_parsed['deleted']
 
@@ -58,6 +60,7 @@ def test_additions(modification: ModifiedFile):
                          [("test-repos/diff", "147c7ce9f725a0e259d63f0bf4e6c8ac085ff8c8")],
                          indirect=True)
 def test_deletions(modification: ModifiedFile):
+    assert modification.diff_parsed
     added = modification.diff_parsed['added']
     deleted = modification.diff_parsed['deleted']
 
@@ -86,6 +89,7 @@ def test_diff_no_newline(modification: ModifiedFile):
         \\ No newline at end of file
     in diffs. This test asserts these additional lines are parsed correctly.
     """
+    assert modification.diff_parsed
     added = modification.diff_parsed['added']
     deleted = modification.diff_parsed['deleted']
 

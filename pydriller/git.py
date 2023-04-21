@@ -255,7 +255,7 @@ class Git:
             path = mod.new_path
             if mod.change_type == ModificationType.RENAME or mod.change_type == ModificationType.DELETE:
                 path = mod.old_path
-            
+
             if not mod.diff_parsed:
                 continue
             deleted_lines = mod.diff_parsed['deleted']

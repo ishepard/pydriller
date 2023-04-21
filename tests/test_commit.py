@@ -17,7 +17,7 @@ from mock import patch
 import pytest
 import logging
 
-from pydriller.domain.commit import ModifiedFile, ModificationType
+from pydriller.domain.commit import ModifiedFile
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -40,6 +40,7 @@ def test_equal(repo: Git):
     assert c3 == c2
     assert c1 != c3
 
+
 @patch('git.diff.Diff')
 def test_filename(mocked_diff):
     mocked_diff.a_path = 'dspadini/pydriller/myfile.py'
@@ -51,6 +52,7 @@ def test_filename(mocked_diff):
 
     assert m1.new_path == 'dspadini/pydriller/mynewfile.py'
     assert m1.old_path == 'dspadini/pydriller/myfile.py'
+
 
 @patch('git.diff.Diff')
 def test_metrics_python(mocked_diff):
@@ -121,7 +123,8 @@ def test_changed_methods():
     mod = gr.get_commit(
         '9f6ddc2aac740a257af59a76860590cb8a84c77b').modified_files[0]
     assert len(mod.changed_methods) == 3
-        
+
+
 @patch('git.diff.Diff')
 def test_metrics_cpp(mocked_diff):
     with open('test-repos/lizard/FileCPP.cpp', 'rb') as f:
@@ -139,6 +142,7 @@ def test_metrics_cpp(mocked_diff):
 
     assert len(m1.methods) == 16
 
+
 @patch('git.diff.Diff')
 def test_metrics_java(mocked_diff):
     with open('test-repos/lizard/FileJava.java', 'rb') as f:
@@ -155,6 +159,7 @@ def test_metrics_java(mocked_diff):
     assert m1.complexity == 92
 
     assert len(m1.methods) == 46
+
 
 @patch('git.diff.Diff')
 def test_metrics_not_supported_file(mocked_diff):

@@ -182,7 +182,7 @@ class ModifiedFile:
     @property
     def change_type(self) -> ModificationType:
         return self._from_change_to_modification_type(self._c_diff)
-        
+
     @staticmethod
     def _from_change_to_modification_type(diff: Diff) -> ModificationType:
         if diff.new_file:
@@ -195,11 +195,11 @@ class ModifiedFile:
             return ModificationType.MODIFY
 
         return ModificationType.UNKNOWN
-    
+
     @property
     def diff(self) -> str:
         return self._get_decoded_str(self._c_diff.diff) or ''
-    
+
     def _get_decoded_str(self, diff: Union[str, bytes, None]) -> Optional[str]:
         try:
             if type(diff) == bytes:
@@ -210,11 +210,11 @@ class ModifiedFile:
         except (AttributeError, ValueError):
             logger.debug(f"Could not load the diff of file {self.filename}")
             return None
-    
+
     @property
     def content(self) -> Optional[bytes]:
         return self._get_undecoded_content(self._c_diff.b_blob)
-    
+
     @property
     def content_before(self) -> Optional[bytes]:
         return self._get_undecoded_content(self._c_diff.a_blob)
@@ -355,7 +355,7 @@ class ModifiedFile:
         """
         if not self.diff:
             return None
-        
+
         lines = self.diff.split("\n")
         modified_lines = {
             "added": [],

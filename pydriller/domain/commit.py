@@ -237,7 +237,7 @@ class ModifiedFile:
         return None
 
     @property
-    def added_lines(self) -> Optional[int]:
+    def added_lines(self) -> int:
         """
         Return the total number of added lines in the file.
 
@@ -250,7 +250,7 @@ class ModifiedFile:
         return added_lines
 
     @property
-    def deleted_lines(self) -> Optional[int]:
+    def deleted_lines(self) -> int:
         """
         Return the total number of deleted lines in the file.
 
@@ -293,7 +293,7 @@ class ModifiedFile:
 
         :return: str filename
         """
-        if self.new_path is not None and str(self.new_path) != "/dev/null":
+        if self.new_path is not None and self.new_path != "/dev/null":
             path = self.new_path
         else:
             assert self.old_path
@@ -343,7 +343,7 @@ class ModifiedFile:
         return self._token_count
 
     @property
-    def diff_parsed(self) -> Optional[Dict[str, List[Tuple[int, str]]]]:
+    def diff_parsed(self) -> Dict[str, List[Tuple[int, str]]]:
         """
         Returns a dictionary with the added and deleted lines.
         The dictionary has 2 keys: "added" and "deleted", each containing the
@@ -353,9 +353,6 @@ class ModifiedFile:
 
         :return: Dictionary
         """
-        if not self.diff:
-            return None
-
         lines = self.diff.split("\n")
         modified_lines = {
             "added": [],
@@ -423,7 +420,7 @@ class ModifiedFile:
         return self._function_list_before
 
     @property
-    def changed_methods(self) -> Optional[List[Method]]:
+    def changed_methods(self) -> List[Method]:
         """
         Return the list of methods that were changed. This analysis
         is more complex because Lizard runs twice: for methods before
@@ -431,8 +428,6 @@ class ModifiedFile:
 
         :return: list of methods
         """
-        if not self.diff_parsed:
-            return None
         new_methods = self.methods
         old_methods = self.methods_before
         added = self.diff_parsed["added"]

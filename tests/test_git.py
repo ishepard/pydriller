@@ -242,6 +242,7 @@ def test_should_detail_a_commit(repo: Git):
     assert len(commit.modified_files) == 1
 
     assert commit.modified_files[0].new_path == "Matricula.java"
+    assert commit.modified_files[0].diff
     assert commit.modified_files[0].diff.startswith("@@ -0,0 +1,62 @@\n+package model;") is True
     assert commit.modified_files[0].content is not None
     assert commit.modified_files[0].content.decode().startswith("package model;") is True

@@ -255,6 +255,7 @@ class Git:
             path = mod.new_path
             if mod.change_type == ModificationType.RENAME or mod.change_type == ModificationType.DELETE:
                 path = mod.old_path
+
             deleted_lines = mod.diff_parsed['deleted']
 
             assert path is not None, "We could not find the path to the file"

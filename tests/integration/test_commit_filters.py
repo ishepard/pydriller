@@ -235,7 +235,7 @@ def test_filepath_with_since():
 
 
 def test_since_as_filter():
-    since_as_filter = datetime(2018, 6, 6, 0, 0, 0, tzinfo=timezone.utc)
+    since_as_filter = datetime(2018, 6, 6, tzinfo=timezone.utc)
 
     assert len(list(Repository(
         path_to_repo='test-repos/since_as_filter',

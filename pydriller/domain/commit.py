@@ -197,8 +197,8 @@ class ModifiedFile:
         return ModificationType.UNKNOWN
     
     @property
-    def diff(self) -> Optional[str]:
-        return self._get_decoded_str(self._c_diff.diff)
+    def diff(self) -> str:
+        return self._get_decoded_str(self._c_diff.diff) or ''
     
     def _get_decoded_str(self, diff: Union[str, bytes, None]) -> Optional[str]:
         try:

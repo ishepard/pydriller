@@ -1,3 +1,4 @@
 mock
+types-mock
 pytest
 psutil

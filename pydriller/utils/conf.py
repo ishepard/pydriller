@@ -156,11 +156,11 @@ class Conf:
             try:
                 commit = self.get("git").get_commit(from_commit)
                 if len(commit.parents) == 0:
-                    return [commit.hash]
+                    return [f'--ancestry-path={commit.hash}']
                 elif len(commit.parents) == 1:
-                    return ['^' + commit.hash + '^']
+                    return [f'--ancestry-path={commit.hash}', '^' + commit.hash + '^']
                 else:
-                    return ['^' + x for x in commit.parents]
+                    return [f'--ancestry-path={commit.hash}'] + ['^' + x for x in commit.parents]
             except Exception:
                 raise Exception("The commit {} defined in the 'from_tag' or 'from_commit' filter does "
                                 "not exist".format(self.get('from_commit')))

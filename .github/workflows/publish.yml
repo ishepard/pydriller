@@ -8,6 +8,11 @@ jobs:
   publish:
     name: "Build, test and upload to pypi"
     runs-on: "ubuntu-latest"
+    environment:
+      name: pypi
+      url: https://pypi.org/project/PyDriller/
+    permissions:
+      id-token: write
 
     steps:
       - uses: actions/checkout@v3
@@ -39,7 +44,3 @@ jobs:
       - name: Publish distribution 📦 to PyPI
         if: startsWith(github.ref, 'refs/tags')
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
-
-      

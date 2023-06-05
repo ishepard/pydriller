@@ -32,9 +32,9 @@ def clone_temp_repo(tmpdir) -> str:
 
 
 def test_memory(caplog, tmpdir):
-    # if not PATH:
-    #     # Check we are on GitHub
-    #     return
+    if not PATH:
+        # Check we are on GitHub
+        return
 
     caplog.set_level(logging.WARNING)
 

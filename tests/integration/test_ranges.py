@@ -41,6 +41,12 @@ def repository_mining_cc(request):
 
 
 @pytest.fixture
+def repository_mining_cc_complex(request):
+    from_commit, to_commit = request.param
+    return list(Repository('test-repos/refactoring-toy-example/', from_commit=from_commit, to_commit=to_commit).traverse_commits())
+
+
+@pytest.fixture
 def repository_mining_tt(request):
     from_tag, to_tag = request.param
     return list(Repository('test-repos/small_repo/', from_tag=from_tag, to_tag=to_tag).traverse_commits())
@@ -96,6 +102,17 @@ def test_to_commit_filter(repository_mining_cc, expected_commits):
     assert len(repository_mining_cc) == expected_commits
 
 
+@pytest.mark.parametrize('repository_mining_cc_complex,expected_commits', [
+    ((None, '05c1e773878bbacae64112f70964f4f2f7944398'), 9),
+    ((None, '76b12f8bd6559f9ab1c830ae2b4be2afad16ec22'), 27),
+    ((None, 'ef3422578c0bcaef1561980ef077d06c3f6fc9f9'), 59),
+    ((None, '9a5c33b16d07d62651ea80552e8782974c96bb8a'), 64),
+    ((None, 'HEAD'), 65),
+], indirect=['repository_mining_cc_complex'])
+def test_to_commit_filter_complex(repository_mining_cc_complex, expected_commits):
+    assert len(repository_mining_cc_complex) == expected_commits
+
+
 @pytest.mark.parametrize('repository_mining_cc,expected_commits', [
     (('6411e3096dd2070438a17b225f44475136e54e3a', None), 4),
     (('09f6182cef737db02a085e1d018963c7a29bde5a', None), 3),
@@ -104,6 +121,18 @@ def test_to_commit_filter(repository_mining_cc, expected_commits):
 ], indirect=['repository_mining_cc'])
 def test_from_commit_filter(repository_mining_cc, expected_commits):
     assert len(repository_mining_cc) == expected_commits
+
+
+@pytest.mark.parametrize('repository_mining_cc_complex,expected_commits', [
+    (('0bb0526b70870d57cbac9fcc8c4a7346a4ce5879', None), 4),
+    (('1328d7873efe6caaffaf635424e19a4bb5e786a8', None), 8),
+    (('5849e143567474f037950f005d994729de0775fc', None), 30),
+    (('05c1e773878bbacae64112f70964f4f2f7944398', None), 56),
+    (('819b202bfb09d4142dece04d4039f1708735019b', None), 65),
+    (('HEAD', None), 1)
+], indirect=['repository_mining_cc_complex'])
+def test_from_commit_filter_complex(repository_mining_cc_complex, expected_commits):
+    assert len(repository_mining_cc_complex) == expected_commits
 
 
 @pytest.mark.parametrize('repository_mining_cc,expected_commits', [
@@ -116,11 +145,34 @@ def test_from_and_to_commit(repository_mining_cc, expected_commits):
     assert len(repository_mining_cc) == expected_commits
 
 
-def test_from_and_to_commit_with_merge_commit():
-    commits = Repository('test-repos/pydriller',
-                         from_commit="015f7144641a418f6a9fae4d024286ec17fd7ce8",
-                         to_commit="01d2f2fbeb6980cc5568825d008017ca8ca767d6").traverse_commits()
-    assert len(list(commits)) == 3
+@pytest.mark.parametrize('repository_mining_cc_complex,expected_commits', [
+    (('cd61fd2a70828030ccb3cf46d8719f8b204c52ed', 'e78b02fe027621aec1227cbf5555c75775ba296b'), 6),
+    (('40950c317bd52ea5ce4cf0d19707fe426b66649c', '3bfbc107eac92f388de9f8b87682c3a0baf74981'), 10),
+    (('e78b02fe027621aec1227cbf5555c75775ba296b', 'e6237f795546c5f14765330ceebe44cd41cdfffe'), 45),
+    (('cd61fd2a70828030ccb3cf46d8719f8b204c52ed', '9a5c33b16d07d62651ea80552e8782974c96bb8a'), 63),
+], indirect=['repository_mining_cc_complex'])
+def test_from_and_to_commit_complex(repository_mining_cc_complex, expected_commits):
+    assert len(repository_mining_cc_complex) == expected_commits
+
+
+@pytest.mark.parametrize('repository_mining_cc_complex,expected_commits', [
+    (('c286db365e7374fe4d08f54077abb7fba81dd296', None), 5),
+    (('e6237f795546c5f14765330ceebe44cd41cdfffe', None), 10),
+    (('b95891f09907aaa0c6dfc6012a7b3add6b33a9b1', None), 21),
+    (('e78b02fe027621aec1227cbf5555c75775ba296b', None), 59),
+], indirect=['repository_mining_cc_complex'])
+def test_from_commit_with_merge_commit(repository_mining_cc_complex, expected_commits):
+    assert len(repository_mining_cc_complex) == expected_commits
+
+
+@pytest.mark.parametrize('repository_mining_cc_complex,expected_commits', [
+    (('36287f7c3b09eff78395267a3ac0d7da067863fd', 'e78b02fe027621aec1227cbf5555c75775ba296b'), 5),
+    (('70b71b7fd3c5973511904c468e464d4910597928', '90c0927162e4cef50fd65da6715932f908264d24'), 9),
+    (('70b71b7fd3c5973511904c468e464d4910597928', 'c286db365e7374fe4d08f54077abb7fba81dd296'), 54),
+    (('3bfbc107eac92f388de9f8b87682c3a0baf74981', 'c286db365e7374fe4d08f54077abb7fba81dd296'), 24),
+], indirect=['repository_mining_cc_complex'])
+def test_from_and_to_commit_with_merge_commit(repository_mining_cc_complex, expected_commits):
+    assert len(repository_mining_cc_complex) == expected_commits
 
 
 # FROM AND TO TAG

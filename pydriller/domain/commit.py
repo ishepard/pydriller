@@ -202,9 +202,9 @@ class ModifiedFile:
 
     def _get_decoded_str(self, diff: Union[str, bytes, None]) -> Optional[str]:
         try:
-            if type(diff) == bytes:
+            if isinstance(diff, bytes):
                 return diff.decode("utf-8", "ignore")
-            if type(diff) == str:
+            if isinstance(diff, str):
                 return diff
             return None
         except (AttributeError, ValueError):
@@ -224,14 +224,14 @@ class ModifiedFile:
 
     @property
     def source_code(self) -> Optional[str]:
-        if self.content and type(self.content) == bytes:
+        if self.content and isinstance(self.content, bytes):
             return self._get_decoded_content(self.content)
 
         return None
 
     @property
     def source_code_before(self) -> Optional[str]:
-        if self.content_before and type(self.content_before) == bytes:
+        if self.content_before and isinstance(self.content_before, bytes):
             return self._get_decoded_content(self.content_before)
 
         return None

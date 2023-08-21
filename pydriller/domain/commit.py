@@ -671,6 +671,33 @@ class Commit:
         """
         return len(self._c_object.parents) > 1
 
+    def _stats(self):
+        if len(self.parents) == 0:
+            text = self._conf.get('git').repo.git.diff_tree(self.hash, "--", numstat=True, root=True)
+            text2 = ""
+            for line in text.splitlines()[1:]:
+                (insertions, deletions, filename) = line.split("\t")
+                text2 += "%s\t%s\t%s\n" % (insertions, deletions, filename)
+            text = text2
+        else:
+            text = self._conf.get('git').repo.git.diff(self._c_object.parents[0].hexsha, self._c_object.hexsha, "--", numstat=True, root=True)
+
+        return self._list_from_string(text)
+
+    def _list_from_string(self, text: str):
+        total = {"insertions": 0, "deletions": 0, "lines": 0, "files": 0}
+
+        for line in text.splitlines():
+            (raw_insertions, raw_deletions, _) = line.split("\t")
+            insertions = raw_insertions != "-" and int(raw_insertions) or 0
+            deletions = raw_deletions != "-" and int(raw_deletions) or 0
+            total["insertions"] += insertions
+            total["deletions"] += deletions
+            total["lines"] += insertions + deletions
+            total["files"] += 1
+
+        return total
+
     @property
     def insertions(self) -> int:
         """
@@ -678,7 +705,7 @@ class Commit:
 
         :return: int insertion lines
         """
-        return self._c_object.stats.total["insertions"]
+        return self._stats()["insertions"]
 
     @property
     def deletions(self) -> int:
@@ -687,7 +714,7 @@ class Commit:
 
         :return: int deletion lines
         """
-        return self._c_object.stats.total["deletions"]
+        return self._stats()["deletions"]
 
     @property
     def lines(self) -> int:
@@ -696,7 +723,7 @@ class Commit:
 
         :return: int insertion + deletion lines
         """
-        return self._c_object.stats.total["lines"]
+        return self._stats()["lines"]
 
     @property
     def files(self) -> int:
@@ -705,7 +732,7 @@ class Commit:
 
         :return: int modified files number
         """
-        return self._c_object.stats.total["files"]
+        return self._stats()["files"]
 
     @property
     def modified_files(self) -> List[ModifiedFile]:

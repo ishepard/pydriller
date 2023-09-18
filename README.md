@@ -1,4 +1,4 @@
-[![Build Status](https://github.com/ishepard/pydriller/workflows/Pydriller%20workflow/badge.svg?event=push&branch=master)](https://github.com/ishepard/pydriller/actions)
+[![Build Status](https://github.com/ishepard/pydriller/workflows/Pydriller%20workflow/badge.svg?branch=master)](https://github.com/ishepard/pydriller/actions)
 [![Documentation Status](https://readthedocs.org/projects/pydriller/badge/?version=latest)](https://pydriller.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/ishepard/pydriller/branch/master/graph/badge.svg)](https://codecov.io/gh/ishepard/pydriller)
 [![Downloads](https://pepy.tech/badge/pydriller/month)](https://pepy.tech/project/pydriller)

@@ -577,6 +577,22 @@ class Commit:
         )
 
     @property
+    def co_authors(self) -> List[Developer]:
+        """
+        Return the co-authors of the commit as a list of Developer objects.
+
+        :return: List[Developer] author
+        """
+        co_authors = []
+        for co_author in self._c_object.co_authors:
+            d = Developer(
+                co_author.name, co_author.email
+            )
+            co_authors.append(d)
+
+        return co_authors
+
+    @property
     def committer(self) -> Developer:
         """
         Return the committer of the commit as a Developer object.

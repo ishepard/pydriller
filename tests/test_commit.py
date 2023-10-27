@@ -421,3 +421,11 @@ def test_modification_dictset(repo: Git):
     assert isinstance(mod_set, set)
     assert m1 in mod_set
     assert mod_set - {m1} == set(m2s)
+
+
+@pytest.mark.parametrize('repo', ['test-repos/multiple_authors'], indirect=True)
+def test_co_authors(repo: Git):
+    c1 = repo.get_commit('a455e6c8ba6960aa8b89bd0fd5f9abefcd10bcd6')
+
+    assert c1.co_authors[0].name == "Somebody"
+    assert c1.co_authors[0].email == "some@body.org"

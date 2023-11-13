@@ -500,3 +500,20 @@ def test_get_commits_last_modified_lines_hyper_blame_with_renaming(repo: Git):
         'A.java']
     assert '9568d20856728304ab0b4d2d02fb9e81d0e5156d' in buggy_commits[
         'H.java']
+
+@pytest.mark.parametrize('repo', ["test-repos/diff"], indirect=True)
+def test_diff_function_in_git(repo: Git):
+    from_commit_id = "9e9473d5ca310b7663e9df93c402302b6b7f24aa"
+    to_commit_id = "b267a14e0503fdac36d280422f16360d1f661f12"
+    modied_files = repo.diff(from_commit_id, to_commit_id)
+    
+    diff = modied_files[0].diff
+
+    assert len(modied_files) == 1
+    assert "@@ -107,7 +107,7 @@ public class GitRepository implements SCM {" in diff
+    assert "     }" in diff
+    assert "     public static SCMRepository completelyNewName(String path) {" in diff
+    assert "-        return allProjectsIn(path, false);" in diff
+    assert "+        return new GitRepository(path).info();" in diff
+    assert "     }" in diff
+    assert "     public static SCMRepository singleProject(String path, boolean singleParentOnly) {" in diff

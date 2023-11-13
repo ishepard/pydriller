@@ -244,6 +244,17 @@ class Git:
         return self._calculate_last_commits(commit, modifications,
                                             hashes_to_ignore_path)
 
+    def diff(self, from_commit_id: str, to_commit_id: str) -> List[ModifiedFile]:
+        from_commit = self.repo.commit(from_commit_id)
+        to_commit = self.repo.commit(to_commit_id)
+        diff_index = from_commit.diff(
+            other=to_commit,
+            paths=None,
+            create_patch=True)
+        
+        modified_files_list = [ModifiedFile(diff=diff) for diff in diff_index]
+        return modified_files_list
+
     def _calculate_last_commits(self, commit: Commit,
                                 modifications: List[ModifiedFile],
                                 hashes_to_ignore_path: Optional[str] = None) \

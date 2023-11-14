@@ -501,6 +501,7 @@ def test_get_commits_last_modified_lines_hyper_blame_with_renaming(repo: Git):
     assert '9568d20856728304ab0b4d2d02fb9e81d0e5156d' in buggy_commits[
         'H.java']
 
+
 @pytest.mark.parametrize('repo', ["test-repos/diff"], indirect=True)
 def test_diff_function_in_git(repo: Git):
     from_commit_id = "9e9473d5ca310b7663e9df93c402302b6b7f24aa"

@@ -251,7 +251,7 @@ class Git:
             other=to_commit,
             paths=None,
             create_patch=True)
-        
+
         modified_files_list = [ModifiedFile(diff=diff) for diff in diff_index]
         return modified_files_list
 

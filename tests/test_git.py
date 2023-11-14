@@ -506,7 +506,7 @@ def test_diff_function_in_git(repo: Git):
     from_commit_id = "9e9473d5ca310b7663e9df93c402302b6b7f24aa"
     to_commit_id = "b267a14e0503fdac36d280422f16360d1f661f12"
     modied_files = repo.diff(from_commit_id, to_commit_id)
-    
+
     diff = modied_files[0].diff
 
     assert len(modied_files) == 1

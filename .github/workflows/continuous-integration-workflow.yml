@@ -26,8 +26,6 @@ jobs:
           pip install -r test-requirements.txt
           pip install pytest-cov
           unzip test-repos
-      - name: Run pytest
-        run: pytest tests/ --cov=pydriller/ --cov-report=xml
       - name: Mypy
         run: |
           pip install mypy
@@ -36,6 +34,8 @@ jobs:
         run: |
           pip install flake8
           flake8
+      - name: Run pytest
+        run: pytest tests/ --cov=pydriller/ --cov-report=xml
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:

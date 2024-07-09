@@ -1,6 +1,5 @@
 from unittest.mock import patch
 from pydriller.utils.check_git_version import CheckGitVersion, GitVersion
-from pytest_mock import MockerFixture
 from contextlib import nullcontext as does_not_raise
 
 import pytest
@@ -14,7 +13,7 @@ import pytest
         ("2.0.0", pytest.raises(GitVersion)),
     ],
 )
-def test_extracts_correct_version(mocker: MockerFixture, version_number, expectation):
+def test_extracts_correct_version(version_number, expectation):
     with patch(
         "pydriller.utils.check_git_version.subprocess.check_output"
     ) as mock_git_version:

@@ -35,7 +35,7 @@ jobs:
           pip install flake8
           flake8
       - name: Run pytest
-        run: pytest tests/ --cov=pydriller/ --cov-report=xml
+        run: pytest --junitxml=testpulse/test_run/test_results.xml --cov-report xml:testpulse/test_run/coverage.xml --cov=pydriller tests/
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:

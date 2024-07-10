@@ -41,3 +41,10 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
+      - name: Upload to testpulse
+        if: github.ref == 'refs/heads/master' && '!cancelled()'
+        env: 
+          TESTPULSE_TOKEN: ${{ secrets.TESTPULSE_TOKEN }}
+        run: |
+          pip install testpulse-uploader
+          testpulse-upload -tr ".*testpulse\/test_run\/.*\.xml" -tr ".*testpulse\\test_run\\.*\.xml" --config-file .testpulse.yaml -lv ${{ matrix.python }} -tt unit

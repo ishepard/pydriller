@@ -42,7 +42,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
       - name: Upload to testpulse
-        if: github.ref == 'refs/heads/master' && '!cancelled()'
+        if: '!cancelled()'
         env: 
           TESTPULSE_TOKEN: ${{ secrets.TESTPULSE_TOKEN }}
         run: |

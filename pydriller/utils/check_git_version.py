@@ -13,7 +13,6 @@ class CheckGitVersion:
             subprocess.check_output(["git", "--version"]).decode("ascii").strip()
         )
         version_number = re.findall(r"[0-9]+\.[0-9]+", git_version)[0]
-        print(git_version)
         if float(version_number) < 2.38:
             raise GitVersion(
                 f"Current git version is {version_number}. Minimum supported version is 2.38."

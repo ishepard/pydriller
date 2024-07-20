@@ -1,0 +1,11 @@
+settings:
+  broken:
+    consecutive_failures:
+      unit: 1
+  recovery:
+    consecutive_passes:
+      from_broken:
+        unit: 5
+      from_flaky:
+        unit: 5
+  emails: contact@testpulse.io

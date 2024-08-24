@@ -3,8 +3,8 @@
 ============
 Repository
 ============
-`Repository` is the main class of Pydriller, responsible of returning the list of commits you want.
-One of the main advantage of using PyDriller to mine software repositories is that it is highly configurable. We will now see all the options that once can pass to Repository.
+`Repository` is the main class of Pydriller, responsible for returning the list of commits you want.
+One of the main advantages of using PyDriller to mine software repositories is that it is highly configurable. We will now see all the options that one can pass to Repository.
 
 Simple Scenario
 ===============

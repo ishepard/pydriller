@@ -2,7 +2,7 @@
 Module that calculates the number of hunks made to a commit file.
 """
 import statistics
-from typing import Optional
+from typing import Optional, Dict, Tuple
 
 from pydriller import ModificationType
 from pydriller.metrics.process.process_metric import ProcessMetric
@@ -35,10 +35,10 @@ class CodeChurn(ProcessMetric):
         super().__init__(path_to_repo, since=since, to=to, from_commit=from_commit, to_commit=to_commit)
         self.ignore_added_files = ignore_added_files
         self.add_deleted_lines_to_churn = add_deleted_lines_to_churn
+        self.added_removed_lines = {}
         self._initialize()
 
     def _initialize(self):
-
         renamed_files = {}
         self.files = {}
 
@@ -54,12 +54,24 @@ class CodeChurn(ProcessMetric):
                 if self.ignore_added_files and modified_file.change_type == ModificationType.ADD:
                     continue
 
+                added_lines = modified_file.added_lines
+                deleted_lines = modified_file.deleted_lines
+                self.added_removed_lines[filepath] = (added_lines, deleted_lines)
+
                 if self.add_deleted_lines_to_churn:
-                    churn = modified_file.added_lines + modified_file.deleted_lines
+                    churn = added_lines + deleted_lines
                 else:
-                    churn = modified_file.added_lines - modified_file.deleted_lines
+                    churn = added_lines - deleted_lines
 
                 self.files.setdefault(filepath, []).append(churn)
+
+    def get_added_and_removed_lines(self) -> Dict[str, Tuple[int, int]]:
+        """
+        Returns a dictionary with file paths as keys and a tuple of added and removed lines as values.
+
+        :return: A dictionary where the key is the file path, and the value is a tuple (added_lines, removed_lines).
+        """
+        return self.added_removed_lines
 
     def count(self):
         """

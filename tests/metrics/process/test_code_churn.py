@@ -85,3 +85,13 @@ def test_with_add_deleted_lines_flag():
     assert len(code_churns) == 18
     assert str(Path('domain/__init__.py')) in code_churns
     assert code_churns[str(Path('domain/commit.py'))] == 40
+
+def test_get_added_and_removed_lines():
+    metric = CodeChurn(path_to_repo='test-repos/pydriller',
+                       from_commit='ab36bf45859a210b0eae14e17683f31d19eea041',
+                       to_commit='fdf671856b260aca058e6595a96a7a0fba05454b')
+
+    added_removed_lines = metric.get_added_and_removed_lines()
+
+    assert isinstance(added_removed_lines, dict)
+    assert all(isinstance(value, tuple) and len(value) == 2 for value in added_removed_lines.values())

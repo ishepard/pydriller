@@ -67,11 +67,12 @@ Depending on the parametrization, a code churn is the sum of either
     
 across the analyzed commits.
 
-The class ``CodeChurn`` has three methods:
+The class ``CodeChurn`` has four methods:
 
 * ``count()`` to count the *total* size of code churns of a file;
 * ``max()`` to count the *maximum* size of a code churn of a file;
-* ``avg()`` to count the *average* size of a code churn of a file. **Note:** The average value is rounded off to the nearest integer.
+* ``avg()`` to count the *average* size of a code churn of a file. **Note:** The average value is rounded off to the nearest integer;
+* ``get_added_and_removed_lines()`` to retrieve the *exact* number of lines added and removed for each file as a tuple (added_lines, removed_lines).
 
 For example::
 
@@ -82,15 +83,20 @@ For example::
     files_count = metric.count()
     files_max = metric.max()
     files_avg = metric.avg()
+    added_removed_lines = metric.get_added_and_removed_lines()
+    
     print('Total code churn for each file: {}'.format(files_count))
     print('Maximum code churn for each file: {}'.format(files_max))
     print('Average code churn for each file: {}'.format(files_avg))
+    print('Lines added and removed for each file: {}'.format(added_removed_lines))
 
-will print the total, maximum and average number of code churn for each modified file in the evolution period ``[from_commit, to_commit]``. 
+will print the total, maximum, and average number of code churns for each modified file, along with the number of lines added and removed, in the evolution period ``[from_commit, to_commit]``.
 
 The calculation variant (a) or (b) can be configured by setting the ``CodeChurn`` init parameter:
 
 * ``add_deleted_lines_to_churn``
+
+To retrieve the added and removed lines for each file directly, the ``get_added_and_removed_lines()`` method can be used, which returns a dictionary with file paths as keys and a tuple (added_lines, removed_lines) as values.
 
 
 Commits Count

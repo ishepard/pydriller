@@ -118,8 +118,14 @@ class Git:
         if 'reverse' not in kwargs:
             kwargs['reverse'] = True
 
-        for commit in self.repo.iter_commits(rev=rev, **kwargs):
-            yield self.get_commit_from_gitpython(commit)
+        try:
+            for commit in self.repo.iter_commits(rev=rev, **kwargs):
+                yield self.get_commit_from_gitpython(commit)
+        except GitCommandError as gce:
+            if "fatal: bad revision 'HEAD'" in str(gce):
+                logger.debug(f"Could not find commits in {self.path}")
+            else:
+                raise Exception(f"Error while getting commits: {gce}")
 
     def get_commit(self, commit_id: str) -> Commit:
         """

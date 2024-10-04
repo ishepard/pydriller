@@ -42,10 +42,12 @@ def test_get_head(repo: Git):
     assert cs.hash == 'da39b1326dbc2edfe518b90672734a08f3c13458'
     assert cs.author_date.timestamp() == 1522164679
 
+    
 @pytest.mark.parametrize('repo', ['test-repos/empty_repo/'], indirect=True)
 def test_empty_repo(repo: Git):
     change_sets = list(repo.get_list_commits())
     assert change_sets == []
+
 
 @pytest.mark.parametrize('repo', ['test-repos/small_repo/'], indirect=True)
 def test_list_commits(repo: Git):

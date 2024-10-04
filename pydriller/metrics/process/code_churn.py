@@ -35,7 +35,7 @@ class CodeChurn(ProcessMetric):
         super().__init__(path_to_repo, since=since, to=to, from_commit=from_commit, to_commit=to_commit)
         self.ignore_added_files = ignore_added_files
         self.add_deleted_lines_to_churn = add_deleted_lines_to_churn
-        self.added_removed_lines = {}
+        self.added_removed_lines: Dict[str, Tuple[int, int]] = {}
         self._initialize()
 
     def _initialize(self):

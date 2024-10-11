@@ -7,13 +7,13 @@ from typing import Optional, Tuple
 class DeveloperFactory(ABC):
 
     @abstractmethod
-    def get_developer(self, name: Optional[str] = None, email: Optional[str] = None):
+    def get_developer(self, name: Optional[str] = None, email: Optional[str] = None) -> Developer:
         pass
 
 
 class DefaultDeveloperFactory(DeveloperFactory):
 
-    def get_developer(self, name: Optional[str] = None, email: Optional[str] = None):
+    def get_developer(self, name: Optional[str] = None, email: Optional[str] = None) -> Developer:
         return Developer(name, email)
 
 
@@ -52,11 +52,11 @@ class MailmapDeveloperFactory(DeveloperFactory):
             else:
                 map_name, map_email = result.stdout.split(" <")
                 map_email = map_email[:-2]
-            return map_name, map_email
         elif result.stderr:
             # This is to make it robust. In case anything goes wrong, go with the knowledge
             # that we have about the author or committer
-            return name, email
+            return str(name), str(email)
+        return map_name, map_email
 
     def get_developer(self, name: Optional[str] = None, email: Optional[str] = None) -> Developer:
         """ Get canonical names and emails for a `Developer`.

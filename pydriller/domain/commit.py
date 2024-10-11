@@ -572,7 +572,7 @@ class Commit:
 
         :return: author
         """
-        return Developer(
+        return self._conf.get("developer_factory").get_developer(
             self._c_object.author.name, self._c_object.author.email
         )
 
@@ -585,7 +585,7 @@ class Commit:
         """
         co_authors = []
         for co_author in self._c_object.co_authors:
-            d = Developer(
+            d = self._conf.get("developer_factory").get_developer(
                 co_author.name, co_author.email
             )
             co_authors.append(d)
@@ -599,7 +599,7 @@ class Commit:
 
         :return: committer
         """
-        return Developer(
+        return self._conf.get("developer_factory").get_developer(
             self._c_object.committer.name, self._c_object.committer.email
         )
 

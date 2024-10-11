@@ -11,3 +11,11 @@ def test_eq_dev():
     assert d1 == d2
     assert d1 != d3
     assert d1 != d4
+
+
+def test_representation():
+    d = Developer("Davide", "s.d@gmail.com")
+
+    d_repr = d.__repr__()
+
+    assert d_repr == 'Developer("Davide", "s.d@gmail.com")'

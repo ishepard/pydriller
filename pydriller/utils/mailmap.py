@@ -7,7 +7,7 @@ from typing import Optional, Tuple
 class DeveloperFactory(ABC):
 
     @abstractmethod
-    def get_developer(self):
+    def get_developer(self, name: Optional[str] = None, email: Optional[str] = None):
         pass
 
 

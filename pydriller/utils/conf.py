@@ -10,6 +10,7 @@ import pytz
 from gitdb.exc import BadName
 
 from pydriller.domain.commit import Commit
+from pydriller.utils.mailmap import DefaultDeveloperFactory, MailmapDeveloperFactory
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,11 @@ class Conf:
             self.set_value('path_to_repos', [self.get('path_to_repo')])
         else:
             self.set_value('path_to_repos', self.get('path_to_repo'))
+
+        if self._options.get("use_mailmap"):
+            self.set_value("developer_factory", MailmapDeveloperFactory(self))
+        else:
+            self.set_value("developer_factory", DefaultDeveloperFactory())
 
     def set_value(self, key: str, value: Any) -> None:
         """

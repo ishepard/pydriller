@@ -60,7 +60,8 @@ class Repository:
                  histogram_diff: bool = False,
                  skip_whitespaces: bool = False,
                  clone_repo_to: Optional[str] = None,
-                 order: Optional[str] = None):
+                 order: Optional[str] = None,
+                 use_mailmap: bool = False):
         """
         Init a repository. The only required parameter is
         "path_to_repo": to analyze a single repo, pass the absolute path to
@@ -102,6 +103,8 @@ class Repository:
         :param bool include_deleted_files: include commits modifying a deleted file (useful when analyzing a deleted `filepath`)
         :param str order: order of commits. It can be one of: 'date-order',
             'author-date-order', 'topo-order', or 'reverse'. If order=None, PyDriller returns the commits from the oldest to the newest.
+        :param bool use_mailmap: Map names and emails of authors and committers to canonical values when a .mailmap file is present in
+            the repository.
         """
         file_modification_set = (
             None if only_modifications_with_file_types is None
@@ -139,7 +142,8 @@ class Repository:
             "tagged_commits": None,
             "histogram": histogram_diff,
             "clone_repo_to": clone_repo_to,
-            "order": order
+            "order": order,
+            "use_mailmap": use_mailmap
         }
         self._conf = Conf(options)
 

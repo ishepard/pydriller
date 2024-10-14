@@ -76,7 +76,7 @@ def test_mailmap_dev_factory_with_caching_stderr(dev_factory, name, email, expec
     mock_result = CompletedProcess("", 123)
     mock_result.stderr = "fatal: ..."
 
-    with mock.patch.object(dev_factory, "_run_check_mailmap",  return_value=mock_result):
+    with mock.patch("subprocess.run",  return_value=mock_result):
         d = dev_factory.get_developer(name, email)
 
         assert d == expected

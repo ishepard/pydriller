@@ -59,9 +59,9 @@ testdata3 = [
     (dev_factory, "Davide", "s.d@gmail.com", Developer("Davide", "s.d@gmail.com")),
 ]
 
+
 @pytest.mark.parametrize("dev_factory,name,email,expected", testdata3)
 def test_mailmap_dev_factory_with_caching_raise_exception(dev_factory, name, email, expected):
-
 
     with mock.patch.object(dev_factory, "_run_check_mailmap",  side_effect=Exception("ERROR")):
         d = dev_factory.get_developer(name, email)

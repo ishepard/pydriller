@@ -6,7 +6,7 @@
 
 # PyDriller
 
-PyDriller is a Python framework that helps developers in analyzing Git repositories. With PyDriller you can easily extract information about **commits**, **developers**, **modified files**, **diffs**, and **source code**. 
+PyDriller is a Python framework that helps developers in analyzing Git repositories. With PyDriller you can easily extract information about **commits**, **developers**, **modified files**, **diffs**, and **source code**.
 
 ## Install
 ```
@@ -51,20 +51,34 @@ Furthermore, a video is available on [Youtube](https://www.youtube.com/watch?v=7
 ```
 
 ## How to contribute
-First clone the repository:
-```
-git clone https://github.com/ishepard/pydriller.git
-cd pydriller
-```
-**(Optional)** It is suggested to make use of `virtualenv`. Therefore, before installing the requirements run:
-```
-python3 -m venv venv
-source venv/bin/activate
-```
-Then, install the requirements:
-```
-pip install -r requirements.txt
-```
+
+### Pre-requisites
+
+- First clone the repository:
+  ```
+  git clone https://github.com/ishepard/pydriller.git
+  cd pydriller
+  ```
+- **(Optional)** It is suggested to make use of `virtualenv`. Therefore, before installing the requirements run:
+  ```
+  python3 -m venv venv
+  source venv/bin/activate
+  ```
+- Then, install PyDriller's requirements:
+  ```
+  pip install -r requirements.txt
+  ```
+- For executing the test suite, extract the test repositories and install the test requirements:
+  ```
+  unzip test-repos.zip
+  pip install -r test-requirements.txt
+  ```
+- For linting and type checking, install the development requirements
+  ```
+  pip install -r dev-requirements.txt
+  ```
+
+### Testing
 
 **(Important)** I tend to not accept Pull Requests without tests, so:
 
@@ -72,13 +86,64 @@ pip install -r requirements.txt
 - inside are many "small repositories" that were manually created to test PyDriller. Use one of your choice to test your feature (check the existing tests for inspiration)
 - if none is suitable for testing your feature, create a new one. **Be careful**: if you create a new one, do not forget to upload a new zip file `test-repos.zip` that includes your new repository, otherwise the tests will fail.
 
-To run the tests (using pytest):
+Run the test suite with [pytest](https://docs.pytest.org/en/stable/):
 
 ```
-unzip test-repos.zip
-pip install -r test-requirements.txt
 pytest
 ```
+
+Run the test suite with a coverage report as terminal output:
+
+```
+pytest --cov-report term --cov=pydriller tests/
+```
+
+alternatively run:
+
+```
+make testcoverage
+```
+
+### Type checking
+
+PyDriller source code is annotated for type checking, [see syntax](https://peps.python.org/pep-0484/).
+The [mypy type checker](https://www.mypy-lang.org/) is executed on each pull request.
+That is, code that does not type check will not pass that build step, see [CI step](https://github.com/ishepard/pydriller/blob/51510ab68b30174f085ceec235cfeaeb1bf3fbc0/.github/workflows/continuous-integration-workflow.yml#L29).
+Run the type checker locally:
+
+```
+mypy --ignore-missing-imports pydriller/ tests/
+```
+
+alternatively run:
+
+```
+make typecheck
+```
+
+### Linting
+
+PyDriller relies on the [Flake8 linter](https://flake8.pycqa.org/en/latest/) to check and enforce code style.
+The linter is executed on each pull request.
+That is, code that does not conform to [code style rules as formulated by Flake8](https://www.flake8rules.com/), will not pass that build step, see [CI step](https://github.com/ishepard/pydriller/blob/51510ab68b30174f085ceec235cfeaeb1bf3fbc0/.github/workflows/continuous-integration-workflow.yml#L33).
+Run the type checker locally:
+
+```
+flake8
+```
+
+alternatively run:
+
+```
+make lint
+```
+
+### CodeQL
+
+PyDriller's CI chain executes a set of CodeQL queries related to Python quality and security.
+Currently, a local CodeQL setup is quite big (>1.7GB) and require multiple setup and configuration steps.
+Therefore, it is omitted here and in the [Makefile](./Makefile).
+
 
 ## Acknowledgements
 

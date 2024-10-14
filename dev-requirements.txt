@@ -1,0 +1,4 @@
+mypy
+flake8
+types-mock
+pytest-cov

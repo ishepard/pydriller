@@ -2,6 +2,7 @@ import mock
 import pytest
 from pydriller.domain.developer import Developer
 from pydriller.utils.mailmap import DefaultDeveloperFactory, MailmapDeveloperFactory
+from subprocess import CompletedProcess
 
 
 def test_default_dev_factory():
@@ -64,6 +65,18 @@ testdata3 = [
 def test_mailmap_dev_factory_with_caching_raise_exception(dev_factory, name, email, expected):
 
     with mock.patch.object(dev_factory, "_run_check_mailmap",  side_effect=Exception("ERROR")):
+        d = dev_factory.get_developer(name, email)
+
+        assert d == expected
+
+
+@pytest.mark.parametrize("dev_factory,name,email,expected", testdata3)
+def test_mailmap_dev_factory_with_caching_stderr(dev_factory, name, email, expected):
+
+    mock_result = CompletedProcess("", 123)
+    mock_result.stdout = "fatal: ..."
+
+    with mock.patch.object(dev_factory, "_run_check_mailmap",  return_value=mock_result):
         d = dev_factory.get_developer(name, email)
 
         assert d == expected

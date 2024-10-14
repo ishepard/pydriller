@@ -74,7 +74,7 @@ def test_mailmap_dev_factory_with_caching_raise_exception(dev_factory, name, ema
 def test_mailmap_dev_factory_with_caching_stderr(dev_factory, name, email, expected):
 
     mock_result = CompletedProcess("", 123)
-    mock_result.stdout = "fatal: ..."
+    mock_result.stderr = "fatal: ..."
 
     with mock.patch.object(dev_factory, "_run_check_mailmap",  return_value=mock_result):
         d = dev_factory.get_developer(name, email)

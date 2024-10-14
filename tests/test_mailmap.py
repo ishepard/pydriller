@@ -1,3 +1,4 @@
+import mock
 import pytest
 from pydriller.domain.developer import Developer
 from pydriller.utils.mailmap import DefaultDeveloperFactory, MailmapDeveloperFactory
@@ -39,6 +40,7 @@ testdata2 = [
     (dev_factory, "Thomas Arrow", "thomasarrow@gmail.com", Developer("Thomas Arrow", "thomasarrow@gmail.com")),
     (dev_factory, "Sam Pablo Kuper", "sampablokuper@uclmail.net", Developer("Sam Pablo Kuper", "sampablokuper@uclmail.net")),
     (dev_factory, "Davide", "s.d@gmail.com", Developer("Davide", "s.d@gmail.com")),
+    (dev_factory, "", "sampablokuper@uclmail.net", Developer("", "sampablokuper@uclmail.net")),
 ]
 
 
@@ -47,3 +49,21 @@ def test_mailmap_dev_factory_with_caching(dev_factory, name, email, expected):
     d = dev_factory.get_developer(name, email)
 
     assert d == expected
+
+
+dev_factory = MailmapDeveloperFactory(config)
+testdata3 = [
+    (dev_factory, "My Name", "tarrow@users.noreply.github.com", Developer("My Name", "tarrow@users.noreply.github.com")),
+    (dev_factory, "Thomas Arrow", "thomasarrow@gmail.com", Developer("Thomas Arrow", "thomasarrow@gmail.com")),
+    (dev_factory, "Sam Pablo Kuper", "sampablokuper@uclmail.net", Developer("Sam Pablo Kuper", "sampablokuper@uclmail.net")),
+    (dev_factory, "Davide", "s.d@gmail.com", Developer("Davide", "s.d@gmail.com")),
+]
+
+@pytest.mark.parametrize("dev_factory,name,email,expected", testdata3)
+def test_mailmap_dev_factory_with_caching_raise_exception(dev_factory, name, email, expected):
+
+
+    with mock.patch.object(dev_factory, "_run_check_mailmap",  side_effect=Exception("ERROR")):
+        d = dev_factory.get_developer(name, email)
+
+        assert d == expected

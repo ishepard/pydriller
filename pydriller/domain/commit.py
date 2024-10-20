@@ -690,8 +690,8 @@ class Commit:
 
     def _stats(self):
         if self._stats_cache is not None:
-            return self._stats_cache         
-        
+            return self._stats_cache
+
         if len(self.parents) == 0:
             text = self._conf.get('git').repo.git.diff_tree(self.hash, "--", numstat=True, root=True)
             text2 = ""

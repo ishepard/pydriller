@@ -542,6 +542,7 @@ class Commit:
         """
         self._c_object = commit
         self._conf = conf
+        self._stats_cache = None
 
     def __hash__(self) -> int:
         """
@@ -688,6 +689,9 @@ class Commit:
         return len(self._c_object.parents) > 1
 
     def _stats(self):
+        if self._stats_cache is not None:
+            return self._stats_cache         
+        
         if len(self.parents) == 0:
             text = self._conf.get('git').repo.git.diff_tree(self.hash, "--", numstat=True, root=True)
             text2 = ""
@@ -698,7 +702,8 @@ class Commit:
         else:
             text = self._conf.get('git').repo.git.diff(self._c_object.parents[0].hexsha, self._c_object.hexsha, "--", numstat=True, root=True)
 
-        return self._list_from_string(text)
+        self._stats_cache = self._list_from_string(text)
+        return self._stats_cache
 
     def _list_from_string(self, text: str):
         total = {"insertions": 0, "deletions": 0, "lines": 0, "files": 0}

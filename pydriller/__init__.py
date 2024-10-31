@@ -2,4 +2,4 @@
 from .domain.commit import Commit, ModifiedFile, ModificationType # noqa
 from .repository import Repository, Git    # noqa
 
-__version__ = "2.6"
+__version__ = "2.7"

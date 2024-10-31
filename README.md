@@ -32,6 +32,10 @@ for commit in Repository('https://github.com/ishepard/pydriller').traverse_commi
 Read the [docs](http://pydriller.readthedocs.io) for more usage examples.
 Furthermore, a video is available on [Youtube](https://www.youtube.com/watch?v=7Oui4bP9eN8).
 
+## TestPulse
+If you are interested in tests, tests health and code quality, test code coverage, etc..., you might be interested in our new project: **TestPulse!**
+Check it out: [https://www.testpulse.io](https://www.testpulse.io)
+
 ## How to cite PyDriller
 
 ```

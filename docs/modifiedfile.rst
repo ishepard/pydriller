@@ -18,7 +18,7 @@ You can get a list of modified files as well as their diffs and current source c
 * **source_code_before**: source code of the file before the change (can be ``None`` if the file is added or only renamed)
 * **methods**: list of methods of the file. The list might be empty if the programming language is not supported or if the file is not a source code file. These are the methods **after** the change.
 * **methods_before**: list of methods of the file **before** the change (e.g., before the commit.)
-* **changed_methods**: subset of _methods_ containing **only** the changed methods. 
+* **changed_methods**: subset of *methods* containing **only** the changed methods. 
 * **nloc**: Lines Of Code (LOC) of the file
 * **complexity**: Cyclomatic Complexity of the file
 * **token_count**: Number of Tokens of the file

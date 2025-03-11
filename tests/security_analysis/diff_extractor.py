@@ -1,120 +1,171 @@
 import argparse
 import csv
 import json
+import os
+from pydriller import Repository
 
-# We import the security commit filter function from commit_filter.py
-from commit_filter import filter_security_commits
+########################################################################
+# 1) Define the security keywords and their associated severity levels
+########################################################################
+SECURITY_KEYWORDS = {
+    "cve": "Critical",
+    "buffer overflow": "High",
+    "exploit": "High",
+    "vulnerability": "Medium",
+    "security fix": "Medium",
+    "patch": "Low",
+    "mitigation": "Low"
+}
+
 
 def extract_security_diffs_and_store(repo_url):
     """
-    1. Calls 'filter_security_commits(repo_url)' to obtain flagged (security-related) commits.
-    2. For each flagged commit, collects relevant info (commit hash, author, date, file name, etc.).
-    3. Stores the resulting data in CSV, JSON, and Markdown formats.
+    Main function:
+      - Scans the repository for security-related commits by matching keywords (with severity).
+      - For each flagged commit, writes a .diff file labeled by commit hash.
+      - Stores a snippet of the commit data (including severity) in CSV, JSON, and Markdown.
     """
 
-    # Retrieve flagged commits from the separate commit_filter.py file
-    flagged_commits = filter_security_commits(repo_url)
+    ########################################################################
+    # 2) Filter commits based on the SECURITY_KEYWORDS dictionary
+    ########################################################################
+    flagged_commits = []
+    for commit in Repository(repo_url).traverse_commits():
+        matched_severity = None
+        for keyword, severity in SECURITY_KEYWORDS.items():
+            if keyword in commit.msg.lower():
+                matched_severity = severity
+                break  # only use the first match to assign severity
+        if matched_severity:
+            flagged_commits.append((commit, matched_severity))
+
+    if not flagged_commits:
+        print("[!] No security-related commits were found. Exiting.")
+        return
+
+    # We'll store data (commit info, severity, diff snippet) for CSV/JSON/Markdown
     security_data = []
 
-    # Build a list of dictionaries containing information about each commit/file
-    for commit in flagged_commits:
+    # Ensure we have a folder for storing .diff files
+    os.makedirs("patches", exist_ok=True)
+
+    ########################################################################
+    # 3) For each flagged commit, label patches with commit hash & store data
+    ########################################################################
+    for commit, severity in flagged_commits:
         for mod in commit.modified_files:
-            # Construct a dictionary capturing basic info
+            full_diff = mod.diff or ""
+
+            # A) Write out the full patch to a .diff file labeled by commit hash + filename
+            label_patches_with_commit_hash(commit.hash, mod.filename, full_diff)
+
+            # B) Build dictionary containing info for CSV/JSON/Markdown
             entry = {
                 "commit_hash": commit.hash,
                 "author": commit.author.name,
                 "date": str(commit.author_date),
-                "file_name": mod.filename,
-                # Only a snippet of the diff to prevent storing huge outputs
-                "diff_preview": (mod.diff or "")[:100]
+                "severity": severity,  # from the matched keyword
+                "filename": mod.filename,
+                # We'll only store a partial snippet to keep the table short
+                "diff_preview": full_diff[:100]
             }
             security_data.append(entry)
 
-    # Store the data in three different output formats
+    ########################################################################
+    # 4) Write summary data to CSV, JSON, and Markdown
+    ########################################################################
     store_patches_in_csv(security_data, "report.csv")
     store_patches_in_json(security_data, "report.json")
     store_patches_in_markdown(security_data, "report.md")
 
-    print("[+] Security-related commit data has been saved as report.csv, report.json, and report.md.")
+    print("[+] Done. Labeled .diff files in 'patches/' folder.")
+    print("[+] Summary stored in 'report.csv', 'report.json', and 'report.md'.")
+
+
+def label_patches_with_commit_hash(commit_hash, filename, diff_text):
+    """
+    Creates a .diff file named '<commitHash>_<filename>.diff' in the 'patches' folder,
+    labeling each patch with the commit hash for easy reference.
+    """
+    short_hash = commit_hash[:7]  # optional: shorten commit hash
+    sanitized_filename = filename.replace("/", "_")
+    outfile = f"patches/{short_hash}_{sanitized_filename}.diff"
+
+    with open(outfile, "w", encoding="utf-8") as f:
+        f.write(diff_text)
+    print(f"[+] Wrote patch file -> {outfile}")
+
 
 def store_patches_in_csv(data, csv_filename):
     """
-    Writes the list of dictionaries (data) into a CSV file.
-    Each dictionary's keys will correspond to column headers.
+    Writes the list of dictionaries to a CSV file, including severity and commit hash.
     """
     if not data:
-        print("[!] No data found to store in CSV.")
+        print("[!] No security data to write to CSV.")
         return
 
-    # Extract column headers from the keys of the first dictionary entry
-    headers = data[0].keys()
-
+    headers = list(data[0].keys())
     with open(csv_filename, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=headers)
         writer.writeheader()
         for row in data:
             writer.writerow(row)
 
-    print(f"[+] CSV file created -> {csv_filename}")
+    print(f"[+] CSV created -> {csv_filename}")
+
 
 def store_patches_in_json(data, json_filename):
     """
-    Writes the list of dictionaries (data) into a JSON file.
+    Writes the list of dictionaries to a JSON file, including severity and commit hash.
     """
     if not data:
-        print("[!] No data found to store in JSON.")
+        print("[!] No security data to write to JSON.")
         return
 
     with open(json_filename, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
-    print(f"[+] JSON file created -> {json_filename}")
+    print(f"[+] JSON created -> {json_filename}")
+
 
 def store_patches_in_markdown(data, md_filename):
     """
-    Writes the list of dictionaries (data) into a simple Markdown table.
-    Each dictionary key becomes a column in the table.
+    Writes the list of dictionaries to a Markdown table, including severity and commit hash.
     """
     if not data:
-        print("[!] No data found to store in Markdown.")
+        print("[!] No security data to write to Markdown.")
         return
 
-    # Use the keys of the first dictionary to determine table headers
     headers = list(data[0].keys())
-
     with open(md_filename, "w", encoding="utf-8") as f:
-        # 1) Write a Markdown header row
+        # Header row
         header_row = "| " + " | ".join(headers) + " |\n"
         f.write(header_row)
 
-        # 2) Write a separator row (--- for each column)
+        # Separator row
         separator_row = "| " + " | ".join(["---"] * len(headers)) + " |\n"
         f.write(separator_row)
 
-        # 3) For each data entry, build a row containing the values
+        # Data rows
         for row in data:
             row_values = [str(row[h]) for h in headers]
             line = "| " + " | ".join(row_values) + " |\n"
             f.write(line)
 
-    print(f"[+] Markdown file created -> {md_filename}")
+    print(f"[+] Markdown created -> {md_filename}")
+
 
 def main():
-    """
-    The main entry point to run this script via command-line arguments.
-
-    Usage example:
-        python diff_extractor.py --repo /path/or/url/to/your/repository
-    """
+    import argparse
     parser = argparse.ArgumentParser(
-        description="Extract security-related commits and store results in CSV, JSON, and Markdown."
+        description="Extract diffs from security-related commits using severity-based keywords."
     )
     parser.add_argument("--repo", required=True,
                         help="Path or URL to the Git repository to analyze.")
     args = parser.parse_args()
 
-    # Call the main logic function
     extract_security_diffs_and_store(args.repo)
+
 
 if __name__ == "__main__":
     main()

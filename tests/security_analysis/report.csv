@@ -1,0 +1,383 @@
+commit_hash,author,date,severity,filename,diff_preview
+abf80aae384319ef9b19ffbd0d69a1fbe7421f1f,Viktor Szakats,2025-03-06 22:13:39+01:00,Low,mqttd.c,"@@ -704,7 +704,7 @@ static bool mqttd_incoming(curl_socket_t listenfd)
+         logmsg(""signalled to"
+abf80aae384319ef9b19ffbd0d69a1fbe7421f1f,Viktor Szakats,2025-03-06 22:13:39+01:00,Low,sockfilt.c,"@@ -1075,7 +1075,7 @@ static bool juggle(curl_socket_t *sockfdp,
+       return FALSE;
+     }
+ 
+-  } "
+abf80aae384319ef9b19ffbd0d69a1fbe7421f1f,Viktor Szakats,2025-03-06 22:13:39+01:00,Low,socksd.c,"@@ -699,7 +699,7 @@ static bool socksd_incoming(curl_socket_t listenfd)
+         logmsg(""signalled t"
+abf80aae384319ef9b19ffbd0d69a1fbe7421f1f,Viktor Szakats,2025-03-06 22:13:39+01:00,Low,sws.c,"@@ -861,7 +861,7 @@ static int sws_get_request(curl_socket_t sock, struct sws_httprequest *req)
+    "
+abf80aae384319ef9b19ffbd0d69a1fbe7421f1f,Viktor Szakats,2025-03-06 22:13:39+01:00,Low,util.c,"@@ -299,7 +299,7 @@ int wait_ms(int timeout_ms)
+       if(r != -1)
+         break;
+       error = er"
+abf80aae384319ef9b19ffbd0d69a1fbe7421f1f,Viktor Szakats,2025-03-06 22:13:39+01:00,Low,util.h,"@@ -26,17 +26,21 @@
+ #include ""server_setup.h""
+ 
+ #ifdef USE_WINSOCK
+-/* errno.h values */
+-#undef  "
+d69425ed7d0918aceddd96048b146a9df85638ec,Viktor Szakats,2025-03-07 17:07:35+01:00,Critical,curl_setup_once.h,"@@ -321,68 +321,25 @@ typedef unsigned int bit;
+ #define EWOULDBLOCK      WSAEWOULDBLOCK
+ #undef  EI"
+7e282e18a5c8f76e21de70533f8dce1198dd8133,Viktor Szakats,2025-03-09 00:32:22+01:00,High,windows.yml,"@@ -350,9 +350,6 @@ jobs:
+           if [ '${{ matrix.sys }}' != 'msys' ]; then
+             TFLAGS+"
+7e282e18a5c8f76e21de70533f8dce1198dd8133,Viktor Szakats,2025-03-09 00:32:22+01:00,High,lib2302.c,"@@ -28,13 +28,15 @@
+ 
+ struct ws_data {
+   CURL *easy;
+-  char buf[1024*1024];
++  char *buf;
+   size"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,PickyWarnings.cmake,"@@ -102,6 +102,7 @@ if(PICKY_COMPILER)
+       -Waddress                            # clang  2.7  gcc"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,base64.c,"@@ -191,7 +191,7 @@ static CURLcode base64_encode(const char *table64,
+ {
+   char *output;
+   char *"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,bufref.c,"@@ -61,7 +61,7 @@ void Curl_bufref_free(struct bufref *br)
+   DEBUGASSERT(br->ptr || !br->len);
+ 
+  "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,cf-socket.c,"@@ -731,7 +731,8 @@ static CURLcode bindlocal(struct Curl_easy *data, struct connectdata *conn,
+    "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,cfilters.h,"@@ -656,7 +656,7 @@ struct cf_call_data {
+     (save) = CF_CTX_CALL_DATA(cf); \
+     DEBUGASSERT((sa"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,conncache.c,"@@ -566,7 +566,8 @@ bool Curl_cpool_find(struct Curl_easy *data,
+     return FALSE;
+ 
+   CPOOL_LOCK("
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,content_encoding.c,"@@ -166,7 +166,7 @@ static CURLcode inflate_stream(struct Curl_easy *data,
+   struct zlib_writer *zp"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,cookie.c,"@@ -1249,8 +1249,8 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
+  */
+ static int c"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_fnmatch.c,"@@ -71,13 +71,13 @@ typedef enum {
+ #define SETCHARSET_OK     1
+ #define SETCHARSET_FAIL   0
+ 
+-stat"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_gssapi.c,"@@ -46,10 +46,10 @@
+ #endif
+ 
+ gss_OID_desc Curl_spnego_mech_oid CURL_ALIGN8 = {
+-  6, (char *)""\x2b"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_memrchr.c,"@@ -57,7 +57,7 @@ Curl_memrchr(const void *s, int c, size_t n)
+ 
+     while(p >= q) {
+       if(*p ="
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_multibyte.h,"@@ -84,7 +84,7 @@ typedef union {
+ #define curlx_unicodefree(ptr)                          \
+   do {"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_ntlm_core.c,"@@ -321,16 +321,16 @@ void Curl_ntlm_core_lm_resp(const unsigned char *keys,
+   DES_key_schedule ks;"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_rtmp.c,"@@ -344,7 +344,7 @@ static ssize_t rtmp_send(struct Curl_easy *data, int sockindex,
+   (void)sockind"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_setup.h,"@@ -175,6 +175,12 @@
+ /* system header files in our config files, avoid this at any cost. */
+ /* ==="
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_setup_once.h,"@@ -65,10 +65,20 @@
+ #include <unistd.h>
+ #endif
+ 
+-#ifdef USE_WOLFSSL
++#if defined(HAVE_STDINT_H) |"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_sspi.c,"@@ -154,7 +154,7 @@ CURLcode Curl_create_sspi_identity(const char *userp, const char *passwdp,
+   /*"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_trc.c,"@@ -53,13 +53,14 @@
+ #include ""memdebug.h""
+ 
+ static void trc_write(struct Curl_easy *data, curl_inf"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_trc.h,"@@ -52,7 +52,7 @@ CURLcode Curl_trc_opt(const char *config);
+ 
+ /* the function used to output verbo"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,cw-out.c,"@@ -221,7 +221,7 @@ static CURLcode cw_out_ptr_flush(struct cw_out_ctx *ctx,
+       break;
+     wlen"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,dict.c,"@@ -212,16 +212,8 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
+ 
+     if(!word || "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,dynbuf.c,"@@ -183,7 +183,7 @@ CURLcode Curl_dyn_add(struct dynbuf *s, const char *str)
+   DEBUGASSERT(s->init "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,formdata.c,"@@ -237,7 +237,7 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
+     if(array_state && for"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,getinfo.c,"@@ -98,7 +98,7 @@ static CURLcode getinfo_char(struct Curl_easy *data, CURLINFO info,
+ {
+   switch(i"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,gopher.c,"@@ -162,7 +162,7 @@ static CURLcode gopher_do(struct Curl_easy *data, bool *done)
+ 
+   /* Create sel"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,hash.c,"@@ -121,7 +121,7 @@ hash_elem_create(const void *key, size_t key_len, const void *p,
+     /* copy th"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,headers.c,"@@ -210,7 +210,8 @@ static CURLcode namevalue(char *header, size_t hlen, unsigned int type,
+     ret"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,hostip4.c,"@@ -286,7 +286,7 @@ struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
+    * getaddrinf"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,hsts.c,"@@ -83,7 +83,7 @@ struct hsts *Curl_hsts_init(void)
+ 
+ static void hsts_free(struct stsentry *e)
+ {
+"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,http.c,"@@ -3541,7 +3541,7 @@ static CURLcode http_write_header(struct Curl_easy *data,
+ 
+   /* now, only ou"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,http2.c,"@@ -1454,7 +1454,7 @@ static int on_data_chunk_recv(nghttp2_session *session, uint8_t flags,
+   if(!"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,http_aws_sigv4.c,"@@ -46,16 +46,16 @@
+ 
+ #include ""slist.h""
+ 
+-#define HMAC_SHA256(k, kl, d, dl, o)           \
+-  do "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,http_chunks.c,"@@ -134,7 +134,7 @@ static CURLcode httpchunk_readwrite(struct Curl_easy *data,
+     if(cw_next)
+   "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,http_digest.c,"@@ -145,15 +145,15 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
+   */
+ 
+   if(authp->iesty"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,idn.c,"@@ -64,7 +64,7 @@ static CURLcode iconv_to_utf8(const char *in, size_t inlen,
+   iconv_t cd = iconv_"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,if2ip.c,"@@ -67,7 +67,8 @@
+ unsigned int Curl_ipv6_scope(const struct sockaddr *sa)
+ {
+   if(sa->sa_family =="
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,inet_ntop.h,"@@ -40,7 +40,7 @@ char *Curl_inet_ntop(int af, const void *addr, char *buf, size_t size);
+ #endif
+ #"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,inet_pton.h,"@@ -39,7 +39,7 @@ int Curl_inet_pton(int, const char *, void *);
+ #include <arpa/inet.h>
+ #endif
+ #i"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,krb5.c,"@@ -173,7 +173,7 @@ krb5_encode(void *app_data, const void *from, int length, int level, void **to)
+"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,ldap.c,"@@ -285,8 +285,8 @@ static int ldap_win_bind(struct Curl_easy *data, LDAP *server,
+   PTCHAR inpass "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,llist.c,"@@ -85,7 +85,7 @@ Curl_llist_insert_next(struct Curl_llist *list,
+ #ifdef DEBUGBUILD
+   ne->_init = "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,md4.c,"@@ -170,7 +170,12 @@ static int MD4_Init(MD4_CTX *ctx)
+ 
+ static void MD4_Update(MD4_CTX *ctx, const"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,md5.c,"@@ -252,7 +252,11 @@ static void my_md5_update(void *in,
+                           unsigned int inp"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,memdebug.c,"@@ -229,7 +229,7 @@ ALLOC_FUNC wchar_t *curl_dbg_wcsdup(const wchar_t *str,
+ 
+   if(source)
+     cur"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,mqtt.c,"@@ -117,7 +117,7 @@ static CURLcode mqtt_setup_conn(struct Curl_easy *data,
+ }
+ 
+ static CURLcode mq"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,multi_ev.c,"@@ -548,7 +548,8 @@ void Curl_multi_ev_expire_xfers(struct Curl_multi *multi,
+      asked to get rem"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,openldap.c,"@@ -354,7 +354,7 @@ static CURLcode oldap_perform_auth(struct Curl_easy *data, const char *mech,
+   "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,parsedate.c,"@@ -339,7 +339,7 @@ match:
+   *h = hh;
+   *m = mm;
+   *s = ss;
+-  *endp = (char *)p;
++  *endp = (cha"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,pop3.c,"@@ -1580,11 +1580,11 @@ static CURLcode pop3_write(struct Curl_easy *data, const char *str,
+        "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,psl.c,"@@ -40,7 +40,7 @@ void Curl_psl_destroy(struct PslCache *pslcache)
+ {
+   if(pslcache->psl) {
+     if"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,rename.c,"@@ -46,8 +46,8 @@ int Curl_rename(const char *oldpath, const char *newpath)
+      when there are ope"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,request.c,"@@ -228,11 +228,11 @@ static CURLcode xfer_send(struct Curl_easy *data,
+       data->req.eos_sent = "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,rtsp.c,"@@ -627,7 +627,7 @@ static CURLcode rtp_write_body_junk(struct Curl_easy *data,
+   if(body_remain) {"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,sendf.c,"@@ -360,7 +360,7 @@ static CURLcode cw_raw_write(struct Curl_easy *data,
+                           "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,sha256.c,"@@ -216,7 +216,11 @@ static void my_sha256_update(void *in,
+                              unsigned i"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,socks_sspi.c,"@@ -140,14 +140,14 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(struct Curl_cfilter *cf,
+   cred_handle."
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,telnet.c,"@@ -1066,15 +1066,15 @@ CURLcode telrcv(struct Curl_easy *data,
+   int startwrite = -1;
+   struct TE"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tftp.c,"@@ -520,9 +520,14 @@ static CURLcode tftp_send_first(struct tftp_state_data *state,
+ 
+     /* the ty"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,url.c,"@@ -2101,7 +2101,7 @@ static char *detect_proxy(struct Curl_easy *data,
+    * checked if the lowerca"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,urlapi.c,"@@ -923,7 +923,7 @@ static CURLUcode parseurl(const char *url, CURLU *u, unsigned int flags)
+     }
+"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,digest_sspi.c,"@@ -61,8 +61,9 @@ bool Curl_auth_is_digest_supported(void)
+ 
+   /* Query the security package for Di"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,krb5_gssapi.c,"@@ -133,7 +133,7 @@ CURLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,
+       inf"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,krb5_sspi.c,"@@ -55,9 +55,9 @@ bool Curl_auth_is_gssapi_supported(void)
+   SECURITY_STATUS status;
+ 
+   /* Query "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,ntlm_sspi.c,"@@ -55,8 +55,9 @@ bool Curl_auth_is_ntlm_supported(void)
+   SECURITY_STATUS status;
+ 
+   /* Query th"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,spnego_sspi.c,"@@ -57,9 +57,9 @@ bool Curl_auth_is_spnego_supported(void)
+   SECURITY_STATUS status;
+ 
+   /* Query "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_msh3.c,"@@ -400,7 +400,7 @@ static void MSH3_CALL msh3_header_received(MSH3_REQUEST *Request,
+   msh3_lock_a"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_ngtcp2.c,"@@ -977,7 +977,7 @@ static int cb_h3_recv_data(nghttp3_conn *conn, int64_t stream3_id,
+   if(!stream"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_osslq.c,"@@ -171,7 +171,7 @@ static CURLcode make_bio_addr(BIO_ADDR **pbio_addr,
+   switch(addr->family) {
+  "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl_quiche.c,"@@ -662,7 +662,8 @@ static CURLcode recv_pkt(const unsigned char *pkt, size_t pktlen,
+   recv_info.f"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,vquic.c,"@@ -127,7 +127,7 @@ static CURLcode do_sendmsg(struct Curl_cfilter *cf,
+ #endif
+ 
+   *psent = 0;
+-  "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,libssh.c,"@@ -2687,7 +2687,7 @@ static void sftp_quote(struct Curl_easy *data)
+       sshc->nextstate = SSH_NO"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,libssh2.c,"@@ -930,7 +930,7 @@ static CURLcode sftp_quote(struct Curl_easy *data,
+     char *tmp = aprintf(""257"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,wolfssh.c,"@@ -263,7 +263,7 @@ static ssize_t wsftp_send(struct Curl_easy *data, int sockindex,
+   rc = wolfSSH"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,bearssl.c,"@@ -153,7 +153,7 @@ static CURLcode load_cafile(struct cafile_source *source,
+     }
+     else if(so"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,gtls.c,"@@ -564,7 +564,7 @@ gtls_get_cached_creds(struct Curl_cfilter *cf, struct Curl_easy *data)
+ 
+   if(d"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,mbedtls.c,"@@ -198,7 +198,7 @@ static int mbedtls_bio_cf_write(void *bio,
+   if(!data)
+     return 0;
+ 
+-  nwri"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,openssl.c,"@@ -140,19 +140,22 @@
+ #include <openssl/ui.h>
+ #endif
+ 
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L
+"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,schannel.c,"@@ -806,11 +806,12 @@ schannel_acquire_credential_handle(struct Curl_cfilter *cf,
+ #endif
+ 
+     ssp"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,schannel_verify.c,"@@ -155,13 +155,13 @@ static CURLcode add_certs_data_to_store(HCERTSTORE trust_store,
+       }
+     "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,sectransp.c,"@@ -263,7 +263,7 @@ static OSStatus sectransp_bio_cf_in_read(SSLConnectionRef connection,
+          "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,vtls_scache.c,"@@ -112,14 +112,14 @@ static void cf_ssl_scache_sesssion_ldestroy(void *udata, void *obj)
+ {
+   stru"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,vtls_scache.h,"@@ -115,7 +115,7 @@ CURLcode Curl_ssl_scache_add_obj(struct Curl_cfilter *cf,
+ 
+ /* All about a SSL "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,vtls_spack.c,"@@ -254,10 +254,11 @@ CURLcode Curl_ssl_session_pack(struct Curl_easy *data,
+ }
+ 
+ CURLcode Curl_ssl"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,vtls_spack.h,"@@ -35,7 +35,7 @@ CURLcode Curl_ssl_session_pack(struct Curl_easy *data,
+                           "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,wolfssl.c,"@@ -744,7 +744,7 @@ static WOLFSSL_X509_STORE *wssl_get_cached_x509_store(struct Curl_cfilter *cf,
+ "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,x509asn1.c,"@@ -1026,7 +1026,7 @@ static int do_pubkey(struct Curl_easy *data, int certnum,
+     len = ((elem.en"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,ws.c,"@@ -866,7 +866,7 @@ CURLcode Curl_ws_accept(struct Curl_easy *data,
+   else { /* !connect_only */
+  "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,curl-compilers.m4,"@@ -851,6 +851,7 @@ AC_DEFUN([CURL_SET_COMPILER_WARNING_OPTS], [
+           #
+           dnl Only cl"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,mkhelp.pl,"@@ -122,8 +122,8 @@ void hugehelp(void)
+   memset(&z, 0, sizeof(z_stream));
+   z.zalloc = (alloc_fun"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tool_cb_hdr.c,"@@ -250,7 +250,7 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)
+    "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tool_filetime.c,"@@ -43,7 +43,7 @@ int getfiletime(const char *filename, struct GlobalConfig *global,
+    access to a"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tool_getparam.c,"@@ -1789,7 +1789,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
+     if(AR"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tool_help.c,"@@ -173,7 +173,7 @@ void inithelpscan(struct scan_ctx *ctx,
+   memset(ctx->rbuf, 0, sizeof(ctx->rbuf"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tool_help.h,"@@ -45,7 +45,7 @@ struct scan_ctx {
+ };
+ void inithelpscan(struct scan_ctx *ctx, const char *trigger"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tool_operate.c,"@@ -1214,7 +1214,7 @@ static CURLcode config2setopts(struct GlobalConfig *global,
+ #ifdef CURL_CA_EM"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tool_operhlp.c,"@@ -210,16 +210,16 @@ CURLcode get_url_file_name(struct GlobalConfig *global,
+         }
+       }
+ 
+"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tool_setopt.c,"@@ -252,7 +252,7 @@ static char *c_escape(const char *str, curl_off_t len)
+                         "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tool_urlglob.c,"@@ -609,7 +609,7 @@ CURLcode glob_match_url(char **result, const char *filename,
+                   "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tool_writeout.c,"@@ -427,7 +427,7 @@ static int writeString(FILE *stream, const struct writeoutvar *wovar,
+     if(us"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tool_writeout_json.c,"@@ -38,7 +38,7 @@
+ int jsonquoted(const char *in, size_t len,
+                struct curlx_dynbuf *o"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,var.c,"@@ -60,7 +60,7 @@ void varcleanup(struct GlobalConfig *global)
+   while(list) {
+     struct tool_var"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,lib1537.c,"@@ -43,12 +43,12 @@ CURLcode test(char *URL)
+   }
+ 
+   asize = (int)sizeof(a);
+-  ptr = curl_easy_es"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,lib1948.c,"@@ -56,7 +56,7 @@ CURLcode test(char *URL)
+   easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+   easy_setopt("
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,lib2405.c,"@@ -339,7 +339,8 @@ static CURLcode empty_multi_test(void)
+   /* calling curl_multi_waitfds() on mul"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,lib3207.c,"@@ -95,7 +95,7 @@ test_thread(void *ptr)
+   for(i = 0; i < PER_THREAD_SIZE; i++) {
+     CURL *curl ="
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,mk-lib1521.pl,"@@ -335,7 +335,7 @@ CURLcode test(char *URL)
+   void *conv_to_network_cb = NULL;
+   void *conv_from_"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,stub_gssapi.c,"@@ -218,7 +218,7 @@ OM_uint32 gss_init_sec_context(OM_uint32 *min,
+   /* Note: this is using the *re"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,mqttd.c,"@@ -326,7 +326,7 @@ static size_t decode_length(unsigned char *buffer,
+ /* return 0 on success */
+ s"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,resolve.c,"@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
+     struct hostent *he;  /* gethostbyname() re"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,tftpd.c,"@@ -324,7 +324,7 @@ static struct tftphdr *r_init(void)
+ /* Have emptied current buffer by sending t"
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,unit1304.c,"@@ -62,7 +62,7 @@ UNITTEST_START
+   /*
+    * Test a non existent login in our netrc file.
+    */
+-  "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,unit1650.c,"@@ -177,7 +177,7 @@ UNITTEST_START
+     if(req[i].packet && memcmp(req[i].packet, buffer, size)) {
+ "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,unit1661.c,"@@ -49,7 +49,7 @@ static void unit_stop(void)
+ 
+ UNITTEST_START
+ {
+-  char *buffer = NULL;
++  const "
+f4e23950c7b1c389cf0dde8b91353d85b8361b64,Viktor Szakats,2025-01-31 23:20:46+01:00,Low,unit2604.c,"@@ -84,7 +84,7 @@ UNITTEST_START
+ 
+   list[0].cp = calloc(1, too_long + 1);
+   fail_unless(list[0].c"
+0b40db0489adc31bb539ba55a786d714e0eae979,Stefan Eissing,2025-03-10 16:34:10+01:00,Critical,libssh2.c,"@@ -106,7 +106,8 @@ static int ssh_getsock(struct Curl_easy *data, struct connectdata *conn,
+ static"
+571e92f730831a860f8d2786674177ca08c0f592,Stefan Eissing,2025-03-10 17:08:57+01:00,Critical,libssh.c,"@@ -138,6 +138,7 @@ static void myssh_block2waitfor(struct connectdata *conn, bool block);
+ 
+ static"
+763fa529df91ab46fb8c03f00b221a8b046d80d4,Stefan Eissing,2025-03-11 10:04:50+01:00,Critical,wolfssh.c,"@@ -70,6 +70,7 @@ static int wssh_getsock(struct Curl_easy *data,
+                         curl_sock"

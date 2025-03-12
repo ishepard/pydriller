@@ -1,0 +1,1010 @@
+[
+  {
+    "commit_hash": "abf80aae384319ef9b19ffbd0d69a1fbe7421f1f",
+    "author": "Viktor Szakats",
+    "date": "2025-03-06 22:13:39+01:00",
+    "severity": "Low",
+    "filename": "mqttd.c",
+    "diff_preview": "@@ -704,7 +704,7 @@ static bool mqttd_incoming(curl_socket_t listenfd)\n         logmsg(\"signalled to"
+  },
+  {
+    "commit_hash": "abf80aae384319ef9b19ffbd0d69a1fbe7421f1f",
+    "author": "Viktor Szakats",
+    "date": "2025-03-06 22:13:39+01:00",
+    "severity": "Low",
+    "filename": "sockfilt.c",
+    "diff_preview": "@@ -1075,7 +1075,7 @@ static bool juggle(curl_socket_t *sockfdp,\n       return FALSE;\n     }\n \n-  } "
+  },
+  {
+    "commit_hash": "abf80aae384319ef9b19ffbd0d69a1fbe7421f1f",
+    "author": "Viktor Szakats",
+    "date": "2025-03-06 22:13:39+01:00",
+    "severity": "Low",
+    "filename": "socksd.c",
+    "diff_preview": "@@ -699,7 +699,7 @@ static bool socksd_incoming(curl_socket_t listenfd)\n         logmsg(\"signalled t"
+  },
+  {
+    "commit_hash": "abf80aae384319ef9b19ffbd0d69a1fbe7421f1f",
+    "author": "Viktor Szakats",
+    "date": "2025-03-06 22:13:39+01:00",
+    "severity": "Low",
+    "filename": "sws.c",
+    "diff_preview": "@@ -861,7 +861,7 @@ static int sws_get_request(curl_socket_t sock, struct sws_httprequest *req)\n    "
+  },
+  {
+    "commit_hash": "abf80aae384319ef9b19ffbd0d69a1fbe7421f1f",
+    "author": "Viktor Szakats",
+    "date": "2025-03-06 22:13:39+01:00",
+    "severity": "Low",
+    "filename": "util.c",
+    "diff_preview": "@@ -299,7 +299,7 @@ int wait_ms(int timeout_ms)\n       if(r != -1)\n         break;\n       error = er"
+  },
+  {
+    "commit_hash": "abf80aae384319ef9b19ffbd0d69a1fbe7421f1f",
+    "author": "Viktor Szakats",
+    "date": "2025-03-06 22:13:39+01:00",
+    "severity": "Low",
+    "filename": "util.h",
+    "diff_preview": "@@ -26,17 +26,21 @@\n #include \"server_setup.h\"\n \n #ifdef USE_WINSOCK\n-/* errno.h values */\n-#undef  "
+  },
+  {
+    "commit_hash": "d69425ed7d0918aceddd96048b146a9df85638ec",
+    "author": "Viktor Szakats",
+    "date": "2025-03-07 17:07:35+01:00",
+    "severity": "Critical",
+    "filename": "curl_setup_once.h",
+    "diff_preview": "@@ -321,68 +321,25 @@ typedef unsigned int bit;\n #define EWOULDBLOCK      WSAEWOULDBLOCK\n #undef  EI"
+  },
+  {
+    "commit_hash": "7e282e18a5c8f76e21de70533f8dce1198dd8133",
+    "author": "Viktor Szakats",
+    "date": "2025-03-09 00:32:22+01:00",
+    "severity": "High",
+    "filename": "windows.yml",
+    "diff_preview": "@@ -350,9 +350,6 @@ jobs:\n           if [ '${{ matrix.sys }}' != 'msys' ]; then\n             TFLAGS+"
+  },
+  {
+    "commit_hash": "7e282e18a5c8f76e21de70533f8dce1198dd8133",
+    "author": "Viktor Szakats",
+    "date": "2025-03-09 00:32:22+01:00",
+    "severity": "High",
+    "filename": "lib2302.c",
+    "diff_preview": "@@ -28,13 +28,15 @@\n \n struct ws_data {\n   CURL *easy;\n-  char buf[1024*1024];\n+  char *buf;\n   size"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "PickyWarnings.cmake",
+    "diff_preview": "@@ -102,6 +102,7 @@ if(PICKY_COMPILER)\n       -Waddress                            # clang  2.7  gcc"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "base64.c",
+    "diff_preview": "@@ -191,7 +191,7 @@ static CURLcode base64_encode(const char *table64,\n {\n   char *output;\n   char *"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "bufref.c",
+    "diff_preview": "@@ -61,7 +61,7 @@ void Curl_bufref_free(struct bufref *br)\n   DEBUGASSERT(br->ptr || !br->len);\n \n  "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "cf-socket.c",
+    "diff_preview": "@@ -731,7 +731,8 @@ static CURLcode bindlocal(struct Curl_easy *data, struct connectdata *conn,\n    "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "cfilters.h",
+    "diff_preview": "@@ -656,7 +656,7 @@ struct cf_call_data {\n     (save) = CF_CTX_CALL_DATA(cf); \\\n     DEBUGASSERT((sa"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "conncache.c",
+    "diff_preview": "@@ -566,7 +566,8 @@ bool Curl_cpool_find(struct Curl_easy *data,\n     return FALSE;\n \n   CPOOL_LOCK("
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "content_encoding.c",
+    "diff_preview": "@@ -166,7 +166,7 @@ static CURLcode inflate_stream(struct Curl_easy *data,\n   struct zlib_writer *zp"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "cookie.c",
+    "diff_preview": "@@ -1249,8 +1249,8 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,\n  */\n static int c"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_fnmatch.c",
+    "diff_preview": "@@ -71,13 +71,13 @@ typedef enum {\n #define SETCHARSET_OK     1\n #define SETCHARSET_FAIL   0\n \n-stat"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_gssapi.c",
+    "diff_preview": "@@ -46,10 +46,10 @@\n #endif\n \n gss_OID_desc Curl_spnego_mech_oid CURL_ALIGN8 = {\n-  6, (char *)\"\\x2b"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_memrchr.c",
+    "diff_preview": "@@ -57,7 +57,7 @@ Curl_memrchr(const void *s, int c, size_t n)\n \n     while(p >= q) {\n       if(*p ="
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_multibyte.h",
+    "diff_preview": "@@ -84,7 +84,7 @@ typedef union {\n #define curlx_unicodefree(ptr)                          \\\n   do {"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_ntlm_core.c",
+    "diff_preview": "@@ -321,16 +321,16 @@ void Curl_ntlm_core_lm_resp(const unsigned char *keys,\n   DES_key_schedule ks;"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_rtmp.c",
+    "diff_preview": "@@ -344,7 +344,7 @@ static ssize_t rtmp_send(struct Curl_easy *data, int sockindex,\n   (void)sockind"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_setup.h",
+    "diff_preview": "@@ -175,6 +175,12 @@\n /* system header files in our config files, avoid this at any cost. */\n /* ==="
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_setup_once.h",
+    "diff_preview": "@@ -65,10 +65,20 @@\n #include <unistd.h>\n #endif\n \n-#ifdef USE_WOLFSSL\n+#if defined(HAVE_STDINT_H) |"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_sspi.c",
+    "diff_preview": "@@ -154,7 +154,7 @@ CURLcode Curl_create_sspi_identity(const char *userp, const char *passwdp,\n   /*"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_trc.c",
+    "diff_preview": "@@ -53,13 +53,14 @@\n #include \"memdebug.h\"\n \n static void trc_write(struct Curl_easy *data, curl_inf"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_trc.h",
+    "diff_preview": "@@ -52,7 +52,7 @@ CURLcode Curl_trc_opt(const char *config);\n \n /* the function used to output verbo"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "cw-out.c",
+    "diff_preview": "@@ -221,7 +221,7 @@ static CURLcode cw_out_ptr_flush(struct cw_out_ctx *ctx,\n       break;\n     wlen"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "dict.c",
+    "diff_preview": "@@ -212,16 +212,8 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)\n \n     if(!word || "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "dynbuf.c",
+    "diff_preview": "@@ -183,7 +183,7 @@ CURLcode Curl_dyn_add(struct dynbuf *s, const char *str)\n   DEBUGASSERT(s->init "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "formdata.c",
+    "diff_preview": "@@ -237,7 +237,7 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,\n     if(array_state && for"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "getinfo.c",
+    "diff_preview": "@@ -98,7 +98,7 @@ static CURLcode getinfo_char(struct Curl_easy *data, CURLINFO info,\n {\n   switch(i"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "gopher.c",
+    "diff_preview": "@@ -162,7 +162,7 @@ static CURLcode gopher_do(struct Curl_easy *data, bool *done)\n \n   /* Create sel"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "hash.c",
+    "diff_preview": "@@ -121,7 +121,7 @@ hash_elem_create(const void *key, size_t key_len, const void *p,\n     /* copy th"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "headers.c",
+    "diff_preview": "@@ -210,7 +210,8 @@ static CURLcode namevalue(char *header, size_t hlen, unsigned int type,\n     ret"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "hostip4.c",
+    "diff_preview": "@@ -286,7 +286,7 @@ struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,\n    * getaddrinf"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "hsts.c",
+    "diff_preview": "@@ -83,7 +83,7 @@ struct hsts *Curl_hsts_init(void)\n \n static void hsts_free(struct stsentry *e)\n {\n"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "http.c",
+    "diff_preview": "@@ -3541,7 +3541,7 @@ static CURLcode http_write_header(struct Curl_easy *data,\n \n   /* now, only ou"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "http2.c",
+    "diff_preview": "@@ -1454,7 +1454,7 @@ static int on_data_chunk_recv(nghttp2_session *session, uint8_t flags,\n   if(!"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "http_aws_sigv4.c",
+    "diff_preview": "@@ -46,16 +46,16 @@\n \n #include \"slist.h\"\n \n-#define HMAC_SHA256(k, kl, d, dl, o)           \\\n-  do "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "http_chunks.c",
+    "diff_preview": "@@ -134,7 +134,7 @@ static CURLcode httpchunk_readwrite(struct Curl_easy *data,\n     if(cw_next)\n   "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "http_digest.c",
+    "diff_preview": "@@ -145,15 +145,15 @@ CURLcode Curl_output_digest(struct Curl_easy *data,\n   */\n \n   if(authp->iesty"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "idn.c",
+    "diff_preview": "@@ -64,7 +64,7 @@ static CURLcode iconv_to_utf8(const char *in, size_t inlen,\n   iconv_t cd = iconv_"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "if2ip.c",
+    "diff_preview": "@@ -67,7 +67,8 @@\n unsigned int Curl_ipv6_scope(const struct sockaddr *sa)\n {\n   if(sa->sa_family =="
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "inet_ntop.h",
+    "diff_preview": "@@ -40,7 +40,7 @@ char *Curl_inet_ntop(int af, const void *addr, char *buf, size_t size);\n #endif\n #"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "inet_pton.h",
+    "diff_preview": "@@ -39,7 +39,7 @@ int Curl_inet_pton(int, const char *, void *);\n #include <arpa/inet.h>\n #endif\n #i"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "krb5.c",
+    "diff_preview": "@@ -173,7 +173,7 @@ krb5_encode(void *app_data, const void *from, int length, int level, void **to)\n"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "ldap.c",
+    "diff_preview": "@@ -285,8 +285,8 @@ static int ldap_win_bind(struct Curl_easy *data, LDAP *server,\n   PTCHAR inpass "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "llist.c",
+    "diff_preview": "@@ -85,7 +85,7 @@ Curl_llist_insert_next(struct Curl_llist *list,\n #ifdef DEBUGBUILD\n   ne->_init = "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "md4.c",
+    "diff_preview": "@@ -170,7 +170,12 @@ static int MD4_Init(MD4_CTX *ctx)\n \n static void MD4_Update(MD4_CTX *ctx, const"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "md5.c",
+    "diff_preview": "@@ -252,7 +252,11 @@ static void my_md5_update(void *in,\n                           unsigned int inp"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "memdebug.c",
+    "diff_preview": "@@ -229,7 +229,7 @@ ALLOC_FUNC wchar_t *curl_dbg_wcsdup(const wchar_t *str,\n \n   if(source)\n     cur"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "mqtt.c",
+    "diff_preview": "@@ -117,7 +117,7 @@ static CURLcode mqtt_setup_conn(struct Curl_easy *data,\n }\n \n static CURLcode mq"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "multi_ev.c",
+    "diff_preview": "@@ -548,7 +548,8 @@ void Curl_multi_ev_expire_xfers(struct Curl_multi *multi,\n      asked to get rem"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "openldap.c",
+    "diff_preview": "@@ -354,7 +354,7 @@ static CURLcode oldap_perform_auth(struct Curl_easy *data, const char *mech,\n   "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "parsedate.c",
+    "diff_preview": "@@ -339,7 +339,7 @@ match:\n   *h = hh;\n   *m = mm;\n   *s = ss;\n-  *endp = (char *)p;\n+  *endp = (cha"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "pop3.c",
+    "diff_preview": "@@ -1580,11 +1580,11 @@ static CURLcode pop3_write(struct Curl_easy *data, const char *str,\n        "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "psl.c",
+    "diff_preview": "@@ -40,7 +40,7 @@ void Curl_psl_destroy(struct PslCache *pslcache)\n {\n   if(pslcache->psl) {\n     if"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "rename.c",
+    "diff_preview": "@@ -46,8 +46,8 @@ int Curl_rename(const char *oldpath, const char *newpath)\n      when there are ope"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "request.c",
+    "diff_preview": "@@ -228,11 +228,11 @@ static CURLcode xfer_send(struct Curl_easy *data,\n       data->req.eos_sent = "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "rtsp.c",
+    "diff_preview": "@@ -627,7 +627,7 @@ static CURLcode rtp_write_body_junk(struct Curl_easy *data,\n   if(body_remain) {"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "sendf.c",
+    "diff_preview": "@@ -360,7 +360,7 @@ static CURLcode cw_raw_write(struct Curl_easy *data,\n                           "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "sha256.c",
+    "diff_preview": "@@ -216,7 +216,11 @@ static void my_sha256_update(void *in,\n                              unsigned i"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "socks_sspi.c",
+    "diff_preview": "@@ -140,14 +140,14 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(struct Curl_cfilter *cf,\n   cred_handle."
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "telnet.c",
+    "diff_preview": "@@ -1066,15 +1066,15 @@ CURLcode telrcv(struct Curl_easy *data,\n   int startwrite = -1;\n   struct TE"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tftp.c",
+    "diff_preview": "@@ -520,9 +520,14 @@ static CURLcode tftp_send_first(struct tftp_state_data *state,\n \n     /* the ty"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "url.c",
+    "diff_preview": "@@ -2101,7 +2101,7 @@ static char *detect_proxy(struct Curl_easy *data,\n    * checked if the lowerca"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "urlapi.c",
+    "diff_preview": "@@ -923,7 +923,7 @@ static CURLUcode parseurl(const char *url, CURLU *u, unsigned int flags)\n     }\n"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "digest_sspi.c",
+    "diff_preview": "@@ -61,8 +61,9 @@ bool Curl_auth_is_digest_supported(void)\n \n   /* Query the security package for Di"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "krb5_gssapi.c",
+    "diff_preview": "@@ -133,7 +133,7 @@ CURLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,\n       inf"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "krb5_sspi.c",
+    "diff_preview": "@@ -55,9 +55,9 @@ bool Curl_auth_is_gssapi_supported(void)\n   SECURITY_STATUS status;\n \n   /* Query "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "ntlm_sspi.c",
+    "diff_preview": "@@ -55,8 +55,9 @@ bool Curl_auth_is_ntlm_supported(void)\n   SECURITY_STATUS status;\n \n   /* Query th"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "spnego_sspi.c",
+    "diff_preview": "@@ -57,9 +57,9 @@ bool Curl_auth_is_spnego_supported(void)\n   SECURITY_STATUS status;\n \n   /* Query "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_msh3.c",
+    "diff_preview": "@@ -400,7 +400,7 @@ static void MSH3_CALL msh3_header_received(MSH3_REQUEST *Request,\n   msh3_lock_a"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_ngtcp2.c",
+    "diff_preview": "@@ -977,7 +977,7 @@ static int cb_h3_recv_data(nghttp3_conn *conn, int64_t stream3_id,\n   if(!stream"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_osslq.c",
+    "diff_preview": "@@ -171,7 +171,7 @@ static CURLcode make_bio_addr(BIO_ADDR **pbio_addr,\n   switch(addr->family) {\n  "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl_quiche.c",
+    "diff_preview": "@@ -662,7 +662,8 @@ static CURLcode recv_pkt(const unsigned char *pkt, size_t pktlen,\n   recv_info.f"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "vquic.c",
+    "diff_preview": "@@ -127,7 +127,7 @@ static CURLcode do_sendmsg(struct Curl_cfilter *cf,\n #endif\n \n   *psent = 0;\n-  "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "libssh.c",
+    "diff_preview": "@@ -2687,7 +2687,7 @@ static void sftp_quote(struct Curl_easy *data)\n       sshc->nextstate = SSH_NO"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "libssh2.c",
+    "diff_preview": "@@ -930,7 +930,7 @@ static CURLcode sftp_quote(struct Curl_easy *data,\n     char *tmp = aprintf(\"257"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "wolfssh.c",
+    "diff_preview": "@@ -263,7 +263,7 @@ static ssize_t wsftp_send(struct Curl_easy *data, int sockindex,\n   rc = wolfSSH"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "bearssl.c",
+    "diff_preview": "@@ -153,7 +153,7 @@ static CURLcode load_cafile(struct cafile_source *source,\n     }\n     else if(so"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "gtls.c",
+    "diff_preview": "@@ -564,7 +564,7 @@ gtls_get_cached_creds(struct Curl_cfilter *cf, struct Curl_easy *data)\n \n   if(d"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "mbedtls.c",
+    "diff_preview": "@@ -198,7 +198,7 @@ static int mbedtls_bio_cf_write(void *bio,\n   if(!data)\n     return 0;\n \n-  nwri"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "openssl.c",
+    "diff_preview": "@@ -140,19 +140,22 @@\n #include <openssl/ui.h>\n #endif\n \n+#if OPENSSL_VERSION_NUMBER >= 0x10100000L\n"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "schannel.c",
+    "diff_preview": "@@ -806,11 +806,12 @@ schannel_acquire_credential_handle(struct Curl_cfilter *cf,\n #endif\n \n     ssp"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "schannel_verify.c",
+    "diff_preview": "@@ -155,13 +155,13 @@ static CURLcode add_certs_data_to_store(HCERTSTORE trust_store,\n       }\n     "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "sectransp.c",
+    "diff_preview": "@@ -263,7 +263,7 @@ static OSStatus sectransp_bio_cf_in_read(SSLConnectionRef connection,\n          "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "vtls_scache.c",
+    "diff_preview": "@@ -112,14 +112,14 @@ static void cf_ssl_scache_sesssion_ldestroy(void *udata, void *obj)\n {\n   stru"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "vtls_scache.h",
+    "diff_preview": "@@ -115,7 +115,7 @@ CURLcode Curl_ssl_scache_add_obj(struct Curl_cfilter *cf,\n \n /* All about a SSL "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "vtls_spack.c",
+    "diff_preview": "@@ -254,10 +254,11 @@ CURLcode Curl_ssl_session_pack(struct Curl_easy *data,\n }\n \n CURLcode Curl_ssl"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "vtls_spack.h",
+    "diff_preview": "@@ -35,7 +35,7 @@ CURLcode Curl_ssl_session_pack(struct Curl_easy *data,\n                           "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "wolfssl.c",
+    "diff_preview": "@@ -744,7 +744,7 @@ static WOLFSSL_X509_STORE *wssl_get_cached_x509_store(struct Curl_cfilter *cf,\n "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "x509asn1.c",
+    "diff_preview": "@@ -1026,7 +1026,7 @@ static int do_pubkey(struct Curl_easy *data, int certnum,\n     len = ((elem.en"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "ws.c",
+    "diff_preview": "@@ -866,7 +866,7 @@ CURLcode Curl_ws_accept(struct Curl_easy *data,\n   else { /* !connect_only */\n  "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "curl-compilers.m4",
+    "diff_preview": "@@ -851,6 +851,7 @@ AC_DEFUN([CURL_SET_COMPILER_WARNING_OPTS], [\n           #\n           dnl Only cl"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "mkhelp.pl",
+    "diff_preview": "@@ -122,8 +122,8 @@ void hugehelp(void)\n   memset(&z, 0, sizeof(z_stream));\n   z.zalloc = (alloc_fun"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tool_cb_hdr.c",
+    "diff_preview": "@@ -250,7 +250,7 @@ size_t tool_header_cb(char *ptr, size_t size, size_t nmemb, void *userdata)\n    "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tool_filetime.c",
+    "diff_preview": "@@ -43,7 +43,7 @@ int getfiletime(const char *filename, struct GlobalConfig *global,\n    access to a"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tool_getparam.c",
+    "diff_preview": "@@ -1789,7 +1789,7 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */\n     if(AR"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tool_help.c",
+    "diff_preview": "@@ -173,7 +173,7 @@ void inithelpscan(struct scan_ctx *ctx,\n   memset(ctx->rbuf, 0, sizeof(ctx->rbuf"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tool_help.h",
+    "diff_preview": "@@ -45,7 +45,7 @@ struct scan_ctx {\n };\n void inithelpscan(struct scan_ctx *ctx, const char *trigger"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tool_operate.c",
+    "diff_preview": "@@ -1214,7 +1214,7 @@ static CURLcode config2setopts(struct GlobalConfig *global,\n #ifdef CURL_CA_EM"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tool_operhlp.c",
+    "diff_preview": "@@ -210,16 +210,16 @@ CURLcode get_url_file_name(struct GlobalConfig *global,\n         }\n       }\n \n"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tool_setopt.c",
+    "diff_preview": "@@ -252,7 +252,7 @@ static char *c_escape(const char *str, curl_off_t len)\n                         "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tool_urlglob.c",
+    "diff_preview": "@@ -609,7 +609,7 @@ CURLcode glob_match_url(char **result, const char *filename,\n                   "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tool_writeout.c",
+    "diff_preview": "@@ -427,7 +427,7 @@ static int writeString(FILE *stream, const struct writeoutvar *wovar,\n     if(us"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tool_writeout_json.c",
+    "diff_preview": "@@ -38,7 +38,7 @@\n int jsonquoted(const char *in, size_t len,\n                struct curlx_dynbuf *o"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "var.c",
+    "diff_preview": "@@ -60,7 +60,7 @@ void varcleanup(struct GlobalConfig *global)\n   while(list) {\n     struct tool_var"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "lib1537.c",
+    "diff_preview": "@@ -43,12 +43,12 @@ CURLcode test(char *URL)\n   }\n \n   asize = (int)sizeof(a);\n-  ptr = curl_easy_es"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "lib1948.c",
+    "diff_preview": "@@ -56,7 +56,7 @@ CURLcode test(char *URL)\n   easy_setopt(curl, CURLOPT_UPLOAD, 1L);\n   easy_setopt("
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "lib2405.c",
+    "diff_preview": "@@ -339,7 +339,8 @@ static CURLcode empty_multi_test(void)\n   /* calling curl_multi_waitfds() on mul"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "lib3207.c",
+    "diff_preview": "@@ -95,7 +95,7 @@ test_thread(void *ptr)\n   for(i = 0; i < PER_THREAD_SIZE; i++) {\n     CURL *curl ="
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "mk-lib1521.pl",
+    "diff_preview": "@@ -335,7 +335,7 @@ CURLcode test(char *URL)\n   void *conv_to_network_cb = NULL;\n   void *conv_from_"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "stub_gssapi.c",
+    "diff_preview": "@@ -218,7 +218,7 @@ OM_uint32 gss_init_sec_context(OM_uint32 *min,\n   /* Note: this is using the *re"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "mqttd.c",
+    "diff_preview": "@@ -326,7 +326,7 @@ static size_t decode_length(unsigned char *buffer,\n /* return 0 on success */\n s"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "resolve.c",
+    "diff_preview": "@@ -135,7 +135,7 @@ int main(int argc, char *argv[])\n     struct hostent *he;  /* gethostbyname() re"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "tftpd.c",
+    "diff_preview": "@@ -324,7 +324,7 @@ static struct tftphdr *r_init(void)\n /* Have emptied current buffer by sending t"
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "unit1304.c",
+    "diff_preview": "@@ -62,7 +62,7 @@ UNITTEST_START\n   /*\n    * Test a non existent login in our netrc file.\n    */\n-  "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "unit1650.c",
+    "diff_preview": "@@ -177,7 +177,7 @@ UNITTEST_START\n     if(req[i].packet && memcmp(req[i].packet, buffer, size)) {\n "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "unit1661.c",
+    "diff_preview": "@@ -49,7 +49,7 @@ static void unit_stop(void)\n \n UNITTEST_START\n {\n-  char *buffer = NULL;\n+  const "
+  },
+  {
+    "commit_hash": "f4e23950c7b1c389cf0dde8b91353d85b8361b64",
+    "author": "Viktor Szakats",
+    "date": "2025-01-31 23:20:46+01:00",
+    "severity": "Low",
+    "filename": "unit2604.c",
+    "diff_preview": "@@ -84,7 +84,7 @@ UNITTEST_START\n \n   list[0].cp = calloc(1, too_long + 1);\n   fail_unless(list[0].c"
+  },
+  {
+    "commit_hash": "0b40db0489adc31bb539ba55a786d714e0eae979",
+    "author": "Stefan Eissing",
+    "date": "2025-03-10 16:34:10+01:00",
+    "severity": "Critical",
+    "filename": "libssh2.c",
+    "diff_preview": "@@ -106,7 +106,8 @@ static int ssh_getsock(struct Curl_easy *data, struct connectdata *conn,\n static"
+  },
+  {
+    "commit_hash": "571e92f730831a860f8d2786674177ca08c0f592",
+    "author": "Stefan Eissing",
+    "date": "2025-03-10 17:08:57+01:00",
+    "severity": "Critical",
+    "filename": "libssh.c",
+    "diff_preview": "@@ -138,6 +138,7 @@ static void myssh_block2waitfor(struct connectdata *conn, bool block);\n \n static"
+  },
+  {
+    "commit_hash": "763fa529df91ab46fb8c03f00b221a8b046d80d4",
+    "author": "Stefan Eissing",
+    "date": "2025-03-11 10:04:50+01:00",
+    "severity": "Critical",
+    "filename": "wolfssh.c",
+    "diff_preview": "@@ -70,6 +70,7 @@ static int wssh_getsock(struct Curl_easy *data,\n                         curl_sock"
+  }
+]

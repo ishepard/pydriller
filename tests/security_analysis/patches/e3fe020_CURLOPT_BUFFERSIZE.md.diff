@@ -1,0 +1,20 @@
+@@ -10,7 +10,7 @@ See-also:
+   - CURLOPT_UPLOAD_BUFFERSIZE (3)
+   - CURLOPT_WRITEFUNCTION (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -53,10 +53,6 @@ allocated as long as there are active transfers.
+ 
+ CURL_MAX_WRITE_SIZE (16kB)
+ 
+-# PROTOCOLS
+-
+-All
+-
+ # EXAMPLE
+ 
+ ~~~c

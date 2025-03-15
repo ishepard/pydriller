@@ -1,0 +1,20 @@
+@@ -9,7 +9,7 @@ See-also:
+   - CURLINFO_PRIMARY_PORT (3)
+   - CURLOPT_PREREQFUNCTION (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -33,10 +33,6 @@ argument in the pre-request callback set with CURLOPT_PREREQFUNCTION(3).
+ 
+ NULL
+ 
+-# PROTOCOLS
+-
+-All
+-
+ # EXAMPLE
+ 
+ ~~~c

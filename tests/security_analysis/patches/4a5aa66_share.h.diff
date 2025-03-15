@@ -1,0 +1,14 @@
+@@ -22,10 +22,10 @@
+  *
+  ***************************************************************************/
+ 
+-#include "curl_setup.h"
++#include "setup.h"
+ #include <curl/curl.h>
+-#include "curl_cookie.h"
+-#include "curl_urldata.h"
++#include "cookie.h"
++#include "urldata.h"
+ 
+ /* SalfordC says "A structure member may not be volatile". Hence:
+  */

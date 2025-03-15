@@ -1,0 +1,12 @@
+@@ -20,9 +20,9 @@
+  *
+  ***************************************************************************/
+ 
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+-#include "curl_splay.h"
++#include "splay.h"
+ 
+ /*
+  * This macro compares two node keys i and j and returns:

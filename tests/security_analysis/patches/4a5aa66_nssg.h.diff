@@ -1,0 +1,28 @@
+@@ -7,7 +7,7 @@
+  *                            | (__| |_| |  _ <| |___
+  *                             \___|\___/|_| \_\_____|
+  *
+- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
++ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+  *
+  * This software is licensed as described in the file COPYING, which
+  * you should have received as part of this distribution. The terms
+@@ -21,15 +21,14 @@
+  * KIND, either express or implied.
+  *
+  ***************************************************************************/
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+ #ifdef USE_NSS
+ /*
+- * This header should only be needed to get included by curl_sslgen.c and
+- * curl_nss.c
++ * This header should only be needed to get included by sslgen.c and nss.c
+  */
+ 
+-#include "curl_urldata.h"
++#include "urldata.h"
+ 
+ CURLcode Curl_nss_connect(struct connectdata *conn, int sockindex);
+ CURLcode Curl_nss_connect_nonblocking(struct connectdata *conn,

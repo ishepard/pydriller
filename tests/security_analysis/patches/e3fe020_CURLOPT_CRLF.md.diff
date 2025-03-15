@@ -1,0 +1,20 @@
+@@ -8,7 +8,7 @@ See-also:
+   - CURLOPT_CONV_FROM_NETWORK_FUNCTION (3)
+   - CURLOPT_CONV_TO_NETWORK_FUNCTION (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -35,10 +35,6 @@ This is a legacy option of questionable use.
+ 
+ 0
+ 
+-# PROTOCOLS
+-
+-All
+-
+ # EXAMPLE
+ 
+ ~~~c

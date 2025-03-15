@@ -1,0 +1,12 @@
+@@ -2,9 +2,9 @@
+ <VisualStudioProject
+ 	ProjectType="Visual C++"
+ 	Version="9.00"
+-	Name="curlsrc"
++	Name="curl"
+ 	ProjectGUID="{5228E9CE-A216-422F-A5E6-58E95E2DD71D}"
+-	RootNamespace="curlsrc"
++	RootNamespace="curl"
+ 	TargetFrameworkVersion="131072"
+ 	>
+ 	<Platforms>

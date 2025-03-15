@@ -1,0 +1,36 @@
+@@ -29,7 +29,7 @@ smtp
+ SMTP plain authentication with alternative authorization identity
+  </name>
+ <stdin>
+-mail body
++mail body
+ </stdin>
+  <command>
+ smtp://%HOSTIP:%SMTPPORT/953 --mail-rcpt recipient@example.com --mail-from sender@example.com -u kurt:xipj3plmq --sasl-authzid ursel -T -
+@@ -40,17 +40,17 @@ smtp://%HOSTIP:%SMTPPORT/953 --mail-rcpt recipient@example.com --mail-from sende
+ # Verify data after the test has been "shot"
+ <verify>
+ <protocol>
+-EHLO 953
+-AUTH PLAIN
+-dXJzZWwAa3VydAB4aXBqM3BsbXE=
+-MAIL FROM:<sender@example.com>
+-RCPT TO:<recipient@example.com>
+-DATA
+-QUIT
++EHLO 953
++AUTH PLAIN
++dXJzZWwAa3VydAB4aXBqM3BsbXE=
++MAIL FROM:<sender@example.com>
++RCPT TO:<recipient@example.com>
++DATA
++QUIT
+ </protocol>
+ <upload>
+-mail body
+-.
++mail body
++.
+ </upload>
+ </verify>
+ </testcase>

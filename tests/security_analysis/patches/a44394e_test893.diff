@@ -1,0 +1,13 @@
+@@ -45,9 +45,9 @@ pop3://%HOSTIP:%POP3PORT/893 -u kurt:xipj3plmq --sasl-authzid ursel
+ # The multi interface considers a broken "CONNECT" as a prematurely broken
+ # transfer and such a connection will not get a "QUIT"
+ <protocol>
+-CAPA
+-AUTH PLAIN
+-dXJzZWwAa3VydAB4aXBqM3BsbXE=
++CAPA
++AUTH PLAIN
++dXJzZWwAa3VydAB4aXBqM3BsbXE=
+ </protocol>
+ </verify>
+ </testcase>

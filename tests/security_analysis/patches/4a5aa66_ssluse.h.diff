@@ -1,0 +1,28 @@
+@@ -7,7 +7,7 @@
+  *                            | (__| |_| |  _ <| |___
+  *                             \___|\___/|_| \_\_____|
+  *
+- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
++ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+  *
+  * This software is licensed as described in the file COPYING, which
+  * you should have received as part of this distribution. The terms
+@@ -22,15 +22,14 @@
+  *
+  ***************************************************************************/
+ 
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+ #ifdef USE_SSLEAY
+ /*
+- * This header should only be needed to get included by curl_sslgen.c and
+- * curl_ssluse.c
++ * This header should only be needed to get included by sslgen.c and ssluse.c
+  */
+ 
+-#include "curl_urldata.h"
++#include "urldata.h"
+ 
+ CURLcode Curl_ossl_connect(struct connectdata *conn, int sockindex);
+ CURLcode Curl_ossl_connect_nonblocking(struct connectdata *conn,

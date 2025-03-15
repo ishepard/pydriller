@@ -1,0 +1,20 @@
+@@ -5,7 +5,7 @@ Title: CURLOPT_IOCTLFUNCTION
+ Section: 3
+ Source: libcurl
+ Protocol:
+-  - *
++  - All
+ See-also:
+   - CURLOPT_IOCTLDATA (3)
+   - CURLOPT_SEEKFUNCTION (3)
+@@ -63,10 +63,6 @@ parameter is ignored when seeking.
+ 
+ By default, this parameter is set to NULL. Not used.
+ 
+-# PROTOCOLS
+-
+-Used with HTTP
+-
+ # EXAMPLE
+ 
+ ~~~c

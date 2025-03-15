@@ -1,0 +1,38 @@
+@@ -45,6 +45,7 @@ BEGIN {
+         server_cmdfilename
+         server_inputfilename
+         server_outputfilename
++        server_exe
+         mainsockf_pidfilename
+         mainsockf_logfilename
+         datasockf_pidfilename
+@@ -59,6 +60,10 @@ BEGIN {
+     }
+ }
+ 
++use globalconfig;
++use pathhelp qw(
++    exe_ext
++    );
+ 
+ our $logfile;  # server log file name, for logmsg
+ 
+@@ -230,6 +235,18 @@ sub server_outputfilename {
+ }
+ 
+ 
++#***************************************************************************
++# Return filename for a server executable
++#
++sub server_exe {
++    my ($name, $ext) = @_;
++    if(!defined $ext) {
++        $ext = 'SRV';
++    }
++    return $SRVDIR . $name . exe_ext($ext);
++}
++
++
+ #***************************************************************************
+ # Return file name for main or primary sockfilter pid file.
+ #

@@ -1,0 +1,17 @@
+@@ -74,6 +74,8 @@ int main(void)
+ #endif
+ 
+   headerfile = fopen(pHeaderFile, "wb");
++  if(!headerfile)
++    return 1;
+ 
+   curl_global_init(CURL_GLOBAL_DEFAULT);
+ 
+@@ -146,5 +148,7 @@ int main(void)
+ 
+   curl_global_cleanup();
+ 
++  fclose(headerfile);
++
+   return 0;
+ }

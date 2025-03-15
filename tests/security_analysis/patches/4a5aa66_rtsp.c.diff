@@ -1,0 +1,67 @@
+@@ -5,7 +5,7 @@
+  *                            | (__| |_| |  _ <| |___
+  *                             \___|\___/|_| \_\_____|
+  *
+- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
++ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+  *
+  * This software is licensed as described in the file COPYING, which
+  * you should have received as part of this distribution. The terms
+@@ -20,29 +20,29 @@
+  *
+  ***************************************************************************/
+ 
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+ #ifndef CURL_DISABLE_RTSP
+ 
+-#include "curl_urldata.h"
++#include "urldata.h"
+ #include <curl/curl.h>
+-#include "curl_transfer.h"
+-#include "curl_sendf.h"
+-#include "curl_multiif.h"
+-#include "curl_http.h"
+-#include "curl_url.h"
+-#include "curl_progress.h"
+-#include "curl_rtsp.h"
+-#include "curl_rawstr.h"
++#include "transfer.h"
++#include "sendf.h"
++#include "multiif.h"
++#include "http.h"
++#include "url.h"
++#include "progress.h"
++#include "rtsp.h"
++#include "rawstr.h"
+ #include "curl_memory.h"
+-#include "curl_select.h"
+-#include "curl_connect.h"
++#include "select.h"
++#include "connect.h"
+ 
+ #define _MPRINTF_REPLACE /* use our functions only */
+ #include <curl/mprintf.h>
+ 
+ /* The last #include file should be: */
+-#include "curl_memdebug.h"
++#include "memdebug.h"
+ 
+ /*
+  * TODO (general)
+@@ -381,10 +381,10 @@ static CURLcode rtsp_do(struct connectdata *conn, bool *done)
+     }
+   }
+ 
+-  /* The User-Agent string might have been allocated in curl_url.c already,
+-     because it might have been used in the proxy connect, but if we have
+-     got a header with the user-agent string specified, we erase the
+-     previously made string here. */
++  /* The User-Agent string might have been allocated in url.c already, because
++     it might have been used in the proxy connect, but if we have got a header
++     with the user-agent string specified, we erase the previously made string
++     here. */
+   if(Curl_checkheaders(data, "User-Agent:") && conn->allocptr.uagent) {
+     Curl_safefree(conn->allocptr.uagent);
+     conn->allocptr.uagent = NULL;

@@ -1,0 +1,74 @@
+@@ -5,7 +5,7 @@
+  *                            | (__| |_| |  _ <| |___
+  *                             \___|\___/|_| \_\_____|
+  *
+- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
++ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+  *
+  * This software is licensed as described in the file COPYING, which
+  * you should have received as part of this distribution. The terms
+@@ -20,7 +20,7 @@
+  *
+  ***************************************************************************/
+ 
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+ #ifdef HAVE_NETINET_IN_H
+ #include <netinet/in.h>
+@@ -42,35 +42,35 @@
+ #include <sys/param.h>
+ #endif
+ 
+-#include "curl_strequal.h"
+-#include "curl_urldata.h"
++#include "strequal.h"
++#include "urldata.h"
+ #include <curl/curl.h>
+-#include "curl_transfer.h"
+-#include "curl_sslgen.h"
+-#include "curl_url.h"
+-#include "curl_getinfo.h"
+-#include "curl_hostip.h"
+-#include "curl_share.h"
+-#include "curl_strdup.h"
++#include "transfer.h"
++#include "sslgen.h"
++#include "url.h"
++#include "getinfo.h"
++#include "hostip.h"
++#include "share.h"
++#include "strdup.h"
+ #include "curl_memory.h"
+-#include "curl_progress.h"
+-#include "curl_easyif.h"
+-#include "curl_select.h"
+-#include "curl_sendf.h" /* for failf function prototype */
++#include "progress.h"
++#include "easyif.h"
++#include "select.h"
++#include "sendf.h" /* for failf function prototype */
+ #include "curl_ntlm.h"
+-#include "curl_connect.h" /* for Curl_getconnectinfo */
+-#include "curl_slist.h"
+-#include "curl_amigaos.h"
++#include "connect.h" /* for Curl_getconnectinfo */
++#include "slist.h"
++#include "amigaos.h"
+ #include "curl_rand.h"
+-#include "curl_non_ascii.h"
+-#include "curl_warnless.h"
+-#include "curl_conncache.h"
++#include "non-ascii.h"
++#include "warnless.h"
++#include "conncache.h"
+ 
+ #define _MPRINTF_REPLACE /* use our functions only */
+ #include <curl/mprintf.h>
+ 
+ /* The last #include file should be: */
+-#include "curl_memdebug.h"
++#include "memdebug.h"
+ 
+ /* win32_cleanup() is for win32 socket cleanup functionality, the opposite
+    of win32_init() */

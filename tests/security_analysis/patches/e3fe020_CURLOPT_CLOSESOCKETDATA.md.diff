@@ -1,0 +1,20 @@
+@@ -8,7 +8,7 @@ See-also:
+   - CURLOPT_CLOSESOCKETFUNCTION (3)
+   - CURLOPT_OPENSOCKETFUNCTION (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -34,10 +34,6 @@ CURLOPT_CLOSESOCKETFUNCTION(3).
+ 
+ The default value of this parameter is NULL.
+ 
+-# PROTOCOLS
+-
+-All except file:
+-
+ # EXAMPLE
+ 
+ ~~~c

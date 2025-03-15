@@ -1,0 +1,17 @@
+@@ -20,13 +20,13 @@
+  *
+  ***************************************************************************/
+ 
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+-#include "curl_llist.h"
++#include "llist.h"
+ #include "curl_memory.h"
+ 
+ /* this must be the last include file */
+-#include "curl_memdebug.h"
++#include "memdebug.h"
+ 
+ /*
+  * @unittest: 1300

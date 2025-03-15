@@ -1,0 +1,18 @@
+@@ -22,7 +22,7 @@
+  *
+  ***************************************************************************/
+ 
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+ #ifndef CURL_DISABLE_CRYPTO_AUTH
+ 
+@@ -33,7 +33,7 @@
+ 
+ #include "curl_memory.h"
+ /* The last #include file should be: */
+-#include "curl_memdebug.h"
++#include "memdebug.h"
+ 
+ /*
+  * Generic HMAC algorithm.

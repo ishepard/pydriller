@@ -1,0 +1,122 @@
+@@ -7,7 +7,7 @@
+  *                            | (__| |_| |  _ <| |___
+  *                             \___|\___/|_| \_\_____|
+  *
+- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
++ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+  *
+  * This software is licensed as described in the file COPYING, which
+  * you should have received as part of this distribution. The terms
+@@ -24,7 +24,7 @@
+ 
+ /* This file is for lib internal stuff */
+ 
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+ #define PORT_FTP 21
+ #define PORT_FTPS 990
+@@ -66,8 +66,8 @@
+ */
+ #define RESP_TIMEOUT (1800*1000)
+ 
+-#include "curl_cookie.h"
+-#include "curl_formdata.h"
++#include "cookie.h"
++#include "formdata.h"
+ 
+ #ifdef USE_SSLEAY
+ #ifdef USE_OPENSSL
+@@ -150,7 +150,7 @@
+ #include <netinet/in.h>
+ #endif
+ 
+-#include "curl_timeval.h"
++#include "timeval.h"
+ 
+ #ifdef HAVE_ZLIB_H
+ #include <zlib.h>               /* for content-encoding */
+@@ -162,20 +162,20 @@
+ 
+ #include <curl/curl.h>
+ 
+-#include "curl_http_chunks.h" /* for the structs and enum stuff */
+-#include "curl_hostip.h"
+-#include "curl_hash.h"
+-#include "curl_splay.h"
+-
+-#include "curl_imap.h"
+-#include "curl_pop3.h"
+-#include "curl_smtp.h"
+-#include "curl_ftp.h"
+-#include "curl_file.h"
+-#include "curl_ssh.h"
+-#include "curl_http.h"
+-#include "curl_rtsp.h"
+-#include "curl_wildcard.h"
++#include "http_chunks.h" /* for the structs and enum stuff */
++#include "hostip.h"
++#include "hash.h"
++#include "splay.h"
++
++#include "imap.h"
++#include "pop3.h"
++#include "smtp.h"
++#include "ftp.h"
++#include "file.h"
++#include "ssh.h"
++#include "http.h"
++#include "rtsp.h"
++#include "wildcard.h"
+ 
+ #ifdef HAVE_GSSAPI
+ # ifdef HAVE_GSSGNU
+@@ -664,7 +664,7 @@ struct SingleRequest {
+ 
+   bool forbidchunk;   /* used only to explicitly forbid chunk-upload for
+                          specific upload buffers. See readmoredata() in
+-                         curl_http.c for details. */
++                         http.c for details. */
+ };
+ 
+ /*
+@@ -731,8 +731,8 @@ struct Curl_handler {
+    */
+   CURLcode (*disconnect)(struct connectdata *, bool dead_connection);
+ 
+-  /* If used, this function gets called from curl_transfer.c:readwrite_data()
+-     to allow the protocol to do extra reads/writes */
++  /* If used, this function gets called from transfer.c:readwrite_data() to
++     allow the protocol to do extra reads/writes */
+   CURLcode (*readwrite)(struct SessionHandle *data, struct connectdata *conn,
+                         ssize_t *nread, bool *readmore);
+ 
+@@ -1068,7 +1068,7 @@ struct Progress {
+ 
+   bool callback;  /* set when progress callback is used */
+   int width; /* screen width at download start */
+-  int flags; /* see curl_progress.h */
++  int flags; /* see progress.h */
+ 
+   double timespent;
+ 
+@@ -1276,7 +1276,7 @@ struct UrlState {
+     struct FTP *ftp;
+     /* void *tftp;    not used */
+     struct FILEPROTO *file;
+-    void *telnet;        /* private for curl_telnet.c-eyes only */
++    void *telnet;        /* private for telnet.c-eyes only */
+     void *generic;
+     struct SSHPROTO *ssh;
+     struct FTP *imap;
+@@ -1317,8 +1317,8 @@ struct DynamicStatic {
+  * the 'DynamicStatic' struct.
+  * Character pointer fields point to dynamic storage, unless otherwise stated.
+  */
+-struct Curl_one_easy; /* declared and used only in curl_multi.c */
+-struct Curl_multi;    /* declared and used only in curl_multi.c */
++struct Curl_one_easy; /* declared and used only in multi.c */
++struct Curl_multi;    /* declared and used only in multi.c */
+ 
+ enum dupstring {
+   STRING_CERT,            /* client certificate file name */

@@ -1,0 +1,20 @@
+@@ -10,7 +10,7 @@ See-also:
+   - CURLOPT_PROXYAUTH (3)
+   - CURLOPT_USERPWD (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -60,10 +60,6 @@ option.
+ 
+ blank
+ 
+-# PROTOCOLS
+-
+-Most
+-
+ # EXAMPLE
+ 
+ ~~~c

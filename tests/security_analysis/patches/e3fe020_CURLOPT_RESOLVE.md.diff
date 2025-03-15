@@ -1,0 +1,20 @@
+@@ -9,7 +9,7 @@ See-also:
+   - CURLOPT_DNS_CACHE_TIMEOUT (3)
+   - CURLOPT_IPRESOLVE (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -73,10 +73,6 @@ number must exactly match what was added previously.
+ 
+ NULL
+ 
+-# PROTOCOLS
+-
+-All
+-
+ # EXAMPLE
+ 
+ ~~~c

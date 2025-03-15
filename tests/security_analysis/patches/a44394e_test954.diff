@@ -1,0 +1,13 @@
+@@ -47,9 +47,9 @@ smtp://%HOSTIP:%SMTPPORT/954 --mail-rcpt recipient@example.com --mail-from sende
+ # The multi interface considers a broken "CONNECT" as a prematurely broken
+ # transfer and such a connection will not get a "QUIT"
+ <protocol>
+-EHLO 954
+-AUTH PLAIN
+-dXJzZWwAa3VydAB4aXBqM3BsbXE=
++EHLO 954
++AUTH PLAIN
++dXJzZWwAa3VydAB4aXBqM3BsbXE=
+ </protocol>
+ </verify>
+ </testcase>

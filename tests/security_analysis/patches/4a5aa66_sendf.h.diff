@@ -1,0 +1,9 @@
+@@ -22,7 +22,7 @@
+  *
+  ***************************************************************************/
+ 
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+ CURLcode Curl_sendf(curl_socket_t sockfd, struct connectdata *,
+                     const char *fmt, ...);

@@ -1,0 +1,100 @@
+@@ -5,7 +5,7 @@
+  *                            | (__| |_| |  _ <| |___
+  *                             \___|\___/|_| \_\_____|
+  *
+- * Copyright (C) 1998 - 2013, Daniel Stenberg, <daniel@haxx.se>, et al.
++ * Copyright (C) 1998 - 2012, Daniel Stenberg, <daniel@haxx.se>, et al.
+  *
+  * This software is licensed as described in the file COPYING, which
+  * you should have received as part of this distribution. The terms
+@@ -20,11 +20,11 @@
+  *
+  ***************************************************************************/
+ 
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+-#include "curl_strtoofft.h"
+-#include "curl_strequal.h"
+-#include "curl_rawstr.h"
++#include "strtoofft.h"
++#include "strequal.h"
++#include "rawstr.h"
+ 
+ #ifdef HAVE_NETINET_IN_H
+ #include <netinet/in.h>
+@@ -57,35 +57,35 @@
+ #error "We can't compile without socket() support!"
+ #endif
+ 
+-#include "curl_urldata.h"
++#include "urldata.h"
+ #include <curl/curl.h>
+-#include "curl_netrc.h"
+-
+-#include "curl_content_encoding.h"
+-#include "curl_hostip.h"
+-#include "curl_transfer.h"
+-#include "curl_sendf.h"
+-#include "curl_speedcheck.h"
+-#include "curl_progress.h"
+-#include "curl_http.h"
+-#include "curl_url.h"
+-#include "curl_getinfo.h"
+-#include "curl_sslgen.h"
+-#include "curl_http_digest.h"
++#include "netrc.h"
++
++#include "content_encoding.h"
++#include "hostip.h"
++#include "transfer.h"
++#include "sendf.h"
++#include "speedcheck.h"
++#include "progress.h"
++#include "http.h"
++#include "url.h"
++#include "getinfo.h"
++#include "sslgen.h"
++#include "http_digest.h"
+ #include "curl_ntlm.h"
+-#include "curl_http_negotiate.h"
+-#include "curl_share.h"
++#include "http_negotiate.h"
++#include "share.h"
+ #include "curl_memory.h"
+-#include "curl_select.h"
+-#include "curl_multiif.h"
+-#include "curl_connect.h"
+-#include "curl_non_ascii.h"
++#include "select.h"
++#include "multiif.h"
++#include "connect.h"
++#include "non-ascii.h"
+ 
+ #define _MPRINTF_REPLACE /* use our functions only */
+ #include <curl/mprintf.h>
+ 
+ /* The last #include file should be: */
+-#include "curl_memdebug.h"
++#include "memdebug.h"
+ 
+ #define CURL_TIMEOUT_EXPECT_100 1000 /* counting ms here */
+ 
+@@ -683,7 +683,7 @@ static CURLcode readwrite_data(struct SessionHandle *data,
+         if(k->badheader < HEADER_ALLBAD) {
+           /* This switch handles various content encodings. If there's an
+              error here, be sure to check over the almost identical code
+-             in curl_http_chunks.c.
++             in http_chunks.c.
+              Make sure that ALL_CONTENT_ENCODINGS contains all the
+              encodings handled here. */
+ #ifdef HAVE_LIBZ
+@@ -1725,7 +1725,7 @@ CURLcode Curl_follow(struct SessionHandle *data,
+                      char *newurl, /* this 'newurl' is the Location: string,
+                                       and it must be malloc()ed before passed
+                                       here */
+-                     followtype type) /* see curl_transfer.h */
++                     followtype type) /* see transfer.h */
+ {
+ #ifdef CURL_DISABLE_HTTP
+   (void)data;

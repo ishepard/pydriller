@@ -1,0 +1,20 @@
+@@ -9,7 +9,7 @@ See-also:
+   - CURLOPT_RANGE (3)
+   - CURLOPT_RESUME_FROM_LARGE (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -43,10 +43,6 @@ CURLOPT_RESUME_FROM_LARGE(3) instead.
+ 
+ 0, not used
+ 
+-# PROTOCOLS
+-
+-HTTP, FTP, SFTP, FILE
+-
+ # EXAMPLE
+ 
+ ~~~c

@@ -1,0 +1,20 @@
+@@ -12,7 +12,7 @@ See-also:
+   - curl_share_strerror (3)
+   - curl_url_strerror (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -51,10 +51,6 @@ debug and trace why errors happen.
+ 
+ NULL
+ 
+-# PROTOCOLS
+-
+-All
+-
+ # EXAMPLE
+ 
+ ~~~c

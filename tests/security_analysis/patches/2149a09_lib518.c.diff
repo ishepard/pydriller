@@ -1,0 +1,414 @@
+@@ -8,56 +8,31 @@
+  * $Id$
+  */
+ 
+-/*
+- * This source code is used for lib518 and lib537.
+- */
+-
+ #include "test.h"
+ 
+ #ifdef HAVE_SYS_TYPES_H
+ #include <sys/types.h>
+ #endif
+-#ifdef HAVE_SYS_STAT_H
+-#include <sys/stat.h>
+-#endif
+-#ifdef HAVE_SYS_TIME_H
+-#include <sys/time.h>
+-#endif
+ #ifdef HAVE_SYS_RESOURCE_H
+ #include <sys/resource.h>
+ #endif
+ #ifdef HAVE_FCNTL_H
+ #include <fcntl.h>
+ #endif
+-#ifdef HAVE_UNISTD_H
+-#include <unistd.h>
+-#endif
+ #ifdef HAVE_LIMITS_H
+ #include <limits.h>
+ #endif
+-
+-#define _MPRINTF_REPLACE /* use our functions only */
+-#include <mprintf.h>
+-
+-#ifdef HAVE_SYS_SELECT_H
+-#include <sys/select.h>
++#ifdef HAVE_STRING_H
++#include <string.h>
+ #endif
+ 
+-#if defined(LIB518) && !defined(FD_SETSIZE)
++#ifndef FD_SETSIZE
+ #error "this test requires FD_SETSIZE"
+ #endif
+ 
+-#ifdef LIB518
+-#define SAFETY_MARGIN 16
+-#define NUM_OPEN (FD_SETSIZE + 10)
+-#define NUM_NEEDED (NUM_OPEN + SAFETY_MARGIN)
+-#endif
+-
+-#ifdef LIB537
+-#define SAFETY_MARGIN 5
+-#endif
+-
+-#define MEMCHUNK_NITEMS 32000
++#define SAFETY_MARGIN (16)
++#define NUM_OPEN      (FD_SETSIZE + 10)
++#define NUM_NEEDED    (NUM_OPEN + SAFETY_MARGIN)
+ 
+ #if defined(WIN32) || defined(_WIN32) || defined(MSDOS)
+ #define DEV_NULL "NUL"
+@@ -88,38 +63,31 @@ static int our_errno(void)
+ static void store_errmsg(const char *msg, int err)
+ {
+   if (!err)
+-    snprintf(msgbuff, sizeof(msgbuff), "%s", msg);
++    sprintf(msgbuff, "%s", msg);
+   else
+-    snprintf(msgbuff, sizeof(msgbuff), "%s, errno %d, %s",
+-             msg, err, strerror(err));
++    sprintf(msgbuff, "%s, errno %d, %s", msg, err, strerror(err));
+ }
+ 
+ static void close_file_descriptors(void)
+ {
+-  fprintf(stderr, "closing file descriptors\n");
+   for (num_open.rlim_cur = 0;
+        num_open.rlim_cur < num_open.rlim_max;
+        num_open.rlim_cur++)
+-    close(fd[num_open.rlim_cur]);
++    if (fd[num_open.rlim_cur] > 0)
++      close(fd[num_open.rlim_cur]);
+   free(fd);
+   fd = NULL;
+-  fprintf(stderr, "file descriptors closed\n");
+ }
+ 
+ static int rlimit(int keep_open)
+ {
+-#ifdef LIB537
+-  int *tmpfd;
+-#endif
+-  int i;
++  int nitems, i;
+   int *memchunk = NULL;
+   char *fmt;
+   struct rlimit rl;
+   char strbuff[256];
+   char strbuff1[81];
+-#ifdef LIB518
+   char strbuff2[81];
+-#endif
+   char fmt_u[] = "%u";
+   char fmt_lu[] = "%lu";
+ #ifdef HAVE_LONGLONG
+@@ -146,7 +114,7 @@ static int rlimit(int keep_open)
+     strcpy(strbuff, "INFINITY");
+   else
+ #endif
+-    snprintf(strbuff, sizeof(strbuff), fmt, rl.rlim_cur);
++    sprintf(strbuff, fmt, rl.rlim_cur);
+   fprintf(stderr, "initial soft limit: %s\n", strbuff);
+ 
+ #ifdef RLIM_INFINITY
+@@ -154,16 +122,14 @@ static int rlimit(int keep_open)
+     strcpy(strbuff, "INFINITY");
+   else
+ #endif
+-    snprintf(strbuff, sizeof(strbuff), fmt, rl.rlim_max);
++    sprintf(strbuff, fmt, rl.rlim_max);
+   fprintf(stderr, "initial hard limit: %s\n", strbuff);
+ 
+-#ifdef LIB518
+   /* show our constants */
+ 
+   fprintf(stderr, "test518 FD_SETSIZE: %d\n", FD_SETSIZE);
+   fprintf(stderr, "test518 NUM_OPEN  : %d\n", NUM_OPEN);
+   fprintf(stderr, "test518 NUM_NEEDED: %d\n", NUM_NEEDED);
+-#endif
+ 
+   /*
+    * if soft limit and hard limit are different we ask the
+@@ -199,7 +165,7 @@ static int rlimit(int keep_open)
+       strcpy(strbuff, "INFINITY");
+     else
+ #endif
+-      snprintf(strbuff, sizeof(strbuff), fmt, rl.rlim_cur);
++      sprintf(strbuff, fmt, rl.rlim_cur);
+     fprintf(stderr, "current soft limit: %s\n", strbuff);
+ 
+ #ifdef RLIM_INFINITY
+@@ -207,7 +173,7 @@ static int rlimit(int keep_open)
+       strcpy(strbuff, "INFINITY");
+     else
+ #endif
+-      snprintf(strbuff, sizeof(strbuff), fmt, rl.rlim_max);
++      sprintf(strbuff, fmt, rl.rlim_max);
+     fprintf(stderr, "current hard limit: %s\n", strbuff);
+ 
+   } /* (rl.rlim_cur != rl.rlim_max) */
+@@ -218,15 +184,8 @@ static int rlimit(int keep_open)
+    * This means that if for any reason we are not able to
+    * open more than FD_SETSIZE file descriptors then test
+    * 518 should not be run.
+-   *
+-   * test 537 is all about testing libcurl functionality
+-   * when the system has nearly exhausted the number of
+-   * free file descriptors. Test 537 will try to run with 
+-   * very few free file descriptors.
+    */
+ 
+-#ifdef LIB518
+-
+   /*
+    * verify that soft limit is higher than NUM_NEEDED,
+    * number of file descriptors we would try to open
+@@ -240,17 +199,15 @@ static int rlimit(int keep_open)
+      (rl.rlim_cur != RLIM_INFINITY) &&
+ #endif
+      (rl.rlim_cur <= num_open.rlim_cur)) {
+-    snprintf(strbuff2, sizeof(strbuff2), fmt, rl.rlim_cur);
+-    snprintf(strbuff1, sizeof(strbuff1), fmt, num_open.rlim_cur);
+-    snprintf(strbuff, sizeof(strbuff), "fd needed (%s) > "
+-             "system limit (%s)", strbuff1, strbuff2);
++    sprintf(strbuff2, fmt, rl.rlim_cur);
++    sprintf(strbuff1, fmt, num_open.rlim_cur);
++    sprintf(strbuff, "fd needed (%s) > system limit (%s)",
++            strbuff1, strbuff2);
+     store_errmsg(strbuff, 0);
+     fprintf(stderr, "%s\n", msgbuff);
+-    return -6;
++    return -4;
+   }
+ 
+-#endif /* LIB518 */
+-
+   /*
+    * reserve a chunk of memory before opening file descriptors to
+    * avoid a low memory condition once the file descriptors are
+@@ -260,7 +217,12 @@ static int rlimit(int keep_open)
+    * that it becomes available to the test.
+    */
+ 
+-  memchunk = malloc(sizeof(*memchunk) * MEMCHUNK_NITEMS);
++  nitems = INT_MAX / sizeof(*memchunk);
++  do {
++    memchunk = malloc(sizeof(*memchunk) * (size_t)nitems);
++    if (!memchunk)
++      nitems /= 2;
++  } while (nitems && !memchunk);
+   if (!memchunk) {
+     store_errmsg("memchunk, malloc() failed", our_errno());
+     fprintf(stderr, "%s\n", msgbuff);
+@@ -269,44 +231,28 @@ static int rlimit(int keep_open)
+ 
+   /* initialize it to fight lazy allocation */
+ 
+-  for (i = 0; i < MEMCHUNK_NITEMS; i++)
++  for (i = 0; i < nitems; i++)
+     memchunk[i] = -1;
+ 
+-  /* set the number of file descriptors we will try to open to ... */
++  /* set the number of file descriptors we will try to open */
+ 
+-#ifdef LIB518
+-  /* NUM_OPEN */
+   num_open.rlim_max = NUM_OPEN;
+-#endif
+-
+-#ifdef LIB537
+-#ifdef RLIM_INFINITY
+-  if ((rl.rlim_cur > 0) && (rl.rlim_cur != RLIM_INFINITY)) {
+-#else
+-  if (rl.rlim_cur > 0) {
+-#endif
+-    /* soft limit minus SAFETY_MARGIN */
+-    num_open.rlim_max = rl.rlim_cur - SAFETY_MARGIN;
+-  }
+-  else {
+-    /* biggest file descriptor array size */
+-    num_open.rlim_max = INT_MAX;
+-  }
+-#endif /* LIB537 */
+ 
+   /* verify that we won't overflow size_t in malloc() */
+ 
+   if (num_open.rlim_max > ((size_t)-1) / sizeof(*fd)) {
+-    snprintf(strbuff1, sizeof(strbuff1), fmt, num_open.rlim_max);
+-    snprintf(strbuff, sizeof(strbuff), "unable to allocate an array for %s "
+-             "file descriptors, would overflow size_t", strbuff1);
++    sprintf(strbuff1, fmt, num_open.rlim_max);
++    sprintf(strbuff, "unable to allocate an array for %s "
++            "file descriptors, would overflow size_t", strbuff1);
+     store_errmsg(strbuff, 0);
+     fprintf(stderr, "%s\n", msgbuff);
+     free(memchunk);
+     return -8;
+   }
+ 
+-  snprintf(strbuff, sizeof(strbuff), fmt, num_open.rlim_max);
++  /* allocate array for file descriptors */
++
++  sprintf(strbuff, fmt, num_open.rlim_max);
+   fprintf(stderr, "allocating array for %s file descriptors\n", strbuff);
+ 
+   fd = malloc(sizeof(*fd) * (size_t)(num_open.rlim_max));
+@@ -324,14 +270,14 @@ static int rlimit(int keep_open)
+        num_open.rlim_cur++)
+     fd[num_open.rlim_cur] = -1;
+ 
+-  snprintf(strbuff, sizeof(strbuff), fmt, num_open.rlim_max);
++  sprintf(strbuff, fmt, num_open.rlim_max);
+   fprintf(stderr, "trying to open %s file descriptors\n", strbuff);
+ 
+   /* open a dummy descriptor */
+ 
+   fd[0] = open(DEV_NULL, O_RDONLY);
+   if (fd[0] < 0) {
+-    snprintf(strbuff, sizeof(strbuff), "opening of %s failed", DEV_NULL);
++    sprintf(strbuff, "opening of %s failed", DEV_NULL);
+     store_errmsg(strbuff, our_errno());
+     fprintf(stderr, "%s\n", msgbuff);
+     free(fd);
+@@ -342,8 +288,6 @@ static int rlimit(int keep_open)
+ 
+   /* create a bunch of file descriptors */
+ 
+-#ifdef LIB518
+-
+   for (num_open.rlim_cur = 1; 
+        num_open.rlim_cur < num_open.rlim_max; 
+        num_open.rlim_cur++) {
+@@ -355,19 +299,17 @@ static int rlimit(int keep_open)
+       fd[num_open.rlim_cur] = -1;
+ 
+       num_open.rlim_max = NUM_NEEDED;
+-      snprintf(strbuff2, sizeof(strbuff2), fmt, num_open.rlim_max);
+-      snprintf(strbuff1, sizeof(strbuff1), fmt, num_open.rlim_cur);
+-      snprintf(strbuff, sizeof(strbuff), "fd needed (%s) > "
+-               "system limit (%s)", strbuff2, strbuff1);
++      sprintf(strbuff2, fmt, num_open.rlim_max);
++      sprintf(strbuff1, fmt, num_open.rlim_cur);
++      sprintf(strbuff, "fd needed (%s) > system limit (%s)",
++              strbuff2, strbuff1);
+       store_errmsg(strbuff, 0);
+       fprintf(stderr, "%s\n", msgbuff);
+ 
+-      fprintf(stderr, "closing file descriptors\n");
+       for (num_open.rlim_cur = 0;
+            fd[num_open.rlim_cur] >= 0;
+            num_open.rlim_cur++)
+         close(fd[num_open.rlim_cur]);
+-      fprintf(stderr, "file descriptors closed\n");
+       free(fd);
+       fd = NULL;
+       free(memchunk);
+@@ -377,64 +319,7 @@ static int rlimit(int keep_open)
+ 
+   }
+ 
+-#endif /* LIB518 */
+-
+-#ifdef LIB537
+-
+-  for (num_open.rlim_cur = 1; 
+-       num_open.rlim_cur < num_open.rlim_max; 
+-       num_open.rlim_cur++) {
+-
+-    fd[num_open.rlim_cur] = dup(fd[0]);
+-
+-    if (fd[num_open.rlim_cur] < 0) {
+-
+-      fd[num_open.rlim_cur] = -1;
+-
+-      snprintf(strbuff1, sizeof(strbuff1), fmt, num_open.rlim_cur);
+-      snprintf(strbuff, sizeof(strbuff), "dup() attempt %s failed", strbuff1);
+-      fprintf(stderr, "%s\n", strbuff);
+-
+-      snprintf(strbuff1, sizeof(strbuff1), fmt, num_open.rlim_cur + 2);
+-      snprintf(strbuff, sizeof(strbuff), "system does not support opening "
+-               "more than %s files" , strbuff1);
+-      fprintf(stderr, "%s\n", strbuff);
+-
+-      num_open.rlim_max = num_open.rlim_cur + 2 - SAFETY_MARGIN;
+-
+-      num_open.rlim_cur -= num_open.rlim_max;
+-      snprintf(strbuff1, sizeof(strbuff1), fmt, num_open.rlim_cur);
+-      snprintf(strbuff, sizeof(strbuff), "closing %s files", strbuff1);
+-      fprintf(stderr, "%s\n", strbuff);
+-
+-      for (num_open.rlim_cur = num_open.rlim_max;
+-           fd[num_open.rlim_cur] >= 0;
+-           num_open.rlim_cur++) {
+-        close(fd[num_open.rlim_cur]);
+-        fd[num_open.rlim_cur] = -1;
+-      }
+-
+-      snprintf(strbuff, sizeof(strbuff1), fmt, num_open.rlim_max);
+-      fprintf(stderr, "shrinking array for %s file descriptors\n", strbuff);
+-
+-      tmpfd = realloc(fd, sizeof(*fd) * (size_t)(num_open.rlim_max));
+-      if (!tmpfd) {
+-        snprintf(strbuff, sizeof(strbuff), "fd, realloc() failed, "
+-                 "errno %d, %s", our_errno(), strerror(our_errno()));
+-        fprintf(stderr, "%s\n", strbuff);
+-      }
+-      else {
+-        fd = tmpfd;
+-        tmpfd = NULL;
+-      }
+-
+-    }
+-
+-  }
+-
+-#endif /* LIB537 */
+-
+-  snprintf(strbuff, sizeof(strbuff), fmt, num_open.rlim_max);
++  sprintf(strbuff, fmt, num_open.rlim_max);
+   fprintf(stderr, "%s file descriptors open\n", strbuff);
+ 
+   /* free the chunk of memory we were reserving so that it
+@@ -458,7 +343,6 @@ int test(char *URL)
+   if(!strcmp(URL, "check")) {
+     /* used by the test script to ask if we can run this test or not */
+     if(rlimit(FALSE)) {
+-      fprintf(stderr, "Previous condition prevents running this test\n");
+       fprintf(stdout, "rlimit problem: %s\n", msgbuff);
+       return 1;
+     }
+@@ -467,12 +351,9 @@ int test(char *URL)
+ 
+   if (rlimit(TRUE)) {
+     /* failure */
+-    fprintf(stderr, "Previous condition aborts this test\n");
+     return TEST_ERR_MAJOR_BAD;
+   }
+ 
+-  fprintf(stderr, "running test...\n");
+-
+   /* run the test with the bunch of open file descriptors 
+      and close them all once the test is over */
+ 
+@@ -500,12 +381,14 @@ int test(char *URL)
+ 
+   return (int)res;
+ }
+-#else
+-/* system lacks getrlimit() and/or setrlimit() */
++
++#else /* defined(HAVE_GETRLIMIT) && defined(HAVE_SETRLIMIT) */
++
+ int test(char *URL)
+ {
+   (void)URL;
+   printf("system lacks necessary system function(s)");
+-  return 1;
++  return 1; /* skip test */
+ }
+-#endif
++
++#endif /* defined(HAVE_GETRLIMIT) && defined(HAVE_SETRLIMIT) */

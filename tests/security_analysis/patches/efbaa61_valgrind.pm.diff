@@ -1,0 +1,21 @@
+@@ -22,9 +22,20 @@
+ #
+ ###########################################################################
+ 
++package valgrind;
++
+ use strict;
+ use warnings;
+ 
++BEGIN {
++    use base qw(Exporter);
++
++    our @EXPORT = qw(
++        valgrindparse
++    );
++}
++
++
+ use File::Basename;
+ 
+ sub valgrindparse {

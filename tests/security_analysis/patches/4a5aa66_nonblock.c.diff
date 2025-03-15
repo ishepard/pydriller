@@ -1,0 +1,18 @@
+@@ -20,7 +20,7 @@
+  *
+  ***************************************************************************/
+ 
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+ #ifdef HAVE_SYS_IOCTL_H
+ #include <sys/ioctl.h>
+@@ -37,7 +37,7 @@
+ #include <inet.h>
+ #endif
+ 
+-#include "curl_nonblock.h"
++#include "nonblock.h"
+ 
+ /*
+  * curlx_nonblock() set the given socket to either blocking or non-blocking

@@ -1,0 +1,9 @@
+@@ -25,7 +25,7 @@
+ 
+ #ifdef USE_AXTLS
+ #include "curl/curl.h"
+-#include "curl_urldata.h"
++#include "urldata.h"
+ 
+ int Curl_axtls_init(void);
+ int Curl_axtls_cleanup(void);

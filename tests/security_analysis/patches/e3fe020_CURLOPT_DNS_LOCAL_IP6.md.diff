@@ -1,0 +1,20 @@
+@@ -9,7 +9,7 @@ See-also:
+   - CURLOPT_DNS_LOCAL_IP4 (3)
+   - CURLOPT_DNS_SERVERS (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -38,10 +38,6 @@ option.
+ 
+ NULL
+ 
+-# PROTOCOLS
+-
+-All
+-
+ # EXAMPLE
+ 
+ ~~~c

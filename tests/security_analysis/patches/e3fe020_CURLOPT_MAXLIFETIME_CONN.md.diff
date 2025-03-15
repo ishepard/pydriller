@@ -1,0 +1,20 @@
+@@ -10,7 +10,7 @@ See-also:
+   - CURLOPT_MAXAGE_CONN (3)
+   - CURLOPT_TIMEOUT (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -45,10 +45,6 @@ If set to 0, this behavior is disabled: all connections are eligible for reuse.
+ 
+ Default *maxlifetime* is 0 seconds (i.e., disabled).
+ 
+-# PROTOCOLS
+-
+-All
+-
+ # EXAMPLE
+ 
+ ~~~c

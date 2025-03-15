@@ -1,0 +1,17 @@
+@@ -20,13 +20,13 @@
+  *
+  ***************************************************************************/
+ 
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+ #if defined(USE_SSLEAY) || defined(USE_AXTLS)
+ /* these two backends use functions from this file */
+ 
+-#include "curl_hostcheck.h"
+-#include "curl_rawstr.h"
++#include "hostcheck.h"
++#include "rawstr.h"
+ 
+ /*
+  * Match a hostname against a wildcard pattern.

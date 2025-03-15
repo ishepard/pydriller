@@ -1,0 +1,20 @@
+@@ -9,7 +9,7 @@ See-also:
+   - CURLOPT_READDATA (3)
+   - CURLOPT_WRITEFUNCTION (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -43,10 +43,6 @@ crashes.
+ 
+ By default, this is a FILE * to stdout.
+ 
+-# PROTOCOLS
+-
+-Used for all protocols.
+-
+ # EXAMPLE
+ 
+ A common technique is to use the write callback to store the incoming data

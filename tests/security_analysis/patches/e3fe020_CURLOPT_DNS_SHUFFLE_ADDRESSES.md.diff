@@ -1,0 +1,20 @@
+@@ -8,7 +8,7 @@ See-also:
+   - CURLOPT_DNS_CACHE_TIMEOUT (3)
+   - CURLOPT_IPRESOLVE (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -46,10 +46,6 @@ performance impacts and may cause IPv4 to be used before IPv6 or vice versa.
+ 
+ 0 (disabled)
+ 
+-# PROTOCOLS
+-
+-All
+-
+ # EXAMPLE
+ 
+ ~~~c

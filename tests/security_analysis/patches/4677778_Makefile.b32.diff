@@ -1,0 +1,5 @@
+@@ -88,4 +88,3 @@ hugehelp.c: hugehelp.c.cvs
+ 	@$(CP) $** $@
+ 
+ 
+-

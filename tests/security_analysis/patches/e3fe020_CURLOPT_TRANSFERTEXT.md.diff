@@ -1,0 +1,20 @@
+@@ -7,7 +7,7 @@ Source: libcurl
+ See-also:
+   - CURLOPT_CRLF (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -38,10 +38,6 @@ simply sets the mode to ASCII and performs a standard transfer.
+ 
+ 0, disabled
+ 
+-# PROTOCOLS
+-
+-FTP
+-
+ # EXAMPLE
+ 
+ ~~~c

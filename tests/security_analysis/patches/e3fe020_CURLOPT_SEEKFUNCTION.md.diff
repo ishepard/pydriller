@@ -1,0 +1,20 @@
+@@ -10,7 +10,7 @@ See-also:
+   - CURLOPT_SEEKDATA (3)
+   - CURLOPT_STDERR (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -65,10 +65,6 @@ many systems!
+ 
+ By default, this is NULL and unused.
+ 
+-# PROTOCOLS
+-
+-HTTP, FTP, SFTP
+-
+ # EXAMPLE
+ 
+ ~~~c

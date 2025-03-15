@@ -1,0 +1,9 @@
+@@ -21,7 +21,7 @@
+  * KIND, either express or implied.
+  *
+  ***************************************************************************/
+-#include "curl_setup.h"
++#include "setup.h"
+ 
+ #ifndef CURL_DISABLE_FTP
+ 

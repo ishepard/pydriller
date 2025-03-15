@@ -1,0 +1,20 @@
+@@ -10,7 +10,7 @@ See-also:
+   - curl_easy_getinfo (3)
+   - curl_easy_setopt (3)
+ Protocol:
+-  - *
++  - All
+ ---
+ 
+ # NAME
+@@ -31,10 +31,6 @@ Pass a pointer to a long to receive the total size of the issued
+ requests. This is so far only for HTTP requests. Note that this may be more
+ than one request if CURLOPT_FOLLOWLOCATION(3) is enabled.
+ 
+-# PROTOCOLS
+-
+-All
+-
+ # EXAMPLE
+ 
+ ~~~c

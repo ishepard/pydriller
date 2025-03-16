@@ -1,9 +1,0 @@
-@@ -22,7 +22,7 @@
-  *
-  ***************************************************************************/
- 
--#include "curl_setup.h"
-+#include "setup.h"
- 
- struct Curl_sockaddr_storage {
-   union {

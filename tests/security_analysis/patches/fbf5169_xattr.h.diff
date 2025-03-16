@@ -1,2 +1,0 @@
-@@ -0,0 +1 @@
-+int write_xattr( CURL *curl, const char *filename );

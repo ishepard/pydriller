@@ -1,9 +1,0 @@
-@@ -22,7 +22,7 @@
-  *
-  ***************************************************************************/
- 
--#include "curl_setup.h"
-+#include "setup.h"
- 
- #ifdef HAVE_SYS_POLL_H
- #include <sys/poll.h>

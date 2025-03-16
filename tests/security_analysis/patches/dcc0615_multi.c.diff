@@ -1,9 +1,0 @@
-@@ -1462,7 +1462,7 @@ static CURLMcode multi_runsingle(struct Curl_multi *multi,
- 
-       if(easy->easy_handle->set.wildcardmatch) {
-         if(easy->easy_handle->wildcard.state != CURLWC_DONE) {
--          /* if a wildcard is set and we are not ending -> lets start again
-+          /* if a wildcard is set and we are not ending -> lets start again
-              with CURLM_STATE_INIT */
-           result = CURLM_CALL_MULTI_PERFORM;
-           multistate(easy, CURLM_STATE_INIT);

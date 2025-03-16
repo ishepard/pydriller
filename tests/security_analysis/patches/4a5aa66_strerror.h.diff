@@ -1,9 +1,0 @@
-@@ -22,7 +22,7 @@
-  *
-  ***************************************************************************/
- 
--#include "curl_urldata.h"
-+#include "urldata.h"
- 
- const char *Curl_strerror (struct connectdata *conn, int err);
- 

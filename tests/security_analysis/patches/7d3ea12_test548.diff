@@ -1,8 +1,0 @@
-@@ -3,7 +3,6 @@
- <keywords>
- HTTP
- HTTP POST
----proxy-anyauth
- HTTP proxy NTLM auth
- </keywords>
- </info>

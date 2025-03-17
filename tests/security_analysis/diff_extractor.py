@@ -144,70 +144,84 @@ def classify_severity(commit_message: str) -> str:
             return severity
     return "Low"  # fallback if no known keywords found
 
-
 def extract_security_diffs_and_store(repo_url, since=None, to=None, continuous=False, interval=300):
     """
-    Main scanning function:
-      - Scans the repository for commits
-      - Looks for CVE references via regex
-      - Classifies severity via known keywords
-      - Classifies OWASP category
-      - Writes results to CSV/JSON/Markdown
-      - Optionally runs continuously
-    """
-    while True:
-        # Build PyDriller arguments
-        repo_args = {"since": since, "to": to} if (since or to) else {}
+    Main function to:
+    - Scan the repository for security-related commits
+    - Use regex to extract CVE references
+    - Classify security risks based on severity & OWASP
+    - Store results in CSV, JSON, and Markdown
+    - Support continuous scanning mode with interval-based execution
 
+    :param repo_url: The target repository URL or path
+    :param since: Start date for commit scanning
+    :param to: End date for commit scanning
+    :param continuous: Boolean flag to enable continuous mode
+    :param interval: Time interval (in seconds) between continuous scans
+    """
+    last_checked_commit = None  # Track the last scanned commit to avoid reprocessing
+
+    while True:
+        repo_args = {"since": since, "to": to} if (since or to) else {}
         flagged_commits = []
-        # Use concurrency for performance if needed
+
         with ThreadPoolExecutor(max_workers=4) as executor:
             for commit in Repository(repo_url, **repo_args).traverse_commits():
+                if commit.hash == last_checked_commit:
+                    break  # Stop processing if we reach the last known commit
                 executor.submit(process_commit, commit, flagged_commits)
 
         if flagged_commits:
             save_results(flagged_commits)
-        else:
-            print("[!] No security-related commits found in this scan.")
+            last_checked_commit = flagged_commits[0][0].hash  # Store latest scanned commit hash
 
         if not continuous:
             break
-        print(f"[i] Sleeping for {interval} seconds before next scan...")
-        time.sleep(interval)
+
+        # Log the scanning interval for user feedback
+        print(f"[ℹ️] Sleeping for {interval} seconds before the next scan...")
+        time.sleep(interval)  # Pause before re-scanning
 
 
 def process_commit(commit, flagged_commits):
     """
-    Checks the commit message for:
-      - CVE references (using regex)
-      - Security keywords for severity
-      - OWASP category based on keywords
-    If the commit is security-related (non-"Low" severity or containing a CVE), it is added to flagged_commits.
+    Processes each commit to:
+    - Check for CVE references (using regex)
+    - Identify security severity using predefined keywords
+    - Classify the commit based on OWASP categories
+    - Generate CLI alerts for high-risk security commits
+
+    :param commit: PyDriller commit object
+    :param flagged_commits: List to store flagged security commits
     """
-    # Convert commit message to lower-case for consistent matching.
     commit_msg_lower = commit.msg.lower()
 
-    # 1) Extract CVE identifiers (if any) using regex.
+    # Extract CVE IDs from the commit message
     found_cves = extract_cve_ids_from_msg(commit.msg)
 
-    # 2) Determine severity from security keywords (defaults to "Low" if no match).
+    # Identify severity level (defaulting to "Low" if no keyword is found)
     severity = classify_severity(commit_msg_lower)
 
-    # 3) Determine the OWASP category from the commit message.
+    # Classify the commit based on OWASP Top 10 categories
     owasp_category = classify_owasp(commit_msg_lower)
 
-    # 4) Decide if the commit should be flagged:
-    #    If the severity is not "Low" or if any CVE IDs were found.
-    if severity != "Low" or found_cves:
-        # Prepare a string to hold CVE details.
+    # If a commit is classified as "High" or "Critical", or if it references a CVE, flag it
+    if severity in ["Critical", "High"] or found_cves:
         cve_text = "No CVE found"
         if found_cves:
-            # For simplicity, fetch details for the first CVE found.
-            first_cve = found_cves[0]
+            first_cve = found_cves[0] # Process only the first CVE found
             cve_details = fetch_cve_details_v2(first_cve)
             cve_text = f"{first_cve}: {cve_details}"
 
+        # Store the flagged commit for report generation
         flagged_commits.append((commit, severity, cve_text, owasp_category))
+
+        # 🔴 CLI Alert for High-Risk Commits
+        print(f"\n[⚠️ ALERT] High-risk security commit detected!\n"
+              f"Commit Hash: {commit.hash}\n"
+              f"Severity Level: {severity}\n"
+              f"CVE Details: {cve_text}\n"
+              f"OWASP Category: {owasp_category}\n")
 
 
 def save_results(flagged_commits):

@@ -1,5 +1,3 @@
-# tests/test_diff_extractor.py
-
 import os
 import csv
 import json

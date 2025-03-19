@@ -86,12 +86,7 @@ SECURITY_KEYWORDS = {
 # Regex to detect CVE-YYYY-NNNNN
 CVE_REGEX = re.compile(r'\bCVE-\d{4}-\d{4,}\b', re.IGNORECASE)
 
-
 def fetch_cve_details_v2(cve_id: str) -> str:
-    """
-    Fetch CVE details from NVD 2.0 API given a CVE ID.
-    If found, return a short description. Otherwise 'No CVE details found.'
-    """
     try:
         url = f"{CVE_API_URL_V2}?cveId={cve_id}"
         resp = requests.get(url, timeout=10)
@@ -100,68 +95,46 @@ def fetch_cve_details_v2(cve_id: str) -> str:
             vulnerabilities = data.get("vulnerabilities", [])
             if vulnerabilities:
                 cve_obj = vulnerabilities[0]
-                cve_desc = cve_obj["cve"]["descriptions"][0]["value"]
-                return cve_desc
+                return cve_obj["cve"]["descriptions"][0]["value"]
         return "No CVE details found."
     except Exception as exc:
         return f"Error fetching CVE details: {str(exc)}"
 
-
 def extract_cve_ids_from_msg(commit_msg: str):
-    """
-    Return a list of CVE IDs found in the commit message using regex.
-    """
     return CVE_REGEX.findall(commit_msg)
 
-
 def classify_owasp(commit_message: str) -> str:
-    """
-    Classify the commit under an OWASP category based on known keywords.
-    """
     msg_lower = commit_message.lower()
     for keyword, category in OWASP_MAPPING.items():
         if keyword in msg_lower:
             return category
     return "Unknown Category"
 
-
 def classify_severity(commit_message: str) -> str:
-    """
-    Assign severity if a known keyword is found. Default 'Low' if none found.
-    """
     msg_lower = commit_message.lower()
     for keyword, severity in SECURITY_KEYWORDS.items():
         if keyword in msg_lower:
             return severity
     return "Low"
 
-
 def extract_security_diffs_and_store(repo_url, since=None, to=None,
                                      continuous=False, interval=300):
-    """
-    Main scanning:
-      - Traverse commits
-      - Use regex to find CVEs
-      - Classify severity/OWASP
-      - Save results to CSV/JSON/Markdown
-      - If continuous=True, re-scan after 'interval' seconds
-    """
     last_checked_commit = None
-
     while True:
         repo_args = {"since": since, "to": to} if (since or to) else {}
         flagged_commits = []
 
-        # concurrently process each commit
         with ThreadPoolExecutor(max_workers=4) as executor:
             for commit in Repository(repo_url, **repo_args).traverse_commits():
                 if commit.hash == last_checked_commit:
                     break
                 executor.submit(process_commit, commit, flagged_commits)
 
+        # Always call save_results, even if flagged_commits is empty
+        save_results(flagged_commits)
+
+        # If there are flagged commits, store the latest one
         if flagged_commits:
-            save_results(flagged_commits)
-            # store the latest commit's hash
             last_checked_commit = flagged_commits[0][0].hash
 
         if not continuous:
@@ -170,50 +143,43 @@ def extract_security_diffs_and_store(repo_url, since=None, to=None,
         print(f"[ℹ️] Sleeping for {interval} seconds before the next scan...")
         time.sleep(interval)
 
-
 def process_commit(commit, flagged_commits):
-    """
-    For each commit:
-      - check CVEs
-      - check severity & OWASP
-      - store flagged commits
-      - alert on high risk
-    """
     commit_msg_lower = commit.msg.lower()
     found_cves = extract_cve_ids_from_msg(commit.msg)
     severity = classify_severity(commit_msg_lower)
     owasp_category = classify_owasp(commit_msg_lower)
 
+    # Flag if severity is "Critical"/"High" or a CVE is found
     if severity in ["Critical", "High"] or found_cves:
         cve_text = "No CVE found"
         if found_cves:
-            first_cve = found_cves[0]
-            details = fetch_cve_details_v2(first_cve)
-            cve_text = f"{first_cve}: {details}"
+            cve_text = f"{found_cves[0]}: {fetch_cve_details_v2(found_cves[0])}"
 
         flagged_commits.append((commit, severity, cve_text, owasp_category))
-
-        # CLI alert
         print(f"\n[⚠️ ALERT] High-risk security commit detected!\n"
               f"Commit Hash: {commit.hash}\n"
               f"Severity Level: {severity}\n"
               f"CVE Details: {cve_text}\n"
               f"OWASP Category: {owasp_category}\n")
 
-
 def save_results(flagged_commits):
-    from tests.security_analysis.patch_labeler import label_patches_with_commit_hash
-    security_data = []
-    os.makedirs("patches", exist_ok=True)
+    # Let’s put the reports in the same folder as THIS script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    patches_dir = os.path.join(script_dir, "patches")
+    os.makedirs(patches_dir, exist_ok=True)
 
-    for (commit, severity, cve_details, owasp_category) in flagged_commits:
+    security_data = []
+
+    from .patch_labeler import label_patches_with_commit_hash
+
+    for commit, severity, cve_details, owasp_category in flagged_commits:
         for mod in commit.modified_files:
             diff_text = mod.diff or ""
             if not diff_text.strip():
                 continue
 
-            label_patches_with_commit_hash(commit.hash, mod.filename, diff_text)
-            row = {
+            label_patches_with_commit_hash(commit.hash, mod.filename, diff_text, patches_dir)
+            security_data.append({
                 "commit_hash": commit.hash,
                 "author": commit.author.name,
                 "date": str(commit.author_date),
@@ -222,60 +188,54 @@ def save_results(flagged_commits):
                 "owasp_category": owasp_category,
                 "filename": mod.filename,
                 "diff_preview": diff_text[:100]
-            }
-            security_data.append(row)
+            })
 
-    save_patches_in_csv(security_data, "report.csv")
-    save_patches_in_json(security_data, "report.json")
-    save_patches_in_markdown(security_data, "report.md")
+    # Even if security_data is empty, create empty files
+    csv_path = os.path.join(script_dir, "report.csv")
+    json_path = os.path.join(script_dir, "report.json")
+    md_path = os.path.join(script_dir, "report.md")
 
+    save_patches_in_csv(security_data, csv_path)
+    save_patches_in_json(security_data, json_path)
+    save_patches_in_markdown(security_data, md_path)
 
 def save_patches_in_csv(data, filename):
-    import csv
-    if not data:
-        print(f"[!] No data to write to {filename}")
-        return
-    headers = data[0].keys()
+    headers = [
+        "commit_hash", "author", "date", "severity",
+        "cve_details", "owasp_category", "filename", "diff_preview"
+    ]
     with open(filename, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=headers)
         writer.writeheader()
-        writer.writerows(data)
+        for row in data:
+            writer.writerow(row)
     print(f"[+] CSV created -> {filename}")
 
-
 def save_patches_in_json(data, filename):
-    import json
-    if not data:
-        print(f"[!] No data to write to {filename}")
-        return
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
     print(f"[+] JSON created -> {filename}")
 
-
 def save_patches_in_markdown(data, filename):
-    if not data:
-        print(f"[!] No data to write to {filename}")
-        return
-    headers = list(data[0].keys())
+    headers = [
+        "commit_hash", "author", "date", "severity",
+        "cve_details", "owasp_category", "filename", "diff_preview"
+    ]
     with open(filename, "w", encoding="utf-8") as f:
         f.write("| " + " | ".join(headers) + " |\n")
         f.write("| " + " | ".join(["---"] * len(headers)) + " |\n")
         for row in data:
-            line = "| " + " | ".join(str(row[h]) for h in headers) + " |\n"
+            line = "| " + " | ".join(str(row.get(h, "")) for h in headers) + " |\n"
             f.write(line)
     print(f"[+] Markdown created -> {filename}")
 
-
 def main():
-    parser = argparse.ArgumentParser(
-        description="Extract diffs from security-related commits using regex-based CVE detection and OWASP classification."
-    )
-    parser.add_argument("--repo", required=True, help="Path or URL to the Git repository.")
-    parser.add_argument("--since", help="Start date (YYYY-MM-DD)", default=None)
-    parser.add_argument("--to", help="End date (YYYY-MM-DD)", default=None)
-    parser.add_argument("--continuous", action="store_true", help="Enable continuous scanning.")
-    parser.add_argument("--interval", type=int, default=300, help="Seconds between scans if continuous.")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--repo", required=True)
+    parser.add_argument("--since", default=None)
+    parser.add_argument("--to", default=None)
+    parser.add_argument("--continuous", action="store_true")
+    parser.add_argument("--interval", type=int, default=300)
     args = parser.parse_args()
 
     since_date = datetime.strptime(args.since, "%Y-%m-%d") if args.since else None
@@ -288,7 +248,6 @@ def main():
         continuous=args.continuous,
         interval=args.interval
     )
-
 
 if __name__ == "__main__":
     main()

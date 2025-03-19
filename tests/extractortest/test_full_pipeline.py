@@ -1,5 +1,4 @@
-# tests/integration/test_full_pipeline.py
-
+# tests/extractortest/test_full_pipeline.py
 import pytest
 import subprocess
 
@@ -7,18 +6,17 @@ import subprocess
 def test_full_pipeline(tmp_path):
     """
     Launch diff_extractor.py with sample arguments to ensure end-to-end execution.
-    This requires a valid Git repo with possible security commits (like DVWA).
+    This requires a valid Git repository with security commits.
     """
-    repo_url = "C:/Users/yara9/OneDrive/Skrivbord/DVWA"
+    repo_url = r"C:\Users\yara9\OneDrive\Skrivbord\DVWA"  # Ensure this is a valid local Git repo
 
     cmd = [
         "python",
         "-m",
-        "pydriller.tests.security_analysis.diff_extractor",
+        "tests.security_analysis.diff_extractor",  # Updated module path
         "--repo", repo_url,
         "--since", "2023-01-01",
         "--to", "2023-12-31",
-        "--continuous", "False",
     ]
 
     try:

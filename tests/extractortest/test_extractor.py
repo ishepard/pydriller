@@ -12,9 +12,6 @@ def test_extract_security_diffs_and_store(repo_url, tmp_path):
     A basic test that calls extract_security_diffs_and_store with a known small repo.
     Then checks if the CSV/JSON/MD files are generated.
     """
-    # You might mock or just rely on a real small repo
-    # For demonstration, let's just do a short check
-
     # By default, it writes to 'report.csv', 'report.json', 'report.md'
     extract_security_diffs_and_store(repo_url, continuous=False, interval=1)
 

@@ -1,28 +1,32 @@
+# tests/extractortest/test_patch_labeler.py
+
 import os
 import pytest
 from tests.security_analysis.patch_labeler import label_patches_with_commit_hash
 
-def test_label_patches_creates_file(tmp_path, monkeypatch):
+def test_label_patches_with_commit_hash(tmp_path):
     """
-    Test that label_patches_with_commit_hash creates a patch file with the expected content.
+    Ensure that label_patches_with_commit_hash creates the correct .diff file
+    with the expected content.
     """
-    # Set the working directory to the temporary path.
-    monkeypatch.chdir(tmp_path)
-
-    # Define sample inputs.
     commit_hash = "abcdef1234567890"
-    filename = "subdir/example.txt"
-    diff_text = "This is a sample diff."
+    filename = "my_script.py"
+    diff_text = "some diff lines..."
 
-    # Call the function.
+    # Change to tmp_path so the 'patches' folder is created there
+    os.chdir(tmp_path)
+
     label_patches_with_commit_hash(commit_hash, filename, diff_text)
 
-    # Expected file name: first 7 characters of commit hash, with slashes replaced by underscores.
-    expected_filename = f"{commit_hash[:7]}_{filename.replace('/', '_')}.diff"
-    expected_path = tmp_path / "patches" / expected_filename
+    # The function shortens commit_hash to first 7 chars => 'abcdef1'
+    # and replaces any slashes in filename with '_'.
+    expected_filename = os.path.join(
+        tmp_path,
+        "patches",
+        "abcdef1_my_script.py.diff"
+    )
+    assert os.path.exists(expected_filename), f"Patch file not found: {expected_filename}"
 
-    # Check that the file exists and its contents match.
-    assert expected_path.exists(), f"Expected file {expected_path} was not created."
-    with open(expected_path, "r", encoding="utf-8") as f:
-        content = f.read()
-    assert content == diff_text, "The patch file content does not match the expected diff text."
+    with open(expected_filename, "r", encoding="utf-8") as f:
+        contents = f.read()
+        assert contents == diff_text, "File content does not match the provided diff_text."

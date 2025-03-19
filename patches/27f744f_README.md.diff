@@ -1,0 +1,37 @@
+@@ -93,6 +93,8 @@ ### Database Setup
+ The variables are set to the following by default:
+ 
+ ```php
++$_DVWA[ 'db_server'] = '127.0.0.1';
++$_DVWA[ 'db_port'] = '3306';
+ $_DVWA[ 'db_user' ] = 'dvwa';
+ $_DVWA[ 'db_password' ] = 'p@ssw0rd';
+ $_DVWA[ 'db_database' ] = 'dvwa';
+@@ -357,6 +359,27 @@ ### Anything else
+ 
+ - - -
+ 
++## SQLite3 SQL Injection
++
++_Support for this is limited, before raising issues, please ensure you are prepared to work on debugging, do not simply claim "it does not work"._
++
++By default, SQLi and Blind SQLi are done against the MariaDB/MySQL server used by the site but it is possible to switch to do the SQLi testing against SQLite3 instead.
++
++I am not going to cover how to get SQLite3 working with PHP, but it should be a simple case of installing the `php-sqlite3` package and making sure it is enabled.
++
++To make the switch, simply edit the config file and add or edit these lines:
++
++```
++$_DVWA["SQLI_DB"] = "sqlite";
++$_DVWA["SQLITE_DB"] = "sqli.db";
++```
++
++By default it uses the file `database/sqli.db`, if you mess it up, simply copy `database/sqli.db.dist` over the top.
++
++The challenges are exactly the same as for MySQL, they just run against SQLite3 instead.
++
++- - -
++
+ ## Links
+ 
+ Homepage: <http://www.dvwa.co.uk/>

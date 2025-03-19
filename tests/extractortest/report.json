@@ -1,0 +1,1742 @@
+[
+  {
+    "commit_hash": "101597a89519343e1681b9c31a077a367a128921",
+    "author": "g0tmi1k",
+    "date": "2015-09-11 13:36:18+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "main.css",
+    "diff_preview": "@@ -8,7 +8,7 @@ body{\n }\r\n \r\n body.home{\r\n-\tbackground: #e7e7e7;\t\r\n+\tbackground: #e7e7e7;\r\n }\r\n \r\n d"
+  },
+  {
+    "commit_hash": "101597a89519343e1681b9c31a077a367a128921",
+    "author": "g0tmi1k",
+    "date": "2015-09-11 13:36:18+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "dvwaPage.inc.php",
+    "diff_preview": "@@ -261,7 +261,7 @@ function dvwaHtmlEcho( $pPage ) {\n \r\n \t\t}\r\n \r\n-\t\t$menuHtml .= \"<ul>{$menuBlockHt"
+  },
+  {
+    "commit_hash": "4073d00ebc265450e40edfd4160e9c97d1d1cec8",
+    "author": "g0tmi1k",
+    "date": "2015-09-12 19:50:30+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -12,16 +12,11 @@ if(isset($_GET[ 'Submit' ])) {\n \t\t$result = mysql_query( $getid ); // Removed 'o"
+  },
+  {
+    "commit_hash": "4073d00ebc265450e40edfd4160e9c97d1d1cec8",
+    "author": "g0tmi1k",
+    "date": "2015-09-12 19:50:30+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -9,16 +9,11 @@ if(isset($_GET[ 'Submit' ])) {\n \t$result = mysql_query( $getid ); // Removed 'or d"
+  },
+  {
+    "commit_hash": "4073d00ebc265450e40edfd4160e9c97d1d1cec8",
+    "author": "g0tmi1k",
+    "date": "2015-09-12 19:50:30+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -10,16 +10,11 @@ if(isset($_GET[ 'Submit' ])) {\n \t$result = mysql_query( $getid ); // Removed 'or"
+  },
+  {
+    "commit_hash": "56864d300be750e24a4b3e5d536b0a1561adae9a",
+    "author": "g0tmi1k",
+    "date": "2015-09-12 20:13:39+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -16,6 +16,7 @@ if(isset($_GET[ 'Submit' ])) {\n \t\t\t$html .= '<pre>User ID exists in the database.<"
+  },
+  {
+    "commit_hash": "56864d300be750e24a4b3e5d536b0a1561adae9a",
+    "author": "g0tmi1k",
+    "date": "2015-09-12 20:13:39+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -13,6 +13,7 @@ if(isset($_GET[ 'Submit' ])) {\n \t\t$html .= '<pre>User ID exists in the database.</"
+  },
+  {
+    "commit_hash": "56864d300be750e24a4b3e5d536b0a1561adae9a",
+    "author": "g0tmi1k",
+    "date": "2015-09-12 20:13:39+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -14,6 +14,7 @@ if(isset($_GET[ 'Submit' ])) {\n \t\t$html .= '<pre>User ID exists in the database.</"
+  },
+  {
+    "commit_hash": "76851d7935bdfd3ae5d02d6bb345349c2a14b07d",
+    "author": "g0tmi1k",
+    "date": "2015-09-14 16:28:28+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "dvwaPage.inc.php",
+    "diff_preview": "@@ -440,6 +440,7 @@ function dvwaDatabaseConnect() {\n \tglobal $_DVWA;\r\n \tglobal $DBMS;\r\n \tglobal $DB"
+  },
+  {
+    "commit_hash": "76851d7935bdfd3ae5d02d6bb345349c2a14b07d",
+    "author": "g0tmi1k",
+    "date": "2015-09-14 16:28:28+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -3,24 +3,16 @@\n if(isset($_GET[ 'Submit' ])) {\r\n \t// Retrieve data\r\n \t$id = $_GET[ 'id' ];\r\n-\t$id"
+  },
+  {
+    "commit_hash": "76851d7935bdfd3ae5d02d6bb345349c2a14b07d",
+    "author": "g0tmi1k",
+    "date": "2015-09-14 16:28:28+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -3,15 +3,10 @@\n if(isset($_GET[ 'Submit' ])) {\r\n \t// Retrieve data\r\n \t$id = $_GET[ 'id' ];\r\n-\t$id"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,7 +1,6 @@\n <?php\r\n \r\n if( isset( $_GET[ 'Login' ] ) ) {\r\n-\r\n \t$user = $_GET[ 'username' ];\r\n \r"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,6 +1,6 @@\n <?php\r\n \r\n-if(isset($_GET[ 'Change' ])) {\r\n+if( isset( $_GET[ 'Change' ] ) ) {\r\n \t/"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,7 +1,6 @@\n <?php\r\n \r\n-if(isset($_GET[ 'Change' ])) {\r\n-\r\n+if( isset( $_GET[ 'Change' ] ) ) {\r\n"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,7 +1,6 @@\n <?php\r\n \r\n-if(isset($_GET[ 'Change' ])) {\r\n-\r\n+if( isset( $_GET[ 'Change' ] ) ) {\r\n"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,7 +1,6 @@\n <?php\r\n \r\n if( isset( $_POST[ 'submit' ] ) ) {\r\n-\r\n \t$target = $_REQUEST[ 'ip' ];\r\n"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,7 +1,6 @@\n <?php\r\n \r\n if( isset( $_POST[ 'submit' ] ) ) {\r\n-\r\n \t$target = $_REQUEST[ 'ip' ];\r\n"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,6 +1,6 @@\n <?php\r\n \r\n-if(isset($_GET[ 'Submit' ])) {\r\n+if( isset( $_GET[ 'Submit' ] ) ) {\r\n \t/"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,6 +1,6 @@\n <?php\r\n \r\n-if(isset($_GET[ 'Submit' ])) {\r\n+if( isset($_GET[ 'Submit' ] ) ) {\r\n \t//"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,6 +1,6 @@\n <?php\r\n \r\n-if(isset($_GET[ 'Submit' ])) {\r\n+if( isset( $_GET[ 'Submit' ] ) ) {\r\n \t/"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,6 +1,6 @@\n <?php\r\n \r\n-if(isset($_GET[ 'Submit' ])) {\r\n+if( isset( $_GET[ 'Submit' ] ) ) {\r\n \t/"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,6 +1,6 @@\n <?php\r\n \r\n-if(isset($_GET[ 'Submit' ])) {\r\n+if( isset($_GET[ 'Submit' ] ) ) {\r\n \t//"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,6 +1,6 @@\n <?php\r\n \r\n-if(isset($_GET[ 'Submit' ])) {\r\n+if( isset( $_GET[ 'Submit' ] ) ) {\r\n \t/"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,9 +1,9 @@\n <?php\r\n \r\n-if(!array_key_exists (\"name\", $_GET) || $_GET[ 'name' ] == NULL || $_GET"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,9 +1,6 @@\n <?php\r\n \r\n-if(!array_key_exists (\"name\", $_GET) || $_GET[ 'name' ] == NULL || $_GET"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,12 +1,6 @@\n <?php\r\n \r\n-if(!array_key_exists (\"name\", $_GET) || $_GET[ 'name' ] == NULL || $_GE"
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,24 +1,24 @@\n <?php\r\n \r\n-if(isset( $_POST[ 'btnSign' ] )) {\r\n+if( isset( $_POST[ 'btnSign' ] ) "
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,6 +1,6 @@\n <?php\r\n \r\n-if(isset( $_POST[ 'btnSign' ] )) {\r\n+if( isset( $_POST[ 'btnSign' ] ) ) "
+  },
+  {
+    "commit_hash": "7ae63158824d784730f0fcda8c3ec4be54e70f46",
+    "author": "g0tmi1k",
+    "date": "2015-09-16 13:25:23+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,6 +1,6 @@\n <?php\r\n \r\n-if(isset( $_POST[ 'btnSign' ] )) {\r\n+if( isset( $_POST[ 'btnSign' ] ) ) "
+  },
+  {
+    "commit_hash": "188cf5406c8e5ef58da356b209b2c30eff1130ce",
+    "author": "g0tmi1k",
+    "date": "2015-09-18 10:19:40+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -2,7 +2,7 @@\n \r\n if( isset( $_GET[ 'Login' ] ) ) {\r\n \t// Anti-CSRF\r\n-\tcheckTokens( $_POST[ 'token"
+  },
+  {
+    "commit_hash": "188cf5406c8e5ef58da356b209b2c30eff1130ce",
+    "author": "g0tmi1k",
+    "date": "2015-09-18 10:19:40+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -2,16 +2,23 @@\n \r\n if( isset( $_POST[ 'Upload' ] ) ) {\r\n \t// Anti-CSRF\r\n-\tcheckTokens( $_POST[ 't"
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "MySQL.php",
+    "diff_preview": "@@ -44,8 +44,8 @@ dvwaMessagePush( \"'users' table was created.\" );\n // Insert some data into users\r\n"
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "dvwaPage.inc.php",
+    "diff_preview": "@@ -9,7 +9,6 @@ session_start(); // Creates a 'Full Path Disclosure' vuln.\n \r\n // Include configs\r\n "
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "login.php",
+    "diff_preview": "@@ -1,7 +1,6 @@\n <?php\r\n \r\n define( 'DVWA_WEB_PAGE_TO_ROOT', '' );\r\n-\r\n require_once DVWA_WEB_PAGE_T"
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "security.php",
+    "diff_preview": "@@ -12,7 +12,7 @@ $page[ 'page_id' ] = 'security';\n $securityHtml = '';\r\n if( isset( $_POST['seclev_"
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "setup.php",
+    "diff_preview": "@@ -11,7 +11,7 @@ $page[ 'page_id' ] = 'setup';\n \r\n if( isset( $_POST[ 'create_db' ] ) ) {\r\n \t// Ant"
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "index.php",
+    "diff_preview": "@@ -50,7 +50,7 @@ $page[ 'body' ] .= \"\n \t\t\t<input type=\\\"submit\\\" value=\\\"Login\\\" name=\\\"Login\\\">\r\n "
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "high.php",
+    "diff_preview": "@@ -2,7 +2,7 @@\n \r\n if( isset( $_GET[ 'Login' ] ) ) {\r\n \t// Anti-CSRF\r\n-\tcheckTokens( $_POST[ 'token"
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "session-input.php",
+    "diff_preview": "@@ -1,4 +1,5 @@\n <?php\r\n+\r\n define( 'DVWA_WEB_PAGE_TO_ROOT', '../../' );\r\n require_once DVWA_WEB_PAG"
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "cookie-input.php",
+    "diff_preview": "@@ -1,4 +1,5 @@\n <?php\r\n+\r\n define( 'DVWA_WEB_PAGE_TO_ROOT', '../../' );\r\n require_once DVWA_WEB_PAG"
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "index.php",
+    "diff_preview": "@@ -53,7 +53,7 @@ $page[ 'body' ] .= \"\n \r\n \t<div class=\\\"vulnerable_code_area\\\">\";\r\n if( $vulnerabil"
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "high.php",
+    "diff_preview": "@@ -2,7 +2,7 @@\n \r\n if( isset( $_POST[ 'Upload' ] ) ) {\r\n \t// Anti-CSRF\r\n-\tcheckTokens( $_POST[ 'tok"
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "view_source.php",
+    "diff_preview": "@@ -60,7 +60,7 @@ $page[ 'body' ] .= \"\n \t<br /> <br />\r\n \r\n \t<form>\r\n-\t\t<input type=\\\"button\\\" value"
+  },
+  {
+    "commit_hash": "87c1a30a9f96490788674cd1441b2ee5c755bebb",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:31:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "view_source_all.php",
+    "diff_preview": "@@ -62,7 +62,7 @@ $page[ 'body' ] .= \"\n \t<h3>Impossible {$vuln} Source</h3>\r\n \t<table width='100%' b"
+  },
+  {
+    "commit_hash": "58e0cc7a622b9d263ec95a4740d850a3cc420cf1",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:32:38+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "medium.php",
+    "diff_preview": "@@ -23,6 +23,7 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \t}\r\n \telse {\r\n \t\t// Login failed\r\n+\t\tsleep(2);\r"
+  },
+  {
+    "commit_hash": "58e0cc7a622b9d263ec95a4740d850a3cc420cf1",
+    "author": "g0tmi1k",
+    "date": "2015-09-20 16:32:38+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,12 +1,19 @@\n <?php\r\n \r\n if( isset( $_POST[ 'submit' ] ) ) {\r\n-\t$target = $_REQUEST[ 'ip' ];\r\n+"
+  },
+  {
+    "commit_hash": "9f0549b88d01d89284dd889230ff4f7f94abbfcb",
+    "author": "g0tmi1k",
+    "date": "2015-09-21 18:30:18+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "MySQL.php",
+    "diff_preview": "@@ -33,7 +33,7 @@ if( !@mysql_select_db( $_DVWA[ 'db_database' ] ) ) {\n \tdvwaPageReload();\r\n }\r\n \r\n-"
+  },
+  {
+    "commit_hash": "9f0549b88d01d89284dd889230ff4f7f94abbfcb",
+    "author": "g0tmi1k",
+    "date": "2015-09-21 18:30:18+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -24,7 +24,7 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \r\n \t\t// Login Successful\r\n \t\t$html .= \"<p>Welco"
+  },
+  {
+    "commit_hash": "9f0549b88d01d89284dd889230ff4f7f94abbfcb",
+    "author": "g0tmi1k",
+    "date": "2015-09-21 18:30:18+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -19,9 +19,6 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \t$lockout_time       = '15';\r\n \t$account_locked"
+  },
+  {
+    "commit_hash": "9f0549b88d01d89284dd889230ff4f7f94abbfcb",
+    "author": "g0tmi1k",
+    "date": "2015-09-21 18:30:18+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "low.php",
+    "diff_preview": "@@ -15,7 +15,7 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \r\n \t\t// Login Successful\r\n \t\t$html .= \"<p>Welco"
+  },
+  {
+    "commit_hash": "9f0549b88d01d89284dd889230ff4f7f94abbfcb",
+    "author": "g0tmi1k",
+    "date": "2015-09-21 18:30:18+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "medium.php",
+    "diff_preview": "@@ -19,7 +19,7 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \r\n \t\t// Login Successful\r\n \t\t$html .= \"<p>Welco"
+  },
+  {
+    "commit_hash": "3c2a9c4eacc2600b8ed1edaa7ec42798333bf77c",
+    "author": "g0tmi1k",
+    "date": "2015-09-22 23:36:54+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "README.md",
+    "diff_preview": "@@ -143,7 +143,7 @@ ### Troubleshooting\n </IfModule>\r\n ```\r\n \r\n-+Q. Command execution won't work.\r\n+"
+  },
+  {
+    "commit_hash": "3c2a9c4eacc2600b8ed1edaa7ec42798333bf77c",
+    "author": "g0tmi1k",
+    "date": "2015-09-22 23:36:54+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "dvwaPage.inc.php",
+    "diff_preview": "@@ -188,7 +188,7 @@ function dvwaHtmlEcho( $pPage ) {\n \tif( dvwaIsLoggedIn() ) {\r\n \t\t$menuBlocks[ 'v"
+  },
+  {
+    "commit_hash": "3c2a9c4eacc2600b8ed1edaa7ec42798333bf77c",
+    "author": "g0tmi1k",
+    "date": "2015-09-22 23:36:54+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "help.php",
+    "diff_preview": "@@ -1,5 +1,5 @@\n <div class=\"body_padded\">\r\n-\t<h1>Help - Command Execution</h1>\r\n+\t<h1>Help - Comman"
+  },
+  {
+    "commit_hash": "3c2a9c4eacc2600b8ed1edaa7ec42798333bf77c",
+    "author": "g0tmi1k",
+    "date": "2015-09-22 23:36:54+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "index.php",
+    "diff_preview": "@@ -6,7 +6,7 @@ require_once DVWA_WEB_PAGE_TO_ROOT.'dvwa/includes/dvwaPage.inc.php';\n dvwaPageStartu"
+  },
+  {
+    "commit_hash": "3c2a9c4eacc2600b8ed1edaa7ec42798333bf77c",
+    "author": "g0tmi1k",
+    "date": "2015-09-22 23:36:54+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "view_source.php",
+    "diff_preview": "@@ -22,7 +22,7 @@ elseif( $id == 'csrf' ) {\n \t$vuln = 'CSRF';\r\n }\r\n elseif( $id == 'exec' ) {\r\n-\t$vu"
+  },
+  {
+    "commit_hash": "3c2a9c4eacc2600b8ed1edaa7ec42798333bf77c",
+    "author": "g0tmi1k",
+    "date": "2015-09-22 23:36:54+01:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "view_source_all.php",
+    "diff_preview": "@@ -36,7 +36,7 @@ elseif( $id == 'csrf' ) {\n \t$vuln = 'CSRF';\r\n }\r\n elseif( $id == 'exec' ) {\r\n-\t$vu"
+  },
+  {
+    "commit_hash": "5e0982cefa6614baf7bf708642ea656c26a5be14",
+    "author": "g0tmi1k",
+    "date": "2015-09-24 16:10:32+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "index.php",
+    "diff_preview": "@@ -54,7 +54,7 @@ $page[ 'body' ] .= \"\n if( ( $hide_form ) || $_DVWA[ 'recaptcha_public_key' ] == \"\""
+  },
+  {
+    "commit_hash": "5e0982cefa6614baf7bf708642ea656c26a5be14",
+    "author": "g0tmi1k",
+    "date": "2015-09-24 16:10:32+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,6 +1,6 @@\n <?php\r\n \r\n-if( isset( $_POST[ 'Change' ] ) && ( $_POST[ 'step' ] == '1' ) ) {\r\n+if("
+  },
+  {
+    "commit_hash": "5e0982cefa6614baf7bf708642ea656c26a5be14",
+    "author": "g0tmi1k",
+    "date": "2015-09-24 16:10:32+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -1,6 +1,6 @@\n <?php\r\n \r\n-if( isset( $_POST[ 'Change' ] ) && ( $_POST[ 'step' ] == '1' ) ) {\r\n+if("
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -15,14 +15,15 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \t$pass = mysql_real_escape_string( $pass );\r\n"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -15,61 +15,74 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \t$pass = mysql_real_escape_string( $pass );\r\n"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,19 +1,22 @@\n <?php\r\n \r\n if( isset( $_GET[ 'Login' ] ) ) {\r\n+\t// Get username\r\n \t$user = $_GET["
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "medium.php",
+    "diff_preview": "@@ -10,14 +10,15 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \t$pass = mysql_real_escape_string( $pass );\r\n"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,16 +1,20 @@\n <?php\r\n \r\n if( isset( $_POST[ 'Change' ] ) ) {\r\n+\t// Hide the CAPTCHA form\r\n \t$hi"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -4,8 +4,10 @@ if( isset( $_POST[ 'Change' ] ) ) {\n \t// Check Anti-CSRF token\r\n \tcheckToken( $_REQ"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,16 +1,20 @@\n <?php\r\n \r\n if( isset( $_POST[ 'Change' ] ) && ( $_POST[ 'step' ] == '1' ) ) {\r\n+\t"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,24 +1,30 @@\n <?php\r\n \r\n if( isset( $_POST[ 'Change' ] ) && ( $_POST[ 'step' ] == '1' ) ) {\r\n+\t"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -4,22 +4,29 @@ if( isset( $_GET[ 'Change' ] ) ) {\n \t// Check Anti-CSRF token\r\n \tcheckToken( $_REQ"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -4,7 +4,7 @@ if( isset( $_GET[ 'Change' ] ) ) {\n \t// Check Anti-CSRF token\r\n \tcheckToken( $_REQUE"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,22 +1,29 @@\n <?php\r\n \r\n if( isset( $_GET[ 'Change' ] ) ) {\r\n-\t// Turn requests into variables\r"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,28 +1,36 @@\n <?php\r\n \r\n if( isset( $_GET[ 'Change' ] ) ) {\r\n-\t// Checks the http referer heade"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "index.php",
+    "diff_preview": "@@ -42,7 +42,7 @@ $page[ 'body' ] .= \"\n \t\t\t<p>\r\n \t\t\t\tEnter an IP address:\r\n \t\t\t\t<input type=\\\"text\\\""
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,9 +1,10 @@\n <?php\r\n \r\n-if( isset( $_POST[ 'submit' ] ) ) {\r\n+if( isset( $_POST[ 'Submit' ]  ) "
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -1,9 +1,10 @@\n <?php\r\n \r\n-if( isset( $_POST[ 'submit' ] ) ) {\r\n+if( isset( $_POST[ 'Submit' ]  ) "
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,17 +1,21 @@\n <?php\r\n \r\n-if( isset( $_POST[ 'submit' ] ) ) {\r\n+if( isset( $_POST[ 'Submit' ]  )"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,25 +1,30 @@\n <?php\r\n \r\n-if( isset( $_POST[ 'submit' ] ) ) {\r\n+if( isset( $_POST[ 'Submit' ]  )"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,8 +1,11 @@\n <?php\r\n \r\n-$file = $_GET[ 'page' ]; // The page we wish to display\r\n+// The page w"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -1,9 +1,11 @@\n <?php\r\n \r\n-$file = $_GET[ 'page' ]; // The page we wish to display\r\n+// The page w"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,5 +1,6 @@\n <?php\r\n \r\n-$file = $_GET[ 'page' ]; // The page we wish to display\r\n+// The page we"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,6 +1,7 @@\n <?php\r\n \r\n-$file = $_GET[ 'page' ]; // The page we wish to display\r\n+// The page we"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,26 +1,29 @@\n <?php\r\n \r\n if( isset( $_SESSION [ 'id' ] ) ) {\r\n-\t// Retrieve data\r\n+\t// Get inpu"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -1,23 +1,29 @@\n <?php\r\n \r\n-if( isset( $_GET[ 'Submit' ] ) ) {\r\n+if( isset( $_GET[ 'Submit' ]  ) )"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,24 +1,29 @@\n <?php\r\n \r\n-if( isset( $_REQUEST[ 'Submit' ] ) ) {\r\n-\t// Retrieve data\r\n+if( isset"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,25 +1,30 @@\n <?php\r\n \r\n-if( isset( $_POST[ 'Submit' ] ) ) {\r\n-\t// Retrieve data\r\n+if( isset( $"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,23 +1,33 @@\n <?php\r\n \r\n if( isset( $_COOKIE[ 'id' ] ) ) {\r\n-\t// Retrieve data\r\n+\t// Get input\r"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -1,19 +1,27 @@\n <?php\r\n \r\n-if( isset( $_GET[ 'Submit' ] ) ) {\r\n+if( isset( $_GET[ 'Submit' ]  ) )"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,20 +1,28 @@\n <?php\r\n \r\n-if( isset( $_GET[ 'Submit' ] ) ) {\r\n-\t// Retrieve data\r\n+if( isset( $_"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,21 +1,26 @@\n <?php\r\n \r\n-if( isset( $_POST[ 'Submit' ] ) ) {\r\n-\t// Retrieve data\r\n+if( isset( $"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,29 +1,35 @@\n <?php\r\n \r\n if( isset( $_POST[ 'Upload' ] ) ) {\r\n-\t$target_path   = DVWA_WEB_PAGE_"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -4,24 +4,28 @@ if( isset( $_POST[ 'Upload' ] ) ) {\n \t// Check Anti-CSRF token\r\n \tcheckToken( $_RE"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,17 +1,19 @@\n <?php\r\n \r\n if( isset( $_POST[ 'Upload' ] ) ) {\r\n-\t$target_path = DVWA_WEB_PAGE_TO"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,27 +1,33 @@\n <?php\r\n \r\n if( isset( $_POST[ 'Upload' ] ) ) {\r\n-\t$target_path   = DVWA_WEB_PAGE_"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,9 +1,12 @@\n <?php\r\n \r\n+// Is there any input?\r\n if( array_key_exists( \"name\", $_GET ) && $_GET"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -1,12 +1,15 @@\n <?php\r\n \r\n+// Is there any input?\r\n if( array_key_exists( \"name\", $_GET ) && $_GE"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,9 +1,9 @@\n <?php\r\n \r\n+// Is there any input?\r\n if( array_key_exists( \"name\", $_GET ) && $_GET["
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,9 +1,12 @@\n <?php\r\n \r\n+// Is there any input?\r\n if( array_key_exists( \"name\", $_GET ) && $_GET"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,11 +1,12 @@\n <?php\r\n \r\n if( isset( $_POST[ 'btnSign' ] ) ) {\r\n+\t// Get input\r\n \t$message = tri"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -4,6 +4,7 @@ if( isset( $_POST[ 'btnSign' ] ) ) {\n \t// Check Anti-CSRF token\r\n \tcheckToken( $_REQ"
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,6 +1,7 @@\n <?php\r\n \r\n if( isset( $_POST[ 'btnSign' ] ) ) {\r\n+\t// Get input\r\n \t$message = trim("
+  },
+  {
+    "commit_hash": "d41ae43d18aa0eb128ca324f8ebd4e2a9ff210ae",
+    "author": "g0tmi1k",
+    "date": "2015-09-27 19:15:44+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,11 +1,12 @@\n <?php\r\n \r\n if( isset( $_POST[ 'btnSign' ] ) ) {\r\n+\t// Get input\r\n \t$message = tri"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "MySQL.php",
+    "diff_preview": "@@ -6,7 +6,7 @@ This file contains all of the code to setup the initial MySQL database. (setup.p\n \r\n"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "dvwaPage.inc.php",
+    "diff_preview": "@@ -458,8 +458,8 @@ function dvwaDatabaseConnect() {\n \tglobal $db;\r\n \r\n \tif( $DBMS == 'MySQL' ) {\r\n-"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "login.php",
+    "diff_preview": "@@ -13,26 +13,26 @@ if( isset( $_POST[ 'Login' ] ) ) {\n \r\n \t$user = $_POST[ 'username' ];\r\n \t$user ="
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -7,19 +7,19 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \t// Sanitise username input\r\n \t$user = $_GET[ '"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -7,12 +7,12 @@ if( isset( $_POST[ 'Login' ] ) ) {\n \t// Sanitise username input\r\n \t$user = $_POST["
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -10,9 +10,9 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \r\n \t// Check the database\r\n \t$query  = \"SELECT "
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -3,18 +3,18 @@\n if( isset( $_GET[ 'Login' ] ) ) {\r\n \t// Sanitise username input\r\n \t$user = $_GET["
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -24,12 +24,12 @@ if( isset( $_POST[ 'Change' ] ) ) {\n \telse {\r\n \t\t// CAPTCHA was correct. Do both"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -10,17 +10,17 @@ if( isset( $_POST[ 'Change' ] ) ) {\n \t// Get input\r\n \t$pass_new  = $_POST[ 'pass"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -53,12 +53,12 @@ if( isset( $_POST[ 'Change' ] ) && ( $_POST[ 'step' ] == '2' ) ) {\n \t// Check to"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -61,12 +61,12 @@ if( isset( $_POST[ 'Change' ] ) && ( $_POST[ 'step' ] == '2' ) ) {\n \t// Check to"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -11,12 +11,12 @@ if( isset( $_GET[ 'Change' ] ) ) {\n \t// Do the passwords match?\r\n \tif( $pass_new"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -11,7 +11,7 @@ if( isset( $_GET[ 'Change' ] ) ) {\n \r\n \t// Sanitise current password input\r\n \t$pas"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -8,12 +8,12 @@ if( isset( $_GET[ 'Change' ] ) ) {\n \t// Do the passwords match?\r\n \tif( $pass_new ="
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -10,12 +10,12 @@ if( isset( $_GET[ 'Change' ] ) ) {\n \t\t// Do the passwords match?\r\n \t\tif( $pass_n"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "index.php",
+    "diff_preview": "@@ -61,7 +61,7 @@ else {\n \tif( $vulnerabilityFile == 'medium.php' ) {\r\n \t\t$page[ 'body' ] .= \"\\n\t\t\t\t"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -6,10 +6,10 @@ if( isset( $_SESSION [ 'id' ] ) ) {\n \r\n \t// Check database\r\n \t$query  = \"SELECT fi"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -6,10 +6,10 @@ if( isset( $_REQUEST[ 'Submit' ] ) ) {\n \r\n \t// Check database\r\n \t$query  = \"SELECT"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -3,14 +3,14 @@\n if( isset( $_POST[ 'Submit' ] ) ) {\r\n \t// Get input\r\n \t$id = $_POST[ 'id' ];\r\n-\t$"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "index.php",
+    "diff_preview": "@@ -61,7 +61,7 @@ else {\n \tif( $vulnerabilityFile == 'medium.php' ) {\r\n \t\t$page[ 'body' ] .= \"\\n\t\t\t\t"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -6,10 +6,10 @@ if( isset( $_COOKIE[ 'id' ] ) ) {\n \r\n \t// Check database\r\n \t$getid  = \"SELECT firs"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -6,10 +6,10 @@ if( isset( $_GET[ 'Submit' ] ) ) {\n \r\n \t// Check database\r\n \t$getid  = \"SELECT fir"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -3,14 +3,14 @@\n if( isset( $_POST[ 'Submit' ]  ) ) {\r\n \t// Get input\r\n \t$id = $_POST[ 'id' ];\r\n-\t"
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -7,16 +7,16 @@ if( isset( $_POST[ 'btnSign' ] ) ) {\n \r\n \t// Sanitize message input\r\n \t$message = "
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -10,12 +10,12 @@ if( isset( $_POST[ 'btnSign' ] ) ) {\n \r\n \t// Sanitize message input\r\n \t$message "
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -7,14 +7,14 @@ if( isset( $_POST[ 'btnSign' ] ) ) {\n \r\n \t// Sanitize message input\r\n \t$message = "
+  },
+  {
+    "commit_hash": "d185522a990df19485233b1351b8c09fe5b30daf",
+    "author": "Diego Blanco",
+    "date": "2016-02-23 16:53:01+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -7,16 +7,16 @@ if( isset( $_POST[ 'btnSign' ] ) ) {\n \r\n \t// Sanitize message input\r\n \t$message = "
+  },
+  {
+    "commit_hash": "45eb7da35a8f12f43f9fe5903d30cc4c3fdf60c6",
+    "author": "Nick Armstrong",
+    "date": "2016-08-24 18:45:08+10:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "index.php",
+    "diff_preview": "@@ -62,7 +62,7 @@ else {\n \t\t$page[ 'body' ] .= \"\\n\t\t\t\t<select name=\\\"id\\\">\";\r\n \t\t$query  = \"SELECT C"
+  },
+  {
+    "commit_hash": "45eb7da35a8f12f43f9fe5903d30cc4c3fdf60c6",
+    "author": "Nick Armstrong",
+    "date": "2016-08-24 18:45:08+10:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -9,18 +9,13 @@ if( isset( $_SESSION [ 'id' ] ) ) {\n \t$result = mysqli_query($GLOBALS[\"___mysqli_s"
+  },
+  {
+    "commit_hash": "45eb7da35a8f12f43f9fe5903d30cc4c3fdf60c6",
+    "author": "Nick Armstrong",
+    "date": "2016-08-24 18:45:08+10:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -9,18 +9,13 @@ if( isset( $_REQUEST[ 'Submit' ] ) ) {\n \t$result = mysqli_query($GLOBALS[\"___mysql"
+  },
+  {
+    "commit_hash": "45eb7da35a8f12f43f9fe5903d30cc4c3fdf60c6",
+    "author": "Nick Armstrong",
+    "date": "2016-08-24 18:45:08+10:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -10,18 +10,13 @@ if( isset( $_POST[ 'Submit' ] ) ) {\n \t$result = mysqli_query($GLOBALS[\"___mysqli"
+  },
+  {
+    "commit_hash": "b4e5c6f6fda801681d2883bd4645a2dd8a4f4e4b",
+    "author": "Nick Armstrong",
+    "date": "2016-08-24 18:45:27+10:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "index.php",
+    "diff_preview": "@@ -62,7 +62,7 @@ else {\n \t\t$page[ 'body' ] .= \"\\n\t\t\t\t<select name=\\\"id\\\">\";\r\n \t\t$query  = \"SELECT C"
+  },
+  {
+    "commit_hash": "ccff8f650bf1c1ce4ad166f8bf0271444b2f00f7",
+    "author": "Nick Armstrong",
+    "date": "2016-08-24 18:45:48+10:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -21,7 +21,8 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \r\n \tif( $result && mysqli_num_rows( $result ) ="
+  },
+  {
+    "commit_hash": "ccff8f650bf1c1ce4ad166f8bf0271444b2f00f7",
+    "author": "Nick Armstrong",
+    "date": "2016-08-24 18:45:48+10:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -14,7 +14,8 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \r\n \tif( $result && mysqli_num_rows( $result ) ="
+  },
+  {
+    "commit_hash": "ccff8f650bf1c1ce4ad166f8bf0271444b2f00f7",
+    "author": "Nick Armstrong",
+    "date": "2016-08-24 18:45:48+10:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -16,7 +16,8 @@ if( isset( $_GET[ 'Login' ] ) ) {\n \r\n \tif( $result && mysqli_num_rows( $result ) ="
+  },
+  {
+    "commit_hash": "c93b7715c8d81d21a06814b05fe2d065baac3c67",
+    "author": "Michael Hanon",
+    "date": "2016-10-28 20:02:32-07:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "dvwaPage.inc.php",
+    "diff_preview": "@@ -549,7 +549,7 @@ $phpMagicQuotes   = 'PHP function magic_quotes_gpc: <span class=\"' . ( ini_get(\n"
+  },
+  {
+    "commit_hash": "3671ae793b6ba42a0f166c09d472557cf91d56ae",
+    "author": "Michael Hanon",
+    "date": "2016-10-28 20:13:15-07:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "dvwaPage.inc.php",
+    "diff_preview": "@@ -549,7 +549,7 @@ $phpMagicQuotes   = 'PHP function magic_quotes_gpc: <span class=\"' . ( ini_get(\n"
+  },
+  {
+    "commit_hash": "80f682e4afdaea07d9aa4465d74e4061bc20dbfd",
+    "author": "Robin Wood",
+    "date": "2017-04-12 04:30:04+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -6,7 +6,7 @@ if( isset( $_SESSION [ 'id' ] ) ) {\n \r\n \t// Check database\r\n \t$query  = \"SELECT firs"
+  },
+  {
+    "commit_hash": "80f682e4afdaea07d9aa4465d74e4061bc20dbfd",
+    "author": "Robin Wood",
+    "date": "2017-04-12 04:30:04+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -6,7 +6,7 @@ if( isset( $_REQUEST[ 'Submit' ] ) ) {\n \r\n \t// Check database\r\n \t$query  = \"SELECT f"
+  },
+  {
+    "commit_hash": "80f682e4afdaea07d9aa4465d74e4061bc20dbfd",
+    "author": "Robin Wood",
+    "date": "2017-04-12 04:30:04+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -3,11 +3,11 @@\n if( isset( $_POST[ 'Submit' ] ) ) {\r\n \t// Get input\r\n \t$id = $_POST[ 'id' ];\r\n-\t$"
+  },
+  {
+    "commit_hash": "965c92b63e7caef953a503b1887be75420e4c768",
+    "author": "Robin Wood",
+    "date": "2017-04-17 22:37:22+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "index.php",
+    "diff_preview": "@@ -60,11 +60,8 @@ else {\n \t\t\t\tUser ID:\";\r\n \tif( $vulnerabilityFile == 'medium.php' ) {\r\n \t\t$page[ '"
+  },
+  {
+    "commit_hash": "965c92b63e7caef953a503b1887be75420e4c768",
+    "author": "Robin Wood",
+    "date": "2017-04-17 22:37:22+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -6,7 +6,7 @@ if( isset( $_SESSION [ 'id' ] ) ) {\n \r\n \t// Check database\r\n \t$query  = \"SELECT firs"
+  },
+  {
+    "commit_hash": "965c92b63e7caef953a503b1887be75420e4c768",
+    "author": "Robin Wood",
+    "date": "2017-04-17 22:37:22+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -6,7 +6,7 @@ if( isset( $_REQUEST[ 'Submit' ] ) ) {\n \r\n \t// Check database\r\n \t$query  = \"SELECT f"
+  },
+  {
+    "commit_hash": "965c92b63e7caef953a503b1887be75420e4c768",
+    "author": "Robin Wood",
+    "date": "2017-04-17 22:37:22+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -3,11 +3,11 @@\n if( isset( $_POST[ 'Submit' ] ) ) {\r\n \t// Get input\r\n \t$id = $_POST[ 'id' ];\r\n-\t$"
+  },
+  {
+    "commit_hash": "4fb32fb9276181b041ca24eba42df506ce804de1",
+    "author": "Steve Pinkham",
+    "date": "2017-05-08 18:25:52-04:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "index.php",
+    "diff_preview": "@@ -45,7 +45,7 @@ $page[ 'body' ] = <<<EOF\n  \r\n  \t\t<p>Please choose a language:</p>\r\n \r\n-\t\t<form nam"
+  },
+  {
+    "commit_hash": "086d116b19e3762f1c8fab952c2b155f60ff6995",
+    "author": "Robin Wood",
+    "date": "2017-05-12 21:31:56+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -6,7 +6,7 @@ if( isset( $_SESSION [ 'id' ] ) ) {\n \r\n \t// Check database\r\n \t$query  = \"SELECT firs"
+  },
+  {
+    "commit_hash": "086d116b19e3762f1c8fab952c2b155f60ff6995",
+    "author": "Robin Wood",
+    "date": "2017-05-12 21:31:56+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -4,9 +4,12 @@ if( isset( $_REQUEST[ 'Submit' ] ) ) {\n \t// Get input\r\n \t$id = $_REQUEST[ 'id' ];\r\n"
+  },
+  {
+    "commit_hash": "086d116b19e3762f1c8fab952c2b155f60ff6995",
+    "author": "Robin Wood",
+    "date": "2017-05-12 21:31:56+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -3,11 +3,11 @@\n if( isset( $_POST[ 'Submit' ] ) ) {\r\n \t// Get input\r\n \t$id = $_POST[ 'id' ];\r\n-\t$"
+  },
+  {
+    "commit_hash": "6b00d1bf42f2ac31616f546f60ac3d8abc28bd1c",
+    "author": "Robin Wood",
+    "date": "2017-11-03 17:50:22+00:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "high.php",
+    "diff_preview": "@@ -1,5 +1,7 @@\n <?php\r\n \r\n+header (\"X-XSS-Protection: 0\");\r\n+\r\n // Is there any input?\r\n if( array_"
+  },
+  {
+    "commit_hash": "6b00d1bf42f2ac31616f546f60ac3d8abc28bd1c",
+    "author": "Robin Wood",
+    "date": "2017-11-03 17:50:22+00:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,5 +1,7 @@\n <?php\r\n \r\n+header (\"X-XSS-Protection: 0\");\r\n+\r\n // Is there any input?\r\n if( array_"
+  },
+  {
+    "commit_hash": "6b00d1bf42f2ac31616f546f60ac3d8abc28bd1c",
+    "author": "Robin Wood",
+    "date": "2017-11-03 17:50:22+00:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "medium.php",
+    "diff_preview": "@@ -1,5 +1,7 @@\n <?php\r\n \r\n+header (\"X-XSS-Protection: 0\");\r\n+\r\n // Is there any input?\r\n if( array_"
+  },
+  {
+    "commit_hash": "dc492b983803de66825b24d665624aa44c8d9a22",
+    "author": "Michael Bailey",
+    "date": "2017-12-07 02:08:50-05:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "README.md",
+    "diff_preview": "@@ -37,6 +37,8 @@ ## License\n ## Download and install as a docker container\r\n - [dockerhub page](htt"
+  },
+  {
+    "commit_hash": "54574c839dd272550f261c84d72dd91ca78bf4dc",
+    "author": "Shaunak Sontakke",
+    "date": "2020-05-20 23:52:52-06:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "MySQL.php",
+    "diff_preview": "@@ -11,7 +11,7 @@ if( !defined( 'DVWA_WEB_PAGE_TO_ROOT' ) ) {\n }\r\n \r\n if( !@($GLOBALS[\"___mysqli_sto"
+  },
+  {
+    "commit_hash": "1c2c645809b70b2db825552ddb0db1bbe2fa83a8",
+    "author": "kevin",
+    "date": "2020-09-12 13:32:27+07:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "help.php",
+    "diff_preview": "@@ -18,7 +18,7 @@\n \r\n \t\t<h3>Low Level</h3>\r\n \t\t<p>Examine the policy to find all the sources that ca"
+  },
+  {
+    "commit_hash": "1c2c645809b70b2db825552ddb0db1bbe2fa83a8",
+    "author": "kevin",
+    "date": "2020-09-12 13:32:27+07:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "low.php",
+    "diff_preview": "@@ -1,9 +1,10 @@\n <?php\n \n-$headerCSP = \"Content-Security-Policy: script-src 'self' https://pastebin"
+  },
+  {
+    "commit_hash": "8421018f3581b70559092b808f983652c5b1d4a2",
+    "author": "Robin Wood",
+    "date": "2020-09-15 09:34:39+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "index.php",
+    "diff_preview": "@@ -57,7 +57,7 @@ $page[ 'body' ] .= \"\n \r\n \t<h2>More Information</h2>\r\n \t<ul>\r\n-\t\t<li>\" . dvwaExtern"
+  },
+  {
+    "commit_hash": "cabfbc478fe89c0d1db33a2e86b947afab80c197",
+    "author": "Robin Wood",
+    "date": "2021-08-11 22:32:03+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "create_sqlite_db.sql",
+    "diff_preview": "@@ -0,0 +1,25 @@\n+CREATE TABLE `users` (\n+`user_id` int NOT NULL,\n+`first_name` text DEFAULT NULL,\n+"
+  },
+  {
+    "commit_hash": "cabfbc478fe89c0d1db33a2e86b947afab80c197",
+    "author": "Robin Wood",
+    "date": "2021-08-11 22:32:03+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -4,21 +4,45 @@ if( isset( $_REQUEST[ 'Submit' ] ) ) {\n \t// Get input\r\n \t$id = $_REQUEST[ 'id' ];\r"
+  },
+  {
+    "commit_hash": "cabfbc478fe89c0d1db33a2e86b947afab80c197",
+    "author": "Robin Wood",
+    "date": "2021-08-11 22:32:03+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "sqli.db",
+    "diff_preview": "Binary files /dev/null and b/vulnerabilities/sqli/source/sqli.db differ\n"
+  },
+  {
+    "commit_hash": "459bcc3ddbac8d5edf20a504073791a867eb7341",
+    "author": "Robin Wood",
+    "date": "2021-09-07 22:40:42+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -4,21 +4,50 @@ if( isset( $_SESSION [ 'id' ] ) ) {\n \t// Get input\r\n \t$id = $_SESSION[ 'id' ];\r\n \r"
+  },
+  {
+    "commit_hash": "459bcc3ddbac8d5edf20a504073791a867eb7341",
+    "author": "Robin Wood",
+    "date": "2021-09-07 22:40:42+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "impossible.php",
+    "diff_preview": "@@ -9,20 +9,52 @@ if( isset( $_GET[ 'Submit' ] ) ) {\n \r\n \t// Was a number entered?\r\n \tif(is_numeric("
+  },
+  {
+    "commit_hash": "459bcc3ddbac8d5edf20a504073791a867eb7341",
+    "author": "Robin Wood",
+    "date": "2021-09-07 22:40:42+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -23,6 +23,28 @@ if( isset( $_POST[ 'Submit' ] ) ) {\n \t\t\tbreak;\r\n \t\tcase SQLITE:\r\n \t\t\tglobal $sqli"
+  },
+  {
+    "commit_hash": "13d8b636959ed096dcb634dab9a886b889b8a324",
+    "author": "Robin Wood",
+    "date": "2021-10-07 21:06:27+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "high.php",
+    "diff_preview": "@@ -3,14 +3,39 @@\n if( isset( $_COOKIE[ 'id' ] ) ) {\r\n \t// Get input\r\n \t$id = $_COOKIE[ 'id' ];\r\n+\t$"
+  },
+  {
+    "commit_hash": "6b33c820410d3bd1198bfd42b5e6a19e7dca1436",
+    "author": "Robin Wood",
+    "date": "2021-10-07 21:14:45+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "low.php",
+    "diff_preview": "@@ -3,18 +3,41 @@\n if( isset( $_GET[ 'Submit' ] ) ) {\r\n \t// Get input\r\n \t$id = $_GET[ 'id' ];\r\n+\t$ex"
+  },
+  {
+    "commit_hash": "b2cbb3b42131396c3b512530f60bf7461f87c53e",
+    "author": "Robin Wood",
+    "date": "2021-10-07 21:21:28+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "medium.php",
+    "diff_preview": "@@ -3,24 +3,45 @@\n if( isset( $_POST[ 'Submit' ]  ) ) {\r\n \t// Get input\r\n \t$id = $_POST[ 'id' ];\r\n-\t"
+  },
+  {
+    "commit_hash": "27f744f671fe7c5ae588a9c3748c63fbf8c44845",
+    "author": "Robin Wood",
+    "date": "2021-10-28 22:38:16+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "README.md",
+    "diff_preview": "@@ -93,6 +93,8 @@ ### Database Setup\n The variables are set to the following by default:\n \n ```php\n+"
+  },
+  {
+    "commit_hash": "c2763a1f0159069e4b5d005029dfe33e595aa57f",
+    "author": "Robin Wood",
+    "date": "2021-10-27 23:21:18+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "create_sqlite_db.sql",
+    "diff_preview": "@@ -18,10 +18,10 @@ PRIMARY KEY (`comment_id`)\n );\n \n \n-insert into users values ('1','admin','admin"
+  },
+  {
+    "commit_hash": "c2763a1f0159069e4b5d005029dfe33e595aa57f",
+    "author": "Robin Wood",
+    "date": "2021-10-27 23:21:18+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "A03:2021 - Injection",
+    "filename": "sqli.db.dist",
+    "diff_preview": "Binary files /dev/null and b/database/sqli.db.dist differ\n"
+  },
+  {
+    "commit_hash": "87642b94d96bcfc762ee49c75a1ee9994c0f6cad",
+    "author": "Robin Wood",
+    "date": "2023-02-27 14:47:35+00:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "README.md",
+    "diff_preview": "@@ -372,7 +372,7 @@ ### Why can't the database connect on CentOS?\n setsebool -P httpd_can_network_co"
+  },
+  {
+    "commit_hash": "b3f84d0835a266d0edc092c9adba462dfc2b6d67",
+    "author": "ranemirusG",
+    "date": "2024-04-24 12:12:48-03:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "main.css",
+    "diff_preview": "@@ -163,9 +163,14 @@ div#main_menu li {\n div#main_menu li a {\r\n \tcolor: #000000;\r\n \ttext-decoration:"
+  },
+  {
+    "commit_hash": "6e41e1d9ed397fc63bc8e301d0a9c96c6572033c",
+    "author": "Robin Wood",
+    "date": "2024-10-16 10:20:29+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "GenericController.php",
+    "diff_preview": "@@ -17,6 +17,12 @@ class GenericController\n \t\t$this->command = $command;\n \t}\n \n+\tprivate function op"
+  },
+  {
+    "commit_hash": "6e41e1d9ed397fc63bc8e301d0a9c96c6572033c",
+    "author": "Robin Wood",
+    "date": "2024-10-16 10:20:29+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "HealthController.php",
+    "diff_preview": "@@ -18,9 +18,54 @@ class HealthController\n \t\t$this->command = $command;\n \t}\n \n+    #[OAT\\Post(\n+\t\tta"
+  },
+  {
+    "commit_hash": "6e41e1d9ed397fc63bc8e301d0a9c96c6572033c",
+    "author": "Robin Wood",
+    "date": "2024-10-16 10:20:29+01:00",
+    "severity": "Critical",
+    "cve_details": "No CVE found",
+    "owasp_category": "Unknown Category",
+    "filename": "UserController.php",
+    "diff_preview": "@@ -59,7 +59,7 @@ class UserController\n \n     #[OAT\\Get(\n \t\ttags: [\"user\"],\n-        path: '/vulnera"
+  }
+]

@@ -176,7 +176,7 @@ def extract_security_diffs_and_store(repo_url, since=None, to=None, continuous=F
         if not continuous:
             break
 
-        print(f"[ℹ] Sleeping for {interval} seconds before the next scan...")
+        print(f"[INFO] Sleeping for {interval} seconds before the next scan...")
         time.sleep(interval)
 
 
@@ -207,7 +207,13 @@ def process_commit(commit, flagged_commits):
     if severity in ["Critical", "High"] or cve_ids:
         flagged_commits.append((commit, severity, cve_info if cve_info else "No CVE found", owasp_category))
         if severity in ["Critical", "High"]:
-            print(f"\n[⚠ ALERT] High-risk commit detected!\nCommit: {commit.hash}\nSeverity: {severity}\nOWASP Category: {owasp_category}\nCVE Info: {cve_info if cve_info else 'None'}\n")
+            print(
+                f"\n[ALERT] High-risk commit detected!\n"
+                f"Commit: {commit.hash}\n"
+                f"Severity: {severity}\n"
+                f"OWASP Category: {owasp_category}\n"
+                f"CVE Info: {cve_info if cve_info else 'None'}\n"
+            )
 
 
 def save_results(flagged_commits):
@@ -248,8 +254,9 @@ def save_results(flagged_commits):
     save_patches_in_json(security_data, "report.json")
     save_patches_in_markdown(security_data, "report.md")
 
-    print("[✅] Finished saving patch files in 'patches/' folder.")
-    print("[✅] Summary reports saved in 'report.csv', 'report.json', and 'report.md'.")
+    print("[OK] Finished saving patch files in 'patches/' folder.")
+    print("[OK] Summary reports saved in 'report.csv', 'report.json', and 'report.md'.")
+
     print("\n=== Trend Analysis ===")
     for month in sorted(monthly_counts.keys()):
         print(f"{month}: {monthly_counts[month]} commits")

@@ -1,0 +1,12 @@
+[
+  {
+    "commit_hash": "87642b94d96bcfc762ee49c75a1ee9994c0f6cad",
+    "author": "Robin Wood",
+    "date": "2023-02-27 14:47:35+00:00",
+    "severity": "High",
+    "cve_details": "No CVE found",
+    "owasp_category": "A07:2021 - Identification & Authentication Failures",
+    "filename": "README.md",
+    "diff_preview": "@@ -372,7 +372,7 @@ ### Why can't the database connect on CentOS?\n setsebool -P httpd_can_network_co"
+  }
+]

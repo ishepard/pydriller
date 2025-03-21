@@ -4,6 +4,7 @@ import os
 import subprocess
 import pytest
 
+
 @pytest.mark.integration
 def test_full_pipeline(tmp_path):
     """

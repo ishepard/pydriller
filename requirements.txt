@@ -1,4 +1,4 @@
 gitpython
 pytz
 types-pytz
-lizard==1.17.10
+lizard

@@ -9,7 +9,8 @@ A Commit object has all the information of a Git commit, and much more. More spe
 * **hash** *(str)*: hash of the commit
 * **msg** *(str)*: commit message
 * **author** *(Developer)*: commit author (name, email)
-* **committer** *(Developer)*: commit committer (name, email) 
+* **co_authors** *(List[Developer])*: list of co-authors (name, email)
+* **committer** *(Developer)*: commit committer (name, email)
 * **author_date** *(datetime)*: authored date
 * **author_timezone** *(int)*: author timezone (expressed in seconds from epoch)
 * **committer_date** *(datetime)*: commit date
@@ -19,8 +20,8 @@ A Commit object has all the information of a Git commit, and much more. More spe
 * **merge** *(Bool)*: True if the commit is a merge commit
 * **modified_files** *(List[ModifiedFile])*: list of modified files in the commit (see :ref:`modifiedfile_toplevel`)
 * **parents** *(List[str])*: list of the commit parents
-* **project_name** *(str)*: project name 
-* **project_path** *(str)*: project path 
+* **project_name** *(str)*: project name
+* **project_path** *(str)*: project path
 * **deletions** *(int)*: number of deleted lines in the commit (as shown from –shortstat).
 * **insertions** *(int)*: number of added lines in the commit (as shown from –shortstat).
 * **lines** *(int)*: total number of added + deleted lines in the commit (as shown from –shortstat).

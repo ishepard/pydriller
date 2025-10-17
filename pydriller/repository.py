@@ -59,7 +59,7 @@ class Repository:
                  include_deleted_files: bool = False,
                  histogram_diff: bool = False,
                  skip_whitespaces: bool = False,
-                 clone_repo_to: Optional[str] = None,
+                 clone_repo_to: Optional[os.PathLike] = None,
                  order: Optional[str] = None,
                  use_mailmap: bool = False):
         """
@@ -98,7 +98,7 @@ class Repository:
         :param bool only_releases: analyze only tagged commits
         :param bool histogram_diff: add the "--histogram" option when asking for the diff
         :param bool skip_whitespaces: add the "-w" option when asking for the diff
-        :param str clone_repo_to: if the repo under analysis is remote, clone the repo to the specified directory
+        :param Optional[os.PathLike] clone_repo_to: if the repo under analysis is remote, clone the repo to the specified directory
         :param str filepath: only commits that modified this file will be analyzed
         :param bool include_deleted_files: include commits modifying a deleted file (useful when analyzing a deleted `filepath`)
         :param str order: order of commits. It can be one of: 'date-order',
@@ -174,10 +174,10 @@ class Repository:
         return Path(repo_folder)
 
     def _clone_folder(self) -> os.PathLike:
-        if self._conf.get('clone_repo_to'):
-            clone_folder = Path(self._conf.get('clone_repo_to'))
+        clone_folder = self._conf.get('clone_repo_to')
+        if clone_folder is not None:
             if not os.path.isdir(clone_folder):
-                raise Exception("Not a directory: {0}".format(clone_folder))
+                raise ValueError("clone_repo_to must be an existing directory")
         else:
             # Save the temporary directory so we can clean it up later
             self._tmp_dir = tempfile.TemporaryDirectory()

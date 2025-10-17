@@ -41,7 +41,7 @@ class Repository:
     This is the main class of PyDriller, responsible for running the study.
     """
 
-    def __init__(self, path_to_repo: Union[os.PathLike, List[os.PathLike]],
+    def __init__(self, path_to_repo: Union[str, os.PathLike, List[str], List[os.PathLike]],
                  single: Optional[str] = None,
                  since: Optional[datetime] = None, since_as_filter: Optional[datetime] = None, to: Optional[datetime] = None,
                  from_commit: Optional[str] = None, to_commit: Optional[str] = None,
@@ -59,7 +59,7 @@ class Repository:
                  include_deleted_files: bool = False,
                  histogram_diff: bool = False,
                  skip_whitespaces: bool = False,
-                 clone_repo_to: Optional[os.PathLike] = None,
+                 clone_repo_to: Optional[Union[str, os.PathLike]] = None,
                  order: Optional[str] = None,
                  use_mailmap: bool = False):
         """

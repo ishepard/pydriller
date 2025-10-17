@@ -19,7 +19,7 @@ This module includes 1 class, Git, representing a repository in Git.
 import logging
 import os
 from pathlib import Path
-from typing import List, Dict, Optional, Set, Generator
+from typing import List, Dict, Optional, Set, Generator, Union
 
 from git import Repo, GitCommandError
 from git.objects import Commit as GitCommit
@@ -36,7 +36,7 @@ class Git:
     PyDriller: obtaining the list of commits, checkout, reset, etc.
     """
 
-    def __init__(self, path: os.PathLike, conf=None):
+    def __init__(self, path: Union[str, os.PathLike], conf=None):
         """
         Init the Git Repository.
 

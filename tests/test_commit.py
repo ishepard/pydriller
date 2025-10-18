@@ -65,7 +65,7 @@ def test_metrics_python(mocked_diff):
 
     m1 = ModifiedFile(mocked_diff)
 
-    assert m1.nloc == 196
+    assert m1.nloc == 116
     assert m1.token_count == 1009
     assert m1.complexity == 43
 

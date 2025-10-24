@@ -62,3 +62,63 @@ setup(
             "Operating System :: MacOS :: MacOS X",
             ]
 )
+# setup.py
+from os import path
+from setuptools import setup, find_packages
+
+# Read normal dependencies
+with open('requirements.txt') as reqs_file:
+    requirements = reqs_file.read().splitlines()
+
+# Read test dependencies
+with open('test-requirements.txt') as reqs_file:
+    test_requirements = reqs_file.read().splitlines()
+
+long_description = (
+    "This is the PyDriller-based Automated Git Security Monitor project, "
+    "providing continuous scanning, commit classification, OWASP/CVE detection, "
+    "and generating structured security reports."
+)
+
+# Optionally, parse version from security_analysis/__init__.py if you track it there
+def get_version():
+    version_file = path.join(path.dirname(__file__), 'security_analysis', '__init__.py')
+    try:
+        with open(version_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.startswith('__version__'):
+                    delim = '"' if '"' in line else "'"
+                    return line.split(delim)[1]
+    except FileNotFoundError:
+        pass
+    return "0.1.0"  # fallback version
+
+setup(
+    name='SecurityAnalysis',  # distribution/package name
+    version=get_version(),
+    description='PyDriller-based Automated Git Security Monitor',
+    long_description=long_description,
+    author='Your Team',
+    author_email='your.team@example.com',
+    url='https://github.com/yourorg/my_security_tool',
+    license='Apache License 2.0',
+
+    packages=find_packages(exclude=['tests*']),
+    python_requires='>=3.6',
+    install_requires=requirements,
+    tests_require=requirements + test_requirements,
+
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Apache Software License',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        "Operating System :: OS Independent",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+    ],
+)
+

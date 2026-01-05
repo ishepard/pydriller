@@ -41,7 +41,7 @@ class Repository:
     This is the main class of PyDriller, responsible for running the study.
     """
 
-    def __init__(self, path_to_repo: Union[str, List[str]],
+    def __init__(self, path_to_repo: Union[str, os.PathLike, List[str], List[os.PathLike]],
                  single: Optional[str] = None,
                  since: Optional[datetime] = None, since_as_filter: Optional[datetime] = None, to: Optional[datetime] = None,
                  from_commit: Optional[str] = None, to_commit: Optional[str] = None,
@@ -59,7 +59,7 @@ class Repository:
                  include_deleted_files: bool = False,
                  histogram_diff: bool = False,
                  skip_whitespaces: bool = False,
-                 clone_repo_to: Optional[str] = None,
+                 clone_repo_to: Optional[Union[str, os.PathLike]] = None,
                  order: Optional[str] = None,
                  use_mailmap: bool = False):
         """
@@ -73,8 +73,8 @@ class Repository:
         repo; if you pass an URL, PyDriller will clone the repo in a
         temporary folder, run the study, and delete the temporary folder.
 
-        :param Union[str,List[str]] path_to_repo: absolute path (or list of
-            absolute paths) to the repository(ies) to analyze
+        :param Union[os.PathLike, List[os.PathLike] path_to_repo: PathLike object (or list of
+            PathLike objects) to the repository(ies) to analyze
         :param str single: hash of a single commit to analyze
         :param datetime since: starting date
         :param datetime since_as_filter: starting date (scans all commits, does not stop at first commit with date < since_as_filter)
@@ -98,7 +98,7 @@ class Repository:
         :param bool only_releases: analyze only tagged commits
         :param bool histogram_diff: add the "--histogram" option when asking for the diff
         :param bool skip_whitespaces: add the "-w" option when asking for the diff
-        :param str clone_repo_to: if the repo under analysis is remote, clone the repo to the specified directory
+        :param Optional[os.PathLike] clone_repo_to: if the repo under analysis is remote, clone the repo to the specified directory
         :param str filepath: only commits that modified this file will be analyzed
         :param bool include_deleted_files: include commits modifying a deleted file (useful when analyzing a deleted `filepath`)
         :param str order: order of commits. It can be one of: 'date-order',
@@ -115,9 +115,17 @@ class Repository:
             else set(only_commits)
             )
 
+        try:
+            if isinstance(path_to_repo, list):
+                path_to_repos = [os.fspath(path) for path in path_to_repo]
+            else:
+                path_to_repos = [os.fspath(path_to_repo)]
+        except TypeError:
+            raise AttributeError("Path to repo must be PathLike or list of PathLike")
+
         options = {
             "git": None,
-            "path_to_repo": path_to_repo,
+            "path_to_repo": path_to_repos,
             "from_commit": from_commit,
             "to_commit": to_commit,
             "from_tag": from_tag,
@@ -152,24 +160,24 @@ class Repository:
         self._cleanup = False if clone_repo_to is not None else True
 
     @staticmethod
-    def _is_remote(repo: str) -> bool:
-        return repo.startswith(("git@", "https://", "http://", "git://"))
+    def _is_remote(repo: os.PathLike) -> bool:
+        return os.fspath(repo).startswith(("git@", "https://", "http://", "git://"))
 
-    def _clone_remote_repo(self, tmp_folder: str, repo: str) -> str:
-        repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(repo))
+    def _clone_remote_repo(self, tmp_folder: os.PathLike, repo: os.PathLike) -> os.PathLike:
+        repo_folder = os.path.join(tmp_folder, self._get_repo_name_from_url(os.fspath(repo)))
         if os.path.isdir(repo_folder):
             logger.info(f"Reusing folder {repo_folder} for {repo}")
         else:
             logger.info(f"Cloning {repo} in temporary folder {repo_folder}")
             Repo.clone_from(url=repo, to_path=repo_folder)
 
-        return repo_folder
+        return Path(repo_folder)
 
-    def _clone_folder(self) -> str:
-        if self._conf.get('clone_repo_to'):
-            clone_folder = str(Path(self._conf.get('clone_repo_to')))
+    def _clone_folder(self) -> os.PathLike:
+        clone_folder = self._conf.get('clone_repo_to')
+        if clone_folder is not None:
             if not os.path.isdir(clone_folder):
-                raise Exception("Not a directory: {0}".format(clone_folder))
+                raise ValueError("clone_repo_to must be an existing directory")
         else:
             # Save the temporary directory so we can clean it up later
             self._tmp_dir = tempfile.TemporaryDirectory()
@@ -177,11 +185,11 @@ class Repository:
         return clone_folder
 
     @contextmanager
-    def _prep_repo(self, path_repo: str) -> Generator[Git, None, None]:
+    def _prep_repo(self, path_repo: os.PathLike) -> Generator[Git, None, None]:
         local_path_repo = path_repo
         if self._is_remote(path_repo):
             local_path_repo = self._clone_remote_repo(self._clone_folder(), path_repo)
-        local_path_repo = str(Path(local_path_repo).expanduser().resolve())
+        local_path_repo = Path(local_path_repo).expanduser().resolve()
 
         # when multiple repos are given in input, this variable will serve as a reminder
         # of which one we are currently analyzing

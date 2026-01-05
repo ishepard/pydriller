@@ -19,7 +19,7 @@ This module includes 1 class, Git, representing a repository in Git.
 import logging
 import os
 from pathlib import Path
-from typing import List, Dict, Optional, Set, Generator
+from typing import List, Dict, Optional, Set, Generator, Union
 
 from git import Repo, GitCommandError
 from git.objects import Commit as GitCommit
@@ -36,11 +36,11 @@ class Git:
     PyDriller: obtaining the list of commits, checkout, reset, etc.
     """
 
-    def __init__(self, path: str, conf=None):
+    def __init__(self, path: Union[str, os.PathLike], conf=None):
         """
         Init the Git Repository.
 
-        :param str path: path to the repository
+        :param os.PathLike path: path to the repository
         """
         self.path = Path(path).expanduser().resolve()
         self.project_name = self.path.name
@@ -50,7 +50,7 @@ class Git:
         # with just "path_to_repo" inside.
         if conf is None:
             conf = Conf({
-                "path_to_repo": str(self.path),
+                "path_to_repo": self.path,
                 "git": self
             })
 
@@ -84,7 +84,7 @@ class Git:
             self.repo.git.clear_cache()
 
     def _open_repository(self):
-        self._repo = Repo(str(self.path))
+        self._repo = Repo(self.path)
         self._repo.config_writer().set_value("blame", "markUnblamableLines", "true").release()
         if self._conf.get("main_branch") is None:
             self._discover_main_branch(self._repo)
@@ -165,7 +165,7 @@ class Git:
         :return: List[str], the list of the files
         """
         _all = []
-        for path, _, files in os.walk(str(self.path)):
+        for path, _, files in os.walk(self.path):
             if '.git' in path:
                 continue
             for name in files:

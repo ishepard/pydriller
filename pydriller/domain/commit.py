@@ -691,20 +691,25 @@ class Commit:
     def _stats(self):
         if self._stats_cache is not None:
             return self._stats_cache
-        
+
         options = {}
         if self._conf.get("skip_whitespaces"):
             options["w"] = True
 
         if len(self.parents) == 0:
-            text = self._conf.get('git').repo.git.diff_tree(self.hash, "--", numstat=True, root=True, **options)
+            text = self._conf.get('git').repo.git.diff_tree(
+                self.hash, "--", numstat=True, root=True, **options
+            )
             text2 = ""
             for line in text.splitlines()[1:]:
                 (insertions, deletions, filename) = line.split("\t")
                 text2 += "%s\t%s\t%s\n" % (insertions, deletions, filename)
             text = text2
         else:
-            text = self._conf.get('git').repo.git.diff(self._c_object.parents[0].hexsha, self._c_object.hexsha, "--", numstat=True, root=True, **options)
+            text = self._conf.get('git').repo.git.diff(
+                self._c_object.parents[0].hexsha, self._c_object.hexsha,
+                "--", numstat=True, root=True, **options
+            )
 
         self._stats_cache = self._list_from_string(text)
         return self._stats_cache

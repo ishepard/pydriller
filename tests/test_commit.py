@@ -381,6 +381,27 @@ def test_shortstats_add_and_del(repo: Git):
     assert c1.deletions == 1
 
 
+@pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
+def test_patch_root_commit(repo: Git):
+    commit = repo.get_commit('a88c84ddf42066611e76e6cb690144e5357d132c')
+    assert commit.patch.startswith('diff --git')
+    assert 'new file mode' in commit.patch
+
+
+@pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
+def test_patch_normal_commit(repo: Git):
+    commit = repo.get_commit('6411e3096dd2070438a17b225f44475136e54e3a')
+    assert commit.patch.startswith('diff --git')
+    assert '-    public boolean isMerge() {' in commit.patch
+
+
+@pytest.mark.parametrize('repo', ['test-repos/branches_merged'], indirect=True)
+def test_patch_merge_commit(repo: Git):
+    commit = repo.get_commit('29e929fbc5dc6a2e9c620069b24e2a143af4285f')
+    assert commit.merge is True
+    assert commit.patch == ''
+
+
 @pytest.mark.parametrize("repo", ["test-repos/complex_repo"], indirect=True)
 def test_commit_dictset(repo: Git):
     c1 = repo.get_commit("e7d13b0511f8a176284ce4f92ed8c6e8d09c77f2")

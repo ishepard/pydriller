@@ -217,6 +217,18 @@ def test_ignore_add_whitespaces_and_changed_file():
     assert len(commit.modified_files) == 1
 
 
+def test_ignore_whitespaces_in_stats():
+    for commit in Repository('test-repos/whitespace',
+                             single="338a74ceae164784e216555d930210371279ba8e").traverse_commits():
+        assert commit.insertions > 0
+
+    for commit in Repository('test-repos/whitespace',
+                             skip_whitespaces=True,
+                             single="338a74ceae164784e216555d930210371279ba8e").traverse_commits():
+        assert commit.insertions == 0
+        assert commit.deletions == 0
+
+
 def test_clone_repo_to(tmp_path):
     dt2 = datetime(2018, 10, 20)
     url = "https://github.com/ishepard/pydriller.git"

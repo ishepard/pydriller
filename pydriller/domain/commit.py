@@ -714,6 +714,34 @@ class Commit:
         self._stats_cache = self._list_from_string(text)
         return self._stats_cache
 
+    @property
+    def patch(self) -> str:
+        """
+        Return the entire patch of the commit, as Git would show it
+        (equivalent to "git show <hash>" or a GitHub ".patch" URL).
+
+        NOTE: returns an empty string for merge commits. Merge commits
+        make up a meaningful fraction of commits in most repositories,
+        and combined-diff parsing for merges is not currently supported
+        by PyDriller (the same limitation applies to modified_files).
+        Check commit.merge before relying on this property if your use
+        case needs merge-commit patches too.
+
+        :return: str patch
+        """
+        git_repo = self._conf.get('git')
+
+        if len(self.parents) > 1:
+            return ''
+
+        if len(self.parents) == 0:
+            text = git_repo.repo.git.diff_tree(self.hash, "-p", "--root", "--")
+            return "\n".join(text.splitlines()[1:])
+
+        return git_repo.repo.git.diff(
+            self._c_object.parents[0].hexsha, self._c_object.hexsha
+        )
+
     def _list_from_string(self, text: str):
         total = {"insertions": 0, "deletions": 0, "lines": 0, "files": 0}
 

@@ -208,6 +208,15 @@ def test_branches_from_commit(repo: Git):
     assert 'b2' in commit.branches
 
 
+@pytest.mark.parametrize('repo', ['test-repos/tags'], indirect=True)
+def test_tags_from_commit(repo: Git):
+    commit = repo.get_commit('6bb9e2c6a8080e6b5b34e6e316c894b2ddbf7fcd')
+
+    assert commit.tags == {'tag1', 'tag2', 'tag3'}
+
+    commit = repo.get_commit('4638730126d40716e230c2040751a13153fb1556')
+    assert commit.tags == {'tag2', 'tag3'}
+
 @pytest.mark.parametrize('repo', ['test-repos/branches_not_merged'], indirect=True)
 def test_other_branches_with_merge(repo: Git):
     commit = repo.get_commit('7203c0b8220dcc7a59614bc7549799cd203ac072')

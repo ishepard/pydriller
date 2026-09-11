@@ -16,6 +16,7 @@ A Commit object has all the information of a Git commit, and much more. More spe
 * **committer_date** *(datetime)*: commit date
 * **committer_timezone** *(int)*: commit timezone (expressed in seconds from epoch)
 * **branches** *(List[str])*: List of branches that contain this commit
+* **tags** *(Set[str])*: Set of tags that contain this commit
 * **in_main_branch** *(Bool)*: True if the commit is in the main branch
 * **merge** *(Bool)*: True if the commit is a merge commit
 * **modified_files** *(List[ModifiedFile])*: list of modified files in the commit (see :ref:`modifiedfile_toplevel`)

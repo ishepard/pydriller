@@ -872,6 +872,19 @@ class Commit:
         return branches
 
     @property
+    def tags(self) -> Set[str]:
+        """
+        Return the set of tags that contain the commit.
+
+        :return: set(str) tags
+        """
+        c_git = Git(str(self._conf.get("path_to_repo")))
+        return {
+            tag for tag in c_git.tag("--contains", self.hash).split("\n")
+            if tag
+        }
+
+    @property
     def dmm_unit_size(self) -> Optional[float]:
         """
         Return the Delta Maintainability Model (DMM) metric value for the unit size property.

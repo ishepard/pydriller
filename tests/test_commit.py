@@ -381,6 +381,34 @@ def test_shortstats_add_and_del(repo: Git):
     assert c1.deletions == 1
 
 
+@pytest.mark.parametrize('repo', ['test-repos/diff'], indirect=True)
+def test_deleted_lines_starting_with_dashes(repo: Git):
+    c1 = repo.get_commit('156111a7a49d6906da0fedfda9cf1cf0e8c3f08b')
+    modification = next(mod for mod in c1.modified_files
+                        if mod.filename == 'reference.rst')
+
+    # the deleted block contains the reST underline "----------------", which
+    # git reports as a deleted line and not as the "--- a/file" patch header
+    assert modification.deleted_lines == 9
+    assert modification.deleted_lines == len(modification.diff_parsed['deleted'])
+    assert sum(mod.added_lines for mod in c1.modified_files) == c1.insertions
+    assert sum(mod.deleted_lines for mod in c1.modified_files) == c1.deletions
+
+
+@patch('git.diff.Diff')
+def test_added_and_deleted_lines_starting_with_plus_and_minus(mocked_diff):
+    mocked_diff.diff = (b'@@ -1,3 +1,3 @@\n'
+                        b' int main() {\n'
+                        b'---i;\n'
+                        b'+++i;\n'
+                        b' }\n')
+
+    modification = ModifiedFile(mocked_diff)
+
+    assert modification.added_lines == 1
+    assert modification.deleted_lines == 1
+
+
 @pytest.mark.parametrize('repo', ['test-repos/small_repo'], indirect=True)
 def test_patch_root_commit(repo: Git):
     commit = repo.get_commit('a88c84ddf42066611e76e6cb690144e5357d132c')

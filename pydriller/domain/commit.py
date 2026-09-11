@@ -243,9 +243,13 @@ class ModifiedFile:
 
         :return: int lines_added
         """
+        # GitPython consumes the "--- a/file" and "+++ b/file" headers while it
+        # parses the patch, so self.diff always starts at the first hunk header.
+        # Skipping lines that start with "+++" would drop added lines whose own
+        # content starts with "++", not a header.
         added_lines = 0
         for line in self.diff.replace("\r", "").split("\n"):
-            if line.startswith("+") and not line.startswith("+++"):
+            if line.startswith("+"):
                 added_lines += 1
         return added_lines
 
@@ -256,9 +260,11 @@ class ModifiedFile:
 
         :return: int lines_deleted
         """
+        # Same as in added_lines: the "--- a/file" header is never part of
+        # self.diff, so a deleted line starting with "--" must still be counted.
         deleted_lines = 0
         for line in self.diff.replace("\r", "").split("\n"):
-            if line.startswith("-") and not line.startswith("---"):
+            if line.startswith("-"):
                 deleted_lines += 1
         return deleted_lines
 

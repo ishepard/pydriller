@@ -17,7 +17,7 @@ from mock import patch
 import pytest
 import logging
 
-from pydriller.domain.commit import ModifiedFile
+from pydriller.domain.commit import ModificationType, ModifiedFile
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -43,6 +43,8 @@ def test_equal(repo: Git):
 
 @patch('git.diff.Diff')
 def test_filename(mocked_diff):
+    mocked_diff.new_file = False
+    mocked_diff.deleted_file = False
     mocked_diff.a_path = 'dspadini/pydriller/myfile.py'
     mocked_diff.b_path = 'dspadini/pydriller/mynewfile.py'
 
@@ -56,6 +58,8 @@ def test_filename(mocked_diff):
 
 @patch('git.diff.Diff')
 def test_metrics_python(mocked_diff):
+    mocked_diff.new_file = False
+    mocked_diff.deleted_file = False
     with open('test-repos/lizard/git_repository.py', 'rb') as f:
         content = f.read()
 
@@ -127,6 +131,8 @@ def test_changed_methods():
 
 @patch('git.diff.Diff')
 def test_metrics_cpp(mocked_diff):
+    mocked_diff.new_file = False
+    mocked_diff.deleted_file = False
     with open('test-repos/lizard/FileCPP.cpp', 'rb') as f:
         content = f.read()
 
@@ -145,6 +151,8 @@ def test_metrics_cpp(mocked_diff):
 
 @patch('git.diff.Diff')
 def test_metrics_java(mocked_diff):
+    mocked_diff.new_file = False
+    mocked_diff.deleted_file = False
     with open('test-repos/lizard/FileJava.java', 'rb') as f:
         content = f.read()
 
@@ -163,6 +171,8 @@ def test_metrics_java(mocked_diff):
 
 @patch('git.diff.Diff')
 def test_metrics_not_supported_file(mocked_diff):
+    mocked_diff.new_file = False
+    mocked_diff.deleted_file = False
     content = b'asd !&%@*&^@\n jjdkj'
 
     mocked_diff.b_blob.data_stream.read.return_value = content
@@ -478,3 +488,27 @@ def test_co_authors(repo: Git):
 
     assert c1.co_authors[0].name == "Somebody"
     assert c1.co_authors[0].email == "some@body.org"
+
+
+@pytest.mark.parametrize('repo', ['test-repos/diff'], indirect=True)
+def test_added_empty_file_has_no_old_path(repo: Git):
+    c1 = repo.get_commit('4be0402d466470ae7274c4244bad2712dfeda3ab')
+
+    added = [mod for mod in c1.modified_files
+             if mod.new_path == str(Path('pydriller/tests/integration/__init__.py'))]
+
+    assert len(added) == 1
+    assert added[0].change_type == ModificationType.ADD
+    assert added[0].old_path is None
+
+
+@pytest.mark.parametrize('repo', ['test-repos/diff'], indirect=True)
+def test_deleted_empty_file_has_no_new_path(repo: Git):
+    c1 = repo.get_commit('df51c5ef1ab01640971ececfd3354623bc67dc2e')
+
+    deleted = [mod for mod in c1.modified_files
+               if mod.old_path == str(Path('pydriller/tests/integration/__init__.py'))]
+
+    assert len(deleted) == 1
+    assert deleted[0].change_type == ModificationType.DELETE
+    assert deleted[0].new_path is None

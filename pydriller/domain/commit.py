@@ -275,6 +275,12 @@ class ModifiedFile:
 
         :return: str old_path
         """
+        # GitPython infers that an added file has no old path from the
+        # "--- /dev/null" line of the patch header. Git omits that header
+        # when the added file is empty, and GitPython then falls back to the
+        # path on the "diff --git a/X b/X" line, so a_path is wrongly set.
+        if self._c_diff.new_file:
+            return None
         if self._c_diff.a_path:
             return str(Path(self._c_diff.a_path))
         return None
@@ -286,6 +292,10 @@ class ModifiedFile:
 
         :return: str new_path
         """
+        # Same reason as in old_path: the "+++ /dev/null" line that marks a
+        # deletion is missing when the deleted file was empty.
+        if self._c_diff.deleted_file:
+            return None
         if self._c_diff.b_path:
             return str(Path(self._c_diff.b_path))
         return None

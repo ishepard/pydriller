@@ -30,6 +30,19 @@ from pydriller.utils.conf import Conf
 logger = logging.getLogger(__name__)
 
 
+class ShallowRepositoryError(Exception):
+    """Raised when a diff cannot be computed because the repository is a shallow clone."""
+
+
+def is_shallow(repo: Repo) -> bool:
+    """
+    Return True if the given git.Repo is a shallow clone (i.e. its history was
+    truncated with --depth), meaning older commits have parents that are not
+    present locally.
+    """
+    return repo.git.rev_parse("--is-shallow-repository").strip() == "true"
+
+
 class Git:
     """
     Class representing a repository in Git. It contains most of the logic of

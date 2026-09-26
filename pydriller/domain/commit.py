@@ -28,6 +28,7 @@ import hashlib
 import lizard
 import lizard_languages
 from git import Diff, Git, NULL_TREE
+from git.exc import GitCommandError
 from git.objects import Commit as GitCommit
 from git.objects.base import IndexObject
 
@@ -827,9 +828,22 @@ class Commit:
 
         if len(self.parents) == 1:
             # the commit has a parent
-            diff_index: Any = self._c_object.parents[0].diff(
-                other=self._c_object, paths=None, create_patch=True, **options
-            )
+            try:
+                diff_index: Any = self._c_object.parents[0].diff(
+                    other=self._c_object, paths=None, create_patch=True, **options
+                )
+            except GitCommandError as gce:
+                # In a shallow clone the parent is listed but its object is absent,
+                # so git fails with a bare "exit code(128) ... bad object <sha>".
+                # Imported here because pydriller.git imports this module.
+                from pydriller.git import ShallowRepositoryError, is_shallow
+
+                if is_shallow(self._c_object.repo):
+                    raise ShallowRepositoryError(
+                        f"Cannot compute the diff of commit {self.hash} because "
+                        f"{self.project_path} is a shallow clone"
+                    ) from gce
+                raise
         elif len(self.parents) > 1:
             # if it's a merge commit, the modified files of the commit are the
             # conflicts. This because if the file is not in conflict,

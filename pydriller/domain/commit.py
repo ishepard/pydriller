@@ -833,13 +833,10 @@ class Commit:
                     other=self._c_object, paths=None, create_patch=True, **options
                 )
             except GitCommandError as gce:
-                # In a shallow clone the parent is listed but its object is absent,
-                # so git fails with a bare "exit code(128) ... bad object <sha>".
-                # Imported here because pydriller.git imports this module.
-                from pydriller.git import ShallowRepositoryError, is_shallow
-
-                if is_shallow(self._c_object.repo):
-                    raise ShallowRepositoryError(
+                # In a shallow clone the parent is listed but its object is absent
+                c_git = Git(self._conf.get("path_to_repo"))
+                if c_git.rev_parse("--is-shallow-repository").strip() == "true":
+                    raise Exception(
                         f"Cannot compute the diff of commit {self.hash} because "
                         f"{self.project_path} is a shallow clone"
                     ) from gce

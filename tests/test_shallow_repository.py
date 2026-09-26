@@ -15,7 +15,7 @@ import pytest
 from git.exc import GitCommandError
 from git.objects.commit import Commit as GitCommit
 
-from pydriller import Git, ShallowRepositoryError
+from pydriller import Git
 
 
 @pytest.fixture
@@ -29,7 +29,7 @@ def repo(request):
 def test_shallow_clone_raises_informative_error(repo: Git):
     commit = repo.get_head()
 
-    with pytest.raises(ShallowRepositoryError) as exc_info:
+    with pytest.raises(Exception) as exc_info:
         _ = commit.modified_files
 
     assert "shallow clone" in str(exc_info.value)
@@ -55,5 +55,4 @@ def test_other_git_errors_are_not_relabelled(repo: Git, monkeypatch):
     with pytest.raises(GitCommandError) as exc_info:
         _ = commit.modified_files
 
-    assert not isinstance(exc_info.value, ShallowRepositoryError)
     assert "something else entirely" in str(exc_info.value)

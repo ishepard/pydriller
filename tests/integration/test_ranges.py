@@ -175,6 +175,27 @@ def test_from_and_to_commit_with_merge_commit(repository_mining_cc_complex, expe
     assert len(repository_mining_cc_complex) == expected_commits
 
 
+# Ancestry, not the dates, decides which of from_commit and to_commit comes
+# first. In empty_modifications, e4f1f53 and its child 9fa5674 have the same
+# author and committer date. In since_as_filter, 020ec70 has a committer date
+# about a year before the one of its parent 0f72692; the last case passes the
+# two the other way round.
+@pytest.mark.parametrize('path,from_commit,to_commit,expected_commits', [
+    ('test-repos/empty_modifications/',
+     'e4f1f53ec3766aae702e1c901ce5b31dd615c78e', '9fa567406c64f1685481a7f663dab7ef7a27d638',
+     ['e4f1f53ec3766aae702e1c901ce5b31dd615c78e', '9fa567406c64f1685481a7f663dab7ef7a27d638']),
+    ('test-repos/since_as_filter/',
+     '0f726924f96621e4965039123098ba83e39ffba6', '020ec703212950571e3ad097e87262ddba1da740',
+     ['0f726924f96621e4965039123098ba83e39ffba6', '020ec703212950571e3ad097e87262ddba1da740']),
+    ('test-repos/since_as_filter/',
+     '020ec703212950571e3ad097e87262ddba1da740', '0f726924f96621e4965039123098ba83e39ffba6',
+     ['0f726924f96621e4965039123098ba83e39ffba6', '020ec703212950571e3ad097e87262ddba1da740']),
+])
+def test_from_and_to_commit_with_dates_out_of_order(path, from_commit, to_commit, expected_commits):
+    commits = Repository(path, from_commit=from_commit, to_commit=to_commit).traverse_commits()
+    assert [commit.hash for commit in commits] == expected_commits
+
+
 # FROM AND TO TAG
 @pytest.mark.parametrize('repository_mining_tt,expected_commits', [
     ((None, 'v1.4'), 3),

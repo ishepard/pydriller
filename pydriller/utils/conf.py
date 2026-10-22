@@ -130,9 +130,19 @@ class Conf:
         Check that from_commit comes before to_commit
         """
         if self.get('from_commit') and self.get('to_commit'):
-            chronological_order = self._is_commit_before(
-                self.get('git').get_commit(self.get('from_commit')),
-                self.get('git').get_commit(self.get('to_commit')))
+            git = self.get('git')
+            from_commit = git.get_commit(self.get('from_commit'))
+            to_commit = git.get_commit(self.get('to_commit'))
+
+            # Dates can tie or go backwards along the history (commits made in
+            # the same second, rebases, clock skew), so when one commit is an
+            # ancestor of the other, that alone decides the order.
+            if git.repo.is_ancestor(from_commit.hash, to_commit.hash):
+                chronological_order = True
+            elif git.repo.is_ancestor(to_commit.hash, from_commit.hash):
+                chronological_order = False
+            else:
+                chronological_order = self._is_commit_before(from_commit, to_commit)
 
             if not chronological_order:
                 self._swap_commit_fiters()
